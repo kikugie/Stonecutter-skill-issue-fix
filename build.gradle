@@ -8,8 +8,11 @@ repositories {
     gradlePluginPortal()
 }
 
-version = '1.5-dev.5'
+version = '1.5-dev.6'
 group = 'io.shcm.shsupercm.fabric'
+
+def file = project.file("latest.version")
+file.write(version)
 
 dependencies {
     compileOnly project('idea-integration')

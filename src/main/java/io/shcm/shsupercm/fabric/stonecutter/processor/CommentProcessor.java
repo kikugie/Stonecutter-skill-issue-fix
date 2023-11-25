@@ -53,6 +53,8 @@ public class CommentProcessor {
     private void addExpression(String expression, String prev) throws StonecutterSyntaxException, IOException {
         if (expression.contains(START))
             throw new StonecutterSyntaxException("Expression wasn't correctly closed: " + expression);
+        // Regex token
+        if (expression.startsWith("$")) return;
 
         ExpressionType type = ExpressionType.of(expression);
         switch (type) {
