@@ -50,4 +50,9 @@ public class ProcessorTest {
     public void testIfElseChain() {
         processDirectory("ifelsechain");
     }
+
+    @Test
+    public void testNewSyntax() {
+        processDirectory("newsyntax");
+    }
 }

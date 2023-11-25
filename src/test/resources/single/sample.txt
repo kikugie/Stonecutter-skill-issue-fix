@@ -17,3 +17,6 @@ unrelated code
 /*? false ?*/
 /*commented code*/
 unrelated code
+
+// same line
+/*? false ?*/ code
