@@ -37,6 +37,8 @@ public class CommentProcessor {
         while (true) {
             if (!next()) break;
         }
+        if (!conditions.isEmpty())
+            throw new StonecutterSyntaxException("Expression have not been closed: " + conditions.peek().getLast());
     }
 
     private boolean next() throws IOException, StonecutterSyntaxException {
@@ -66,7 +68,7 @@ public class CommentProcessor {
         String code = readRegex("\\S\\s*(\\r\\n|\\r|\\n)", true);
         if (code == null)
             throw new StonecutterSyntaxException("No end of line found. How peculiar");
-        String trimmedCode = code.replaceAll("(\\r\\n|\\r|\\n)", "");
+        String trimmedCode = code.replaceAll("(\\r\\n|\\r|\\n)", "").trim();
 
         processCode(enabled, trimmedCode);
     }
