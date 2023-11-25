@@ -209,8 +209,8 @@ public class CommentProcessor {
 
     public enum ExpressionType {
         SINGLE(String::trim),
-        OPENER(str -> str.substring(0, str.length() - 2).trim()),
-        EXTENSION(str -> str.substring(1, str.length() - 2).trim()),
+        OPENER(str -> str.substring(0, str.length() - 1).trim()),
+        EXTENSION(str -> str.substring(1, str.length() - 1).trim()),
         CLOSER(str -> str.substring(1).trim());
 
         private final UnaryOperator<String> formatter;
