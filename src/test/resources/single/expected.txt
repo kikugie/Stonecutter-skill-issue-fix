@@ -19,4 +19,4 @@ unrelated code
 unrelated code
 
 // same line
-/*? false ?*//* code*/
+/*? false ?*/ /*code*/

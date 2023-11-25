@@ -76,6 +76,10 @@ public class StonecutterBuildGradle {
         return this.version;
     }
 
+    public String active() {
+        return setup.current();
+    }
+
     public Iterable<String> versions() {
         return setup.versions();
     }

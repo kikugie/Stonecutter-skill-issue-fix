@@ -33,7 +33,9 @@ To use the plugin's editor, hit `Ctrl`+`Shift`+`S` while working on a stonecutte
 Look at the [commits](https://github.com/kikugie/Stonecutter-skill-issue-fix/commits/main) for a changelog.
 
 ## Planned
-- [ ] Make a wiki and actually explaining how to operate Stonecutter
+- [ ] Custom condition parsers
+- [ ] Better syntax error reports
+- [ ] Cross-version remapper
 - [ ] Intellij Integration: Add easy way of using the tokenizer
 - [x] Make the Intellij IDEA plugin easier to install
 - [x] Add more integration features to the Intellij IDEA plugin(switch versions, insert versioned code, etc..)

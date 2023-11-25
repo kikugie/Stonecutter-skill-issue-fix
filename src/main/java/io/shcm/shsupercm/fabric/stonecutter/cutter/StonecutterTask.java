@@ -1,6 +1,7 @@
 package io.shcm.shsupercm.fabric.stonecutter.cutter;
 
 import io.shcm.shsupercm.fabric.stonecutter.StonecutterBuildGradle;
+import io.shcm.shsupercm.fabric.stonecutter.StonecutterSettingsGradle;
 import io.shcm.shsupercm.fabric.stonecutter.processor.ExpressionProcessor;
 import io.shcm.shsupercm.fabric.stonecutter.processor.expression.McVersionExpression;
 import io.shcm.shsupercm.fabric.stonecutter.version.FAPIVersionChecker;
@@ -20,6 +21,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public abstract class StonecutterTask extends DefaultTask {
     @Input public abstract Property<File> getInputDir();
     @Input public abstract Property<File> getOutputDir();
