@@ -55,4 +55,9 @@ public class ProcessorTest {
     public void testNewSyntax() {
         processDirectory("newsyntax");
     }
+
+    @Test
+    public void testNested() {
+        processDirectory("nested");
+    }
 }
