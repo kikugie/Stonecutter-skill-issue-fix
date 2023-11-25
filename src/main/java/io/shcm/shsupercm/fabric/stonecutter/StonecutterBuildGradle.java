@@ -55,6 +55,8 @@ public class StonecutterBuildGradle {
                 for (SourceSet sourceSet : (SourceSetContainer) Objects.requireNonNull(project.property("sourceSets"))) {
                     sourceSet.getJava().srcDir(new File(project.getBuildDir(), "chiseledSrc/" + sourceSet.getName() + "/java"));
                     sourceSet.getResources().srcDir(new File(project.getBuildDir(), "chiseledSrc/" + sourceSet.getName() + "/resources"));
+
+                    sourceSet.getJava().srcDir(new File(project.getBuildDir(), "chiseledSrc/" + sourceSet.getName() + "/kotlin"));
                 }
                 return;
             }
@@ -63,6 +65,8 @@ public class StonecutterBuildGradle {
                 for (SourceSet sourceSet : (SourceSetContainer) Objects.requireNonNull(project.property("sourceSets"))) {
                     sourceSet.getJava().srcDir("../../src/" + sourceSet.getName() + "/java");
                     sourceSet.getResources().srcDir("../../src/" + sourceSet.getName() + "/resources");
+
+                    sourceSet.getJava().srcDir("../../src/" + sourceSet.getName() + "/kotlin");
                 }
             }
         } catch (MissingPropertyException ignored) { }

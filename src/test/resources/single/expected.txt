@@ -1,0 +1,19 @@
+// apply comment
+/*? false ?*/
+/*code to comment*/
+unrelated code
+
+// remove comment
+/*? true ?*/
+commented code
+unrelated code
+
+// keep uncommented
+/*? true ?*/
+code
+unrelated code
+
+// keep comment
+/*? false ?*/
+/*commented code*/
+unrelated code

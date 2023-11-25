@@ -8,16 +8,44 @@ repositories {
     gradlePluginPortal()
 }
 
-version = '1.5'
+version = '1.5-dev.1'
 group = 'io.shcm.shsupercm.fabric'
 
 dependencies {
     compileOnly project('idea-integration')
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 jar {
     from {
         project('idea-integration').sourceSets.main.output
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "kikugieMaven"
+            url = "https://maven.kikugie.dev/third-party"
+            credentials(PasswordCredentials)
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
+
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = group
+            artifactId = "stonecutter"
+            version = version
+            artifact jar
+        }
     }
 }
 

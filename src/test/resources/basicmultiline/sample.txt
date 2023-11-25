@@ -1,0 +1,13 @@
+// apply comment
+/*? false {?*/
+1
+2
+/*? } ?*/
+unrelated code
+
+// remove comment
+/*? true {?*//*
+1
+2
+*//*? } ?*/
+unrelated code

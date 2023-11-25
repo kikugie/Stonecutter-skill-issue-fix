@@ -1,5 +1,7 @@
 package io.shcm.shsupercm.fabric.stonecutter.cutter;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -21,23 +23,19 @@ public class FileCutter {
     public void write(File outputFile) throws Exception {
         StringBuilder transformedContents = new StringBuilder();
 
-        try (Reader oldContents = Files.newBufferedReader(file.toPath(), StandardCharsets.ISO_8859_1)) {
+        try (Reader oldContents = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
             applyVersionedCodeComments(oldContents, transformedContents);
             stonecutter.tokenRemapper().apply(file, transformedContents);
         }
 
         outputFile.delete();
-        Files.writeString(outputFile.toPath(), transformedContents, StandardCharsets.ISO_8859_1, StandardOpenOption.CREATE);
+        Files.writeString(outputFile.toPath(), transformedContents, StandardCharsets.UTF_8, StandardOpenOption.CREATE);
     }
 
     private void applyVersionedCodeComments(Reader input, StringBuilder output) throws StonecutterSyntaxException, IOException {
         Deque<Boolean> conditions = new LinkedList<>();
-        while (read("/*?", input, output) != null) {
-            String expression = read("?*/", input, output);
-            if (expression == null)
-                throw new StonecutterSyntaxException("Expected ?*/ to close stonecutter expression");
-            expression = expression.trim();
-
+        while (getExpressionStart(input, output) != null) {
+            String expression = getExpressionEnd(input, output);
             if (expression.startsWith("$token"))
                 continue;
 
@@ -80,6 +78,17 @@ public class FileCutter {
                     output.append("/*");
             }
         }
+    }
+
+    private static @Nullable String getExpressionStart(Reader input, StringBuilder output) throws IOException {
+        return read("/*?", input, output);
+    }
+
+    private static String getExpressionEnd(Reader input, StringBuilder output) throws StonecutterSyntaxException, IOException {
+        String expression = read("?*/", input, output);
+        if (expression == null)
+            throw new StonecutterSyntaxException("Expected ?*/ to close stonecutter expression");
+        return expression.trim();
     }
 
     private static String read(String match, Reader input, StringBuilder output) throws IOException {
