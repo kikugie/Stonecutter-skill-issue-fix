@@ -20,6 +20,7 @@ public class StonecutterProjectSetups {
         private final String vcsVersion;
         private String current;
         private final Set<String> chiseledTasks = new HashSet<>();
+        private boolean debug = false;
 
         private Setup(StonecutterSettingsGradle.StonecutterProjectBuilder setupBuilder) {
             this.versions = setupBuilder.versions;
@@ -52,6 +53,14 @@ public class StonecutterProjectSetups {
                     return true;
 
             return false;
+        }
+
+        public void setDebug(boolean value) {
+            this.debug = value;
+        }
+
+        public boolean isDebug() {
+            return debug;
         }
     }
 }

@@ -13,6 +13,7 @@ import org.gradle.api.tasks.TaskAction;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -26,6 +27,7 @@ public abstract class StonecutterTask extends DefaultTask {
     @Input public abstract Property<StonecutterBuildGradle.Version> getToVersion();
     @Input public abstract Property<Predicate<File>> getFileFilter(); { getFileFilter().convention(f -> true); }
     @Input public abstract Property<Function<Project, VersionChecker>> getVersionChecker(); { getVersionChecker().convention(FAPIVersionChecker::create); }
+    @Input public abstract Property<Boolean> getDebug(); { getDebug().convention(false); }
 
     @Nullable
     private ExpressionProcessor processor;
@@ -36,7 +38,7 @@ public abstract class StonecutterTask extends DefaultTask {
     public void run() {
         if (!getInputDir().isPresent() || !getOutputDir().isPresent() || !getFromVersion().isPresent() || !getToVersion().isPresent())
             throw new IllegalArgumentException();
-        this.processor = new ExpressionProcessor();
+        this.processor = new ExpressionProcessor(Collections.emptyList(), getDebug().get());
 
         try {
             final VersionChecker checker = getVersionChecker().get().apply(getProject());

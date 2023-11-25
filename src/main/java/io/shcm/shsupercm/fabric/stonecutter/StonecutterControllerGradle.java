@@ -35,6 +35,7 @@ public class StonecutterControllerGradle {
                 StonecutterTask task = afterEvaluate.getTasks().create("Set active version to " + versionData.version(), StonecutterTask.class);
                 task.setGroup("stonecutter");
 
+                task.getDebug().set(setup.isDebug());
                 task.getFromVersion().set(currentVersionData);
                 task.getToVersion().set(versionData);
                 task.getInputDir().set(afterEvaluate.file("./src"));
@@ -55,6 +56,10 @@ public class StonecutterControllerGradle {
                 });
             }
         });
+    }
+
+    public void debug(boolean value) {
+        setup.setDebug(value);
     }
 
     public void active(String current) {

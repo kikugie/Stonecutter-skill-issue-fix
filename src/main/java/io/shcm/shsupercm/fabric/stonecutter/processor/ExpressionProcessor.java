@@ -19,10 +19,6 @@ public class ExpressionProcessor {
     public static final Expression ELSE = (p, e) -> e.startsWith("else") ? ExpressionResult.of(!p) : INVALID;
     private final List<Expression> checkers = new ArrayList<>();
 
-    public ExpressionProcessor() {
-        this(Collections.emptyList(), false);
-    }
-
     public ExpressionProcessor(Collection<Expression> checkers, boolean debug) {
         if (debug) this.checkers.add(BASIC);
         this.checkers.addAll(checkers);
