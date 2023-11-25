@@ -133,7 +133,7 @@ public class CommentProcessor {
 
         int current;
         while ((current = input.read()) != -1) {
-            char ch = (char) current;
+            String ch = Character.toString(current);
             buffer.append(ch);
             output.append(ch);
 
@@ -151,7 +151,7 @@ public class CommentProcessor {
 
         int current;
         while ((current = input.read()) != -1) {
-            char ch = (char) current;
+            String ch = Character.toString(current);
             buffer.append(ch);
             output.append(ch);
 

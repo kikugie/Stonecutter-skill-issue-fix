@@ -92,7 +92,7 @@ public abstract class StonecutterTask extends DefaultTask {
         return this.remapTokenizer;
     }
 
-    public ExpressionProcessor getProcessor() {
+    public ExpressionProcessor processor() {
         return processor;
     }
 }

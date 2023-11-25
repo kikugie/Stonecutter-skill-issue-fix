@@ -20,12 +20,12 @@ public class FileCutter {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void write(File outputFile) throws Exception {
         StringBuilder transformedContents;
-        try (Reader oldContents = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
-            transformedContents = CommentProcessor.process(oldContents, stonecutter.getProcessor());
+        try (Reader oldContents = Files.newBufferedReader(file.toPath(), StandardCharsets.ISO_8859_1)) {
+            transformedContents = CommentProcessor.process(oldContents, stonecutter.processor());
             stonecutter.tokenRemapper().apply(file, transformedContents);
         }
 
         outputFile.delete();
-        Files.writeString(outputFile.toPath(), transformedContents, StandardCharsets.UTF_8, StandardOpenOption.CREATE);
+        Files.writeString(outputFile.toPath(), transformedContents, StandardCharsets.ISO_8859_1, StandardOpenOption.CREATE);
     }
 }

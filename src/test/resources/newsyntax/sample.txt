@@ -3,3 +3,7 @@ code
 
 /*? false */
 code
+
+/*? false {*/
+code
+/*?}*/
