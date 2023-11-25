@@ -1,7 +1,7 @@
 package io.shcm.shsupercm.fabric.stonecuttertest;
 
-import io.shcm.shsupercm.fabric.stonecutter.cutter.StonecutterSyntaxException;
 import io.shcm.shsupercm.fabric.stonecutter.processor.CommentProcessor;
+import io.shcm.shsupercm.fabric.stonecutter.processor.ExpressionProcessor;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
@@ -19,7 +19,7 @@ public class ProcessorTest {
             Reader sample = getResource(dir + "/sample.txt");
             String expected = getResource(dir + "/expected.txt").lines().reduce("", (acc, line) -> acc + line + "\r\n");
 
-            String result = CommentProcessor.process(sample).toString();
+            String result = CommentProcessor.process(sample, ExpressionProcessor.TEST).toString();
             assertEquals(expected.trim(), result.trim());
         } catch (Exception e) {
             fail(e);

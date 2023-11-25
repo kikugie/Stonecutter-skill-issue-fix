@@ -18,16 +18,18 @@ public class CommentProcessor {
     private final Stack<LinkedList<Token>> conditions = new Stack<>();
     private final Reader input;
     private final StringBuilder output;
+    private final ExpressionProcessor processor;
 
-    public CommentProcessor(Reader input, StringBuilder output) {
+    public CommentProcessor(Reader input, StringBuilder output, ExpressionProcessor processor) {
         this.input = input;
         this.output = output;
+        this.processor = processor;
     }
 
-    public static StringBuilder process(Reader input) throws Exception {
+    public static StringBuilder process(Reader input, ExpressionProcessor processor) throws Exception {
         StringBuilder builder = new StringBuilder();
-        CommentProcessor processor = new CommentProcessor(input, builder);
-        processor.process();
+        CommentProcessor commentProcessor = new CommentProcessor(input, builder, processor);
+        commentProcessor.process();
         return builder;
     }
 
@@ -60,7 +62,7 @@ public class CommentProcessor {
     }
 
     private void single(String expression) throws StonecutterSyntaxException, IOException {
-        boolean enabled = processExpression(true, ExpressionType.SINGLE.format(expression));
+        boolean enabled = processExpression(ExpressionType.SINGLE.format(expression));
         String code = readRegex("\\S\\s*(\\r\\n|\\r|\\n)", true);
         if (code == null)
             throw new StonecutterSyntaxException("No end of line found. How peculiar");
@@ -70,7 +72,7 @@ public class CommentProcessor {
     }
 
     private void opener(String expression) throws StonecutterSyntaxException {
-        Token token = new Token(ExpressionType.OPENER, processExpression(true, ExpressionType.OPENER.format(expression)));
+        Token token = new Token(ExpressionType.OPENER, processExpression(ExpressionType.OPENER.format(expression)));
         LinkedList<Token> list = new LinkedList<>();
         list.add(token);
         conditions.push(list);
@@ -104,8 +106,12 @@ public class CommentProcessor {
         }
     }
 
+    private boolean processExpression(String expression) throws StonecutterSyntaxException {
+        return processExpression(false, expression);
+    }
+
     private boolean processExpression(boolean previous, String expression) throws StonecutterSyntaxException {
-        return ExpressionProcessor.testStatic(previous, expression);
+        return processor.test(previous, expression);
     }
 
     private String readExpression() throws StonecutterSyntaxException, IOException {
