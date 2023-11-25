@@ -23,6 +23,8 @@ public class FileCutter {
         try (Reader oldContents = Files.newBufferedReader(file.toPath(), StandardCharsets.ISO_8859_1)) {
             transformedContents = CommentProcessor.process(oldContents, stonecutter.processor());
             stonecutter.tokenRemapper().apply(file, transformedContents);
+        } catch (Exception e) {
+            throw new Exception("Failed to process file %s: %s".formatted(outputFile.getCanonicalPath(), e.getMessage()), e);
         }
 
         outputFile.delete();
