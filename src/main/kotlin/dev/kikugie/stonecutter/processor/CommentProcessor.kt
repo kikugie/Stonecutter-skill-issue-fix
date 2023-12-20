@@ -43,21 +43,20 @@ class CommentProcessor(
     }
 
     private fun opener(expr: String) {
-        if (!expr.startsWith("if", true))
-            throw error("Only IF statement is allowed for openers: $expr")
+        val hasIf = expr.startsWith("if", true)
         val last = tokens.lastOrNull()?.type
         if (last == OPENER || last == EXTENSION) throw error("Statements can't be nested: $expr")
         val code = read(START) ?: throw error("Conditional block is not closed")
         if ("/*" in code) throw error("Nested comments are not allowed yet, sorry")
-        processCode(code, testExpression(expr, 2, OPENER))
+        processCode(code, testExpression(expr, if (hasIf) 2 else 0, OPENER))
     }
 
     private fun extension(expr: String) {
         val last = tokens.lastOrNull()?.type
         if (last != OPENER && last != EXTENSION) throw error("Statement must follow a condition: $expr")
-        if (expr.startsWith("else", true))
+        if (expr.equals("else", true))
             elseExtension(expr)
-        else if (expr.startsWith("elif", true))
+        if (expr.startsWith("else", true) || expr.startsWith("elif", true))
             elifExtension(expr)
         else throw error("Invalid expression $expr, must be ELSE or ELIF")
     }
@@ -70,8 +69,6 @@ class CommentProcessor(
     }
 
     private fun elseExtension(expression: String) {
-        if (!expression.equals("else", true))
-            throw error("ELSE statements can't have a condition, use ELIF instead")
         val code = read(START) ?: throw error("Conditional block is not closed")
         if ("/*" in code) throw error("Nested comments are not allowed yet, sorry")
         (!tokens.last().result).also {
@@ -82,7 +79,7 @@ class CommentProcessor(
 
     private fun elifExtension(expression: String) {
         if (expression.equals("elif", true))
-            throw error("ELIF statement without a condition, use ELSE instead")
+            throw error("ELIF statement without a condition")
         val code = read(START) ?: throw error("Conditional block is not closed")
         if ("/*" in code) throw error("Nested comments are not allowed yet, sorry")
         (!tokens.last().result && testExpression(expression, 4, EXTENSION)).also { processCode(code, it) }
