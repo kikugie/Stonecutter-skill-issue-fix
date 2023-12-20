@@ -13,11 +13,11 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.io.path.exists
-import kotlin.io.path.isDirectory
-import kotlin.io.path.listDirectoryEntries
+import java.nio.file.StandardOpenOption
+import kotlin.io.path.*
 
 @Suppress("LeakingThis")
 abstract class StonecutterTask : DefaultTask() {
@@ -56,13 +56,18 @@ abstract class StonecutterTask : DefaultTask() {
     }
 
     @TaskAction
+    @ExperimentalPathApi
     fun run() {
         if (!input.isPresent || !output.isPresent || !fromVersion.isPresent || !toVersion.isPresent)
             throw IllegalArgumentException("[Stonecutter] StonecutterTask is not fully initialized")
         processor = ConditionProcessor(collectExpressions())
         // TODO: Regex tokenizer
 
-        transform(input.get(), input.get(), output.get())
+        try {
+            transform(input.get(), output.get())
+        } catch (e: Exception) {
+            throw RuntimeException("[Stonecutter] Failed to transform file:\n${e.message}", e)
+        }
     }
 
     private fun collectExpressions(): List<Expression> {
@@ -78,18 +83,34 @@ abstract class StonecutterTask : DefaultTask() {
         return exprs
     }
 
-    private fun transform(file: Path, inputRoot: Path, outputRoot: Path) {
-        if (!file.exists()) return
 
-        if (file.isDirectory())
-            file.listDirectoryEntries().forEach { transform(it, inputRoot, outputRoot) }
-        else if (fileFilter.get()(file)) {
-            var output = file
-            if (inputRoot != outputRoot) {
-                output = outputRoot.resolve(inputRoot.relativize(output))
-                Files.createDirectories(output.parent)
+    @ExperimentalPathApi
+    private fun transform(inputRoot: Path, outputRoot: Path): Boolean {
+        if (inputRoot.notExists()) return false
+        val processed = mutableListOf<Pair<Path, CharSequence>>()
+        // Files without changes will be skipped or copied directly
+        val matching = mutableListOf<Pair<Path, Path>>()
+        // Collect files before writing in case an exception is thrown
+        for (file in inputRoot.walk().filter(fileFilter.get())) {
+            val out = if (inputRoot == outputRoot) file
+            else outputRoot.resolve(inputRoot.relativize(file)).also {
+                Files.createDirectories(file.parent)
             }
-            FileCutter(file, this).write(output)
+            val result = FileCutter.process(file, this)
+            if (result == null) {
+                matching += file to out
+                continue
+            }
+            processed += out to result
         }
+        matching.filter { it.first != it.second }.forEach { (inFile, outFile) ->
+            Files.createDirectories(outFile.parent)
+            inFile.copyTo(outFile, true)
+        }
+        processed.forEach { (file, content) ->
+            if (file.notExists()) Files.createDirectories(file.parent)
+            file.writeText(content, StandardCharsets.ISO_8859_1, StandardOpenOption.CREATE)
+        }
+        return true
     }
 }

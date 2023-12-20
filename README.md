@@ -15,7 +15,7 @@ Preprocessor/JCP inspired multi-version environment manager
 ### Processor
 - [x] Comment formatter
 - [x] Custom formatter conditions
-- [ ] Safe error handling
+- [x] Safe error handling
 - [ ] Regex find-and-replace
 - [ ] Versioned file patcher
 

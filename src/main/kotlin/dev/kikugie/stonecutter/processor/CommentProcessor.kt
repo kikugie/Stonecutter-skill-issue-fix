@@ -12,12 +12,14 @@ class CommentProcessor(
     private val tokens = ArrayDeque<Entry>()
     private val line: Int
         get() = output.count { it == '\n' } + 1
+    private var modified = false
 
     @Suppress("ControlFlowWithEmptyBody")
-    fun run() {
-        read(START) ?: return // No expressions in this file
+    fun run(): Boolean {
+        read(START) ?: return false // No expressions in this file
         while (next()) {
         }
+        return modified
     }
 
     private fun next(): Boolean {
@@ -150,6 +152,7 @@ class CommentProcessor(
             "/*$code*/"
         else return
 
+        modified = true
         val index = output.lastIndexOf(code)
         if (index != -1)
             output.replace(index, index + code.length, result)
@@ -172,11 +175,10 @@ class CommentProcessor(
         val NEW_LINE = "(\\r\\n|\\r|\\n)".toRegex()
         val CODE_LINE: Pattern = Pattern.compile("\\S\\s*$NEW_LINE")
 
-        fun process(input: Reader, processor: ConditionProcessor): StringBuilder {
+        fun process(input: Reader, processor: ConditionProcessor): Pair<StringBuilder, Boolean> {
             val builder = StringBuilder()
             val processor2 = CommentProcessor(input, builder, processor)
-            processor2.run()
-            return builder
+            return builder to processor2.run()
         }
     }
 }

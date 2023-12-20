@@ -2,7 +2,6 @@ package dev.kikugie.stonecutter.test
 
 import dev.kikugie.stonecutter.processor.CommentProcessor
 import dev.kikugie.stonecutter.processor.ConditionProcessor
-import dev.kikugie.stonecutter.processor.Expression
 import java.io.FileNotFoundException
 import kotlin.test.Test
 import kotlin.test.junit5.JUnit5Asserter.assertEquals
@@ -15,7 +14,7 @@ object ProcessorTest {
         try {
             val sample = resource("samples/$file")
             val expected = resource("expected/$file").readText()
-            val result = CommentProcessor.process(sample, ConditionProcessor.TEST).toString()
+            val result = CommentProcessor.process(sample, ConditionProcessor.TEST).first.toString()
 
             assertEquals("Incorrect processing", expected, result)
         } catch (e: Exception) {
