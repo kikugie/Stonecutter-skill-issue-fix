@@ -1,5 +1,0 @@
-token ('test_token') {
-    read ~/is (?<word>\S+) 1\.20\.1/
-    write 'is ${word} 1.20.1'
-    defaultEnabled true
-}
