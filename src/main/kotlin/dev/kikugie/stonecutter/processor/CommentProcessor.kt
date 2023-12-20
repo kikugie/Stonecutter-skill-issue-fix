@@ -47,7 +47,6 @@ class CommentProcessor(
         val last = tokens.lastOrNull()?.type
         if (last == OPENER || last == EXTENSION) throw error("Statements can't be nested: $expr")
         val code = read(START) ?: throw error("Conditional block is not closed")
-        if ("/*" in code) throw error("Nested comments are not allowed yet, sorry")
         processCode(code, testExpression(expr, if (hasIf) 2 else 0, OPENER))
     }
 
@@ -70,7 +69,6 @@ class CommentProcessor(
 
     private fun elseExtension(expression: String) {
         val code = read(START) ?: throw error("Conditional block is not closed")
-        if ("/*" in code) throw error("Nested comments are not allowed yet, sorry")
         (!tokens.last().result).also {
             processCode(code, it)
             tokens += Entry(EXTENSION, it)
@@ -81,7 +79,6 @@ class CommentProcessor(
         if (expression.equals("elif", true))
             throw error("ELIF statement without a condition")
         val code = read(START) ?: throw error("Conditional block is not closed")
-        if ("/*" in code) throw error("Nested comments are not allowed yet, sorry")
         (!tokens.last().result && testExpression(expression, 4, EXTENSION)).also { processCode(code, it) }
     }
 
