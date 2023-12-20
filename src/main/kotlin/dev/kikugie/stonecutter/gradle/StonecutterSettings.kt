@@ -5,8 +5,8 @@ import org.gradle.api.GradleException
 import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings
 import java.io.File
+import java.nio.file.Files
 import java.nio.file.StandardOpenOption
-import kotlin.io.path.Path
 import kotlin.io.path.notExists
 import kotlin.io.path.writeText
 
@@ -26,12 +26,24 @@ import kotlin.io.path.writeText
  * ```
  * @see ProjectBuilder
  */
-class StonecutterSettings(private val settings: Settings) {
+@Suppress("unused")
+open class StonecutterSettings(private val settings: Settings) {
     private val projects: ProjectSetup.SetupContainer =
         settings.gradle.extensions.create("stonecutterProjects", ProjectSetup.SetupContainer::class.java)
 
     private var shared = ProjectBuilder.DEFAULT
     private var build = "build.gradle"
+
+    init {
+        try {
+            var stonecutter = File(settings.rootDir, ".gradle/stonecutter")
+            stonecutter.mkdirs()
+            val thisJar = File(javaClass.getProtectionDomain().codeSource.location.toURI())
+            stonecutter = File(stonecutter, thisJar.getName())
+            if (!stonecutter.exists()) Files.copy(thisJar.toPath(), stonecutter.toPath())
+        } catch (ignored: Exception) {
+        }
+    }
 
     fun shared(builder: Action<ProjectBuilder>) {
         shared = ProjectBuilder(shared, builder)
@@ -39,6 +51,12 @@ class StonecutterSettings(private val settings: Settings) {
 
     fun build(file: String) {
         build = file
+    }
+
+    fun create(vararg projects: ProjectDescriptor) {
+        for (proj in projects) create(proj) {
+            if (versions.isEmpty()) throw GradleException("[Stonecutter] To create a stonecutter project without a configuration element, make use of shared default values")
+        }
     }
 
     fun create(project: ProjectDescriptor, action: Action<ProjectBuilder>) {
@@ -51,25 +69,19 @@ class StonecutterSettings(private val settings: Settings) {
         if (!projects.register(project.path, builder))
             throw IllegalArgumentException("[Stonecutter] Project ${project.path} is already registered")
 
-        try {
-            project.buildFileName = "stonecutter.gradle"
-            val file = Path("stonecutter.gradle")
-            if (file.notExists()) file.writeText(
-                createHeader(vcs),
-                Charsets.UTF_8,
-                StandardOpenOption.CREATE
-            )
-        } catch (e: Exception) {
-            throw RuntimeException(e)
-        }
-
+        project.buildFileName = "stonecutter.gradle"
+        val file = project.projectDir.resolve("stonecutter.gradle").toPath()
+        if (file.notExists()) file.writeText(
+            createHeader(vcs),
+            Charsets.UTF_8,
+            StandardOpenOption.CREATE
+        )
         builder.versions.forEach { createProject(project, it) }
     }
 
     private fun createHeader(vcs: ProjectName) = """
                 plugins.apply "dev.kikugie.stonecutter"
                 stonecutter.active "$vcs"
-                stonecutter.vcs "$vcs"
                 //-------- !DO NOT EDIT ABOVE THIS LINE! --------\\
             """.trimIndent()
 
@@ -78,7 +90,7 @@ class StonecutterSettings(private val settings: Settings) {
         settings.include(path)
         val project = settings.project(path)
 
-        val versionDir = File("${project.projectDir}/versions/$version")
+        val versionDir = File("${root.projectDir}/versions/$version")
         versionDir.mkdirs()
 
         // TODO: Regex tokens file

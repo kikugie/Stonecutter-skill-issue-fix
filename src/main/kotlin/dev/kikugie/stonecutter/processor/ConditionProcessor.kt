@@ -2,10 +2,10 @@ package dev.kikugie.stonecutter.processor
 
 typealias Expression = (String) -> Boolean?
 
-data class ConditionProcessor(private val checkers: Iterable<Expression>) {
+data class ConditionProcessor(private val checkers: Collection<Expression>) {
     fun test(expr: String): Boolean {
         for (it in checkers) return it(expr) ?: continue
-        throw IllegalArgumentException()
+        throw StonecutterSyntaxException("Invalid expression: $expr, ${checkers.size} checkers")
     }
 
     companion object {

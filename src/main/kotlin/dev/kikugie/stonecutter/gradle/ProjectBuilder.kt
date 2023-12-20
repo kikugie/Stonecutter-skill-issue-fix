@@ -7,9 +7,10 @@ import java.util.*
  * Represents the inital setup defined in `settings.gradle` in the `shared` block.
  * @see StonecutterSettings
  */
+@Suppress("unused")
 class ProjectBuilder() {
     internal var vcsVersion: ProjectName? = null
-    internal lateinit var versions: List<ProjectName>
+    internal var versions: List<ProjectName> = emptyList()
 
     constructor(defaults: ProjectBuilder?, builder: Action<ProjectBuilder>) : this() {
         versions = defaults?.versions ?: LinkedList()

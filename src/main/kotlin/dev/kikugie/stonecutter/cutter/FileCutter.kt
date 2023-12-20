@@ -15,7 +15,7 @@ class FileCutter(
         val transformed = try {
             CommentProcessor.process(file.bufferedReader(StandardCharsets.ISO_8859_1), stonecutter.processor)
         } catch (e: Exception) {
-            throw Exception("[Stonecutter] Failed to process file ${file.toAbsolutePath()}:\n${e.message}", e)
+            throw RuntimeException("Failed processing file $file:\n${e.message}", e)
         }
         output.writeText(transformed, StandardCharsets.ISO_8859_1, StandardOpenOption.CREATE)
     }

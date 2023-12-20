@@ -6,7 +6,7 @@ import org.gradle.api.Task
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Input
 
-@Suppress("LeakingThis")
+@Suppress("LeakingThis", "unused")
 abstract class ChiseledTask : DefaultTask() {
     private val setup = project.gradle.extensions.getByType(ProjectSetup.SetupContainer::class.java)[project]
         ?: throw GradleException("Project ${project.path} is not registered in Stonecutter")

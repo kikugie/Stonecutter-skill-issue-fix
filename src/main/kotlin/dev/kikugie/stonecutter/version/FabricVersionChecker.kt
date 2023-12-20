@@ -12,8 +12,8 @@ class FabricVersionChecker @Throws(
     ClassNotFoundException::class,
     NoSuchMethodException::class
 ) constructor(classLoader: ClassLoader) : VersionChecker {
-    val semverParse: Method
-    val predicateParse: Method
+    private val semverParse: Method
+    private val predicateParse: Method
 
     init {
         semverParse = classLoader.loadClass("net.fabricmc.loader.api.SemanticVersion")

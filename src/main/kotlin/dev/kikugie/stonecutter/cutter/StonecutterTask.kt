@@ -11,6 +11,7 @@ import org.gradle.api.Project
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Files
 import java.nio.file.Path
@@ -44,7 +45,8 @@ abstract class StonecutterTask : DefaultTask() {
     @get:Input
     abstract val expressions: ListProperty<Expression>
 
-    lateinit var processor: ConditionProcessor
+    @get:Internal
+    internal lateinit var processor: ConditionProcessor
 
     init {
         fileFilter.convention { true }

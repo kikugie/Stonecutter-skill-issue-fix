@@ -1,11 +1,14 @@
+@file:Suppress("UnstableApiUsage")
+
 plugins {
     kotlin("jvm") version "1.9.21"
     `kotlin-dsl`
     `maven-publish`
+    `java-gradle-plugin`
 }
 
 group = "dev.kikugie"
-version = "0.1-SNAPSHOT"
+version = "0.1.1"
 
 repositories {
     mavenCentral()
@@ -14,7 +17,7 @@ repositories {
 dependencies {
     implementation("org.eclipse.jgit:org.eclipse.jgit.pgm:6.7.0.202309050840-r")
     testImplementation(kotlin("test"))
-    testImplementation("org.jetbrains.kotlin:kotlin-script-runtime:1.8.10")
+    testImplementation(kotlin("script-runtime"))
 }
 
 tasks.test {
@@ -29,7 +32,7 @@ publishing {
     repositories {
         maven {
             name = "kikugieMaven"
-            url = uri("https://maven.kikugie.dev/snapshots")
+            url = uri("https://maven.kikugie.dev/releases")
             credentials(PasswordCredentials::class)
             authentication {
                 create("basic", BasicAuthentication::class)
@@ -40,7 +43,7 @@ publishing {
     repositories {
         maven {
             name = "kikugieMaven"
-            url = uri("https://maven.kikugie.dev/releases")
+            url = uri("https://maven.kikugie.dev/snapshots")
             credentials(PasswordCredentials::class)
             authentication {
                 create("basic", BasicAuthentication::class)
@@ -54,6 +57,21 @@ publishing {
             artifactId = "stonecutter"
             version = project.version.toString()
             artifact(tasks.getByName("jar"))
+        }
+    }
+}
+
+gradlePlugin {
+    website = "https://github.com/kikugie/stonecutter-kt"
+    vcsUrl = "https://github.com/kikugie/stonecutter-kt"
+
+    plugins {
+        create("stonecutter"){
+            id = "dev.kikugie.stonecutter"
+            implementationClass = "dev.kikugie.stonecutter.gradle.StonecutterPlugin"
+            displayName = "Stonecutter"
+            description = "Preprocessor/JCP inspired multi-version environment manager"
+            tags.set(listOf("fabric", "fabricmc"))
         }
     }
 }

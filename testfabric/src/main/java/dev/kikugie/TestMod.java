@@ -6,17 +6,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TestMod implements ModInitializer {
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod id as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
     public static final Logger LOGGER = LoggerFactory.getLogger("testmod");
 
-	@Override
-	public void onInitialize() {
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
-		// However, some things (like resources) may still be uninitialized.
-		// Proceed with mild caution.
+    @Override
+    public void onInitialize() {
+        /*? if ~1.20.1 {*//*
+        System.out.println("This 1.20.1");
+        *//*?} */
 
-		LOGGER.info("Hello Fabric world!");
-	}
+        /*? if ~1.19.4 {*/
+        System.out.println("This 1.19.4");
+        /*?} */
+
+        /*? if ~1.20 */
+        /*System.out.println("This 1.20");*/
+
+
+        /*? if ~1.19 */
+        System.out.println("This 1.19");
+    }
 }

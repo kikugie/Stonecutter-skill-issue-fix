@@ -63,6 +63,7 @@ class CommentProcessor(
         val last = tokens.lastOrNull()?.type
         if (last != OPENER && last != EXTENSION) throw error("Condition block closer without context")
         tokens += Entry(CLOSER, false)
+        read(START)
     }
 
     private fun elseExtension(expression: String) {

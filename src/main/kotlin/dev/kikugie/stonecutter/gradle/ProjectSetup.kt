@@ -7,7 +7,8 @@ typealias ProjectPath = String
 /**
  * Represents a finalized versions configuration to be passed to [StonecutterController]
  */
-class ProjectSetup(builder: ProjectBuilder) {
+@Suppress("unused")
+open class ProjectSetup(builder: ProjectBuilder) {
     internal val versions: List<ProjectName> = builder.versions
     internal val vcs: ProjectName = builder.vcsVersion ?: versions.first()
     internal var current: ProjectName = vcs
@@ -24,7 +25,7 @@ class ProjectSetup(builder: ProjectBuilder) {
         return false
     }
 
-    class SetupContainer(
+    open class SetupContainer(
         private val controllers: MutableMap<ProjectPath, ProjectSetup> = mutableMapOf()
     ) {
         internal fun register(project: ProjectPath, builder: ProjectBuilder): Boolean =

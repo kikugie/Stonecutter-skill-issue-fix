@@ -6,7 +6,7 @@ import org.gradle.api.initialization.Settings
 import org.gradle.api.plugins.ExtensionAware
 typealias ProjectName = String
 typealias TaskName = String
-class StonecutterPlugin : Plugin<ExtensionAware> {
+open class StonecutterPlugin : Plugin<ExtensionAware> {
     override fun apply(target: ExtensionAware) {
         val type = if (target is Settings)
             StonecutterSettings::class

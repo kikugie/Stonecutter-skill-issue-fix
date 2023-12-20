@@ -15,9 +15,12 @@ import kotlin.io.path.writeLines
  * @see StonecutterBuild
  * @see StonecutterSettings
  */
-class StonecutterController(project: Project) {
+@Suppress("unused")
+open class StonecutterController(project: Project) {
     private val setup: ProjectSetup = project.gradle.extensions.getByType<ProjectSetup.SetupContainer>()[project]
         ?: throw GradleException("Project ${project.path} is not registered in Stonecutter")
+    @get:JvmName("versions")
+    val versions: Iterable<String> = setup.versions
 
     init {
         setup.versions.forEach { project.project(it).pluginManager.apply(StonecutterPlugin::class.java) }
@@ -25,6 +28,14 @@ class StonecutterController(project: Project) {
             setup.versions.forEach { dependsOn("$it:setupChiseledBuild") }
         }
         project.afterEvaluate { setupProject(this) }
+    }
+
+    fun active(str: String) {
+        setup.current = str
+    }
+
+    fun debug(value: Boolean) {
+        setup.debug = value
     }
 
     private fun setupProject(root: Project) {

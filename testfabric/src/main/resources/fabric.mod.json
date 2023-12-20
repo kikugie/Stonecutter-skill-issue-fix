@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "testmod",
 	"version": "${version}",
-	"name": "TestMOd",
+	"name": "TestMod",
 	"description": "This is an example description! Tell everyone what your mod is about!",
 	"authors": [
 		"Me!"
@@ -16,7 +16,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"dev.kikugie.TestMOd"
+			"dev.kikugie.TestMod"
 		]
 	},
 	"mixins": [
