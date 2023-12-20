@@ -14,7 +14,8 @@ object FileCutter {
      */
     @Throws(StonecutterSyntaxException::class, IOException::class, IllegalArgumentException::class)
     fun process(file: Path, stonecutter: StonecutterTask): CharSequence? = try {
-        val (result, modified) = CommentProcessor.process(file.bufferedReader(StandardCharsets.ISO_8859_1), stonecutter.processor)
+        val (result, modified) = file.bufferedReader(StandardCharsets.ISO_8859_1)
+            .use { CommentProcessor.process(it, stonecutter.processor) }
         if (modified) result else null
     } catch (e: Exception) {
         throw RuntimeException("Failed processing file $file:\n${e.message}", e)
