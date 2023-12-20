@@ -12,19 +12,6 @@ import kotlin.io.path.writeText
 
 /**
  * Executed for the `stonecutter` block in `settings.gradle` and responsible for creating versioned subprojects.
- *
- * Example setup:
- * ```gradle
- *  stonecutter {
- *      shared {
- *          versions "1.20.2", "1.19.4" // These don't have to be exactly named as Minecraft versions.
- *          vcs "1.19.4" // Optional, uses first of versions by default.
- *      }
- *      build "common.gradle.kts" // Optional if you want custom buildscript. Default is build.gradle.
- *      create rootProject
- *  }
- * ```
- * @see ProjectBuilder
  */
 @Suppress("unused")
 open class StonecutterSettings(private val settings: Settings) {
@@ -45,21 +32,36 @@ open class StonecutterSettings(private val settings: Settings) {
         }
     }
 
+    /**
+     * Specifies version directories and initial active version.
+     *
+     * @param builder version settings.
+     */
     fun shared(builder: Action<ProjectBuilder>) {
         shared = ProjectBuilder(shared, builder)
     }
 
+    /**
+     * Specifies common buildscript to be used by versions.
+     *
+     * @param file name of the file in the project root.
+     */
     fun build(file: String) {
         build = file
     }
 
+    /**
+     * Applies Stonecutter to a project, creating `stonecutter.gradle` and applying plugin to the buildscript.
+     *
+     * @param projects one or more projects to be included. Use `rootProject` for standard mod setup.
+     */
     fun create(vararg projects: ProjectDescriptor) {
         for (proj in projects) create(proj) {
             if (versions.isEmpty()) throw GradleException("[Stonecutter] To create a stonecutter project without a configuration element, make use of shared default values")
         }
     }
 
-    fun create(project: ProjectDescriptor, action: Action<ProjectBuilder>) {
+    private fun create(project: ProjectDescriptor, action: Action<ProjectBuilder>) {
         val builder = ProjectBuilder(shared, action)
         val versions = builder.versions
 

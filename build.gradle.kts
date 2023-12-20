@@ -5,6 +5,7 @@ plugins {
     `kotlin-dsl`
     `maven-publish`
     `java-gradle-plugin`
+    id("org.jetbrains.dokka") version "1.9.10"
 }
 
 group = "dev.kikugie"
@@ -66,7 +67,7 @@ gradlePlugin {
     vcsUrl = "https://github.com/kikugie/stonecutter-kt"
 
     plugins {
-        create("stonecutter"){
+        create("stonecutter") {
             id = "dev.kikugie.stonecutter"
             implementationClass = "dev.kikugie.stonecutter.gradle.StonecutterPlugin"
             displayName = "Stonecutter"

@@ -18,11 +18,18 @@ import kotlin.io.path.writeLines
  */
 @Suppress("unused")
 open class StonecutterController(project: Project) {
-    val chiseled = ChiseledTask::class.java
     private val setup: ProjectSetup = project.gradle.extensions.getByType<ProjectSetup.SetupContainer>()[project]
         ?: throw GradleException("Project ${project.path} is not registered in Stonecutter")
-    @get:JvmName("versions")
-    val versions: Iterable<String> = setup.versions
+
+    /**
+     * All registered subprojects.
+     */
+    val versions: List<ProjectName> = setup.versions
+
+    /**
+     * Chiseled task type reference.
+     */
+    val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
 
     init {
         setup.versions.forEach { project.project(it).pluginManager.apply(StonecutterPlugin::class.java) }
@@ -32,14 +39,31 @@ open class StonecutterController(project: Project) {
         project.afterEvaluate { setupProject(this) }
     }
 
+    /**
+     * Sets active Stonecutter version.
+     *
+     * DO NOT call manually.
+     *
+     * @param str project version
+     */
     fun active(str: String) {
         setup.current = str
     }
 
+    /**
+     * Enables debug functionality. Currently adds `true` and `false` expressions to the processor.
+     *
+     * @param value debug state
+     */
     fun debug(value: Boolean) {
         setup.debug = value
     }
 
+    /**
+     * Registers a chiseled task, which runs in parallel for all versions.
+     *
+     * @param provider task provider.
+     */
     fun registerChiseled(provider: TaskProvider<*>) {
         setup.register(provider.name)
     }

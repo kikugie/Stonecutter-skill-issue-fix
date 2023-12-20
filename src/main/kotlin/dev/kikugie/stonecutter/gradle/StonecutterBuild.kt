@@ -19,13 +19,30 @@ open class StonecutterBuild(internal val project: Project) {
     internal val setup: ProjectSetup = project.gradle.extensions.getByType<ProjectSetup.SetupContainer>()[project.parent
         ?: throw GradleException("[Stonecutter] Project ${project.path} must be a versioned project")
     ] ?: throw GradleException("[Stonecutter] Project ${project.path} is not registered in Stonecutter")
+
+    /**
+     * Version of this buildscript instance. (Unique for each subproject)
+     */
     val current: ProjectVersion = ProjectVersion(this, project.name)
+
+    /**
+     * Current active version. (Global for all subprojects)
+     */
     val active: ProjectName
         get() = setup.current
+
+    /**
+     * All registered subprojects.
+     */
     val versions
         get() = setup.versions
     internal val expressions = mutableListOf<Expression>()
 
+    /**
+     * Create a custom expression for the comment processor.
+     *
+     * @param expr function that accepts an expression string and returns a boolean result, or `null` if expression doesn't match.
+     */
     fun expression(expr: Expression) {
         expressions += expr
     }
@@ -52,7 +69,7 @@ open class StonecutterBuild(internal val project: Project) {
         try {
             val formatter: (SourceSet, String) -> Any = if (setup.anyChiseled(project.gradle.startParameter.taskNames))
                 { source, type -> File(project.buildDir, "chiseledSrc/${source.name}/$type") }
-            else if (current.active)
+            else if (current.isActive)
                 { source, type -> "../../src/${source.name}/$type" }
             else return
 
