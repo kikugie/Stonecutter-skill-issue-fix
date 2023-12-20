@@ -2,9 +2,8 @@
 Preprocessor/JCP inspired multi-version environment manager
 
 > [!WARNING]
-> 
-> This fork of SHsuperCM's Stonecutter is significantly different.
-> Read the wiki page for mor information.
+> This fork of SHsuperCM's Stonecutter is significantly different.  
+> Read the wiki page for more information.
 
 ## Features
 ### Plugin
@@ -22,3 +21,11 @@ Preprocessor/JCP inspired multi-version environment manager
 
 ### Intellij IDEA Integration
 *WIP*
+
+## What's new?
+- Kotlin support
+- Custom buildscripts (`.kts` hype hype)
+- Improved comment syntax
+- Informative errors
+- *Wiki*
+- Custom conditions
