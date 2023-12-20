@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "dev.kikugie"
-version = "0.1.2"
+version = "0.2.0"
 
 repositories {
     mavenCentral()
@@ -34,17 +34,6 @@ publishing {
         maven {
             name = "kikugieMaven"
             url = uri("https://maven.kikugie.dev/releases")
-            credentials(PasswordCredentials::class)
-            authentication {
-                create("basic", BasicAuthentication::class)
-            }
-        }
-    }
-
-    repositories {
-        maven {
-            name = "kikugieMaven"
-            url = uri("https://maven.kikugie.dev/snapshots")
             credentials(PasswordCredentials::class)
             authentication {
                 create("basic", BasicAuthentication::class)

@@ -7,8 +7,12 @@ import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getByType
 import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.StandardOpenOption
+import kotlin.io.path.notExists
 import kotlin.io.path.readLines
+import kotlin.io.path.useLines
 import kotlin.io.path.writeLines
 
 /**
@@ -30,6 +34,7 @@ open class StonecutterController(project: Project) {
      * Chiseled task type reference.
      */
     val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
+
 
     init {
         setup.versions.forEach { project.project(it).pluginManager.apply(StonecutterPlugin::class.java) }
@@ -68,6 +73,15 @@ open class StonecutterController(project: Project) {
         setup.register(provider.name)
     }
 
+    /**
+     * Reads `gradle.properties` file and adds any property set to `VERSIONED` to subproject's file.
+     *
+     * @param value should sync properies
+     */
+    fun syncProperties(value: Boolean) {
+        setup.syncProperties = value
+    }
+
     private fun setupProject(root: Project) {
         val current = root.project(setup.current).extensions.getByType<StonecutterBuild>().current
         setup.versions.forEach { name ->
@@ -90,6 +104,7 @@ open class StonecutterController(project: Project) {
                 doLast { updateInitScript(this, projectVersion.version) }
             }
         }
+        if (setup.syncProperties) updateProperties(root)
     }
 
     private fun updateInitScript(task: Task, version: String) {
@@ -97,5 +112,34 @@ open class StonecutterController(project: Project) {
         val lines = initFile.readLines(StandardCharsets.ISO_8859_1).toMutableList()
         lines[1] = "stonecutter.active \"$version\""
         initFile.writeLines(lines, StandardCharsets.ISO_8859_1, StandardOpenOption.CREATE)
+    }
+
+    private fun updateProperties(project: Project) {
+        val root = project.rootDir.toPath()
+        val props = root.resolve("gradle.properties")
+        if (props.notExists()) return
+
+        val res = mutableListOf<String>()
+        props.useLines { lines ->
+            lines.forEach {
+                if (!it.endsWith("versioned", true)) return@forEach
+                val key = it.split('=').firstOrNull()?.trim() ?: return@forEach
+                res += key
+            }
+        }
+
+        setup.versions.forEach {
+            writeProps(root.resolve("versions/$it/gradle.properties"), res.toMutableSet())
+        }
+    }
+
+    private fun writeProps(file: Path, props: MutableSet<String>) {
+        if (file.notExists()) Files.createFile(file)
+        file.useLines { lines ->
+            lines.forEach {
+                props.remove(it.split('=').firstOrNull()?.trim() ?: return@forEach)
+            }
+        }
+        file.writeLines(props.map { "$it=TODO" }, StandardCharsets.ISO_8859_1, StandardOpenOption.APPEND)
     }
 }
