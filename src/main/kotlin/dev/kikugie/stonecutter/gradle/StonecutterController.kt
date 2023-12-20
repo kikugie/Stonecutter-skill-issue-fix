@@ -4,6 +4,7 @@ import dev.kikugie.stonecutter.cutter.StonecutterTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getByType
 import java.nio.charset.StandardCharsets
 import java.nio.file.StandardOpenOption
@@ -17,6 +18,7 @@ import kotlin.io.path.writeLines
  */
 @Suppress("unused")
 open class StonecutterController(project: Project) {
+    val chiseled = ChiseledTask::class.java
     private val setup: ProjectSetup = project.gradle.extensions.getByType<ProjectSetup.SetupContainer>()[project]
         ?: throw GradleException("Project ${project.path} is not registered in Stonecutter")
     @get:JvmName("versions")
@@ -36,6 +38,10 @@ open class StonecutterController(project: Project) {
 
     fun debug(value: Boolean) {
         setup.debug = value
+    }
+
+    fun registerChiseled(provider: TaskProvider<*>) {
+        setup.register(provider.name)
     }
 
     private fun setupProject(root: Project) {
