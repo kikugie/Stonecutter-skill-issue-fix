@@ -15,7 +15,7 @@ import kotlin.io.path.writeText
  *
  * Example setup:
  * ```gradle
- *  multidev {
+ *  stonecutter {
  *      shared {
  *          versions "1.20.2", "1.19.4" // These don't have to be exactly named as Minecraft versions.
  *          vcs "1.19.4" // Optional, uses first of versions by default.
