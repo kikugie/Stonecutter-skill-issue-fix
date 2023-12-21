@@ -3,7 +3,7 @@ package dev.kikugie.stonecutter.cutter
 import dev.kikugie.stonecutter.gradle.ProjectVersion
 import dev.kikugie.stonecutter.processor.ConditionProcessor
 import dev.kikugie.stonecutter.processor.Expression
-import dev.kikugie.stonecutter.processor.McVersionExpression
+import dev.kikugie.stonecutter.version.McVersionExpression
 import dev.kikugie.stonecutter.version.FabricVersionChecker
 import dev.kikugie.stonecutter.version.VersionChecker
 import org.gradle.api.DefaultTask
@@ -109,7 +109,7 @@ abstract class StonecutterTask : DefaultTask() {
         }
         processed.forEach { (file, content) ->
             if (file.notExists()) Files.createDirectories(file.parent)
-            file.writeText(content, StandardCharsets.ISO_8859_1, StandardOpenOption.CREATE)
+            file.writeText(content, StandardCharsets.ISO_8859_1, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
         }
         return true
     }

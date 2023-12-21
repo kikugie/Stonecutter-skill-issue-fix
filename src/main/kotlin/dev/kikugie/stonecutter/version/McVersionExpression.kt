@@ -1,7 +1,6 @@
-package dev.kikugie.stonecutter.processor
+package dev.kikugie.stonecutter.version
 
-import dev.kikugie.stonecutter.version.Version
-import dev.kikugie.stonecutter.version.VersionChecker
+import dev.kikugie.stonecutter.processor.Expression
 
 class McVersionExpression(val current: Version, val checker: VersionChecker) : Expression {
     override fun invoke(predicate: String): Boolean? = checker.test(current, predicate)

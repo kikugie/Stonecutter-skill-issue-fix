@@ -2,14 +2,30 @@ package dev.kikugie.stonecutter.test
 
 import dev.kikugie.stonecutter.processor.CommentProcessor
 import dev.kikugie.stonecutter.processor.ConditionProcessor
+import dev.kikugie.stonecutter.version.FabricVersionChecker
+import dev.kikugie.stonecutter.version.McVersionExpression
 import java.io.FileNotFoundException
+import java.nio.file.Path
 import kotlin.test.Test
 import kotlin.test.junit5.JUnit5Asserter.assertEquals
 import kotlin.test.junit5.JUnit5Asserter.fail
 
 object ProcessorTest {
-    private fun resource(file: String) = ProcessorTest::class.java.classLoader.getResourceAsStream(file)?.bufferedReader() ?:
-        throw FileNotFoundException(file)
+    private val versionChecker: (String) -> McVersionExpression = { version ->
+        FabricVersionChecker.create(
+            Path.of(
+                // Blursed JIJ
+                ProcessorTest::class.java.classLoader.getResource("fabric-loader.jar")!!.toURI()
+            )
+        ).let {
+            McVersionExpression(it.parseVersion(version), it)
+        }
+    }
+
+    private fun resource(file: String) =
+        ProcessorTest::class.java.classLoader.getResourceAsStream(file)?.bufferedReader()
+            ?: throw FileNotFoundException(file)
+
     private fun processFile(file: String) {
         try {
             val sample = resource("samples/$file")

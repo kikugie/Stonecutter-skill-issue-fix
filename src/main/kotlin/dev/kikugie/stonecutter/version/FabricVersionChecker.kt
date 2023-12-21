@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import java.lang.reflect.Method
 import java.net.URLClassLoader
 import java.nio.file.Files
+import java.nio.file.Path
 import java.util.function.Predicate
 import kotlin.io.path.Path
 import kotlin.io.path.exists
@@ -37,12 +38,7 @@ class FabricVersionChecker @Throws(
             val loaderCopy = path.resolve("fabric-loader.jar")
 
             if (loaderCopy.exists()) try {
-                return FabricVersionChecker(
-                    URLClassLoader(
-                        arrayOf(loaderCopy.toUri().toURL()),
-                        VersionChecker::class.java.classLoader
-                    )
-                )
+                return create(loaderCopy)
             } catch (ignored: Exception) {
             }
 
@@ -55,5 +51,12 @@ class FabricVersionChecker @Throws(
                 }
             }
         }
+
+        fun create(loader: Path) = FabricVersionChecker(
+            URLClassLoader(
+                arrayOf(loader.toUri().toURL()),
+                VersionChecker::class.java.classLoader
+            )
+        )
     }
 }
