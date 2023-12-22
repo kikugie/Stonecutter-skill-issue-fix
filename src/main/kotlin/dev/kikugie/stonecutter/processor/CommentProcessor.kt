@@ -55,7 +55,7 @@ class CommentProcessor(
         if (last != OPENER && last != EXTENSION) throw error("Statement must follow a condition: $expr")
         if (expr.equals("else", true))
             elseExtension(expr)
-        if (expr.startsWith("else", true) || expr.startsWith("elif", true))
+        else if (expr.startsWith("else", true) || expr.startsWith("elif", true))
             elifExtension(expr)
         else throw error("Invalid expression $expr, must be ELSE or ELIF")
     }
