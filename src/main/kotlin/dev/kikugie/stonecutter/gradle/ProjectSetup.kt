@@ -15,7 +15,6 @@ open class ProjectSetup(builder: ProjectBuilder) {
 
     private val chiseledTasks: MutableSet<TaskName> = mutableSetOf()
     var debug = false
-    var syncProperties = false
 
     fun register(task: TaskName) {
         chiseledTasks += task
