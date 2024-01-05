@@ -46,7 +46,7 @@ open class StonecutterSettings(private val settings: Settings) {
      *
      * @param file name of the file in the project root.
      */
-    fun build(file: String) {
+    fun centralScript(file: String) {
         build = file
     }
 
