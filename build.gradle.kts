@@ -9,14 +9,13 @@ plugins {
 }
 
 group = "dev.kikugie"
-version = "0.2.3"
+version = "0.2.4"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation("org.eclipse.jgit:org.eclipse.jgit.pgm:6.7.0.202309050840-r")
     testImplementation(kotlin("test"))
     testImplementation(kotlin("script-runtime"))
 }
