@@ -19,7 +19,9 @@ import kotlin.io.path.writeLines
 @Suppress("unused")
 open class StonecutterController(project: Project) {
     private val setup: ProjectSetup = project.gradle.extensions.getByType<ProjectSetup.SetupContainer>()[project]
-        ?: throw GradleException("Project ${project.path} is not registered in Stonecutter")
+        ?: throw GradleException("Project ${project.path} is not registered")
+    private val controller = project.controller
+        ?: throw GradleException("Project ${project.path} is not a Stonecutter controller")
 
     /**
      * All registered subprojects.
@@ -47,9 +49,9 @@ open class StonecutterController(project: Project) {
      *
      * @param str project version
      */
-    fun active(str: String) {
+    infix fun active(str: String) {
         setup.current = setup.versions.find { it.project == str }
-            ?: throw GradleException("[Stonecutter] Project $str is not registered in Stonecutter")
+            ?: throw GradleException("[Stonecutter] Project $str is not registered")
     }
 
     /**
@@ -66,7 +68,7 @@ open class StonecutterController(project: Project) {
      *
      * @param provider task provider.
      */
-    fun registerChiseled(provider: TaskProvider<*>) {
+    infix fun registerChiseled(provider: TaskProvider<*>) {
         setup.register(provider.name)
     }
 
@@ -87,15 +89,10 @@ open class StonecutterController(project: Project) {
                 input.set(root.file("./src").toPath())
                 output.set(input.get())
 
-                doLast { updateInitScript(this, projectVersion.project) }
+                doLast {
+                    controller.updateHeader(this.project.buildFile.toPath(), projectVersion.project)
+                }
             }
         }
-    }
-
-    private fun updateInitScript(task: Task, version: String) {
-        val initFile = task.project.buildFile.toPath()
-        val lines = initFile.readLines(StandardCharsets.ISO_8859_1).toMutableList()
-        lines[1] = "stonecutter.active \"$version\""
-        initFile.writeLines(lines, StandardCharsets.ISO_8859_1, StandardOpenOption.CREATE)
     }
 }

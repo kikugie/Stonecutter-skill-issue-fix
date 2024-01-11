@@ -19,7 +19,13 @@ open class StonecutterSettings(private val settings: Settings) {
         settings.gradle.extensions.create("stonecutterProjects", ProjectSetup.SetupContainer::class.java)
 
     private var shared = ProjectBuilder.DEFAULT
-    private var build = "build.gradle"
+    private var useKotlin = false
+    private var useKotlinBuild = false
+    private var useKotlinController = false
+    private val controller
+        get() = if (useKotlin || useKotlinController) KotlinController else GroovyController
+    private val buildFile
+        get() = if (useKotlin || useKotlinBuild) "build.gradle.kts" else "build.gradle"
 
     init {
         try {
@@ -41,13 +47,16 @@ open class StonecutterSettings(private val settings: Settings) {
         shared = ProjectBuilder(shared, builder)
     }
 
-    /**
-     * Specifies common buildscript to be used by versions.
-     *
-     * @param file name of the file in the project root.
-     */
-    fun centralScript(file: String) {
-        build = file
+    fun useKotlin(value: Boolean) {
+        useKotlin = value
+    }
+
+    fun useKotlinBuild(value: Boolean) {
+        useKotlinBuild = value
+    }
+
+    fun useKotlinController(value: Boolean) {
+        useKotlinController = value
     }
 
     /**
@@ -71,21 +80,11 @@ open class StonecutterSettings(private val settings: Settings) {
         if (!projects.register(project.path, builder))
             throw IllegalArgumentException("[Stonecutter] Project ${project.path} is already registered")
 
-        project.buildFileName = "stonecutter.gradle"
-        val file = project.projectDir.resolve("stonecutter.gradle").toPath()
-        if (file.notExists()) file.writeText(
-            createHeader(vcs.project),
-            Charsets.UTF_8,
-            StandardOpenOption.CREATE
-        )
+        project.buildFileName = controller.filename
+        val file = project.projectDir.resolve(controller.filename).toPath()
+        if (file.notExists()) controller.createHeader(file, vcs.project)
         builder.versions.forEach { createProject(project, it) }
     }
-
-    private fun createHeader(vcs: ProjectName) = """
-                plugins.apply "dev.kikugie.stonecutter"
-                stonecutter.active "$vcs"
-                //-------- !DO NOT EDIT ABOVE THIS LINE! --------\\
-            """.trimIndent()
 
     private fun createProject(root: ProjectDescriptor, version: SubProject) {
         val path = root.path.let { "${it.trimEnd(':')}:${version.project}" }
@@ -95,9 +94,8 @@ open class StonecutterSettings(private val settings: Settings) {
         val versionDir = File("${root.projectDir}/versions/${version.project}")
         versionDir.mkdirs()
 
-        // TODO: Regex tokens file
         project.projectDir = versionDir
         project.name = version.project
-        project.buildFileName = "../../$build"
+        project.buildFileName = "../../$buildFile"
     }
 }
