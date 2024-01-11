@@ -14,7 +14,7 @@ import java.nio.file.Files
 /**
  * Provides versioned functionality in the buildscript.
  */
-@Suppress("unused")
+@Suppress("unused", "LeakingThis")
 open class StonecutterBuild(internal val project: Project) {
     internal val setup: ProjectSetup = project.gradle.extensions.getByType<ProjectSetup.SetupContainer>()[project.parent
         ?: throw GradleException("[Stonecutter] Project ${project.path} must be a versioned project")
@@ -23,13 +23,14 @@ open class StonecutterBuild(internal val project: Project) {
     /**
      * Version of this buildscript instance. (Unique for each subproject)
      */
-    val current: ProjectVersion = ProjectVersion(this, project.name)
+    val current: ProjectVersion = ProjectVersion(this, setup.versions.find { it.project == project.name }
+        ?: throw GradleException("[Stonecutter] Project ${project.path} is not registered in Stonecutter")
+    )
 
     /**
      * Current active version. (Global for all subprojects)
      */
-    val active: ProjectName
-        get() = setup.current
+    val active: ProjectVersion = ProjectVersion(this, setup.current)
 
     /**
      * All registered subprojects.
@@ -52,7 +53,6 @@ open class StonecutterBuild(internal val project: Project) {
             if (project.parent == null)
                 throw IllegalStateException("[Stonecutter] Chiseled task can't be registered for the root project")
 
-            fromVersion.set(project.parent!!.project(setup.current).extensions.getByType<StonecutterBuild>().current)
             toVersion.set(current)
 
             input.set(project.parent!!.file("./src").toPath())

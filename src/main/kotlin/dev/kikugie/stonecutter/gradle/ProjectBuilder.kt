@@ -1,32 +1,43 @@
 package dev.kikugie.stonecutter.gradle
 
 import org.gradle.api.Action
+import org.gradle.api.GradleException
 import java.util.*
 
 /**
  * Represents the inital setup defined in `settings.gradle` in the `shared` block.
  * @see StonecutterSettings
  */
-@Suppress("unused")
+@Suppress("unused", "MemberVisibilityCanBePrivate")
 class ProjectBuilder() {
-    internal var vcsVersion: ProjectName? = null
-    internal var versions: List<ProjectName> = emptyList()
+    private var _vcsVersion: ProjectName? = null
+    private var _versions = LinkedHashMap<ProjectName, SubProject>()
+
+    internal val vcsVersion: SubProject by lazy {
+        if (_vcsVersion == null) versions.first()
+        else _versions[_vcsVersion]
+            ?: throw GradleException("[Stonecutter] Project $_vcsVersion is not registered")
+    }
+    internal val versions: List<SubProject> by lazy(_versions.values::toList)
 
     constructor(defaults: ProjectBuilder?, builder: Action<ProjectBuilder>) : this() {
-        versions = defaults?.versions ?: LinkedList()
+        defaults?._versions?.forEach { (k, v) ->
+            _versions.putIfAbsent(k, v)
+        }
         builder.execute(this)
     }
 
-    /**
-     * Specifies subprojects and Minecraft versions used for the comment processor.
-     *
-     * @param versions version names in semantic format
-     */
-    fun versions(vararg versions: ProjectName) {
-        if (versions.isEmpty() || versions.toSet().size != versions.size)
-            throw IllegalArgumentException("Invalid versions: $versions")
+    fun vers(project: ProjectName, version: String) {
+        if (project in _versions)
+            throw GradleException("[Stonecutter] Project $project is already registered")
+        this._versions[project] = (SubProject(project, version))
+    }
 
-        this.versions = versions.toList()
+    // Duplicate methods because groovy doesn't have array unpacking :skull:
+    fun versions(vararg projects: ProjectName) = versions(projects.toList())
+
+    fun versions(projects: Collection<ProjectName>) {
+        projects.forEach { vers(it, it) }
     }
 
     /**
@@ -35,7 +46,7 @@ class ProjectBuilder() {
      * @param version subproject name
      */
     fun vcsVersion(version: ProjectName) {
-        vcsVersion = version
+        _vcsVersion = version
     }
 
     companion object {

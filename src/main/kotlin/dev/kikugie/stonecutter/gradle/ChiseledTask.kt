@@ -13,7 +13,7 @@ abstract class ChiseledTask : DefaultTask() {
     private val setupTask: Task = project.tasks.getByName("chiseledStonecutter")
 
     @get:Input
-    abstract val versions: ListProperty<String>
+    abstract val versions: ListProperty<SubProject>
 
     init {
         dependsOn(setupTask)
@@ -22,7 +22,7 @@ abstract class ChiseledTask : DefaultTask() {
 
     fun ofTask(name: String) {
         versions.get().forEach {
-            val task = project.project(it).tasks.getByName(name)
+            val task = project.project(it.project).tasks.getByName(name)
             finalizedBy(task)
             task.mustRunAfter(setupTask)
         }

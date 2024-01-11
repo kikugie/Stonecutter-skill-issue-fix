@@ -67,14 +67,14 @@ open class StonecutterSettings(private val settings: Settings) {
 
         if (versions.isEmpty())
             throw GradleException("[Stonecutter] Must have at least one version")
-        val vcs = builder.vcsVersion ?: versions.first()
+        val vcs = builder.vcsVersion
         if (!projects.register(project.path, builder))
             throw IllegalArgumentException("[Stonecutter] Project ${project.path} is already registered")
 
         project.buildFileName = "stonecutter.gradle"
         val file = project.projectDir.resolve("stonecutter.gradle").toPath()
         if (file.notExists()) file.writeText(
-            createHeader(vcs),
+            createHeader(vcs.project),
             Charsets.UTF_8,
             StandardOpenOption.CREATE
         )
@@ -87,17 +87,17 @@ open class StonecutterSettings(private val settings: Settings) {
                 //-------- !DO NOT EDIT ABOVE THIS LINE! --------\\
             """.trimIndent()
 
-    private fun createProject(root: ProjectDescriptor, version: ProjectName) {
-        val path = root.path.let { "${it.trimEnd(':')}:$version" }
+    private fun createProject(root: ProjectDescriptor, version: SubProject) {
+        val path = root.path.let { "${it.trimEnd(':')}:${version.project}" }
         settings.include(path)
         val project = settings.project(path)
 
-        val versionDir = File("${root.projectDir}/versions/$version")
+        val versionDir = File("${root.projectDir}/versions/${version.project}")
         versionDir.mkdirs()
 
         // TODO: Regex tokens file
         project.projectDir = versionDir
-        project.name = version
+        project.name = version.project
         project.buildFileName = "../../$build"
     }
 }

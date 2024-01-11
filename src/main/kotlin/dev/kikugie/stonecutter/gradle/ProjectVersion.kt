@@ -1,6 +1,11 @@
 package dev.kikugie.stonecutter.gradle
 
-data class ProjectVersion(private val plugin: StonecutterBuild, val version: ProjectName) {
+data class ProjectVersion(
+    private val plugin: StonecutterBuild,
+    private val subProject: SubProject
+) {
+    val version = subProject.version
+    val project = subProject.project
     val isActive: Boolean
-        get() = version == plugin.setup.current
+        get() = project == plugin.setup.current.project
 }

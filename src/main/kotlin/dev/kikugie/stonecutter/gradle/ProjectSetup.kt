@@ -7,11 +7,11 @@ typealias ProjectPath = String
 /**
  * Represents a finalized versions configuration to be passed to [StonecutterController]
  */
-@Suppress("unused")
+@Suppress("unused", "MemberVisibilityCanBePrivate")
 open class ProjectSetup(builder: ProjectBuilder) {
-    internal val versions: List<ProjectName> = builder.versions
-    internal val vcs: ProjectName = builder.vcsVersion ?: versions.first()
-    internal var current: ProjectName = vcs
+    internal val versions: List<SubProject> = builder.versions
+    internal val vcs: SubProject = builder.vcsVersion
+    internal var current: SubProject = vcs
 
     private val chiseledTasks: MutableSet<TaskName> = mutableSetOf()
     var debug = false

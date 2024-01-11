@@ -7,12 +7,8 @@ import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getByType
 import java.nio.charset.StandardCharsets
-import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.StandardOpenOption
-import kotlin.io.path.notExists
 import kotlin.io.path.readLines
-import kotlin.io.path.useLines
 import kotlin.io.path.writeLines
 
 /**
@@ -28,7 +24,7 @@ open class StonecutterController(project: Project) {
     /**
      * All registered subprojects.
      */
-    val versions: List<ProjectName> = setup.versions
+    val versions: List<SubProject> = setup.versions
 
     /**
      * Chiseled task type reference.
@@ -37,7 +33,7 @@ open class StonecutterController(project: Project) {
 
 
     init {
-        setup.versions.forEach { project.project(it).pluginManager.apply(StonecutterPlugin::class.java) }
+        setup.versions.forEach { project.project(it.project).pluginManager.apply(StonecutterPlugin::class.java) }
         project.tasks.create("chiseledStonecutter") {
             setup.versions.forEach { dependsOn("$it:setupChiseledBuild") }
         }
@@ -52,7 +48,8 @@ open class StonecutterController(project: Project) {
      * @param str project version
      */
     fun active(str: String) {
-        setup.current = str
+        setup.current = setup.versions.find { it.project == str }
+            ?: throw GradleException("[Stonecutter] Project $str is not registered in Stonecutter")
     }
 
     /**
@@ -74,25 +71,23 @@ open class StonecutterController(project: Project) {
     }
 
     private fun setupProject(root: Project) {
-        val current = root.project(setup.current).extensions.getByType<StonecutterBuild>().current
-        setup.versions.forEach { name ->
-            val project = root.project(name)
+        setup.versions.forEach { ver ->
+            val project = root.project(ver.project)
             val projectVersion = project.extensions.getByType<StonecutterBuild>().current
 
             root.tasks.create(
-                "Set active version to ${projectVersion.version}",
+                "Set active project to ${projectVersion.project}",
                 StonecutterTask::class.java
             ).apply {
                 group = "stonecutter"
                 debug.set(setup.debug)
                 expressions.set(project.extensions.getByType<StonecutterBuild>().expressions)
 
-                fromVersion.set(current)
                 toVersion.set(projectVersion)
                 input.set(root.file("./src").toPath())
                 output.set(input.get())
 
-                doLast { updateInitScript(this, projectVersion.version) }
+                doLast { updateInitScript(this, projectVersion.project) }
             }
         }
     }

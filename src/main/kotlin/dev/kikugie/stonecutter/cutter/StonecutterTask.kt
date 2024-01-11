@@ -28,9 +28,6 @@ abstract class StonecutterTask : DefaultTask() {
     abstract val output: Property<Path>
 
     @get:Input
-    abstract val fromVersion: Property<ProjectVersion>
-
-    @get:Input
     abstract val toVersion: Property<ProjectVersion>
 
     @get:Input
@@ -58,10 +55,9 @@ abstract class StonecutterTask : DefaultTask() {
     @TaskAction
     @ExperimentalPathApi
     fun run() {
-        if (!input.isPresent || !output.isPresent || !fromVersion.isPresent || !toVersion.isPresent)
+        if (!input.isPresent || !output.isPresent || !toVersion.isPresent)
             throw IllegalArgumentException("[Stonecutter] StonecutterTask is not fully initialized")
         processor = ConditionProcessor(collectExpressions())
-        // TODO: Regex tokenizer
 
         try {
             transform(input.get(), output.get())
