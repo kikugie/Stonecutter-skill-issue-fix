@@ -27,6 +27,12 @@ class ProjectBuilder() {
         builder.execute(this)
     }
 
+    /**
+     * Creates a subproject with separate directory and Minecraft version.
+     *
+     * @param project subproject directory to be used in `./versions/`. Can't be a duplicate.
+     * @param version Minecraft version assigned to this subproject. Can be assigned to multiple subprojects.
+     */
     fun vers(project: ProjectName, version: String) {
         if (project in _versions)
             throw GradleException("[Stonecutter] Project $project is already registered")
@@ -34,8 +40,22 @@ class ProjectBuilder() {
     }
 
     // Duplicate methods because groovy doesn't have array unpacking :skull:
+    /**
+     * Adds subprojects to the Stonecutter setup.
+     * Subproject directory and version are set to the same value.
+     * For more precise controls use [vers].
+     *
+     * @param projects subprojects to be included.
+     */
     fun versions(vararg projects: ProjectName) = versions(projects.toList())
 
+    /**
+     * Adds subprojects to the Stonecutter setup.
+     * Subproject directory and version are set to the same value.
+     * For more precise controls use [vers].
+     *
+     * @param projects subprojects to be included.
+     */
     fun versions(projects: Collection<ProjectName>) {
         projects.forEach { vers(it, it) }
     }
