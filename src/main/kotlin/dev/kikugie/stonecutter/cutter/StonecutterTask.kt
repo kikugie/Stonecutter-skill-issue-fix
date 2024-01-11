@@ -78,8 +78,8 @@ abstract class StonecutterTask : DefaultTask() {
         }
         val checker = versionChecker.get()(project)
         val target = checker.parseVersion(toVersion.get().version)
-        exprs += McVersionExpression(target, checker)
         exprs.addAll(expressions.get())
+        exprs += McVersionExpression(target, checker)
         return exprs
     }
 
