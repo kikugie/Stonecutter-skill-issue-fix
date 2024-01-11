@@ -47,14 +47,33 @@ open class StonecutterSettings(private val settings: Settings) {
         shared = ProjectBuilder(shared, builder)
     }
 
+    /**
+     * Enables Kotlin buildscripts for the controller and subproject build file.
+     * - `build.gradle` -> `build.gradle.kts`
+     * - `stonecutter.gradle` -> `stonecutter.gradle.kts`
+     *
+     * @param value Whenever Kotlin should be used. Setting it to `false` won't do anything.
+     */
     fun useKotlin(value: Boolean) {
         useKotlin = value
     }
 
+    /**
+     * Enables Kotlin buildscripts for the subproject build file.
+     * - `build.gradle` -> `build.gradle.kts`
+     *
+     * @param value Whenever Kotlin should be used. Setting it to `false` won't do anything.
+     */
     fun useKotlinBuild(value: Boolean) {
         useKotlinBuild = value
     }
 
+    /**
+     * Enables Kotlin buildscripts for the controller.
+     * - `stonecutter.gradle` -> `stonecutter.gradle.kts`
+     *
+     * @param value Whenever Kotlin should be used. Setting it to `false` won't do anything.
+     */
     fun useKotlinController(value: Boolean) {
         useKotlinController = value
     }
