@@ -6,9 +6,7 @@ import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.StandardOpenOption
 import kotlin.io.path.notExists
-import kotlin.io.path.writeText
 
 /**
  * Executed for the `stonecutter` block in `settings.gradle` and responsible for creating versioned subprojects.

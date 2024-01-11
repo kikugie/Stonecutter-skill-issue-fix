@@ -5,7 +5,7 @@ import org.gradle.api.GradleException
 import java.util.*
 
 /**
- * Represents the inital setup defined in `settings.gradle` in the `shared` block.
+ * Represents the initial setup defined in `settings.gradle` in the `shared` block.
  * @see StonecutterSettings
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
@@ -61,7 +61,7 @@ class ProjectBuilder() {
     }
 
     /**
-     * Specifies initial active version. By default selects first one from the subprojects list.
+     * Specifies initial active version. By default, selects first one from the subprojects list.
      *
      * @param version subproject name
      */

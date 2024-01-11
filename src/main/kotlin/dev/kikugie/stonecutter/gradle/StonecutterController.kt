@@ -3,13 +3,8 @@ package dev.kikugie.stonecutter.gradle
 import dev.kikugie.stonecutter.cutter.StonecutterTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getByType
-import java.nio.charset.StandardCharsets
-import java.nio.file.StandardOpenOption
-import kotlin.io.path.readLines
-import kotlin.io.path.writeLines
 
 /**
  * Runs for `stonecutter.gradle` file, applying project configurations to versions and generating versioned tasks.
@@ -55,7 +50,7 @@ open class StonecutterController(project: Project) {
     }
 
     /**
-     * Enables debug functionality. Currently adds `true` and `false` expressions to the processor.
+     * Enables debug functionality. Currently, adds `true` and `false` expressions to the processor.
      *
      * @param value debug state
      */

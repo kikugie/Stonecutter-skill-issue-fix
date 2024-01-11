@@ -54,7 +54,7 @@ class CommentProcessor(
         val last = tokens.lastOrNull()?.type
         if (last != OPENER && last != EXTENSION) throw error("Statement must follow a condition: $expr")
         if (expr.equals("else", true))
-            elseExtension(expr)
+            elseExtension()
         else if (expr.startsWith("else", true) || expr.startsWith("elif", true))
             elifExtension(expr)
         else throw error("Invalid expression $expr, must be ELSE or ELIF")
@@ -67,7 +67,7 @@ class CommentProcessor(
         read(START)
     }
 
-    private fun elseExtension(expression: String) {
+    private fun elseExtension() {
         val code = read(START) ?: throw error("Conditional block is not closed")
         (!tokens.last().result).also {
             processCode(code, it)
@@ -124,14 +124,14 @@ class CommentProcessor(
         return if (buffer.isNotEmpty()) buffer.toString() else null
     }
 
-    private fun read(match: String, includeMatch: Boolean = false): String? {
+    private fun read(match: String): String? {
         val buffer = StringBuilder()
         var char: Char
         while (input.read().also { char = it.toChar() } != -1) {
             buffer.append(char)
             output.append(char)
             if (buffer.endsWith(match)) return buffer.toString().let {
-                if (includeMatch) it else it.substring(0, it.length - match.length)
+                it.substring(0, it.length - match.length)
             }
         }
         return null
@@ -154,13 +154,6 @@ class CommentProcessor(
         if (index != -1)
             output.replace(index, index + code.length, result)
     }
-
-    private fun splitOne(str: String): Pair<String?, String?> =
-        if (str.isBlank()) null to null
-        else str.split(' ', limit = 1).let {
-            if (it.size == 1) it.first().trim() to null
-            else it.first().trim() to it.last().trim()
-        }
 
     private fun error(message: String) = StonecutterSyntaxException("Error at line $line:\n$message")
 
