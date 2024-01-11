@@ -56,7 +56,7 @@ open class StonecutterBuild(internal val project: Project) {
             toVersion.set(current)
 
             input.set(project.parent!!.file("./src").toPath())
-            output.set(project.buildDir.toPath().resolve("chiseledSrc"))
+            output.set(project.buildDir().toPath().resolve("chiseledSrc"))
         }
 
         project.afterEvaluate {
@@ -68,7 +68,7 @@ open class StonecutterBuild(internal val project: Project) {
     private fun configureSources(project: Project) {
         try {
             val formatter: (SourceSet, String) -> Any = if (setup.anyChiseled(project.gradle.startParameter.taskNames))
-                { source, type -> File(project.buildDir, "chiseledSrc/${source.name}/$type") }
+                { source, type -> File(project.buildDir(), "chiseledSrc/${source.name}/$type") }
             else if (current.isActive)
                 { source, type -> "../../src/${source.name}/$type" }
             else return
@@ -94,4 +94,6 @@ open class StonecutterBuild(internal val project: Project) {
             } catch (ignored: Exception) {
             }
     }
+
+    private fun Project.buildDir() = layout.buildDirectory.asFile.get()
 }
