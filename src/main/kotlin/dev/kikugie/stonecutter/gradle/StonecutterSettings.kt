@@ -17,13 +17,10 @@ open class StonecutterSettings(private val settings: Settings) {
         settings.gradle.extensions.create("stonecutterProjects", ProjectSetup.SetupContainer::class.java)
 
     private var shared = ProjectBuilder.DEFAULT
-    private var useKotlin = false
-    private var useKotlinBuild = false
-    private var useKotlinController = false
+    private var kotlinController = false
+    private var buildFile = "build.gradle"
     private val controller
-        get() = if (useKotlin || useKotlinController) KotlinController else GroovyController
-    private val buildFile
-        get() = if (useKotlin || useKotlinBuild) "build.gradle.kts" else "build.gradle"
+        get() = if (kotlinController) KotlinController else GroovyController
 
     init {
         try {
@@ -46,24 +43,16 @@ open class StonecutterSettings(private val settings: Settings) {
     }
 
     /**
-     * Enables Kotlin buildscripts for the controller and subproject build file.
-     * - `build.gradle` -> `build.gradle.kts`
-     * - `stonecutter.gradle` -> `stonecutter.gradle.kts`
+     * Sets the buildscript used by all subprojects.
+     * Defaults to `build.gradle`.
      *
-     * @param value Whenever Kotlin should be used. Setting it to `false` won't do anything.
+     * @param file filename.
      */
-    fun useKotlin(value: Boolean) {
-        useKotlin = value
-    }
-
-    /**
-     * Enables Kotlin buildscripts for the subproject build file.
-     * - `build.gradle` -> `build.gradle.kts`
-     *
-     * @param value Whenever Kotlin should be used. Setting it to `false` won't do anything.
-     */
-    fun useKotlinBuild(value: Boolean) {
-        useKotlinBuild = value
+    fun centralScript(file: String) {
+        require(!file.startsWith("stonecutter.gradle")) {
+            "[Stonecutter] Build script can't be the same as the controller"
+        }
+        buildFile = file
     }
 
     /**
@@ -72,8 +61,19 @@ open class StonecutterSettings(private val settings: Settings) {
      *
      * @param value Whenever Kotlin should be used. Setting it to `false` won't do anything.
      */
-    fun useKotlinController(value: Boolean) {
-        useKotlinController = value
+    fun kotlinController(value: Boolean) {
+        kotlinController = value
+    }
+
+    /**
+     * Applies Stonecutter to a project, creating `stonecutter.gradle` and applying plugin to the buildscript.
+     *
+     * @param projects one or more projects to be included. Use `rootProject` for standard mod setup.
+     */
+    fun create(project: ProjectDescriptor) {
+        create(project) {
+            if (versions.isEmpty()) throw GradleException("[Stonecutter] To create a stonecutter project without a configuration element, make use of shared default values")
+        }
     }
 
     /**
@@ -82,9 +82,7 @@ open class StonecutterSettings(private val settings: Settings) {
      * @param projects one or more projects to be included. Use `rootProject` for standard mod setup.
      */
     fun create(vararg projects: ProjectDescriptor) {
-        for (proj in projects) create(proj) {
-            if (versions.isEmpty()) throw GradleException("[Stonecutter] To create a stonecutter project without a configuration element, make use of shared default values")
-        }
+        projects.forEach(::create)
     }
 
     private fun create(project: ProjectDescriptor, action: Action<ProjectBuilder>) {
