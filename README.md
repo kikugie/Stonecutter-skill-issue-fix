@@ -13,7 +13,7 @@ Preprocessor/JCP inspired multi-version environment manager
 ### Plugin
 - [x] Chiseled (parallel) tasks
 - [x] Custom buildscript support
-- [ ] Separate directory and version definitions
+- [x] Separate directory and version definitions
 - [ ] Architectury support
 
 ### Processor
