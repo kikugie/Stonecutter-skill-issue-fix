@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "dev.kikugie"
-version = "0.3.0-rc.1"
+version = "0.3.0"
 
 repositories {
     mavenCentral()
