@@ -54,6 +54,8 @@ open class StonecutterBuild(internal val project: Project) {
                 throw IllegalStateException("[Stonecutter] Chiseled task can't be registered for the root project")
 
             toVersion.set(current)
+            expressions.set(this@StonecutterBuild.expressions)
+            debug.set(setup.debug)
 
             input.set(project.parent!!.file("./src").toPath())
             output.set(project.buildDir().toPath().resolve("chiseledSrc"))
