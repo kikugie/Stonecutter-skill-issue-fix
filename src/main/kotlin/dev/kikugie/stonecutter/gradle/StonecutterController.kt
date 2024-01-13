@@ -32,7 +32,7 @@ open class StonecutterController(project: Project) {
     init {
         setup.versions.forEach { project.project(it.project).pluginManager.apply(StonecutterPlugin::class.java) }
         project.tasks.create("chiseledStonecutter") {
-            setup.versions.forEach { dependsOn("$it:setupChiseledBuild") }
+            setup.versions.forEach { dependsOn("${it.project}:setupChiseledBuild") }
         }
         project.afterEvaluate { setupProject(this) }
     }
