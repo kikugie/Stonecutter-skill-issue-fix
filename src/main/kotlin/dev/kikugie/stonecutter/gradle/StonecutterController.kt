@@ -68,26 +68,31 @@ open class StonecutterController(project: Project) {
     }
 
     private fun setupProject(root: Project) {
+        val vcsProject = root.project(setup.vcs.project)
+        val vcs = vcsProject.extensions.getByType<StonecutterBuild>().current
+        root.tasks.create(
+            "Reset active project", StonecutterTask::class.java
+        ).applyConfig(root, vcsProject, vcs)
         setup.versions.forEach { ver ->
             val project = root.project(ver.project)
-            val projectVersion = project.extensions.getByType<StonecutterBuild>().current
-
+            val version = project.extensions.getByType<StonecutterBuild>().current
             root.tasks.create(
-                "Set active project to ${projectVersion.project}",
-                StonecutterTask::class.java
-            ).apply {
-                group = "stonecutter"
-                debug.set(setup.debug)
-                expressions.set(project.extensions.getByType<StonecutterBuild>().expressions)
+                "Set active project to ${version.project}", StonecutterTask::class.java
+            ).applyConfig(root, project, version)
+        }
+    }
 
-                toVersion.set(projectVersion)
-                input.set(root.file("./src").toPath())
-                output.set(input.get())
+    private fun StonecutterTask.applyConfig(root: Project, subproject: Project, version: ProjectVersion) {
+        group = "stonecutter"
+        debug.set(setup.debug)
+        expressions.set(subproject.extensions.getByType<StonecutterBuild>().expressions)
 
-                doLast {
-                    controller.updateHeader(this.project.buildFile.toPath(), projectVersion.project)
-                }
-            }
+        toVersion.set(version)
+        input.set(root.file("./src").toPath())
+        output.set(input.get())
+
+        doLast {
+            controller.updateHeader(this.project.buildFile.toPath(), version.project)
         }
     }
 }
