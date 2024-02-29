@@ -1,6 +1,7 @@
 package dev.kikugie.stonecutter.gradle
 
 import dev.kikugie.stonecutter.cutter.StonecutterTask
+import dev.kikugie.stonecutter.metadata.StonecutterProject
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
@@ -13,15 +14,23 @@ import org.gradle.kotlin.dsl.getByType
  */
 @Suppress("unused")
 open class StonecutterController(project: Project) {
-    private val setup: ProjectSetup = project.gradle.extensions.getByType<ProjectSetup.SetupContainer>()[project]
-        ?: throw GradleException("Project ${project.path} is not registered")
     private val controller = project.controller
-        ?: throw GradleException("Project ${project.path} is not a Stonecutter controller")
+        ?: throw StonecutterGradleException("Project ${project.path} is not a Stonecutter controller. What did you even do to get this error?")
+    private val setup: ProjectSetup = project.gradle.extensions.getByType<ProjectSetup.SetupContainer>()[project]
+        ?: throw StonecutterGradleException("Project ${project.path} is not registered. This might've been caused by removing a project while its active") {
+            val kts = controller.filename.endsWith("kts")
+            """
+                // ${controller.filename}
+                // We politely ignore the full uppercase warning to not edit this and do it anyway.
+                // After changing it run the `Refresh active project` task.
+                stonecutter${if (kts) " " else "."}active "<a valid project>" /* [SC] DO NOT EDIT */
+            """.trimIndent()
+        }
 
     /**
      * All registered subprojects.
      */
-    val versions: List<SubProject> = setup.versions
+    val versions: List<StonecutterProject> = setup.versions
 
     /**
      * Chiseled task type reference.
@@ -73,6 +82,9 @@ open class StonecutterController(project: Project) {
         root.tasks.create(
             "Reset active project", StonecutterTask::class.java
         ).applyConfig(root, vcsProject, vcs)
+        root.tasks.create(
+            "Refresh active project", StonecutterTask::class.java
+        ).applyConfig(root, root.project(vcs.project), vcs)
         setup.versions.forEach { ver ->
             val project = root.project(ver.project)
             val version = project.extensions.getByType<StonecutterBuild>().current
@@ -82,7 +94,7 @@ open class StonecutterController(project: Project) {
         }
     }
 
-    private fun StonecutterTask.applyConfig(root: Project, subproject: Project, version: ProjectVersion) {
+    private fun StonecutterTask.applyConfig(root: Project, subproject: Project, version: StonecutterProject) {
         group = "stonecutter"
         debug.set(setup.debug)
         expressions.set(subproject.extensions.getByType<StonecutterBuild>().expressions)

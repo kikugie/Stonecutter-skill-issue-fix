@@ -1,7 +1,8 @@
 package dev.kikugie.stonecutter.gradle
 
+import dev.kikugie.stonecutter.metadata.StonecutterProject
+import dev.kikugie.stonecutter.util.filename
 import org.gradle.api.Action
-import org.gradle.api.GradleException
 import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings
 import java.io.File
@@ -11,14 +12,11 @@ import kotlin.io.path.notExists
 /**
  * Executed for the `stonecutter` block in `settings.gradle` and responsible for creating versioned subprojects.
  */
-@Suppress("unused")
+@Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterSettings(private val settings: Settings) {
     private val projects: ProjectSetup.SetupContainer =
         settings.gradle.extensions.create("stonecutterProjects", ProjectSetup.SetupContainer::class.java)
-
-    private var shared = ProjectBuilder.DEFAULT
-    private var kotlinController = false
-    private var buildFile = "build.gradle"
+    private var shared = SharedConfigBuilder.DEFAULT
     private val controller
         get() = if (kotlinController) KotlinController else GroovyController
 
@@ -33,26 +31,29 @@ open class StonecutterSettings(private val settings: Settings) {
         }
     }
 
-    /**
-     * Specifies version directories and initial active version.
-     *
-     * @param builder version settings.
-     */
-    fun shared(builder: Action<ProjectBuilder>) {
-        shared = ProjectBuilder(shared, builder)
-    }
+    var kotlinController = false
+    var centralScript = "build.gradle"
+        set(value) {
+            if (value.startsWith("stonecutter.gradle")) throw StonecutterGradleException(
+                "Invalid buildscript name"
+            ) {
+                exampleClosure { kts ->
+                    "${if (kts) "centralScript = $value" else "setCentralScript($value)"}\n// ..."
+                }
+            }
+            field = value
+        }
 
     /**
      * Sets the buildscript used by all subprojects.
      * Defaults to `build.gradle`.
-     *
-     * @param file filename.
      */
+    @Deprecated(
+        message = "This method is deprecated, use property setter instead",
+        replaceWith = ReplaceWith("centralScript = value")
+    )
     fun centralScript(file: String) {
-        require(!file.startsWith("stonecutter.gradle")) {
-            "[Stonecutter] Build script can't be the same as the controller"
-        }
-        buildFile = file
+        centralScript = file
     }
 
     /**
@@ -61,18 +62,41 @@ open class StonecutterSettings(private val settings: Settings) {
      *
      * @param value Whenever Kotlin should be used. Setting it to `false` won't do anything.
      */
+    @Deprecated(
+        message = "This method is deprecated, use property setter instead",
+        replaceWith = ReplaceWith("kotlinController = value")
+    )
     fun kotlinController(value: Boolean) {
         kotlinController = value
     }
 
     /**
+     * Specifies version directories and initial active version.
+     */
+    fun shared(builder: Action<SharedConfigBuilder>) {
+        shared = SharedConfigBuilder(shared, builder)
+    }
+
+    /**
      * Applies Stonecutter to a project, creating `stonecutter.gradle` and applying plugin to the buildscript.
      *
-     * @param projects one or more projects to be included. Use `rootProject` for standard mod setup.
+     * @param project one or more projects to be included. Use `rootProject` for standard mod setup.
      */
     fun create(project: ProjectDescriptor) {
         create(project) {
-            if (versions.isEmpty()) throw GradleException("[Stonecutter] To create a stonecutter project without a configuration element, make use of shared default values")
+            if (versions.isEmpty()) throw StonecutterGradleException("No version have been specified") {
+                exampleClosure {
+                    """
+                    // Example
+                    shared {
+                        versions("1.19.4", "1.20.1" /*, etc*/)
+                        // optional for more control
+                        vers("1.20.4-test", "1.20.4")
+                    }
+                    create(rootProject)
+                    """.trimIndent()
+                }
+            }
         }
     }
 
@@ -85,15 +109,12 @@ open class StonecutterSettings(private val settings: Settings) {
         projects.forEach(::create)
     }
 
-    private fun create(project: ProjectDescriptor, action: Action<ProjectBuilder>) {
-        val builder = ProjectBuilder(shared, action)
-        val versions = builder.versions
+    private fun create(project: ProjectDescriptor, action: Action<SharedConfigBuilder>) {
+        val builder = SharedConfigBuilder(shared, action)
 
-        if (versions.isEmpty())
-            throw GradleException("[Stonecutter] Must have at least one version")
-        val vcs = builder.vcsVersion
+        val vcs = builder.vcsVersionImpl
         if (!projects.register(project.path, builder))
-            throw IllegalArgumentException("[Stonecutter] Project ${project.path} is already registered")
+            throw StonecutterGradleException("Project ${project.path} is already registered")
 
         project.buildFileName = controller.filename
         val file = project.projectDir.resolve(controller.filename).toPath()
@@ -101,7 +122,7 @@ open class StonecutterSettings(private val settings: Settings) {
         builder.versions.forEach { createProject(project, it) }
     }
 
-    private fun createProject(root: ProjectDescriptor, version: SubProject) {
+    private fun createProject(root: ProjectDescriptor, version: StonecutterProject) {
         val path = root.path.let { "${it.trimEnd(':')}:${version.project}" }
         settings.include(path)
         val project = settings.project(path)
@@ -111,6 +132,20 @@ open class StonecutterSettings(private val settings: Settings) {
 
         project.projectDir = versionDir
         project.name = version.project
-        project.buildFileName = "../../$buildFile"
+        project.buildFileName = "../../$centralScript"
+    }
+
+    private fun exampleClosure(contents: (Boolean) -> String): String {
+        val path = settings.filename
+        val kts = path.endsWith("kts")
+
+        return buildString {
+            append("// $path")
+            append("${if (kts) "extensions.configure<StonecutterSettings>" else "stonecutter"} {")
+            contents(kts).split('\n').forEach {
+                append("    $it")
+            }
+            append("}")
+        }
     }
 }

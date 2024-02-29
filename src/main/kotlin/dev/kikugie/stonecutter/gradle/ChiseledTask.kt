@@ -1,19 +1,18 @@
 package dev.kikugie.stonecutter.gradle
 
+import dev.kikugie.stonecutter.metadata.StonecutterProject
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.Task
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Input
 
 @Suppress("LeakingThis", "unused")
 abstract class ChiseledTask : DefaultTask() {
-    private val setup = project.gradle.extensions.getByType(ProjectSetup.SetupContainer::class.java)[project]
-        ?: throw GradleException("Project ${project.path} is not registered in Stonecutter")
+    private val setup = project.gradle.extensions.getByType(ProjectSetup.SetupContainer::class.java)[project]!!
     private val setupTask: Task = project.tasks.getByName("chiseledStonecutter")
 
     @get:Input
-    abstract val versions: ListProperty<SubProject>
+    abstract val versions: ListProperty<StonecutterProject>
 
     init {
         dependsOn(setupTask)

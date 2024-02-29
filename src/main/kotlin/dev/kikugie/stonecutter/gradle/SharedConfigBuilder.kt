@@ -1,7 +1,8 @@
 package dev.kikugie.stonecutter.gradle
 
+import dev.kikugie.stonecutter.metadata.ProjectName
+import dev.kikugie.stonecutter.metadata.StonecutterProject
 import org.gradle.api.Action
-import org.gradle.api.GradleException
 import java.util.*
 
 /**
@@ -9,18 +10,27 @@ import java.util.*
  * @see StonecutterSettings
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-class ProjectBuilder() {
-    private var _vcsVersion: ProjectName? = null
-    private var _versions = LinkedHashMap<ProjectName, SubProject>()
+class SharedConfigBuilder() {
+    var vcsVersion: ProjectName? = null
+    private var _versions = LinkedHashMap<ProjectName, StonecutterProject>()
 
-    internal val vcsVersion: SubProject by lazy {
-        if (_vcsVersion == null) versions.first()
-        else _versions[_vcsVersion]
-            ?: throw GradleException("[Stonecutter] Project $_vcsVersion is not registered")
+    internal val vcsVersionImpl: StonecutterProject by lazy {
+        if (vcsVersion == null) versions.first()
+        else _versions[vcsVersion]
+            ?: throw StonecutterGradleException("Project $vcsVersion is not registered") {
+                """
+                    // Example
+                    shared {
+                        versions("1.19.4", "1.20.1")
+                        vcsVersion = "1.20.2" // Wrong!
+                        vcsVersion = "1.20.1" // Ok
+                    }
+                """.trimIndent()
+            }
     }
-    internal val versions: List<SubProject> by lazy(_versions.values::toList)
+    internal val versions: List<StonecutterProject> by lazy(_versions.values::toList)
 
-    constructor(defaults: ProjectBuilder?, builder: Action<ProjectBuilder>) : this() {
+    constructor(defaults: SharedConfigBuilder?, builder: Action<SharedConfigBuilder>) : this() {
         defaults?._versions?.forEach { (k, v) ->
             _versions.putIfAbsent(k, v)
         }
@@ -35,8 +45,16 @@ class ProjectBuilder() {
      */
     fun vers(project: ProjectName, version: String) {
         if (project in _versions)
-            throw GradleException("[Stonecutter] Project $project is already registered")
-        this._versions[project] = (SubProject(project, version))
+            throw StonecutterGradleException("[Stonecutter] Project $project is already registered") {
+                """
+                    // Example
+                    shared {
+                        versions("1.19.4", "1.20.1", "1.20.2", "1.19.4") // Wrong!
+                        //          ^- - - - - duplicates - - - - -^
+                    }   
+                """.trimIndent()
+            }
+        this._versions[project] = (StonecutterProject(project, version))
     }
 
     // Duplicate methods because groovy doesn't have array unpacking :skull:
@@ -65,11 +83,15 @@ class ProjectBuilder() {
      *
      * @param version subproject name
      */
+    @Deprecated(
+        message = "This method is deprecated, use property setter instead",
+        replaceWith = ReplaceWith("vcsVersion = value")
+    )
     fun vcsVersion(version: ProjectName) {
-        _vcsVersion = version
+        vcsVersion = version
     }
 
     companion object {
-        val DEFAULT: ProjectBuilder = ProjectBuilder()
+        val DEFAULT: SharedConfigBuilder = SharedConfigBuilder()
     }
 }

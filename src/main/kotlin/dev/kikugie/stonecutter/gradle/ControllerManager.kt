@@ -1,6 +1,6 @@
 package dev.kikugie.stonecutter.gradle
 
-import org.gradle.api.GradleException
+import dev.kikugie.stonecutter.metadata.ProjectName
 import org.gradle.api.Project
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
@@ -34,21 +34,8 @@ object GroovyController : ControllerManager {
         )
     }
 
-    override fun updateHeader(file: Path, version: ProjectName) {
-        var newLines = emptyList<String>()
-        var corrupted = true
-        file.useLines {
-            newLines = it.map { line ->
-                if (line.trim().endsWith(KEY)) {
-                    corrupted = false
-                    "stonecutter.active \"$version\" $KEY"
-                } else line
-            }.toList()
-        }
-        if (newLines.isEmpty()) throw GradleException("[Stonecutter] Empty stonecutter.gradle file")
-        if (corrupted) throw GradleException("[Stonecutter] Invalid stonecutter.gradle script")
-        file.writeLines(newLines, Charsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
-    }
+    override fun updateHeader(file: Path, version: ProjectName) =
+        updateFileWithKey(file, filename, "stonecutter.active \"$version\" $KEY")
 }
 
 object KotlinController : ControllerManager {
@@ -64,19 +51,38 @@ object KotlinController : ControllerManager {
         )
     }
 
-    override fun updateHeader(file: Path, version: ProjectName) {
-        var newLines = emptyList<String>()
-        var corrupted = true
-        file.useLines {
-            newLines = it.map { line ->
-                if (line.trim().endsWith(KEY)) {
-                    corrupted = false
-                    "stonecutter active \"$version\" $KEY"
-                } else line
-            }.toList()
-        }
-        if (newLines.isEmpty()) throw GradleException("[Stonecutter] Empty stonecutter.gradle.kts file")
-        if (corrupted) throw GradleException("[Stonecutter] Invalid stonecutter.gradle.kts script")
-        file.writeLines(newLines, Charsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
-    }
+    override fun updateHeader(file: Path, version: ProjectName) =
+        updateFileWithKey(file, filename, "stonecutter active \"$version\" $KEY")
 }
+
+private fun updateFileWithKey(file: Path, filename: String, key: String) {
+    var newLines = emptyList<String>()
+    var corrupted = true
+    file.useLines {
+        newLines = it.map { line ->
+            if (line.trim().endsWith(KEY)) {
+                corrupted = false
+                key
+            } else line
+        }.toList()
+    }
+    if (newLines.isEmpty()) throw emptyFile(filename)
+    if (corrupted) throw invalidScript(filename, key)
+    file.writeLines(newLines, Charsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+}
+
+private fun emptyFile(name: String): Throwable =
+    StonecutterGradleException(
+        """
+        $name is empty. This might have been caused by a user error.
+        If this is intentional, delete the file to make Stonecutter regenerate it.
+        """.trimIndent()
+    )
+
+private fun invalidScript(name: String, missing: String): Throwable =
+    StonecutterGradleException(
+        """
+        Couldn't find active version specification in $name.
+        Add `$missing` or delete the file to make Stonecutter regenerate it
+        """.trimIndent()
+    )

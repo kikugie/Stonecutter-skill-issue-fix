@@ -1,9 +1,10 @@
 package dev.kikugie.stonecutter.gradle
 
 import dev.kikugie.stonecutter.cutter.StonecutterTask
+import dev.kikugie.stonecutter.metadata.StonecutterProject
 import dev.kikugie.stonecutter.processor.Expression
+import dev.kikugie.stonecutter.util.buildDirectory
 import groovy.lang.MissingPropertyException
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
@@ -14,23 +15,27 @@ import java.nio.file.Files
 /**
  * Provides versioned functionality in the buildscript.
  */
-@Suppress("unused", "LeakingThis")
+@Suppress("unused")
 open class StonecutterBuild(internal val project: Project) {
     internal val setup: ProjectSetup = project.gradle.extensions.getByType<ProjectSetup.SetupContainer>()[project.parent
-        ?: throw GradleException("[Stonecutter] Project ${project.path} must be a versioned project")
-    ] ?: throw GradleException("[Stonecutter] Project ${project.path} is not registered in Stonecutter")
+        ?: throw StonecutterGradleException(
+            """Project ${project.path} must be a versioned project.
+            This might've been caused by applying the plugin in standard mod. 
+            Read https://github.com/kikugie/stonecutter-kt/wiki for an integration guide.
+            """.trimMargin()
+        )]!!
 
     /**
      * Version of this buildscript instance. (Unique for each subproject)
      */
-    val current: ProjectVersion = ProjectVersion(this, setup.versions.find { it.project == project.name }
-        ?: throw GradleException("[Stonecutter] Project ${project.path} is not registered in Stonecutter")
-    )
+    val current: StonecutterProject = setup.versions.find { it.project == project.name }!!.let {
+        StonecutterProject(it.project, it.version, this)
+    }
 
     /**
      * Current active version. (Global for all subprojects)
      */
-    val active: ProjectVersion = ProjectVersion(this, setup.current)
+    val active: StonecutterProject = setup.current.let { StonecutterProject(it.project, it.version, this) }
 
     /**
      * All registered subprojects.
@@ -51,14 +56,14 @@ open class StonecutterBuild(internal val project: Project) {
     init {
         project.tasks.register("setupChiseledBuild", StonecutterTask::class.java) {
             if (project.parent == null)
-                throw IllegalStateException("[Stonecutter] Chiseled task can't be registered for the root project")
+                throw StonecutterGradleException("Chiseled task can't be registered for the root project. How did you manage to do it though?")
 
             toVersion.set(current)
             expressions.set(this@StonecutterBuild.expressions)
             debug.set(setup.debug)
 
             input.set(project.parent!!.file("./src").toPath())
-            output.set(project.buildDir().toPath().resolve("chiseledSrc"))
+            output.set(project.buildDirectory.toPath().resolve("chiseledSrc"))
         }
 
         project.afterEvaluate {
@@ -70,7 +75,7 @@ open class StonecutterBuild(internal val project: Project) {
     private fun configureSources(project: Project) {
         try {
             val formatter: (SourceSet, String) -> Any = if (setup.anyChiseled(project.gradle.startParameter.taskNames))
-                { source, type -> File(project.buildDir(), "chiseledSrc/${source.name}/$type") }
+                { source, type -> File(project.buildDirectory, "chiseledSrc/${source.name}/$type") }
             else if (current.isActive)
                 { source, type -> "../../src/${source.name}/$type" }
             else return
@@ -89,13 +94,13 @@ open class StonecutterBuild(internal val project: Project) {
         loaderCopy.mkdirs()
         loaderCopy = File(loaderCopy, "fabric-loader.jar")
         // Me when one line. Have a nice day
-        if (!loaderCopy.exists()) loaderSearch@ for (configuration in project.configurations) for (dependency in configuration.dependencies) if ("net.fabricmc" == dependency.group && "fabric-loader" == dependency.name) for (file in configuration.files) if (file.getName().startsWith("fabric-loader"))
+        if (!loaderCopy.exists()) loaderSearch@ for (configuration in project.configurations) for (dependency in configuration.dependencies) if ("net.fabricmc" == dependency.group && "fabric-loader" == dependency.name) for (file in configuration.files) if (file.getName()
+                .startsWith("fabric-loader")
+        )
             try {
                 Files.copy(file.toPath(), loaderCopy.toPath())
                 break@loaderSearch
             } catch (ignored: Exception) {
             }
     }
-
-    private fun Project.buildDir() = layout.buildDirectory.asFile.get()
 }

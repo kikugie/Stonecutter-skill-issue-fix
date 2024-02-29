@@ -5,9 +5,6 @@ import org.gradle.api.Project
 import org.gradle.api.initialization.Settings
 import org.gradle.api.plugins.ExtensionAware
 
-typealias ProjectName = String
-typealias TaskName = String
-
 open class StonecutterPlugin : Plugin<ExtensionAware> {
     override fun apply(target: ExtensionAware) {
         val type = if (target is Settings)
@@ -15,7 +12,7 @@ open class StonecutterPlugin : Plugin<ExtensionAware> {
         else if (target is Project)
             if (target.controller != null) StonecutterController::class
             else StonecutterBuild::class
-        else throw IllegalArgumentException("[Stonecutter] The plugin may only be applied to settings and projects")
+        else throw StonecutterGradleException("The plugin may only be applied to settings and projects")
         target.extensions.create("stonecutter", type.java, target)
     }
 }

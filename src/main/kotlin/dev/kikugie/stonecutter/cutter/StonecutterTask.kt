@@ -1,6 +1,6 @@
 package dev.kikugie.stonecutter.cutter
 
-import dev.kikugie.stonecutter.gradle.ProjectVersion
+import dev.kikugie.stonecutter.metadata.StonecutterProject
 import dev.kikugie.stonecutter.processor.ConditionProcessor
 import dev.kikugie.stonecutter.processor.Expression
 import dev.kikugie.stonecutter.version.McVersionExpression
@@ -28,7 +28,7 @@ abstract class StonecutterTask : DefaultTask() {
     abstract val output: Property<Path>
 
     @get:Input
-    abstract val toVersion: Property<ProjectVersion>
+    abstract val toVersion: Property<StonecutterProject>
 
     @get:Input
     abstract val fileFilter: Property<(Path) -> Boolean>
