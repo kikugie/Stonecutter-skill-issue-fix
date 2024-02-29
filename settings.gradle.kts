@@ -10,3 +10,4 @@ plugins {
 }
 
 rootProject.name = "Stonecutter"
+include(":stitcher")
