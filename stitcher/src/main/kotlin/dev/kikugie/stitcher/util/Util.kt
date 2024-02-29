@@ -11,5 +11,19 @@ suspend inline fun SequenceScope<Token>.yield(
 
 fun IntRange.shift(other: IntRange): IntRange {
     val shift = last - first
-    return other.first + shift..other.first + shift + first
+    return other.first + first..other.first + shift + first
+}
+
+fun <T : CharSequence> T.leadingSpaces(): Int {
+    var spaces = 0
+    for (char in this)
+        if (char.isWhitespace()) spaces++ else break
+    return spaces
+}
+
+fun <T : CharSequence> T.trailingSpaces(): Int {
+    var spaces = 0
+    for (char in this.reversed())
+        if (char.isWhitespace()) spaces++ else break
+    return spaces
 }
