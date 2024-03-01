@@ -13,5 +13,5 @@ open class Token(
     override fun toString() = "Token(value=$value, range=$range, type=$type)"
 
     fun subtoken(local: IntRange, type: TokenType) =
-        Token(value.substring(local), local.shift(range), type )
+        Token(value.substring(local), local.shift(range), type)
 }

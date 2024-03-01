@@ -1,7 +1,7 @@
 package dev.kikugie.stitcher.lexer
 
 @Suppress("MemberVisibilityCanBePrivate")
-object DefaultRecognizers {
+object Syntax {
 //    val CONDITION = CharRecognizer('?')
 //    val SWAP = CharRecognizer('$')
 

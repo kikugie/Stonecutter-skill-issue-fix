@@ -6,7 +6,7 @@ import dev.kikugie.stitcher.token.Token
 suspend inline fun SequenceScope<Token>.yield(
     value: CharSequence,
     range: IntRange,
-    type: CommentType
+    type: CommentType,
 ) = yield(Token(value.toString(), range, type))
 
 fun IntRange.shift(other: IntRange): IntRange {

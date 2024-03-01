@@ -11,7 +11,7 @@ object IntRangeSerializer : KSerializer<IntRange> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("IntRange", PrimitiveKind.STRING)
 
     override fun deserialize(decoder: Decoder): IntRange =
-        decoder.decodeString().split("..", limit = 2).let { it[0].toInt() ..it[1].toInt() }
+        decoder.decodeString().split("..", limit = 2).let { it[0].toInt()..it[1].toInt() }
 
     override fun serialize(encoder: Encoder, value: IntRange) {
         encoder.encodeString(value.toString())

@@ -6,7 +6,7 @@ import java.io.Reader
 
 class Scanner(
     private val input: Reader,
-    private val recognizers: Collection<CommentRecognizer>
+    private val recognizers: Collection<CommentRecognizer>,
 ) {
     private val buffer = StringBuilder()
     private var cursor = 0
@@ -16,7 +16,11 @@ class Scanner(
     fun tokenize(): Sequence<Token> = sequence {
         input.readChars { char(it) }
         if (buffer.isNotEmpty())
-            yield(buffer, cursor - buffer.length..<cursor, if (current == null) CommentType.CONTENT else CommentType.COMMENT)
+            yield(
+                buffer,
+                cursor - buffer.length..<cursor,
+                if (current == null) CommentType.CONTENT else CommentType.COMMENT
+            )
     }
 
     private suspend fun SequenceScope<Token>.char(char: Char) {
@@ -31,7 +35,7 @@ class Scanner(
             buffer.delete(match.range)
             if (buffer.isNotEmpty())
                 yield(buffer, start..<range.first, CommentType.CONTENT)
-            yield(match.token, range, CommentType.COMMENT_START)
+            yield(match.value, range, CommentType.COMMENT_START)
             buffer.clear()
             current = rec
         } else {
@@ -40,7 +44,7 @@ class Scanner(
             val range = match.range.shift(start)
             buffer.delete(match.range)
             yield(buffer, start..<range.first, CommentType.COMMENT)
-            yield(match.token, range, CommentType.COMMENT_END)
+            yield(match.value, range, CommentType.COMMENT_END)
             buffer.clear()
             current = null
         }

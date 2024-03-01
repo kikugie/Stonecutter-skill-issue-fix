@@ -21,12 +21,12 @@ class Lexer(private val input: Iterable<Token>) {
         when (token.value.firstOrNull()) {
             '?' -> {
                 yield(token.subtoken(0..<1, CONDITION))
-                yieldAll(scanContents(token, DefaultRecognizers.conditionState))
+                yieldAll(scanContents(token, Syntax.conditionState))
             }
 
             '$' -> {
                 yield(token.subtoken(0..<1, SWAP))
-                yieldAll(scanContents(token, DefaultRecognizers.swapState))
+                yieldAll(scanContents(token, Syntax.swapState))
             }
 
             else -> yield(token)
@@ -52,8 +52,8 @@ class Lexer(private val input: Iterable<Token>) {
                 expressionToken()
                 if (buffer.isNotEmpty()) buffer.clear()
 
-                tokens += token.subtoken(index..<result.end, type)
-                index = result.end
+                tokens += token.subtoken(result.range, type)
+                index = result.range.last + 1
                 matched = true
                 break
             }
