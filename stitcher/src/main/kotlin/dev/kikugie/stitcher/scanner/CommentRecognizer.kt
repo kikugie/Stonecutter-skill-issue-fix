@@ -13,22 +13,22 @@ interface CommentRecognizer {
 }
 
 private fun CharSequence.matchEOL(): TokenMatch? = when {
-    endsWith("\r\n") -> TokenMatch(toString(), length - 2..<length)
-    endsWith("\r") -> TokenMatch(toString(), length - 1..<length)
-    endsWith("\n") -> TokenMatch(toString(), length - 1..<length)
+    endsWith("\r\n") -> TokenMatch("\r\n", length - 2..<length)
+    endsWith("\r") -> TokenMatch("\r", length - 1..<length)
+    endsWith("\n") -> TokenMatch("\n", length - 1..<length)
     else -> null
 }
 
 data object StandardMultiLine : CommentRecognizer {
     override val start = "/*"
     override val end = "*/"
-
-    override fun end(str: CharSequence) = str.matchEOL()
 }
 
 data object StandardSingleLine : CommentRecognizer {
     override val start = "//"
     override val end = "\n"
+
+    override fun end(str: CharSequence) = str.matchEOL()
 }
 
 data object HashSingleLine : CommentRecognizer {

@@ -14,20 +14,18 @@ class Scanner(
     private var quote: Quote? = null
 
     fun tokenize(): Sequence<Token> = sequence {
-        input.readChars { char(it) }
-        if (buffer.isNotEmpty())
-            yield(
-                buffer,
-                cursor - buffer.length..<cursor,
-                if (current == null) CommentType.CONTENT else CommentType.COMMENT
-            )
+        input.readLigatures { scan(it) }
+        if (buffer.isNotEmpty()) yield(
+            buffer,
+            cursor - buffer.length..<cursor,
+            if (current == null) CommentType.CONTENT else CommentType.COMMENT
+        )
     }
 
-    private suspend fun SequenceScope<Token>.char(char: Char) {
+    private suspend fun SequenceScope<Token>.scan(str: String) {
         cursor++
-        if (updateQuoteStatus().also { buffer.append(char) })
+        if (updateQuoteStatus().also { buffer.append(str) })
             return
-
         if (current == null) for (rec in recognizers) {
             val match = rec.start(buffer) ?: continue
             val start = cursor - buffer.length
@@ -59,9 +57,20 @@ class Scanner(
         return quote != null
     }
 
-    private inline fun Reader.readChars(action: (Char) -> Unit) {
+    private inline fun Reader.readLigatures(action: (String) -> Unit) {
         var char: Char
-        while (read().also { char = it.toChar() } != -1) action(char)
+        var captureCR = false
+        while (read().also { char = it.toChar() } != -1) when {
+            char == '\r' -> captureCR = true
+            captureCR ->
+                if (char == '\n')
+                    action("\r\n")
+                else {
+                    action("\r")
+                    action(char.toString())
+                }.also { captureCR = false }
+            else -> action(char.toString())
+        }
     }
 
     private fun IntRange.shift(value: Int): IntRange = first + value..last + value
