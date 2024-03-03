@@ -1,6 +1,7 @@
 package dev.kikugie.stitcher.scanner
 
 import dev.kikugie.stitcher.token.Token
+import dev.kikugie.stitcher.util.shift
 import dev.kikugie.stitcher.util.yield
 import java.io.Reader
 
@@ -20,6 +21,7 @@ class Scanner(
             cursor - buffer.length..<cursor,
             if (current == null) CommentType.CONTENT else CommentType.COMMENT
         )
+        yield(Token.eof(cursor))
     }
 
     private suspend fun SequenceScope<Token>.scan(str: String) {
@@ -72,8 +74,6 @@ class Scanner(
             else -> action(char.toString())
         }
     }
-
-    private fun IntRange.shift(value: Int): IntRange = first + value..last + value
 
     private fun StringBuilder.delete(range: IntRange) =
         deleteRange(range.first, range.last + 1)

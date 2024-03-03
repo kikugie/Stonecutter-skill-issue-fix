@@ -6,3 +6,6 @@ import kotlinx.serialization.Serializable
 @Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
 @Serializable(with = StringifySerializer::class)
 interface TokenType
+
+@Serializable
+data object EOF : TokenType

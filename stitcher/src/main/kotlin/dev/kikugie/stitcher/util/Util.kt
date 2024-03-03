@@ -14,6 +14,9 @@ fun IntRange.shift(other: IntRange): IntRange {
     return other.first + first..other.first + shift + first
 }
 
+fun IntRange.shift(value: Int): IntRange =
+    first + value..last + value
+
 fun <T : CharSequence> T.leadingSpaces(): Int {
     var spaces = 0
     for (char in this)
