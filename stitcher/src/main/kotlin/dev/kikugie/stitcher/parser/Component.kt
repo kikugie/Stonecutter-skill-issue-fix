@@ -49,7 +49,6 @@ data class Condition(
     val sugar: List<Token>,
     val condition: Component,
     val extension: Boolean,
-    val then: Scope,
 ) : Component {
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitCondition(this)
 }
@@ -57,7 +56,6 @@ data class Condition(
 @Serializable
 data class Swap(
     val identifier: Token,
-    val scope: Scope,
 ) : Component {
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitSwap(this)
 }

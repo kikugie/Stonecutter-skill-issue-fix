@@ -25,9 +25,10 @@ class Parser(input: Iterable<Token>) {
         if (match(CommentType.CONTENT))
             active.add(ContentBlock(iter.next()))
         else if (match(CommentType.COMMENT_START))
-            return matchComment()
+            matchComment()
 
-        if (active.enclosure != ScopeType.CLOSED) scopeStack.pop()
+        if (active.enclosure != ScopeType.CLOSED)
+            scopeStack.pop()
     }
 
     private fun matchComment() {
@@ -66,10 +67,18 @@ class Parser(input: Iterable<Token>) {
         val sugar = createConditionSugar(extension)
 
         // TODO: grouping and binary operations
-        val expression = consume(StitcherTokenType.EXPRESSION, "Expected an expression. To get a constant behaviour use `true` or `false`")
+        // FIXME: plain else doesnt work
+        val hasExpression = match(StitcherTokenType.EXPRESSION)
+        val expression = if (!hasExpression && sugar.lastOrNull()?.type == StitcherTokenType.ELSE)
+            Empty else Literal(
+            consume(
+                StitcherTokenType.EXPRESSION,
+                "Expected an expression. To get a constant behaviour use `true` or `false`"
+            )
+        )
         val scope = createScope(StitcherTokenType.CONDITION)
-        val condition = Condition(sugar, Literal(expression), extension, scope)
-        val comment = CommentBlock(start, condition, consume(CommentType.COMMENT_END, "Expected the comment to end"))
+        val condition = Condition(sugar, expression, extension)
+        val comment = CommentBlock(start, condition, consume(CommentType.COMMENT_END, "Expected the comment to end"), scope)
         active.add(comment)
         scopeStack.push(scope)
     }
@@ -84,7 +93,6 @@ class Parser(input: Iterable<Token>) {
             throw StitcherSyntaxException(iter.peek!!, "Invalid token. Check if previous condition is closed with `}`")
         if (hasElse) {
             sugar.add(iter.next())
-            scopeStack.pop()
         }
         if (match(StitcherTokenType.IF))
             sugar.add(iter.next())
@@ -108,8 +116,8 @@ class Parser(input: Iterable<Token>) {
                 "Expected an identifier after $. To disable this swap block use `null`"
             )
             val scope = createScope(StitcherTokenType.SWAP)
-            val swap = Swap(id, scope)
-            val comment = CommentBlock(start, swap, consume(CommentType.COMMENT_END, "Expected the comment to end"))
+            val swap = Swap(id)
+            val comment = CommentBlock(start, swap, consume(CommentType.COMMENT_END, "Expected the comment to end"), scope)
             active.add(comment)
             scopeStack.push(scope)
         }
@@ -133,7 +141,7 @@ class Parser(input: Iterable<Token>) {
     private fun consume(type: TokenType, message: String, strict: Boolean = true): Token {
         if (match(type)) return iter.next()
         else
-            throw StitcherThrowable.yeet(iter.peek ?: Token.eof(iter.current!!.range.last + 1), message, strict)
+            throw StitcherThrowable.create(iter.peek ?: Token.eof(iter.current!!.range.last + 1), message, strict)
     }
 
     private fun skip() {
