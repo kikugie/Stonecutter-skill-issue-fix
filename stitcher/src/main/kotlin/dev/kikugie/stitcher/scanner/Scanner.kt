@@ -5,6 +5,12 @@ import dev.kikugie.stitcher.util.shift
 import dev.kikugie.stitcher.util.yield
 import java.io.Reader
 
+/**
+ * Separates comments and source contents to ease further lexical analysis.
+ *
+ * @property input The reader object to read input from.
+ * @property recognizers The collection of comment recognizers to use for tokenization.
+ */
 class Scanner(
     private val input: Reader,
     private val recognizers: Collection<CommentRecognizer>,

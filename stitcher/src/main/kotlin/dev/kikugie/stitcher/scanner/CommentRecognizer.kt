@@ -2,6 +2,12 @@ package dev.kikugie.stitcher.scanner
 
 import dev.kikugie.stitcher.token.TokenMatch
 
+/**
+ * Interface for matching source comments in [Scanner]
+ *
+ * Matches the start and the end separately to improve scanner performance.
+ * According to (very brief) tests, using regex matching makes it 1.6-2x slower.
+ */
 interface CommentRecognizer {
     val start: String
     val end: String
@@ -19,11 +25,17 @@ private fun CharSequence.matchEOL(): TokenMatch? = when {
     else -> null
 }
 
+/**
+ * Matches `/* ... */` comments
+ */
 data object StandardMultiLine : CommentRecognizer {
     override val start = "/*"
     override val end = "*/"
 }
 
+/**
+ * Matches `// ...` comments
+ */
 data object StandardSingleLine : CommentRecognizer {
     override val start = "//"
     override val end = "\n"
@@ -31,6 +43,9 @@ data object StandardSingleLine : CommentRecognizer {
     override fun end(str: CharSequence) = str.matchEOL()
 }
 
+/**
+ * Matches `# ...` comments
+ */
 data object HashSingleLine : CommentRecognizer {
     override val start = "#"
     override val end = "\n"
