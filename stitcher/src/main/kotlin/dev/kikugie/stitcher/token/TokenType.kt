@@ -8,4 +8,4 @@ import kotlinx.serialization.Serializable
 interface TokenType
 
 @Serializable
-data object EOF : TokenType
+data object NULL : TokenType

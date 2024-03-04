@@ -16,6 +16,6 @@ open class Token(
         Token(value.substring(local), local.shift(range), type)
 
     companion object {
-        fun eof(position: Int) = Token("\u0000", position..-1, EOF)
+        fun eof(position: Int) = Token("\u0000", position..-1, NULL)
     }
 }
