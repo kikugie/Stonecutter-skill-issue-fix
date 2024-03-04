@@ -4,6 +4,7 @@ import dev.kikugie.stitcher.scanner.CommentType.*
 import dev.kikugie.stitcher.scanner.HashSingleLine
 import dev.kikugie.stitcher.scanner.StandardMultiLine
 import dev.kikugie.stitcher.scanner.StandardSingleLine
+import dev.kikugie.stitchertest.token
 import kotlin.test.Test
 
 class ScannerTest {

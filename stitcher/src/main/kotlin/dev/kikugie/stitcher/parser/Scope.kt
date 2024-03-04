@@ -5,11 +5,12 @@ import dev.kikugie.stitcher.token.TokenType
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Scope(
-    val type: TokenType = NULL,
-    val enclosure: ScopeType = ScopeType.CLOSED,
-    val blocks: MutableList<Block> = mutableListOf()
+open class Scope(
+    val type: TokenType,
+    val enclosure: ScopeType,
 ) {
+    val blocks: MutableList<Block> = mutableListOf()
+
     fun add(block: Block) {
         blocks.add(block)
     }
@@ -26,3 +27,6 @@ data class Scope(
         return blocks.find(predicate)
     }
 }
+
+@Serializable
+class RootScope(val version: Int) : Scope(NULL, ScopeType.CLOSED)

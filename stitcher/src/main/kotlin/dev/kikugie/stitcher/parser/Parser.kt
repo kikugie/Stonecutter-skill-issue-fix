@@ -10,9 +10,13 @@ import dev.kikugie.stitcher.util.LookaroundIterator.Companion.lookaround
 import java.util.*
 
 class Parser(input: Iterable<Token>) {
+    companion object {
+        const val VERSION = 1
+    }
+
     private val iter = input.iterator().lookaround()
     private val scopeStack = Stack<Scope>()
-    val rootScope = Scope()
+    val rootScope = RootScope(VERSION)
 
     private val active
         get() = if (scopeStack.empty()) rootScope else scopeStack.peek()
