@@ -41,8 +41,8 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 open class Scope(
-    val type: TokenType,
-    val enclosure: ScopeType,
+    val type: TokenType = NULL,
+    val enclosure: ScopeType = ScopeType.CLOSED,
 ) {
     val blocks: MutableList<Block> = mutableListOf()
 
@@ -79,4 +79,4 @@ open class Scope(
  * @see Parser.VERSION
  */
 @Serializable
-class RootScope(val version: Int) : Scope(NULL, ScopeType.CLOSED)
+class RootScope(val version: Int) : Scope()
