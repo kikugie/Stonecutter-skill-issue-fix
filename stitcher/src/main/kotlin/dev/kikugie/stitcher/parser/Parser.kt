@@ -70,21 +70,44 @@ class Parser(input: Iterable<Token>) {
 
         val sugar = createConditionSugar(extension)
 
-        // TODO: grouping and binary operations
-        // FIXME: plain else doesnt work
         val hasExpression = match(StitcherTokenType.EXPRESSION)
         val expression = if (!hasExpression && sugar.lastOrNull()?.type == StitcherTokenType.ELSE)
-            Empty else Literal(
-            consume(
-                StitcherTokenType.EXPRESSION,
-                "Expected an expression. To get a constant behaviour use `true` or `false`"
-            )
-        )
+            Empty else matchExpression()
         val scope = createScope(StitcherTokenType.CONDITION)
         val condition = Condition(sugar, expression, extension)
         val comment = CommentBlock(start, condition, consume(CommentType.COMMENT_END, "Expected the comment to end"), scope)
         active.add(comment)
         scopeStack.push(scope)
+    }
+
+    private fun matchExpression(grouped: Boolean = false): Component = when {
+        match(StitcherTokenType.EXPRESSION) -> {
+            val left = Literal(consume())
+            if (match(StitcherTokenType.OR, StitcherTokenType.AND) != null) {
+                val operator = consume()
+                val right = matchExpression()
+                Binary(left, operator, right)
+            } else left
+        }
+
+        match(StitcherTokenType.NEGATE) -> {
+            val operator = consume()
+            val target = matchExpression()
+            Unary(operator, target)
+        }
+
+        match(StitcherTokenType.GROUP_OPEN) -> {
+            skip()
+            val group = Group(matchExpression(true))
+            consume(StitcherTokenType.GROUP_CLOSE, "Expected `)` to close the group")
+            if (match(StitcherTokenType.OR, StitcherTokenType.AND) != null) {
+                val operator = consume()
+                val right = matchExpression(true)
+                Binary(group, operator, right)
+            } else group
+        }
+
+        else -> throw StitcherSyntaxException(iter.peek!!, "Unexpected token")
     }
 
     private fun createConditionSugar(isClosed: Boolean): List<Token> {
@@ -121,7 +144,8 @@ class Parser(input: Iterable<Token>) {
             )
             val scope = createScope(StitcherTokenType.SWAP)
             val swap = Swap(id)
-            val comment = CommentBlock(start, swap, consume(CommentType.COMMENT_END, "Expected the comment to end"), scope)
+            val comment =
+                CommentBlock(start, swap, consume(CommentType.COMMENT_END, "Expected the comment to end"), scope)
             active.add(comment)
             scopeStack.push(scope)
         }
@@ -144,8 +168,7 @@ class Parser(input: Iterable<Token>) {
 
     private fun consume(type: TokenType, message: String, strict: Boolean = true): Token {
         if (match(type)) return iter.next()
-        else
-            throw StitcherThrowable.create(iter.peek ?: Token.eof(iter.current!!.range.last + 1), message, strict)
+        else throw StitcherThrowable.create(iter.peek ?: Token.eof(iter.current!!.range.last + 1), message, strict)
     }
 
     private fun skip() {
