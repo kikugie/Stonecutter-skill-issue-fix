@@ -1,10 +1,9 @@
-package dev.kikugie.stitcher.scanner
+package dev.kikugie.stitcher.type
 
-import dev.kikugie.stitcher.token.TokenType
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class CommentType : TokenType {
+enum class Comment : TokenType {
     COMMENT_START,
     COMMENT_END,
     COMMENT,

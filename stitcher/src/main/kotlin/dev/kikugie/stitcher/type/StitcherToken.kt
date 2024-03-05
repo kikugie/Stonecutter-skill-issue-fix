@@ -1,10 +1,9 @@
-package dev.kikugie.stitcher.lexer
+package dev.kikugie.stitcher.type
 
-import dev.kikugie.stitcher.token.TokenType
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class StitcherTokenType : TokenType {
+enum class StitcherToken : TokenType {
     // Single-char
     CONDITION, SWAP, // ? and $
     SCOPE_OPEN, SCOPE_CLOSE,  // { and }

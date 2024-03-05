@@ -1,6 +1,7 @@
 package dev.kikugie.stitcher.scanner
 
 import dev.kikugie.stitcher.token.Token
+import dev.kikugie.stitcher.type.Comment
 import dev.kikugie.stitcher.util.shift
 import dev.kikugie.stitcher.util.yield
 import java.io.Reader
@@ -25,7 +26,7 @@ class Scanner(
         if (buffer.isNotEmpty()) yield(
             buffer,
             cursor - buffer.length..<cursor,
-            if (current == null) CommentType.CONTENT else CommentType.COMMENT
+            if (current == null) Comment.CONTENT else Comment.COMMENT
         )
         yield(Token.eof(cursor))
     }
@@ -40,8 +41,8 @@ class Scanner(
             val range = match.range.shift(start)
             buffer.delete(match.range)
             if (buffer.isNotEmpty())
-                yield(buffer, start..<range.first, CommentType.CONTENT)
-            yield(match.value, range, CommentType.COMMENT_START)
+                yield(buffer, start..<range.first, Comment.CONTENT)
+            yield(match.value, range, Comment.COMMENT_START)
             buffer.clear()
             current = rec
         } else {
@@ -49,8 +50,8 @@ class Scanner(
             val start = cursor - buffer.length
             val range = match.range.shift(start)
             buffer.delete(match.range)
-            yield(buffer, start..<range.first, CommentType.COMMENT)
-            yield(match.value, range, CommentType.COMMENT_END)
+            yield(buffer, start..<range.first, Comment.COMMENT)
+            yield(match.value, range, Comment.COMMENT_END)
             buffer.clear()
             current = null
         }

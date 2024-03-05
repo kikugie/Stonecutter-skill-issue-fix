@@ -1,16 +1,17 @@
 package dev.kikugie.stitchertest.scanner
 
-import dev.kikugie.stitcher.scanner.CommentType.*
-import dev.kikugie.stitcher.scanner.HashSingleLine
-import dev.kikugie.stitcher.scanner.StandardMultiLine
-import dev.kikugie.stitcher.scanner.StandardSingleLine
-import dev.kikugie.stitchertest.token
+import dev.kikugie.stitcher.type.Comment.*
+import dev.kikugie.stitcher.token.Token
+import dev.kikugie.stitchertest.util.printCol
+import dev.kikugie.stitchertest.util.scan
+import dev.kikugie.stitchertest.util.token
+import dev.kikugie.stitchertest.util.yaml
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class ScannerTest {
-    companion object {
-        val recognizers = listOf(StandardSingleLine, StandardMultiLine, HashSingleLine)
-    }
+    private fun check(input: String, expected: List<Token>) =
+        assertEquals(input.scan().toList().dropLast(1).yaml().also { printCol(it) }, expected.asSequence().yaml())
 
     @Test
     fun `slash comment`() {

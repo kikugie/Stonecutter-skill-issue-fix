@@ -1,5 +1,7 @@
 package dev.kikugie.stitcher.token
 
+import dev.kikugie.stitcher.type.NULL
+import dev.kikugie.stitcher.type.TokenType
 import dev.kikugie.stitcher.util.IntRangeSerializer
 import dev.kikugie.stitcher.util.shift
 import kotlinx.serialization.Serializable

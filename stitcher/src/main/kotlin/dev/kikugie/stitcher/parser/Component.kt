@@ -2,7 +2,7 @@ package dev.kikugie.stitcher.parser
 
 import dev.kikugie.stitcher.parser.Component.*
 import dev.kikugie.stitcher.token.Token
-import dev.kikugie.stitcher.lexer.StitcherTokenType.*
+import dev.kikugie.stitcher.type.StitcherToken.*
 import kotlinx.serialization.Serializable
 
 /**

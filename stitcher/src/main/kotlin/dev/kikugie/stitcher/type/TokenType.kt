@@ -1,6 +1,6 @@
-package dev.kikugie.stitcher.token
+package dev.kikugie.stitcher.type
 
-import dev.kikugie.stitcher.util.StringifySerializer
+import dev.kikugie.stitcher.token.Token
 import kotlinx.serialization.Serializable
 
 /**
@@ -13,9 +13,6 @@ import kotlinx.serialization.Serializable
  * This is not an issue anyway, since all implementations are enums.
  * @see Token
  */
-@Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
-@Serializable(with = StringifySerializer::class)
-interface TokenType
-
 @Serializable
-data object NULL : TokenType
+sealed interface TokenType
+

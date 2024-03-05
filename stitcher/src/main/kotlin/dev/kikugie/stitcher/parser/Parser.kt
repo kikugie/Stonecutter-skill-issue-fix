@@ -2,11 +2,11 @@ package dev.kikugie.stitcher.parser
 
 import dev.kikugie.stitcher.exception.StitcherSyntaxException
 import dev.kikugie.stitcher.exception.StitcherThrowable
-import dev.kikugie.stitcher.lexer.StitcherTokenType
-import dev.kikugie.stitcher.scanner.CommentType
-import dev.kikugie.stitcher.token.NULL
+import dev.kikugie.stitcher.type.StitcherToken
+import dev.kikugie.stitcher.type.Comment
+import dev.kikugie.stitcher.type.NULL
 import dev.kikugie.stitcher.token.Token
-import dev.kikugie.stitcher.token.TokenType
+import dev.kikugie.stitcher.type.TokenType
 import dev.kikugie.stitcher.util.LookaroundIterator.Companion.lookaround
 import java.util.*
 
@@ -28,9 +28,9 @@ class Parser(input: Iterable<Token>) {
     }
 
     private fun process() {
-        if (match(CommentType.CONTENT))
+        if (match(Comment.CONTENT))
             active.add(ContentBlock(iter.next()))
-        else if (match(CommentType.COMMENT_START))
+        else if (match(Comment.COMMENT_START))
             matchComment()
 
         if (active.enclosure != ScopeType.CLOSED)
@@ -39,11 +39,11 @@ class Parser(input: Iterable<Token>) {
 
     private fun matchComment() {
         val start = consume()
-        when (match(StitcherTokenType.CONDITION, StitcherTokenType.SWAP)) {
-            StitcherTokenType.CONDITION -> matchCondition(start)
-            StitcherTokenType.SWAP -> matchSwap(start)
+        when (match(StitcherToken.CONDITION, StitcherToken.SWAP)) {
+            StitcherToken.CONDITION -> matchCondition(start)
+            StitcherToken.SWAP -> matchSwap(start)
             else -> {
-                val contents = consume(CommentType.COMMENT, "Expected comment contents")
+                val contents = consume(Comment.COMMENT, "Expected comment contents")
                 val end = getOrCreateCommentEnd()
                 val comment = CommentBlock(start, Literal(contents), end)
                 active.add(comment)
@@ -54,15 +54,15 @@ class Parser(input: Iterable<Token>) {
     private fun matchCondition(start: Token) {
         skip() // Skip ?
         var extension = false
-        if (match(StitcherTokenType.SCOPE_CLOSE)) {
+        if (match(StitcherToken.SCOPE_CLOSE)) {
             if (scopeStack.empty()) throw StitcherSyntaxException(iter.peek!!, "No scope to close")
-            if (active.type != StitcherTokenType.CONDITION) throw StitcherSyntaxException(
+            if (active.type != StitcherToken.CONDITION) throw StitcherSyntaxException(
                 iter.peek!!,
                 "Closes a block of different type ${active.type}"
             )
             skip() // Skip }
             scopeStack.pop()
-            if (match(CommentType.COMMENT_END)) {
+            if (match(Comment.COMMENT_END)) {
                 skip()
                 return
             }
@@ -72,10 +72,10 @@ class Parser(input: Iterable<Token>) {
 
         val sugar = createConditionSugar(extension)
 
-        val hasExpression = match(StitcherTokenType.EXPRESSION)
-        val expression = if (!hasExpression && sugar.lastOrNull()?.type == StitcherTokenType.ELSE)
+        val hasExpression = match(StitcherToken.EXPRESSION)
+        val expression = if (!hasExpression && sugar.lastOrNull()?.type == StitcherToken.ELSE)
             Empty else matchExpression()
-        val scope = createScope(StitcherTokenType.CONDITION)
+        val scope = createScope(StitcherToken.CONDITION)
         val condition = Condition(sugar, expression, extension)
         val comment =
             CommentBlock(start, condition, getOrCreateCommentEnd(), scope)
@@ -84,26 +84,26 @@ class Parser(input: Iterable<Token>) {
     }
 
     private fun matchExpression(grouped: Boolean = false): Component = when {
-        match(StitcherTokenType.EXPRESSION) -> {
+        match(StitcherToken.EXPRESSION) -> {
             val left = Literal(consume())
-            if (match(StitcherTokenType.OR, StitcherTokenType.AND) != null) {
+            if (match(StitcherToken.OR, StitcherToken.AND) != null) {
                 val operator = consume()
                 val right = matchExpression()
                 Binary(left, operator, right)
             } else left
         }
 
-        match(StitcherTokenType.NEGATE) -> {
+        match(StitcherToken.NEGATE) -> {
             val operator = consume()
             val target = matchExpression()
             Unary(operator, target)
         }
 
-        match(StitcherTokenType.GROUP_OPEN) -> {
+        match(StitcherToken.GROUP_OPEN) -> {
             skip()
             val group = Group(matchExpression(true))
-            consume(StitcherTokenType.GROUP_CLOSE, "Expected `)` to close the group")
-            if (match(StitcherTokenType.OR, StitcherTokenType.AND) != null) {
+            consume(StitcherToken.GROUP_CLOSE, "Expected `)` to close the group")
+            if (match(StitcherToken.OR, StitcherToken.AND) != null) {
                 val operator = consume()
                 val right = matchExpression(true)
                 Binary(group, operator, right)
@@ -115,7 +115,7 @@ class Parser(input: Iterable<Token>) {
 
     private fun createConditionSugar(isClosed: Boolean): List<Token> {
         val sugar = mutableListOf<Token>()
-        val hasElse = match(StitcherTokenType.ELSE)
+        val hasElse = match(StitcherToken.ELSE)
 //        val previous = active.blocks.last()
 
         // TODO: Check if its valid in relation to the previous comment. I'm too tired rn for this
@@ -124,16 +124,16 @@ class Parser(input: Iterable<Token>) {
         if (hasElse) {
             sugar.add(iter.next())
         }
-        if (match(StitcherTokenType.IF))
+        if (match(StitcherToken.IF))
             sugar.add(iter.next())
         return sugar
     }
 
     private fun matchSwap(start: Token) {
         skip() // Skip $
-        if (match(StitcherTokenType.SCOPE_CLOSE)) {
+        if (match(StitcherToken.SCOPE_CLOSE)) {
             if (scopeStack.empty()) throw StitcherSyntaxException(iter.peek!!, "No scope to close")
-            if (active.type != StitcherTokenType.SWAP) throw StitcherSyntaxException(
+            if (active.type != StitcherToken.SWAP) throw StitcherSyntaxException(
                 iter.peek!!,
                 "Closes a block of different type ${active.type}"
             )
@@ -142,10 +142,10 @@ class Parser(input: Iterable<Token>) {
             scopeStack.pop()
         } else {
             val id = consume(
-                StitcherTokenType.EXPRESSION,
+                StitcherToken.EXPRESSION,
                 "Expected an identifier after $. To disable this swap block use `null`"
             )
-            val scope = createScope(StitcherTokenType.SWAP)
+            val scope = createScope(StitcherToken.SWAP)
             val swap = Swap(id)
             val comment =
                 CommentBlock(start, swap, getOrCreateCommentEnd(), scope)
@@ -154,8 +154,8 @@ class Parser(input: Iterable<Token>) {
         }
     }
 
-    private fun createScope(type: StitcherTokenType): Scope {
-        val isClosedScope = match(StitcherTokenType.SCOPE_OPEN)
+    private fun createScope(type: StitcherToken): Scope {
+        val isClosedScope = match(StitcherToken.SCOPE_OPEN)
         val scopeType = if (isClosedScope) ScopeType.CLOSED else ScopeType.LINE
         if (isClosedScope) skip() // Skip {
         return Scope(type, scopeType)
@@ -175,8 +175,8 @@ class Parser(input: Iterable<Token>) {
     }
 
     private fun getOrCreateCommentEnd(): Token = when {
-        match(CommentType.COMMENT_END) -> iter.next()
-        match(NULL) -> Token("", iter.current!!.range.let { it.last + 1..<-1 }, CommentType.COMMENT_END)
+        match(Comment.COMMENT_END) -> iter.next()
+        match(NULL) -> Token("", iter.current!!.range.let { it.last + 1..<-1 }, Comment.COMMENT_END)
         else -> throw StitcherSyntaxException(iter.peek!!, "Expected the comment to end")
     }
 

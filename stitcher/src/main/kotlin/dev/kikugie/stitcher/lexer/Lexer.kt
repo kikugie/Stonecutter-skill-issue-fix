@@ -1,9 +1,9 @@
 package dev.kikugie.stitcher.lexer
 
-import dev.kikugie.stitcher.lexer.StitcherTokenType.*
-import dev.kikugie.stitcher.scanner.CommentType
+import dev.kikugie.stitcher.type.StitcherToken.*
+import dev.kikugie.stitcher.type.Comment
 import dev.kikugie.stitcher.token.Token
-import dev.kikugie.stitcher.token.TokenType
+import dev.kikugie.stitcher.type.TokenType
 import dev.kikugie.stitcher.util.leadingSpaces
 import dev.kikugie.stitcher.util.trailingSpaces
 
@@ -13,7 +13,7 @@ class Lexer(private val input: Iterable<Token>) {
     }
 
     private suspend fun SequenceScope<Token>.process(token: Token) {
-        if (token.type != CommentType.COMMENT) {
+        if (token.type != Comment.COMMENT) {
             yield(token)
             return
         }

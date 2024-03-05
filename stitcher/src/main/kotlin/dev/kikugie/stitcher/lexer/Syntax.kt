@@ -1,5 +1,7 @@
 package dev.kikugie.stitcher.lexer
 
+import dev.kikugie.stitcher.type.StitcherToken
+
 @Suppress("MemberVisibilityCanBePrivate")
 object Syntax {
     val SCOPE_OPEN = CharRecognizer('{')
@@ -15,21 +17,21 @@ object Syntax {
     val ELSE = StringRecognizer("else")
 
     val conditionState = listOf(
-        StitcherTokenType.IF to IF,
-        StitcherTokenType.ELSE to ELSE,
-        StitcherTokenType.AND to AND,
-        StitcherTokenType.OR to OR,
-        StitcherTokenType.NEGATE to NEGATE,
+        StitcherToken.IF to IF,
+        StitcherToken.ELSE to ELSE,
+        StitcherToken.AND to AND,
+        StitcherToken.OR to OR,
+        StitcherToken.NEGATE to NEGATE,
 
-        StitcherTokenType.SCOPE_OPEN to SCOPE_OPEN,
-        StitcherTokenType.SCOPE_CLOSE to SCOPE_CLOSE,
+        StitcherToken.SCOPE_OPEN to SCOPE_OPEN,
+        StitcherToken.SCOPE_CLOSE to SCOPE_CLOSE,
 
-        StitcherTokenType.GROUP_OPEN to GROUP_OPEN,
-        StitcherTokenType.GROUP_CLOSE to GROUP_CLOSE,
+        StitcherToken.GROUP_OPEN to GROUP_OPEN,
+        StitcherToken.GROUP_CLOSE to GROUP_CLOSE,
     )
 
     val swapState = listOf(
-        StitcherTokenType.SCOPE_OPEN to SCOPE_OPEN,
-        StitcherTokenType.SCOPE_CLOSE to SCOPE_CLOSE,
+        StitcherToken.SCOPE_OPEN to SCOPE_OPEN,
+        StitcherToken.SCOPE_CLOSE to SCOPE_CLOSE,
     )
 }
