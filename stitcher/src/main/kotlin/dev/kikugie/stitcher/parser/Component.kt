@@ -52,7 +52,7 @@ data class Literal(val token: Token) : Component {
 /**
  * Represents a unary operation in a Stitcher program.
  *
- * Available unary operators are: [NOT]
+ * Available unary operators are: [NEGATE]
  *
  * @param operator The operator token defining the unary operation.
  * @param target The target component of the unary operation.
@@ -116,9 +116,9 @@ data class Group(
  */
 @Serializable
 data class Condition(
-    val sugar: List<Token>,
-    val condition: Component,
-    val extension: Boolean,
+    val sugar: List<Token> = listOf(),
+    val condition: Component = Empty,
+    val extension: Boolean = false,
 ) : Component {
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitCondition(this)
 }
@@ -151,7 +151,8 @@ data class Condition(
  */
 @Serializable
 data class Swap(
-    val identifier: Token,
+    val identifier: Token = Token.eof(-1),
+    val extension: Boolean = false,
 ) : Component {
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitSwap(this)
 }

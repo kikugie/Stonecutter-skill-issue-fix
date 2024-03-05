@@ -61,12 +61,15 @@ class Parser(input: Iterable<Token>) {
                 "Closes a block of different type ${active.type}"
             )
             skip() // Skip }
-            scopeStack.pop()
-            if (match(Comment.COMMENT_END)) {
-                skip()
+            if (match(Comment.COMMENT_END, NULL) != null) {
+                val condition = Condition(extension = true)
+                val comment = CommentBlock(start, condition, getOrCreateCommentEnd())
+                active.add(comment)
+                scopeStack.pop()
                 return
             }
 
+            scopeStack.pop()
             extension = true
         }
 
@@ -83,7 +86,36 @@ class Parser(input: Iterable<Token>) {
         scopeStack.push(scope)
     }
 
-    private fun matchExpression(grouped: Boolean = false): Component = when {
+    private fun matchSwap(start: Token) {
+        skip() // Skip $
+        if (match(StitcherToken.SCOPE_CLOSE)) {
+            if (scopeStack.empty()) throw StitcherSyntaxException(iter.peek!!, "No scope to close")
+            if (active.type != StitcherToken.SWAP) throw StitcherSyntaxException(
+                iter.peek!!,
+                "Closes a block of different type ${active.type}"
+            )
+            skip() // Skip }
+            if (match(Comment.COMMENT_END, NULL) != null) {
+                val swap = Swap(extension = true)
+                val comment = CommentBlock(start, swap, getOrCreateCommentEnd())
+                active.add(comment)
+            }
+            scopeStack.pop()
+        } else {
+            val id = consume(
+                StitcherToken.EXPRESSION,
+                "Expected an identifier after $. To disable this swap block use `null`"
+            )
+            val scope = createScope(StitcherToken.SWAP)
+            val swap = Swap(id)
+            val comment =
+                CommentBlock(start, swap, getOrCreateCommentEnd(), scope)
+            active.add(comment)
+            scopeStack.push(scope)
+        }
+    }
+
+    private fun matchExpression(): Component = when {
         match(StitcherToken.EXPRESSION) -> {
             val left = Literal(consume())
             if (match(StitcherToken.OR, StitcherToken.AND) != null) {
@@ -101,11 +133,11 @@ class Parser(input: Iterable<Token>) {
 
         match(StitcherToken.GROUP_OPEN) -> {
             skip()
-            val group = Group(matchExpression(true))
+            val group = Group(matchExpression())
             consume(StitcherToken.GROUP_CLOSE, "Expected `)` to close the group")
             if (match(StitcherToken.OR, StitcherToken.AND) != null) {
                 val operator = consume()
-                val right = matchExpression(true)
+                val right = matchExpression()
                 Binary(group, operator, right)
             } else group
         }
@@ -127,31 +159,6 @@ class Parser(input: Iterable<Token>) {
         if (match(StitcherToken.IF))
             sugar.add(iter.next())
         return sugar
-    }
-
-    private fun matchSwap(start: Token) {
-        skip() // Skip $
-        if (match(StitcherToken.SCOPE_CLOSE)) {
-            if (scopeStack.empty()) throw StitcherSyntaxException(iter.peek!!, "No scope to close")
-            if (active.type != StitcherToken.SWAP) throw StitcherSyntaxException(
-                iter.peek!!,
-                "Closes a block of different type ${active.type}"
-            )
-            skip() // Skip }
-            getOrCreateCommentEnd()
-            scopeStack.pop()
-        } else {
-            val id = consume(
-                StitcherToken.EXPRESSION,
-                "Expected an identifier after $. To disable this swap block use `null`"
-            )
-            val scope = createScope(StitcherToken.SWAP)
-            val swap = Swap(id)
-            val comment =
-                CommentBlock(start, swap, getOrCreateCommentEnd(), scope)
-            active.add(comment)
-            scopeStack.push(scope)
-        }
     }
 
     private fun createScope(type: StitcherToken): Scope {

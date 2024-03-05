@@ -48,18 +48,24 @@ object AssemblyVisitor : Component.Visitor<String>, Block.Visitor<String> {
         append('?')
         if (condition.extension)
             append('}')
-        space()
         val components = condition.sugar.map { it.value }.toMutableList()
         visitComponent(condition.condition).run {
             if (isNotBlank()) components.add(this)
         }
-        append(components.joinToString(" "))
+        if (components.isNotEmpty()) {
+            space()
+            append(components.joinToString(" "))
+        }
     }
 
     override fun visitSwap(swap: Swap) = buildString {
         append('$')
-        space()
-        token(swap.identifier)
+        if (swap.extension)
+            append('}')
+        else {
+            space()
+            token(swap.identifier)
+        }
     }
 
     override fun visitContent(content: ContentBlock) = content.token.value
