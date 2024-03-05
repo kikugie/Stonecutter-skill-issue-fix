@@ -4,6 +4,7 @@ import dev.kikugie.stitcher.exception.StitcherSyntaxException
 import dev.kikugie.stitcher.exception.StitcherThrowable
 import dev.kikugie.stitcher.lexer.StitcherTokenType
 import dev.kikugie.stitcher.scanner.CommentType
+import dev.kikugie.stitcher.token.NULL
 import dev.kikugie.stitcher.token.Token
 import dev.kikugie.stitcher.token.TokenType
 import dev.kikugie.stitcher.util.LookaroundIterator.Companion.lookaround
@@ -21,8 +22,9 @@ class Parser(input: Iterable<Token>) {
     private val active
         get() = if (scopeStack.empty()) rootScope else scopeStack.peek()
 
-    fun parse() {
+    fun parse(): RootScope {
         while (iter.hasNext()) process()
+        return rootScope
     }
 
     private fun process() {
@@ -42,7 +44,7 @@ class Parser(input: Iterable<Token>) {
             StitcherTokenType.SWAP -> matchSwap(start)
             else -> {
                 val contents = consume(CommentType.COMMENT, "Expected comment contents")
-                val end = consume(CommentType.COMMENT_END, "Expected comment to end")
+                val end = getOrCreateCommentEnd()
                 val comment = CommentBlock(start, Literal(contents), end)
                 active.add(comment)
             }
@@ -75,7 +77,8 @@ class Parser(input: Iterable<Token>) {
             Empty else matchExpression()
         val scope = createScope(StitcherTokenType.CONDITION)
         val condition = Condition(sugar, expression, extension)
-        val comment = CommentBlock(start, condition, consume(CommentType.COMMENT_END, "Expected the comment to end"), scope)
+        val comment =
+            CommentBlock(start, condition, getOrCreateCommentEnd(), scope)
         active.add(comment)
         scopeStack.push(scope)
     }
@@ -135,7 +138,7 @@ class Parser(input: Iterable<Token>) {
                 "Closes a block of different type ${active.type}"
             )
             skip() // Skip }
-            consume(CommentType.COMMENT_END, "Expected the comment to end")
+            getOrCreateCommentEnd()
             scopeStack.pop()
         } else {
             val id = consume(
@@ -145,7 +148,7 @@ class Parser(input: Iterable<Token>) {
             val scope = createScope(StitcherTokenType.SWAP)
             val swap = Swap(id)
             val comment =
-                CommentBlock(start, swap, consume(CommentType.COMMENT_END, "Expected the comment to end"), scope)
+                CommentBlock(start, swap, getOrCreateCommentEnd(), scope)
             active.add(comment)
             scopeStack.push(scope)
         }
@@ -169,6 +172,12 @@ class Parser(input: Iterable<Token>) {
     private fun consume(type: TokenType, message: String, strict: Boolean = true): Token {
         if (match(type)) return iter.next()
         else throw StitcherThrowable.create(iter.peek ?: Token.eof(iter.current!!.range.last + 1), message, strict)
+    }
+
+    private fun getOrCreateCommentEnd(): Token = when {
+        match(CommentType.COMMENT_END) -> iter.next()
+        match(NULL) -> Token("", iter.current!!.range.let { it.last + 1..<-1 }, CommentType.COMMENT_END)
+        else -> throw StitcherSyntaxException(iter.peek!!, "Expected the comment to end")
     }
 
     private fun skip() {
