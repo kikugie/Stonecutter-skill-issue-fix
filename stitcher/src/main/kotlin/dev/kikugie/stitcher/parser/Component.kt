@@ -16,6 +16,7 @@ sealed interface Component {
     fun <T> accept(visitor: Visitor<T>): T
 
     interface Visitor<T> {
+        fun visitUnary(unary: Unary): T
         fun visitBinary(binary: Binary): T
         fun visitGroup(group: Group): T
         fun visitEmpty(empty: Empty): T
@@ -46,6 +47,24 @@ data object Empty : Component {
 @Serializable
 data class Literal(val token: Token) : Component {
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitLiteral(this)
+}
+
+/**
+ * Represents a unary operation in a Stitcher program.
+ *
+ * Available unary operators are: [NOT]
+ *
+ * @param operator The operator token defining the unary operation.
+ * @param target The target component of the unary operation.
+ *
+ * @see Component
+ */
+@Serializable
+data class Unary(
+    val operator: Token,
+    val target: Component,
+) : Component {
+    override fun <T> accept(visitor: Visitor<T>)= visitor.visitUnary(this)
 }
 
 /**

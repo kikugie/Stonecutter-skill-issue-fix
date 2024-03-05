@@ -12,6 +12,7 @@ object AssemblyVisitor : Component.Visitor<String>, Block.Visitor<String> {
     fun visitComponent(it: Component): String = when(it) {
         is Empty -> visitEmpty(it)
         is Literal -> visitLiteral(it)
+        is Unary -> visitUnary(it)
         is Binary -> visitBinary(it)
         is Group -> visitGroup(it)
         is Condition -> visitCondition(it)
@@ -26,6 +27,8 @@ object AssemblyVisitor : Component.Visitor<String>, Block.Visitor<String> {
     override fun visitEmpty(empty: Empty) = ""
 
     override fun visitLiteral(literal: Literal) = literal.token.value
+
+    override fun visitUnary(unary: Unary): String = unary.operator.value + visitComponent(unary.target)
 
     override fun visitBinary(binary: Binary) = buildString {
         append(visitComponent(binary.left))
@@ -73,5 +76,9 @@ object AssemblyVisitor : Component.Visitor<String>, Block.Visitor<String> {
             append(visitScope(comment.scope))
     }
 
-    fun visitScope(scope: Scope): String = assemble(scope)
+    fun visitScope(scope: Scope): String = buildString {
+        scope.blocks.forEach {
+            append(visitBlock(it))
+        }
+    }
 }
