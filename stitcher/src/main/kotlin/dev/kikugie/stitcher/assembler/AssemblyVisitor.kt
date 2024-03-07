@@ -9,21 +9,6 @@ object AssemblyVisitor : Component.Visitor<String>, Block.Visitor<String> {
 
     private fun StringBuilder.space(): StringBuilder = append(' ')
 
-    fun visitComponent(it: Component): String = when(it) {
-        is Empty -> visitEmpty(it)
-        is Literal -> visitLiteral(it)
-        is Unary -> visitUnary(it)
-        is Binary -> visitBinary(it)
-        is Group -> visitGroup(it)
-        is Condition -> visitCondition(it)
-        is Swap -> visitSwap(it)
-    }
-
-    fun visitBlock(it: Block) = when(it) {
-        is CommentBlock -> visitComment(it)
-        is ContentBlock -> visitContent(it)
-    }
-
     override fun visitEmpty(empty: Empty) = ""
 
     override fun visitLiteral(literal: Literal) = literal.token.value

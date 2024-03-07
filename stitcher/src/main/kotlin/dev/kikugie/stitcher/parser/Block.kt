@@ -1,5 +1,6 @@
 package dev.kikugie.stitcher.parser
 
+import dev.kikugie.stitcher.assembler.AssemblyVisitor
 import dev.kikugie.stitcher.parser.Block.Visitor
 import dev.kikugie.stitcher.token.Token
 import kotlinx.serialization.Serializable
@@ -15,6 +16,11 @@ sealed interface Block {
     fun <T> accept(visitor: Visitor<T>): T
 
     interface Visitor<T> {
+        fun visitBlock(it: Block) = when(it) {
+            is CommentBlock -> visitComment(it)
+            is ContentBlock -> visitContent(it)
+        }
+
         fun visitContent(content: ContentBlock): T
         fun visitComment(comment: CommentBlock): T
     }

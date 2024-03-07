@@ -1,5 +1,6 @@
 package dev.kikugie.stitcher.parser
 
+import dev.kikugie.stitcher.assembler.AssemblyVisitor
 import dev.kikugie.stitcher.parser.Component.*
 import dev.kikugie.stitcher.token.Token
 import dev.kikugie.stitcher.type.StitcherToken.*
@@ -16,6 +17,16 @@ sealed interface Component {
     fun <T> accept(visitor: Visitor<T>): T
 
     interface Visitor<T> {
+        fun visitComponent(it: Component) = when(it) {
+            is Empty -> visitEmpty(it)
+            is Literal -> visitLiteral(it)
+            is Unary -> visitUnary(it)
+            is Binary -> visitBinary(it)
+            is Group -> visitGroup(it)
+            is Condition -> visitCondition(it)
+            is Swap -> visitSwap(it)
+        }
+
         fun visitUnary(unary: Unary): T
         fun visitBinary(binary: Binary): T
         fun visitGroup(group: Group): T
