@@ -11,14 +11,14 @@ import kotlinx.serialization.Serializable
  * Parser will assign the next [Block] to the scope and close it.
  * Transformer will apply the change to the next logical line.
  * (i.e. the current line or the next one if the current one has nothing after the condition)
- * - [WORD] - comment ends with `<undecided>`.
+ * - [WORD] - comment ends with `>>`.
  * Parser will assign the next [Block] to the scope and close it.
  * Transformer will apply the change to the next uninterrupted string.
  * (i.e. a string that ends with a whitespace or a line break)
  */
 @Serializable
-enum class ScopeType {
-    CLOSED,
-    LINE,
-    WORD
+enum class ScopeType(val id: String) {
+    CLOSED("{"),
+    LINE(""),
+    WORD(">>")
 }

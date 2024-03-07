@@ -1,5 +1,6 @@
 package dev.kikugie.stitcher.lexer
 
+import dev.kikugie.stitcher.parser.ScopeType
 import dev.kikugie.stitcher.type.StitcherToken
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -16,6 +17,8 @@ object Syntax {
     val IF = StringRecognizer("if")
     val ELSE = StringRecognizer("else")
 
+    val EXPECT_WORD = StringRecognizer(ScopeType.WORD.id)
+
     val conditionState = listOf(
         StitcherToken.IF to IF,
         StitcherToken.ELSE to ELSE,
@@ -28,10 +31,14 @@ object Syntax {
 
         StitcherToken.GROUP_OPEN to GROUP_OPEN,
         StitcherToken.GROUP_CLOSE to GROUP_CLOSE,
+
+        StitcherToken.EXPECT_WORD to EXPECT_WORD,
     )
 
     val swapState = listOf(
         StitcherToken.SCOPE_OPEN to SCOPE_OPEN,
         StitcherToken.SCOPE_CLOSE to SCOPE_CLOSE,
+
+        StitcherToken.EXPECT_WORD to EXPECT_WORD,
     )
 }

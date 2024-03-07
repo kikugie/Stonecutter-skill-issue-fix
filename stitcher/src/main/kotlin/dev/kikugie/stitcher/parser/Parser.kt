@@ -162,9 +162,12 @@ class Parser(input: Iterable<Token>) {
     }
 
     private fun createScope(type: StitcherToken): Scope {
-        val isClosedScope = match(StitcherToken.SCOPE_OPEN)
-        val scopeType = if (isClosedScope) ScopeType.CLOSED else ScopeType.LINE
-        if (isClosedScope) skip() // Skip {
+        val scopeType = when(match(StitcherToken.SCOPE_OPEN, StitcherToken.EXPECT_WORD)) {
+            StitcherToken.SCOPE_OPEN -> ScopeType.CLOSED
+            StitcherToken.EXPECT_WORD -> ScopeType.WORD
+            else -> ScopeType.LINE
+        }
+        if (scopeType != ScopeType.LINE) skip() // Skip { or >>
         return Scope(type, scopeType)
     }
 

@@ -412,6 +412,40 @@ object ParserTest {
             version: 1
             """.trimIndent()
         }
+        this["expect word"] = pair {
+            left = "/*? if >=1.20 >>*/ word1 word2"
+            right = """
+            blocks:
+            - !<dev.kikugie.stitcher.parser.CommentBlock>
+              start:
+                value: "/*"
+                range: "0..<2"
+                type: !<dev.kikugie.stitcher.type.Comment> "COMMENT_START"
+              content: !<dev.kikugie.stitcher.parser.Condition>
+                sugar:
+                - value: "if"
+                  range: "4..<6"
+                  type: !<dev.kikugie.stitcher.type.StitcherToken> "IF"
+                condition: !<dev.kikugie.stitcher.parser.Literal>
+                  token:
+                    value: ">=1.20"
+                    range: "7..<13"
+                    type: !<dev.kikugie.stitcher.type.StitcherToken> "EXPRESSION"
+              end:
+                value: "*/"
+                range: "16..<18"
+                type: !<dev.kikugie.stitcher.type.Comment> "COMMENT_END"
+              scope:
+                type: !<dev.kikugie.stitcher.type.StitcherToken> "CONDITION"
+                enclosure: "WORD"
+            - !<dev.kikugie.stitcher.parser.ContentBlock>
+              token:
+                value: " word1 word2"
+                range: "18..<30"
+                type: !<dev.kikugie.stitcher.type.Comment> "CONTENT"
+            version: 1
+            """.trimIndent()
+        }
     }
 
     fun check(input: String, expected: String) =

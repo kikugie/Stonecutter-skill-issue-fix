@@ -13,4 +13,5 @@ enum class StitcherToken : TokenType {
     // Multi-char
     AND, OR, IF, ELSE, // && , || and self-explanatory
     EXPRESSION, // anything in-between is sent to the expression processor
+    EXPECT_WORD, // >>
 }
