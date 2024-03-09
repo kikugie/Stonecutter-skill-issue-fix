@@ -2,6 +2,7 @@ package dev.kikugie.stitcher.scanner
 
 import dev.kikugie.stitcher.token.Token
 import dev.kikugie.stitcher.type.Comment
+import dev.kikugie.stitcher.util.readLigatures
 import dev.kikugie.stitcher.util.shift
 import dev.kikugie.stitcher.util.yield
 import java.io.Reader
@@ -14,7 +15,7 @@ import java.io.Reader
  */
 class Scanner(
     private val input: Reader,
-    private val recognizers: Collection<CommentRecognizer>,
+    private val recognizers: Iterable<CommentRecognizer>,
 ) {
     private val buffer = StringBuilder()
     private var cursor = 0
@@ -64,22 +65,6 @@ class Scanner(
         else if (buffer.endsWith(quote!!.sequence) && !buffer.endsWith("\\${quote!!.sequence}"))
             quote = null
         return quote != null
-    }
-
-    private inline fun Reader.readLigatures(action: (String) -> Unit) {
-        var char: Char
-        var captureCR = false
-        while (read().also { char = it.toChar() } != -1) when {
-            char == '\r' -> captureCR = true
-            captureCR ->
-                if (char == '\n')
-                    action("\r\n")
-                else {
-                    action("\r")
-                    action(char.toString())
-                }.also { captureCR = false }
-            else -> action(char.toString())
-        }
     }
 
     private fun StringBuilder.delete(range: IntRange) =

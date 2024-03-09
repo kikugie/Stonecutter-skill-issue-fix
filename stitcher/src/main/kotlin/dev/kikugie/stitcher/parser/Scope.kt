@@ -2,7 +2,9 @@ package dev.kikugie.stitcher.parser
 
 import dev.kikugie.stitcher.type.NULL
 import dev.kikugie.stitcher.type.TokenType
+import dev.kikugie.stitcher.util.Buildable
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /**
  * Represents a scope in a Stitcher program.
@@ -44,22 +46,10 @@ open class Scope(
     val type: TokenType = NULL,
     val enclosure: ScopeType = ScopeType.CLOSED,
 ) {
-    val blocks: MutableList<Block> = mutableListOf()
+    var blocks: MutableList<Block> = mutableListOf()
 
     fun add(block: Block) {
         blocks.add(block)
-    }
-
-    fun remove(block: Block) {
-        blocks.remove(block)
-    }
-
-    fun replace(source: Block, block: Block) {
-        blocks[blocks.indexOf(source)] = block
-    }
-
-    fun find(predicate: (Block) -> Boolean): Block? {
-        return blocks.find(predicate)
     }
 }
 

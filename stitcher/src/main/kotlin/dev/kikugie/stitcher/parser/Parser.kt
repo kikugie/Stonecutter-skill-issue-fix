@@ -10,6 +10,7 @@ import dev.kikugie.stitcher.type.TokenType
 import dev.kikugie.stitcher.util.LookaroundIterator.Companion.lookaround
 import java.util.*
 
+// FIXME: Open scopes are not correctly captured
 class Parser(input: Iterable<Token>) {
     companion object {
         const val VERSION = 1
@@ -31,7 +32,7 @@ class Parser(input: Iterable<Token>) {
         if (match(Comment.CONTENT))
             active.add(ContentBlock(iter.next()))
         else if (match(Comment.COMMENT_START))
-            matchComment()
+            matchComment().also { return }
 
         if (active.enclosure != ScopeType.CLOSED)
             scopeStack.pop()
@@ -80,8 +81,7 @@ class Parser(input: Iterable<Token>) {
             Empty else matchExpression()
         val scope = createScope(StitcherToken.CONDITION)
         val condition = Condition(sugar, expression, extension)
-        val comment =
-            CommentBlock(start, condition, getOrCreateCommentEnd(), scope)
+        val comment = CommentBlock(start, condition, getOrCreateCommentEnd(), scope)
         active.add(comment)
         scopeStack.push(scope)
     }
@@ -108,8 +108,7 @@ class Parser(input: Iterable<Token>) {
             )
             val scope = createScope(StitcherToken.SWAP)
             val swap = Swap(id)
-            val comment =
-                CommentBlock(start, swap, getOrCreateCommentEnd(), scope)
+            val comment = CommentBlock(start, swap, getOrCreateCommentEnd(), scope)
             active.add(comment)
             scopeStack.push(scope)
         }

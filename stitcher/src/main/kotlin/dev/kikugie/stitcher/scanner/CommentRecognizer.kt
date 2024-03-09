@@ -1,6 +1,7 @@
 package dev.kikugie.stitcher.scanner
 
 import dev.kikugie.stitcher.token.TokenMatch
+import dev.kikugie.stitcher.util.matchEOL
 
 /**
  * Interface for matching source comments in [Scanner]
@@ -16,13 +17,6 @@ interface CommentRecognizer {
     fun end(str: CharSequence): TokenMatch? = str.match(end)
     fun CharSequence.match(match: CharSequence) = if (endsWith(match))
         TokenMatch(match.toString(), length - match.length..<length) else null
-}
-
-private fun CharSequence.matchEOL(): TokenMatch? = when {
-    endsWith("\r\n") -> TokenMatch("\r\n", length - 2..<length)
-    endsWith("\r") -> TokenMatch("\r", length - 1..<length)
-    endsWith("\n") -> TokenMatch("\n", length - 1..<length)
-    else -> null
 }
 
 /**
