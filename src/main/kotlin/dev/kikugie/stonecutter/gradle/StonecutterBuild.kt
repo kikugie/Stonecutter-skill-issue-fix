@@ -11,6 +11,7 @@ import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.Path
 
 /**
  * Provides versioned functionality in the buildscript.
@@ -64,6 +65,8 @@ open class StonecutterBuild(internal val project: Project) {
 
             input.set(project.parent!!.file("./src").toPath())
             output.set(project.buildDirectory.toPath().resolve("chiseledSrc"))
+            if (setup.fileFilters.isNotEmpty())
+                fileFilter.set { p -> setup.fileFilters.all { it(p) } }
         }
 
         project.afterEvaluate {
