@@ -70,9 +70,6 @@ open class StonecutterSettings(private val settings: Settings) {
         kotlinController = value
     }
 
-    /**
-     * Specifies version directories and initial active version.
-     */
     fun shared(builder: Action<SharedConfigBuilder>) {
         shared = SharedConfigBuilder(shared, builder)
     }

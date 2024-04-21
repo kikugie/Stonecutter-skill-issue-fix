@@ -28,12 +28,16 @@ open class StonecutterBuild(internal val project: Project) {
     /**
      * Version of this buildscript instance. (Unique for each subproject)
      */
-    val current: StonecutterProject = setup.versions.first { it.project in project.name }.withPlugin(this)
+    val current: StonecutterProject by lazy {
+        setup.versions.first { it.project in project.name }.let {
+            if (it.project == setup.current.project) it.asActive() else it
+        }
+    }
 
     /**
      * Current active version. (Global for all subprojects)
      */
-    val active: StonecutterProject = setup.current.withPlugin(this)
+    val active: StonecutterProject by lazy { setup.current }
 
     /**
      * All registered subprojects.
@@ -76,9 +80,9 @@ open class StonecutterBuild(internal val project: Project) {
         try {
             val formatter: (SourceSet, String) -> Any = if (setup.anyChiseled(project.gradle.startParameter.taskNames))
                 { source, type -> File(project.buildDirectory, "chiseledSrc/${source.name}/$type") }
-            else if (current.isActive)
+            else if (current.isActive) {
                 { source, type -> "../../src/${source.name}/$type" }
-            else return
+            } else return
 
             (project.property("sourceSets") as SourceSetContainer).forEach {
                 it.java.srcDir(formatter(it, "java"))

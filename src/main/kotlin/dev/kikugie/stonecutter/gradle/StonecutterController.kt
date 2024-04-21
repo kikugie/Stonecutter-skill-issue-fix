@@ -59,7 +59,7 @@ open class StonecutterController(project: Project) {
      * @param str project version
      */
     infix fun active(str: String) {
-        setup.current = setup.versions.find { it.project == str }
+        setup.current = setup.versions.find { it.project == str }?.asActive()
             ?: throw GradleException("[Stonecutter] Project $str is not registered")
     }
 
@@ -104,6 +104,7 @@ open class StonecutterController(project: Project) {
         root.tasks.create(
             "Refresh active project", StonecutterTask::class.java
         ).applyConfig(root, root.project(active.project), active)
+
         setup.versions.forEach { ver ->
             val project = root.project(ver.project)
             root.tasks.create(
