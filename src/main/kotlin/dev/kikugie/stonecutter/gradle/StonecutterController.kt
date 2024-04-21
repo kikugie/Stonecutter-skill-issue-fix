@@ -96,19 +96,19 @@ open class StonecutterController(project: Project) {
 
     private fun setupProject(root: Project) {
         val vcsProject = root.project(setup.vcs.project)
-        val vcs = vcsProject.extensions.getByType<StonecutterBuild>().current
+        val vcs = setup.vcs
         root.tasks.create(
             "Reset active project", StonecutterTask::class.java
         ).applyConfig(root, vcsProject, vcs)
+        val active = setup.current
         root.tasks.create(
             "Refresh active project", StonecutterTask::class.java
-        ).applyConfig(root, root.project(vcs.project), vcs)
+        ).applyConfig(root, root.project(active.project), active)
         setup.versions.forEach { ver ->
             val project = root.project(ver.project)
-            val version = project.extensions.getByType<StonecutterBuild>().current
             root.tasks.create(
-                "Set active project to ${version.project}", StonecutterTask::class.java
-            ).applyConfig(root, project, version)
+                "Set active project to ${ver.project}", StonecutterTask::class.java
+            ).applyConfig(root, project, ver)
         }
     }
 

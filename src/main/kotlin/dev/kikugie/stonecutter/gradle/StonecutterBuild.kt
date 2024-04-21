@@ -11,7 +11,6 @@ import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Path
 
 /**
  * Provides versioned functionality in the buildscript.
@@ -29,14 +28,12 @@ open class StonecutterBuild(internal val project: Project) {
     /**
      * Version of this buildscript instance. (Unique for each subproject)
      */
-    val current: StonecutterProject = setup.versions.find { it.project == project.name }!!.let {
-        StonecutterProject(it.project, it.version, this)
-    }
+    val current: StonecutterProject = setup.versions.first { it.project in project.name }.withPlugin(this)
 
     /**
      * Current active version. (Global for all subprojects)
      */
-    val active: StonecutterProject = setup.current.let { StonecutterProject(it.project, it.version, this) }
+    val active: StonecutterProject = setup.current.withPlugin(this)
 
     /**
      * All registered subprojects.

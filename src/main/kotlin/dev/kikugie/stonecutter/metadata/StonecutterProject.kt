@@ -8,5 +8,7 @@ class StonecutterProject(
     plugin: StonecutterBuild? = null
 ) {
     val isActive = project == plugin?.setup?.current?.project
+
+    fun withPlugin(plugin: StonecutterBuild) = StonecutterProject(project, version, plugin)
 }
 
