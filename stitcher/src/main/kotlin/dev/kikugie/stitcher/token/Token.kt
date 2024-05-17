@@ -2,8 +2,6 @@ package dev.kikugie.stitcher.token
 
 import dev.kikugie.stitcher.type.NULL
 import dev.kikugie.stitcher.type.TokenType
-import dev.kikugie.stitcher.util.IntRangeSerializer
-import dev.kikugie.stitcher.util.shift
 import kotlinx.serialization.Serializable
 
 /**
@@ -16,13 +14,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Token(
     val value: String,
-    val range: @Serializable(with = IntRangeSerializer::class) IntRange,
     val type: TokenType,
 ) {
-    fun subtoken(local: IntRange, type: TokenType) =
-        Token(value.substring(local), local.shift(range), type)
+    fun take(local: IntRange, type: TokenType) =
+        Token(value.substring(local), type)
 
     companion object {
-        fun eof(position: Int) = Token("\u0000", position..<-1, NULL)
+        val EOF = Token("\u0000", NULL)
     }
 }

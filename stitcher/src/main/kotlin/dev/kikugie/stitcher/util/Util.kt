@@ -8,9 +8,8 @@ import java.io.Reader
 
 suspend inline fun SequenceScope<Token>.yield(
     value: CharSequence,
-    range: IntRange,
     type: Comment,
-) = yield(Token(value.toString(), range, type))
+) = yield(Token(value.toString(), type))
 
 fun IntRange.shift(other: IntRange): IntRange {
     val shift = last - first

@@ -17,7 +17,7 @@ object Syntax {
     val IF = StringRecognizer("if")
     val ELSE = StringRecognizer("else")
 
-    val EXPECT_WORD = StringRecognizer(ScopeType.WORD.id)
+    val EXPECT_WORD = StringRecognizer(ScopeType.WORD.id) // >>
 
     val conditionState = listOf(
         StitcherToken.IF to IF,

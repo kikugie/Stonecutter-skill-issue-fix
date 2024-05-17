@@ -3,6 +3,10 @@ package dev.kikugie.stitcher.scanner
 import dev.kikugie.stitcher.token.TokenMatch
 import dev.kikugie.stitcher.util.matchEOL
 
+enum class CommentType {
+    SINGLE_LINE, MULTI_LINE
+}
+
 /**
  * Interface for matching source comments in [Scanner]
  *
@@ -10,6 +14,7 @@ import dev.kikugie.stitcher.util.matchEOL
  * According to (very brief) tests, using regex matching makes it 1.6-2x slower.
  */
 interface CommentRecognizer {
+    val type: CommentType
     val start: String
     val end: String
 
@@ -23,6 +28,7 @@ interface CommentRecognizer {
  * Matches `/* ... */` comments
  */
 data object StandardMultiLine : CommentRecognizer {
+    override val type = CommentType.MULTI_LINE
     override val start = "/*"
     override val end = "*/"
 }
@@ -31,6 +37,7 @@ data object StandardMultiLine : CommentRecognizer {
  * Matches `// ...` comments
  */
 data object StandardSingleLine : CommentRecognizer {
+    override val type = CommentType.SINGLE_LINE
     override val start = "//"
     override val end = "\n"
 
@@ -41,6 +48,7 @@ data object StandardSingleLine : CommentRecognizer {
  * Matches `# ...` comments
  */
 data object HashSingleLine : CommentRecognizer {
+    override val type = CommentType.SINGLE_LINE
     override val start = "#"
     override val end = "\n"
 

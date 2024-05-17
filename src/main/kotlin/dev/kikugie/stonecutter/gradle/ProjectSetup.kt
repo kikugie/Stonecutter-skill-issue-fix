@@ -10,9 +10,9 @@ typealias ProjectPath = String
  * Represents a finalized versions configuration to be passed to [StonecutterController]
  */
 open class ProjectSetup(builder: SharedConfigBuilder) {
-    internal val versions: List<StonecutterProject> = builder.versions
-    internal val vcs: StonecutterProject = builder.vcsVersionImpl
-    internal var current: StonecutterProject = vcs
+    val versions: List<StonecutterProject> = builder.versions
+    val vcs: StonecutterProject = builder.vcsVersionImpl
+    var current: StonecutterProject = vcs
 
     private val chiseledTasks: MutableSet<TaskName> = mutableSetOf()
     var debug = false

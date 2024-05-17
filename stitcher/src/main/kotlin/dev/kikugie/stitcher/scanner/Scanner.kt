@@ -24,12 +24,8 @@ class Scanner(
 
     fun tokenize(): Sequence<Token> = sequence {
         input.readLigatures { scan(it) }
-        if (buffer.isNotEmpty()) yield(
-            buffer,
-            cursor - buffer.length..<cursor,
-            if (current == null) Comment.CONTENT else Comment.COMMENT
-        )
-        yield(Token.eof(cursor))
+        if (buffer.isNotEmpty()) yield(buffer, if (current == null) Comment.CONTENT else Comment.COMMENT)
+        yield(Token.EOF)
     }
 
     private suspend fun SequenceScope<Token>.scan(str: String) {
@@ -39,20 +35,20 @@ class Scanner(
         if (current == null) for (rec in recognizers) {
             val match = rec.start(buffer) ?: continue
             val start = cursor - buffer.length
-            val range = match.range.shift(start)
+            match.range.shift(start)
             buffer.delete(match.range)
             if (buffer.isNotEmpty())
-                yield(buffer, start..<range.first, Comment.CONTENT)
-            yield(match.value, range, Comment.COMMENT_START)
+                yield(buffer, Comment.CONTENT)
+            yield(match.value, Comment.COMMENT_START)
             buffer.clear()
             current = rec
         } else {
             val match = current?.end(buffer) ?: return
             val start = cursor - buffer.length
-            val range = match.range.shift(start)
+            match.range.shift(start)
             buffer.delete(match.range)
-            yield(buffer, start..<range.first, Comment.COMMENT)
-            yield(match.value, range, Comment.COMMENT_END)
+            yield(buffer, Comment.COMMENT)
+            yield(match.value, Comment.COMMENT_END)
             buffer.clear()
             current = null
         }

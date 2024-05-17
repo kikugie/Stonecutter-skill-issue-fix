@@ -20,12 +20,12 @@ class Lexer(private val input: Iterable<Token>) {
 
         when (token.value.firstOrNull()) {
             '?' -> {
-                yield(token.subtoken(0..<1, CONDITION))
+                yield(token.take(0..<1, CONDITION))
                 yieldAll(scanContents(token, Syntax.conditionState))
             }
 
             '$' -> {
-                yield(token.subtoken(0..<1, SWAP))
+                yield(token.take(0..<1, SWAP))
                 yieldAll(scanContents(token, Syntax.swapState))
             }
 
@@ -39,7 +39,7 @@ class Lexer(private val input: Iterable<Token>) {
         val buffer = StringBuilder()
 
         fun expressionToken() {
-            if (buffer.isNotBlank()) tokens += token.subtoken(
+            if (buffer.isNotBlank()) tokens += token.take(
                 index - buffer.length + buffer.leadingSpaces()..<index - buffer.trailingSpaces(),
                 EXPRESSION
             )
@@ -52,7 +52,7 @@ class Lexer(private val input: Iterable<Token>) {
                 expressionToken()
                 if (buffer.isNotEmpty()) buffer.clear()
 
-                tokens += token.subtoken(result.range, type)
+                tokens += token.take(result.range, type)
                 index = result.range.last + 1
                 matched = true
                 break

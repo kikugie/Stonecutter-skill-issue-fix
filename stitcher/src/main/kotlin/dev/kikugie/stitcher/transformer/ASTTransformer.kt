@@ -4,7 +4,10 @@ import dev.kikugie.stitcher.assembler.AssemblyVisitor
 import dev.kikugie.stitcher.lexer.Lexer
 import dev.kikugie.stitcher.parser.*
 import dev.kikugie.stitcher.scanner.CommentRecognizer
+import dev.kikugie.stitcher.scanner.CommentType
 import dev.kikugie.stitcher.scanner.Scanner
+import dev.kikugie.stitcher.token.Token
+import dev.kikugie.stitcher.type.Comment
 import dev.kikugie.stitcher.type.StitcherToken
 import dev.kikugie.stitcher.util.affectedRange
 

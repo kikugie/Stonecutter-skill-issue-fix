@@ -180,12 +180,12 @@ class Parser(input: Iterable<Token>) {
 
     private fun consume(type: TokenType, message: String, strict: Boolean = true): Token {
         if (match(type)) return iter.next()
-        else throw StitcherThrowable.create(iter.peek ?: Token.eof(iter.current!!.range.last + 1), message, strict)
+        else throw StitcherThrowable.create(iter.peek ?: Token.EOF, message, strict)
     }
 
     private fun getOrCreateCommentEnd(): Token = when {
         match(Comment.COMMENT_END) -> iter.next()
-        match(NULL) -> Token("", iter.current!!.range.let { it.last + 1..<-1 }, Comment.COMMENT_END)
+        match(NULL) -> Token("", Comment.COMMENT_END)
         else -> throw StitcherSyntaxException(iter.peek!!, "Expected the comment to end")
     }
 

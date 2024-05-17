@@ -71,8 +71,6 @@ object AssemblyVisitor : Component.Visitor<String>, Block.Visitor<String> {
     }
 
     fun visitScope(scope: Scope): String = buildString {
-        scope.blocks.forEach {
-            append(visitBlock(it))
-        }
+        for (it in scope.blocks) append(visitBlock(it))
     }
 }

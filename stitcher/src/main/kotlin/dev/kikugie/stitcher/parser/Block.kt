@@ -15,6 +15,11 @@ import kotlinx.serialization.Serializable
 sealed interface Block {
     fun <T> accept(visitor: Visitor<T>): T
 
+    fun isEmpty(): Boolean = when (this) {
+        is CommentBlock -> false // Has opener and closer anyway
+        is ContentBlock -> token.value.isBlank()
+    }
+
     interface Visitor<T> {
         fun visitBlock(it: Block) = when(it) {
             is CommentBlock -> visitComment(it)

@@ -45,12 +45,16 @@ import kotlinx.serialization.Transient
 open class Scope(
     val type: TokenType = NULL,
     val enclosure: ScopeType = ScopeType.CLOSED,
-) {
+) : Iterable<Block> {
     var blocks: MutableList<Block> = mutableListOf()
 
     fun add(block: Block) {
         blocks.add(block)
     }
+
+    override fun iterator() = blocks.iterator()
+
+    fun isCommented(): Boolean = !any { it !is CommentBlock && !it.isEmpty() }
 }
 
 /**
