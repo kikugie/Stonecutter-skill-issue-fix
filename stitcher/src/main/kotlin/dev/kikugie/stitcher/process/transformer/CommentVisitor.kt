@@ -1,9 +1,9 @@
-package dev.kikugie.stitcher.transformer
+package dev.kikugie.stitcher.process.transformer
 
 import dev.kikugie.stitcher.data.*
 import dev.kikugie.stitcher.process.Assembler
 import dev.kikugie.stitcher.process.recognizer.StandardMultiLine
-import dev.kikugie.stitcher.transformer.CommentAdder.onAddComment
+import dev.kikugie.stitcher.process.transformer.CommentAdder.onAddComment
 import dev.kikugie.stitcher.util.affectedRange
 
 const val KEY = '^'
@@ -23,7 +23,7 @@ object CommentRemover : Block.Visitor<String> {
         .replaceAll(onRemoveComment)
 
     fun accept(scope: Scope) = if (!scope.isCommented()) null else
-        scope.blocks.joinToString(transform = ::visitBlock)
+        scope.blocks.joinToString(separator = "", transform = ::visitBlock)
 }
 
 object CommentAdder : Block.Visitor<String> {
@@ -38,7 +38,7 @@ object CommentAdder : Block.Visitor<String> {
         .replaceAll(onAddComment)
 
     fun accept(scope: Scope): String? = if (scope.isCommented()) null else buildString {
-        val processed = scope.blocks.joinToString(transform = ::visitBlock)
+        val processed = scope.blocks.joinToString(separator = "", transform = ::visitBlock)
         if (scope.enclosure == ScopeType.CLOSED)
             return "${StandardMultiLine.start}$processed${StandardMultiLine.end}"
         else {

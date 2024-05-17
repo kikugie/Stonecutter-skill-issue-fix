@@ -55,3 +55,8 @@ inline fun String.filterUntil(predicate: (String) -> Boolean): IntRange {
     }
     return buffer.leadingSpaces()..<buffer.length - buffer.trailingSpaces()
 }
+fun <K, V> memoize(provider: (K) -> V): (K) -> V = object : (K) -> V {
+    val cache: MutableMap<K, V> = mutableMapOf()
+
+    override fun invoke(key: K): V = cache.computeIfAbsent(key, provider)
+}

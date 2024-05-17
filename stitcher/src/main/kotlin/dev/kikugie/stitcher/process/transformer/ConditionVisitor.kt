@@ -1,7 +1,8 @@
-package dev.kikugie.stitcher.transformer
+package dev.kikugie.stitcher.process.transformer
 
 import dev.kikugie.stitcher.data.*
 import dev.kikugie.stitcher.exception.StitcherSyntaxException
+import dev.kikugie.stitcher.process.access.ExpressionProcessor
 import dev.kikugie.stitcher.type.StitcherToken
 
 class ConditionVisitor(private val processor: ExpressionProcessor) : Component.Visitor<Boolean> {
@@ -20,7 +21,7 @@ class ConditionVisitor(private val processor: ExpressionProcessor) : Component.V
 
     override fun visitEmpty(empty: Empty) = true
 
-    override fun visitLiteral(literal: Literal) = processor.test(literal.token)
+    override fun visitLiteral(literal: Literal) = processor.test(literal.token.value)
 
     override fun visitCondition(condition: Condition) = visitComponent(condition.condition)
 

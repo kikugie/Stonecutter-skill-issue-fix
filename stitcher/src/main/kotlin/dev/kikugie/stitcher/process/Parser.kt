@@ -65,8 +65,8 @@ class Parser(input: Iterable<Token>) {
             if (match(Comment.COMMENT_END, NULL) != null) {
                 val condition = Condition(extension = true)
                 val comment = CommentBlock(start, condition, getOrCreateCommentEnd())
-                active.add(comment)
                 scopeStack.pop()
+                active.add(comment)
                 return
             }
 

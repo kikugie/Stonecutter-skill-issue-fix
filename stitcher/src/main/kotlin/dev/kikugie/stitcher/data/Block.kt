@@ -15,7 +15,7 @@ sealed interface Block {
 
     fun isEmpty(): Boolean = when (this) {
         is CommentBlock -> false // Has opener and closer anyway
-        is ContentBlock -> token.value.isBlank()
+        is ContentBlock -> token.value.replace('\r', ' ').isBlank()
     }
 
     interface Visitor<T> {

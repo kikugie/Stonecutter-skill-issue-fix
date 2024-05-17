@@ -1,14 +1,12 @@
 package dev.kikugie.stitchertest
 
 import dev.kikugie.stitcher.process.Assembler
-import dev.kikugie.stitcher.transformer.ASTTransformer
-import dev.kikugie.stitcher.transformer.ExpressionProcessor
-import dev.kikugie.stitcher.transformer.SwapProcessor
-import dev.kikugie.stitchertest.util.parse
-import dev.kikugie.stitchertest.util.printCol
-import dev.kikugie.stitchertest.util.recognizers
-import dev.kikugie.stitchertest.util.yaml
+import dev.kikugie.stitcher.process.Transformer
+import dev.kikugie.stitchertest.util.*
 import org.junit.jupiter.api.Test
+import java.nio.file.StandardOpenOption
+import kotlin.io.path.*
+
 
 object Expr {
 //    @Test
@@ -41,25 +39,20 @@ object Expr {
 
     @Test
     fun test2() {
-        val input = """
-            //? if false {
-            a
-            //?} else
-            b
-        """.trimIndent()
-        val processor = ExpressionProcessor(listOf {
-            it == "true"
-        })
-        val swaps = SwapProcessor.Builder()
+        val input = Path("E:\\IdeaProjects\\Stonecutter-skill-issue-fix\\stitcher\\src\\test\\kotlin\\dev\\kikugie\\stitchertest\\test.kt").readText()
         val ast = input.parse()
-        println("Original")
-        printCol(ast.yaml())
-        val transformer = ASTTransformer(ast, recognizers, processor, swaps)
+//        printCol(Assembler.visitScope(ast))
+        val y1 = ast.yaml()
+        printCol(y1)
+//
+        val transformer = Transformer.create(ast, recognizers, constants = mapOf("true" to true, "false" to false))
         transformer.process()
-        println("Transformed")
-        printCol(ast.yaml())
+
+        val y2 = ast.yaml()
         val res = Assembler.visitScope(ast)
-        printCol(res)
+        Path("E:\\IdeaProjects\\Stonecutter-skill-issue-fix\\stitcher\\src\\test\\kotlin\\dev\\kikugie\\stitchertest\\res\\test-res.kt").writeText(res,
+            options = arrayOf(StandardOpenOption.CREATE)
+        )
     }
 
 }
