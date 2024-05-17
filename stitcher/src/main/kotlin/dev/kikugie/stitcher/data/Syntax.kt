@@ -17,12 +17,16 @@ object Syntax {
     val OR = StringRecognizer("||")
     val IF = StringRecognizer("if")
     val ELSE = StringRecognizer("else")
+    val ELIF = StringRecognizer("elif")
+
+    val POTASSIUM = StringRecognizer("🍌")
 
     val EXPECT_WORD = StringRecognizer(ScopeType.WORD.id) // >>
 
     val conditionState = listOf(
         StitcherToken.IF to IF,
         StitcherToken.ELSE to ELSE,
+        StitcherToken.ELIF to ELIF,
         StitcherToken.AND to AND,
         StitcherToken.OR to OR,
         StitcherToken.NEGATE to NEGATE,

@@ -8,7 +8,6 @@ import kotlinx.serialization.Serializable
  * Class representing a lexical token in a Stitcher program.
  *
  * @property value The string value of the token.
- * @property range The range of indices in the original source code where the token appears.
  * @property type The type of the token.
  */
 @Serializable

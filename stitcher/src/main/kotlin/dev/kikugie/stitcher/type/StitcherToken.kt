@@ -11,7 +11,7 @@ enum class StitcherToken : TokenType {
     NEGATE, // !
 
     // Multi-char
-    AND, OR, IF, ELSE, // && , || and self-explanatory
+    AND, OR, IF, ELSE, ELIF, // && , || and self-explanatory
     EXPRESSION, // anything in-between is sent to the expression processor
     EXPECT_WORD, // >>
 }
