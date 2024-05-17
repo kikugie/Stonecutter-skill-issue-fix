@@ -1,12 +1,11 @@
 package dev.kikugie.stonecutter.metadata
 
-import dev.kikugie.stonecutter.gradle.StonecutterBuild
-
-class StonecutterProject(
+data class StonecutterProject(
     val project: ProjectName,
     val version: TargetVersion,
-    plugin: StonecutterBuild? = null
+    val isActive: Boolean = false
 ) {
-    val isActive = project == plugin?.setup?.current?.project
+
+    fun asActive() = StonecutterProject(project, version, true)
 }
 

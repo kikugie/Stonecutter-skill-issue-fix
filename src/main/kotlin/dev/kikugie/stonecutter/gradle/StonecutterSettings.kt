@@ -50,7 +50,7 @@ open class StonecutterSettings(private val settings: Settings) {
      */
     @Deprecated(
         message = "This method is deprecated, use property setter instead",
-        replaceWith = ReplaceWith("centralScript = value")
+        replaceWith = ReplaceWith("centralScript = file")
     )
     fun centralScript(file: String) {
         centralScript = file
@@ -70,9 +70,6 @@ open class StonecutterSettings(private val settings: Settings) {
         kotlinController = value
     }
 
-    /**
-     * Specifies version directories and initial active version.
-     */
     fun shared(builder: Action<SharedConfigBuilder>) {
         shared = SharedConfigBuilder(shared, builder)
     }

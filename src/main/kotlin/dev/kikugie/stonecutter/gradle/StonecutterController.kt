@@ -6,6 +6,8 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getByType
+import java.nio.file.Path
+import kotlin.properties.Delegates
 
 /**
  * Runs for `stonecutter.gradle` file, applying project configurations to versions and generating versioned tasks.
@@ -26,6 +28,9 @@ open class StonecutterController(project: Project) {
                 stonecutter${if (kts) " " else "."}active "<a valid project>" /* [SC] DO NOT EDIT */
             """.trimIndent()
         }
+    var debug: Boolean by Delegates.observable(false) { _, _, new ->
+        setup.debug = new
+    }
 
     /**
      * All registered subprojects.
@@ -54,7 +59,7 @@ open class StonecutterController(project: Project) {
      * @param str project version
      */
     infix fun active(str: String) {
-        setup.current = setup.versions.find { it.project == str }
+        setup.current = setup.versions.find { it.project == str }?.asActive()
             ?: throw GradleException("[Stonecutter] Project $str is not registered")
     }
 
@@ -63,6 +68,10 @@ open class StonecutterController(project: Project) {
      *
      * @param value debug state
      */
+    @Deprecated(
+        message = "This method is deprecated, use property setter instead",
+        replaceWith = ReplaceWith("debug = value")
+    )
     fun debug(value: Boolean) {
         setup.debug = value
     }
@@ -76,21 +85,31 @@ open class StonecutterController(project: Project) {
         setup.register(provider.name)
     }
 
+    /**
+     * Adds a filter function to the list of file filters in the setup configuration.
+     *
+     * @param func The filter function that takes a Path object and returns a Boolean indicating whether the file should be included or not.
+     */
+    fun filter(func: (Path) -> Boolean) {
+        setup.fileFilters.add(func)
+    }
+
     private fun setupProject(root: Project) {
         val vcsProject = root.project(setup.vcs.project)
-        val vcs = vcsProject.extensions.getByType<StonecutterBuild>().current
+        val vcs = setup.vcs
         root.tasks.create(
             "Reset active project", StonecutterTask::class.java
         ).applyConfig(root, vcsProject, vcs)
+        val active = setup.current
         root.tasks.create(
             "Refresh active project", StonecutterTask::class.java
-        ).applyConfig(root, root.project(vcs.project), vcs)
+        ).applyConfig(root, root.project(active.project), active)
+
         setup.versions.forEach { ver ->
             val project = root.project(ver.project)
-            val version = project.extensions.getByType<StonecutterBuild>().current
             root.tasks.create(
-                "Set active project to ${version.project}", StonecutterTask::class.java
-            ).applyConfig(root, project, version)
+                "Set active project to ${ver.project}", StonecutterTask::class.java
+            ).applyConfig(root, project, ver)
         }
     }
 
@@ -102,6 +121,9 @@ open class StonecutterController(project: Project) {
         toVersion.set(version)
         input.set(root.file("./src").toPath())
         output.set(input.get())
+
+        if (setup.fileFilters.isNotEmpty())
+            fileFilter.set { p -> setup.fileFilters.all { it(p) } }
 
         doLast {
             controller.updateHeader(this.project.buildFile.toPath(), version.project)

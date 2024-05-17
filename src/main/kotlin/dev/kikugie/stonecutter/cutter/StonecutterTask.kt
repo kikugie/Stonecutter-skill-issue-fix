@@ -87,12 +87,13 @@ abstract class StonecutterTask : DefaultTask() {
         // Files without changes will be skipped or copied directly
         val matching = mutableListOf<Pair<Path, Path>>()
         // Collect files before writing in case an exception is thrown
-        for (file in inputRoot.walk().filter(fileFilter.get())) {
+        for (file in inputRoot.walk()) {
             val out = if (inputRoot == outputRoot) file
             else outputRoot.resolve(inputRoot.relativize(file)).also {
                 Files.createDirectories(file.parent)
             }
-            val result = FileCutter.process(file, this)
+            val result = if (fileFilter.get()(file)) FileCutter.process(file, this)
+             else null
             if (result == null) {
                 matching += file to out
                 continue

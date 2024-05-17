@@ -3,6 +3,7 @@ package dev.kikugie.stonecutter.gradle
 import dev.kikugie.stonecutter.metadata.StonecutterProject
 import dev.kikugie.stonecutter.metadata.TaskName
 import org.gradle.api.Project
+import java.nio.file.Path
 
 typealias ProjectPath = String
 
@@ -15,6 +16,7 @@ open class ProjectSetup(builder: SharedConfigBuilder) {
     var current: StonecutterProject = vcs
 
     private val chiseledTasks: MutableSet<TaskName> = mutableSetOf()
+    val fileFilters = mutableListOf<(Path) -> Boolean>()
     var debug = false
 
     fun register(task: TaskName) {
