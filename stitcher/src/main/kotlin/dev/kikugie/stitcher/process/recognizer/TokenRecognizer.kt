@@ -1,6 +1,6 @@
-package dev.kikugie.stitcher.lexer
+package dev.kikugie.stitcher.process.recognizer
 
-import dev.kikugie.stitcher.token.TokenMatch
+import dev.kikugie.stitcher.data.Token.Match
 import org.intellij.lang.annotations.Language
 import java.util.regex.Pattern
 
@@ -12,7 +12,7 @@ import java.util.regex.Pattern
  * @see TokenMatch
  */
 interface TokenRecognizer {
-    fun recognize(value: String, start: Int): TokenMatch?
+    fun recognize(value: String, start: Int): Match?
 }
 
 /**
@@ -25,7 +25,7 @@ interface TokenRecognizer {
 class RegexRecognizer(val regex: Pattern) : TokenRecognizer {
     constructor(@Language("RegExp") regex: String) : this(Pattern.compile(regex))
 
-    override fun recognize(value: String, start: Int): TokenMatch? {
+    override fun recognize(value: String, start: Int): Match? {
         val matcher = regex.matcher(value).apply {
             region(start, value.length)
             useTransparentBounds(true)
@@ -44,7 +44,7 @@ class RegexRecognizer(val regex: Pattern) : TokenRecognizer {
  * @param pattern The pattern to be searched within a string.
  */
 class StringRecognizer(private val pattern: String) : TokenRecognizer {
-    override fun recognize(value: String, start: Int): TokenMatch? = when {
+    override fun recognize(value: String, start: Int): Match? = when {
         start + pattern.length > value.length -> null // Not enough space to fit the pattern
         value.substring(start, start + pattern.length) != pattern -> null // No match
         else -> pattern and start..<start + pattern.length
@@ -59,8 +59,8 @@ class StringRecognizer(private val pattern: String) : TokenRecognizer {
  * @param char The character to be recognized.
  */
 class CharRecognizer(val char: Char) : TokenRecognizer {
-    override fun recognize(value: String, start: Int): TokenMatch? =
+    override fun recognize(value: String, start: Int): Match? =
         if (value[start] == char) char.toString() and start..start else null
 }
 
-private infix fun String.and(p2: IntRange) = TokenMatch(this, p2)
+private infix fun String.and(p2: IntRange) = Match(this, p2)

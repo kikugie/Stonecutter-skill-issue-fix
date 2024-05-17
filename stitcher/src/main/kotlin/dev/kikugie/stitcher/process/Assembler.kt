@@ -1,10 +1,9 @@
-package dev.kikugie.stitcher.assembler
+package dev.kikugie.stitcher.process
 
-import dev.kikugie.stitcher.parser.*
-import dev.kikugie.stitcher.token.Token
+import dev.kikugie.stitcher.data.*
 
 @Suppress("MemberVisibilityCanBePrivate")
-object AssemblyVisitor : Component.Visitor<String>, Block.Visitor<String> {
+object Assembler : Component.Visitor<String>, Block.Visitor<String> {
     private fun StringBuilder.token(token: Token): StringBuilder = append(token.value)
 
     private fun StringBuilder.space(): StringBuilder = append(' ')

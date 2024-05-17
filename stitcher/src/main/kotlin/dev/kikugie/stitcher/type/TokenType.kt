@@ -1,6 +1,6 @@
 package dev.kikugie.stitcher.type
 
-import dev.kikugie.stitcher.token.Token
+import dev.kikugie.stitcher.data.Token
 import kotlinx.serialization.Serializable
 
 /**

@@ -1,7 +1,7 @@
 package dev.kikugie.stitcher.transformer
 
+import dev.kikugie.stitcher.data.*
 import dev.kikugie.stitcher.exception.StitcherSyntaxException
-import dev.kikugie.stitcher.parser.*
 import dev.kikugie.stitcher.type.StitcherToken
 
 class ConditionVisitor(private val processor: ExpressionProcessor) : Component.Visitor<Boolean> {

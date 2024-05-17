@@ -1,8 +1,6 @@
-package dev.kikugie.stitcher.parser
+package dev.kikugie.stitcher.data
 
-import dev.kikugie.stitcher.assembler.AssemblyVisitor
-import dev.kikugie.stitcher.parser.Component.*
-import dev.kikugie.stitcher.token.Token
+import dev.kikugie.stitcher.data.Component.*
 import dev.kikugie.stitcher.type.StitcherToken.*
 import kotlinx.serialization.Serializable
 
@@ -162,7 +160,7 @@ data class Condition(
  */
 @Serializable
 data class Swap(
-    val identifier: Token = Token.eof(-1),
+    val identifier: Token = Token.EOF,
     val extension: Boolean = false,
 ) : Component {
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitSwap(this)

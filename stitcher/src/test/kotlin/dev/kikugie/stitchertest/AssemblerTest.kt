@@ -1,6 +1,6 @@
 package dev.kikugie.stitchertest
 
-import dev.kikugie.stitcher.assembler.AssemblyVisitor
+import dev.kikugie.stitcher.process.Assembler
 import dev.kikugie.stitchertest.util.parse
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DynamicTest
@@ -18,7 +18,7 @@ object AssemblerTest {
         }
         return samples.map {
             DynamicTest.dynamicTest(it.first) {
-                assertEquals(AssemblyVisitor.visitScope(it.second.parse()), it.second)
+                assertEquals(Assembler.visitScope(it.second.parse()), it.second)
             }
         }
     }

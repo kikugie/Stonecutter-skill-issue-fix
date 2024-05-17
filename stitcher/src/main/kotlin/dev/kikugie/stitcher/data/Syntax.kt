@@ -1,6 +1,7 @@
-package dev.kikugie.stitcher.lexer
+package dev.kikugie.stitcher.data
 
-import dev.kikugie.stitcher.parser.ScopeType
+import dev.kikugie.stitcher.process.recognizer.CharRecognizer
+import dev.kikugie.stitcher.process.recognizer.StringRecognizer
 import dev.kikugie.stitcher.type.StitcherToken
 
 @Suppress("MemberVisibilityCanBePrivate")

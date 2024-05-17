@@ -1,41 +1,43 @@
 package dev.kikugie.stitcher.transformer
 
-import dev.kikugie.stitcher.assembler.AssemblyVisitor
-import dev.kikugie.stitcher.parser.*
-import dev.kikugie.stitcher.scanner.StandardMultiLine
+import dev.kikugie.stitcher.data.*
+import dev.kikugie.stitcher.process.Assembler
+import dev.kikugie.stitcher.process.recognizer.StandardMultiLine
+import dev.kikugie.stitcher.transformer.CommentAdder.onAddComment
 import dev.kikugie.stitcher.util.affectedRange
 
 const val KEY = '^'
-private val onAddComment = listOf(
-    "/*" to "/$KEY",
-    "*/" to "$KEY/",
-)
-private val onRemoveComment = onAddComment.map { (k, v) -> v to k }
 private fun String.replaceAll(keys: Iterable<Pair<String, String>>): String {
     var str = this
     keys.forEach { (k, v) -> str = str.replace(k, v) }
     return str
 }
 
-object CommentRemover : Block.Visitor<String>, (Scope) -> String? {
-    override fun visitContent(content: ContentBlock) = AssemblyVisitor.visitContent(content)
+object CommentRemover : Block.Visitor<String> {
+    val onRemoveComment = onAddComment.map { (k, v) -> v to k }
+
+    override fun visitContent(content: ContentBlock) = Assembler.visitContent(content)
         .replaceAll(onRemoveComment)
 
-    override fun visitComment(comment: CommentBlock): String = AssemblyVisitor.visitComponent(comment.content)
+    override fun visitComment(comment: CommentBlock): String = Assembler.visitComponent(comment.content)
         .replaceAll(onRemoveComment)
 
-    override fun invoke(scope: Scope) = if (!scope.isCommented()) null else
+    fun accept(scope: Scope) = if (!scope.isCommented()) null else
         scope.blocks.joinToString(transform = ::visitBlock)
 }
 
-object CommentAdder : Block.Visitor<String>, (Scope) -> String? {
-    override fun visitContent(content: ContentBlock) = AssemblyVisitor.visitContent(content)
+object CommentAdder : Block.Visitor<String> {
+    val onAddComment = listOf(
+        "/*" to "/$KEY",
+        "*/" to "$KEY/",
+    )
+    override fun visitContent(content: ContentBlock) = Assembler.visitContent(content)
         .replaceAll(onAddComment)
 
-    override fun visitComment(comment: CommentBlock): String = AssemblyVisitor.visitComponent(comment.content)
+    override fun visitComment(comment: CommentBlock): String = Assembler.visitComponent(comment.content)
         .replaceAll(onAddComment)
 
-    override fun invoke(scope: Scope): String? = if (scope.isCommented()) null else buildString {
+    fun accept(scope: Scope): String? = if (scope.isCommented()) null else buildString {
         val processed = scope.blocks.joinToString(transform = ::visitBlock)
         if (scope.enclosure == ScopeType.CLOSED)
             return "${StandardMultiLine.start}$processed${StandardMultiLine.end}"

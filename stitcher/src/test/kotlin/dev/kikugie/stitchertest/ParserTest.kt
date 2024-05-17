@@ -1,7 +1,6 @@
 package dev.kikugie.stitchertest
 
 import dev.kikugie.stitcher.exception.StitcherSyntaxException
-import dev.kikugie.stitcher.util.Buildable
 import dev.kikugie.stitchertest.ParserTest.PairBuilder.Companion.pair
 import dev.kikugie.stitchertest.util.parse
 import dev.kikugie.stitchertest.util.yaml
@@ -9,17 +8,17 @@ import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.*
 
 object ParserTest {
-    private class PairBuilder : Buildable<Pair<String, String>> {
+    internal class PairBuilder : () -> Pair<String, String> {
         lateinit var left: String
 
         @Language("yaml")
         lateinit var right: String
 
-        override fun build() = left to right
-
         companion object {
-            fun pair(init: PairBuilder.() -> Unit) = PairBuilder().apply(init).build()
+            fun pair(init: PairBuilder.() -> Unit) = PairBuilder().apply(init)()
         }
+
+        override fun invoke(): Pair<String, String> = left to right
     }
 
     val tests = buildMap {
@@ -192,7 +191,7 @@ object ParserTest {
             //?} else if (bool1) || (bool2)
             /*func3()*/
             """.trimIndent()
-            right ="""
+            right = """
             blocks:
             - !<dev.kikugie.stitcher.parser.CommentBlock>
               start:

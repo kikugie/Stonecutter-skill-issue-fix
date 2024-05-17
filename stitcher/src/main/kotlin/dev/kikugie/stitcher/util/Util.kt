@@ -1,23 +1,8 @@
 package dev.kikugie.stitcher.util
 
-import dev.kikugie.stitcher.parser.ScopeType
-import dev.kikugie.stitcher.type.Comment
-import dev.kikugie.stitcher.token.Token
-import dev.kikugie.stitcher.token.TokenMatch
+import dev.kikugie.stitcher.data.ScopeType
 import java.io.Reader
 
-suspend inline fun SequenceScope<Token>.yield(
-    value: CharSequence,
-    type: Comment,
-) = yield(Token(value.toString(), type))
-
-fun IntRange.shift(other: IntRange): IntRange {
-    val shift = last - first
-    return other.first + first..other.first + shift + first
-}
-
-fun IntRange.shift(value: Int): IntRange =
-    first + value..last + value
 
 fun <T : CharSequence> T.leadingSpaces(): Int {
     var spaces = 0
@@ -33,22 +18,7 @@ fun <T : CharSequence> T.trailingSpaces(): Int {
     return spaces
 }
 
-inline fun Reader.readLigatures(action: (String) -> Unit) {
-    var char: Char
-    var captureCR = false
-    while (read().also { char = it.toChar() } != -1) when {
-        char == '\r' -> captureCR = true
-        captureCR ->
-            if (char == '\n')
-                action("\r\n")
-            else {
-                action("\r")
-                action(char.toString())
-            }.also { captureCR = false }
 
-        else -> action(char.toString())
-    }
-}
 
 fun Reader.ligatures(): Iterator<String> = object : Iterator<String> {
     private var char = read()
@@ -69,13 +39,6 @@ fun Reader.ligatures(): Iterator<String> = object : Iterator<String> {
     private fun advance() {
         char = read()
     }
-}
-
-fun CharSequence.matchEOL(): TokenMatch? = when {
-    endsWith("\r\n") -> TokenMatch("\r\n", length - 2..<length)
-    endsWith("\r") -> TokenMatch("\r", length - 1..<length)
-    endsWith("\n") -> TokenMatch("\n", length - 1..<length)
-    else -> null
 }
 
 fun String.affectedRange(type: ScopeType): IntRange = when (type) {

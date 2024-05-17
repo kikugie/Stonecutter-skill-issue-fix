@@ -1,24 +1,24 @@
-package dev.kikugie.stitcher.parser
+package dev.kikugie.stitcher.process
 
+import dev.kikugie.stitcher.data.*
 import dev.kikugie.stitcher.exception.StitcherSyntaxException
 import dev.kikugie.stitcher.exception.StitcherThrowable
-import dev.kikugie.stitcher.type.StitcherToken
 import dev.kikugie.stitcher.type.Comment
 import dev.kikugie.stitcher.type.NULL
-import dev.kikugie.stitcher.token.Token
+import dev.kikugie.stitcher.type.StitcherToken
 import dev.kikugie.stitcher.type.TokenType
-import dev.kikugie.stitcher.util.LookaroundIterator.Companion.lookaround
 import java.util.*
 
 // FIXME: Open scopes are not correctly captured
 class Parser(input: Iterable<Token>) {
     companion object {
         const val VERSION = 1
+        fun Sequence<Token>.parse() = Parser(this.asIterable()).parse()
     }
 
-    private val iter = input.iterator().lookaround()
+    private val iter = input.lookaround()
     private val scopeStack = Stack<Scope>()
-    val rootScope = RootScope(VERSION)
+    private val rootScope = RootScope(VERSION)
 
     private val active
         get() = if (scopeStack.empty()) rootScope else scopeStack.peek()
@@ -147,8 +147,6 @@ class Parser(input: Iterable<Token>) {
     private fun createConditionSugar(isClosed: Boolean): List<Token> {
         val sugar = mutableListOf<Token>()
         val hasElse = match(StitcherToken.ELSE)
-//        val previous = active.blocks.last()
-
         // TODO: Check if its valid in relation to the previous comment. I'm too tired rn for this
         if (!isClosed && hasElse)
             throw StitcherSyntaxException(iter.peek!!, "Invalid token. Check if previous condition is closed with `}`")
@@ -161,7 +159,7 @@ class Parser(input: Iterable<Token>) {
     }
 
     private fun createScope(type: StitcherToken): Scope {
-        val scopeType = when(match(StitcherToken.SCOPE_OPEN, StitcherToken.EXPECT_WORD)) {
+        val scopeType = when (match(StitcherToken.SCOPE_OPEN, StitcherToken.EXPECT_WORD)) {
             StitcherToken.SCOPE_OPEN -> ScopeType.CLOSED
             StitcherToken.EXPECT_WORD -> ScopeType.WORD
             else -> ScopeType.LINE
@@ -191,5 +189,32 @@ class Parser(input: Iterable<Token>) {
 
     private fun skip() {
         iter.next()
+    }
+
+    private fun <T> Iterable<T>.lookaround(): LookaroundIterator<T> = LookaroundIterator(iterator())
+
+    private class LookaroundIterator<T>(private val iterator: Iterator<T>) : Iterator<T> {
+        var current: T? = null
+            private set
+        var peek: T? = null
+            private set
+        var prev: T? = null
+            private set
+
+        init {
+            if (iterator.hasNext()) {
+                peek = iterator.next()
+            }
+        }
+
+        override fun hasNext() = iterator.hasNext()
+
+        override fun next(): T {
+            prev = current
+            current = peek
+            peek = if (iterator.hasNext()) iterator.next() else null
+
+            return current ?: throw NoSuchElementException("No more elements present.")
+        }
     }
 }

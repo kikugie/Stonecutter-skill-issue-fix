@@ -1,7 +1,6 @@
-package dev.kikugie.stitcher.scanner
+package dev.kikugie.stitcher.process.recognizer
 
-import dev.kikugie.stitcher.token.TokenMatch
-import dev.kikugie.stitcher.util.matchEOL
+import dev.kikugie.stitcher.data.Token.Match
 
 enum class CommentType {
     SINGLE_LINE, MULTI_LINE
@@ -18,10 +17,10 @@ interface CommentRecognizer {
     val start: String
     val end: String
 
-    fun start(str: CharSequence): TokenMatch? = str.match(start)
-    fun end(str: CharSequence): TokenMatch? = str.match(end)
+    fun start(str: CharSequence): Match? = str.match(start)
+    fun end(str: CharSequence): Match? = str.match(end)
     fun CharSequence.match(match: CharSequence) = if (endsWith(match))
-        TokenMatch(match.toString(), length - match.length..<length) else null
+        Match(match.toString(), length - match.length..<length) else null
 }
 
 /**
@@ -53,4 +52,11 @@ data object HashSingleLine : CommentRecognizer {
     override val end = "\n"
 
     override fun end(str: CharSequence) = str.matchEOL()
+}
+
+private fun CharSequence.matchEOL(): Match? = when {
+    endsWith("\r\n") -> Match("\r\n", length - 2..<length)
+    endsWith("\r") -> Match("\r", length - 1..<length)
+    endsWith("\n") -> Match("\n", length - 1..<length)
+    else -> null
 }

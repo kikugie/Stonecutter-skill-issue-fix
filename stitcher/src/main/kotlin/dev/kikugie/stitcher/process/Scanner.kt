@@ -1,10 +1,8 @@
-package dev.kikugie.stitcher.scanner
+package dev.kikugie.stitcher.process
 
-import dev.kikugie.stitcher.token.Token
+import dev.kikugie.stitcher.data.Token
+import dev.kikugie.stitcher.process.recognizer.CommentRecognizer
 import dev.kikugie.stitcher.type.Comment
-import dev.kikugie.stitcher.util.readLigatures
-import dev.kikugie.stitcher.util.shift
-import dev.kikugie.stitcher.util.yield
 import java.io.Reader
 
 /**
@@ -81,5 +79,38 @@ class Scanner(
                 else -> null
             }
         }
+    }
+
+    private suspend inline fun SequenceScope<Token>.yield(
+        value: CharSequence,
+        type: Comment,
+    ) = yield(Token(value.toString(), type))
+
+    private inline fun Reader.readLigatures(action: (String) -> Unit) {
+        var char: Char
+        var captureCR = false
+        while (read().also { char = it.toChar() } != -1) when {
+            char == '\r' -> captureCR = true
+            captureCR ->
+                if (char == '\n')
+                    action("\r\n")
+                else {
+                    action("\r")
+                    action(char.toString())
+                }.also { captureCR = false }
+
+            else -> action(char.toString())
+        }
+    }
+
+    private fun IntRange.shift(value: Int): IntRange =
+        first + value..last + value
+
+//    private fun IntRange.shift(other: IntRange): IntRange {
+//        val shift = last - first
+//        return other.first + first..other.first + shift + first
+//    }
+    companion object {
+        fun Reader.scan(recognizers: Iterable<CommentRecognizer>) = Scanner(this, recognizers).tokenize()
     }
 }

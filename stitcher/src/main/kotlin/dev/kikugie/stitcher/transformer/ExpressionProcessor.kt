@@ -1,7 +1,7 @@
 package dev.kikugie.stitcher.transformer
 
 import dev.kikugie.stitcher.exception.StitcherSyntaxException
-import dev.kikugie.stitcher.token.Token
+import dev.kikugie.stitcher.data.Token
 import dev.kikugie.stitcher.type.StitcherToken
 
 typealias Expression = (String) -> Boolean?

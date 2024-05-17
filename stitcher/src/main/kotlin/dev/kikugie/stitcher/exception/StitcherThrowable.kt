@@ -1,6 +1,6 @@
 package dev.kikugie.stitcher.exception
 
-import dev.kikugie.stitcher.token.Token
+import dev.kikugie.stitcher.data.Token
 
 sealed interface StitcherThrowable {
     companion object {

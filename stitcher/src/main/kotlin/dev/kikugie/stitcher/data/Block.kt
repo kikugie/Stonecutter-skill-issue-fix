@@ -1,8 +1,6 @@
-package dev.kikugie.stitcher.parser
+package dev.kikugie.stitcher.data
 
-import dev.kikugie.stitcher.assembler.AssemblyVisitor
-import dev.kikugie.stitcher.parser.Block.Visitor
-import dev.kikugie.stitcher.token.Token
+import dev.kikugie.stitcher.data.Block.Visitor
 import kotlinx.serialization.Serializable
 
 /**

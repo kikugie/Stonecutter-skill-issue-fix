@@ -1,4 +1,4 @@
-package dev.kikugie.stitcher.token
+package dev.kikugie.stitcher.data
 
 import dev.kikugie.stitcher.type.NULL
 import dev.kikugie.stitcher.type.TokenType
@@ -22,4 +22,15 @@ data class Token(
     companion object {
         val EOF = Token("\u0000", NULL)
     }
+
+    /**
+     * Utility class for representing a found token,
+     *
+     * @property value The actual value of the token that was matched.
+     * @property range The range of indices within the string where the token was found.
+     */
+    data class Match(
+        val value: String,
+        val range: IntRange,
+    )
 }

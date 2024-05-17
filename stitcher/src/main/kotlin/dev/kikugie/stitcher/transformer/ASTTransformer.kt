@@ -1,12 +1,14 @@
 package dev.kikugie.stitcher.transformer
 
-import dev.kikugie.stitcher.assembler.AssemblyVisitor
-import dev.kikugie.stitcher.lexer.Lexer
-import dev.kikugie.stitcher.parser.*
-import dev.kikugie.stitcher.scanner.CommentRecognizer
-import dev.kikugie.stitcher.scanner.CommentType
-import dev.kikugie.stitcher.scanner.Scanner
-import dev.kikugie.stitcher.token.Token
+import dev.kikugie.stitcher.process.Assembler
+import dev.kikugie.stitcher.data.*
+import dev.kikugie.stitcher.process.Lexer
+import dev.kikugie.stitcher.process.Lexer.Companion.lex
+import dev.kikugie.stitcher.process.Parser
+import dev.kikugie.stitcher.process.Parser.Companion.parse
+import dev.kikugie.stitcher.process.recognizer.CommentRecognizer
+import dev.kikugie.stitcher.process.Scanner
+import dev.kikugie.stitcher.process.Scanner.Companion.scan
 import dev.kikugie.stitcher.type.Comment
 import dev.kikugie.stitcher.type.StitcherToken
 import dev.kikugie.stitcher.util.affectedRange
@@ -43,7 +45,7 @@ class ASTTransformer(
 
     private fun processSwap(block: CommentBlock) {
         val swap = block.content as Swap
-        val scope = AssemblyVisitor.visitScope(block.scope!!)
+        val scope = Assembler.visitScope(block.scope!!)
         val range = scope.affectedRange(block.scope.enclosure)
         val newScope = scope.replaceRange(range, swaps.get(swap.identifier))
         if (scope != newScope) {
@@ -59,8 +61,17 @@ class ASTTransformer(
         var result = conditions.visitCondition(condition)
         if (condition.extension)
             result = !previousResult && result
+        val text = (if (result) CommentRemover.accept(scope) else CommentAdder.accept(scope))
+            ?: return
+        if (!result) {
+            scope.blocks.clear()
+            scope.blocks += ContentBlock(Token(text, Comment.CONTENT))
+        } else {
+            val parsed = text.parse()
+            withSource(parsed).process()
+            block.scope.blocks = parsed.blocks
+        }
     }
 
-    private fun String.parse(): Scope =
-        Parser(Lexer(Scanner(reader(), recognizers).tokenize().asIterable()).tokenize().asIterable()).parse()
+    private fun String.parse(): Scope = reader().scan(recognizers).lex().parse()
 }

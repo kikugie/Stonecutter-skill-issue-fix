@@ -2,7 +2,7 @@ package dev.kikugie.stitchertest.util
 
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
-import dev.kikugie.stitcher.token.Token
+import dev.kikugie.stitcher.data.Token
 import kotlinx.serialization.encodeToString
 
 val yaml = Yaml(configuration = YamlConfiguration(encodeDefaults = false))

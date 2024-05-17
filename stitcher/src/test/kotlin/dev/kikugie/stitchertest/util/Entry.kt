@@ -1,12 +1,12 @@
 package dev.kikugie.stitchertest.util
 
-import dev.kikugie.stitcher.lexer.Lexer
-import dev.kikugie.stitcher.parser.Parser
-import dev.kikugie.stitcher.scanner.HashSingleLine
-import dev.kikugie.stitcher.scanner.Scanner
-import dev.kikugie.stitcher.scanner.StandardMultiLine
-import dev.kikugie.stitcher.scanner.StandardSingleLine
-import dev.kikugie.stitcher.token.Token
+import dev.kikugie.stitcher.process.Lexer
+import dev.kikugie.stitcher.process.Parser
+import dev.kikugie.stitcher.process.recognizer.HashSingleLine
+import dev.kikugie.stitcher.process.Scanner
+import dev.kikugie.stitcher.process.recognizer.StandardMultiLine
+import dev.kikugie.stitcher.process.recognizer.StandardSingleLine
+import dev.kikugie.stitcher.data.Token
 
 val recognizers = listOf(StandardSingleLine, StandardMultiLine, HashSingleLine)
 
