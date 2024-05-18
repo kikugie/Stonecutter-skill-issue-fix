@@ -1,6 +1,6 @@
 package dev.kikugie.stitchertest
 
-import dev.kikugie.stitcher.exception.StitcherSyntaxException
+import dev.kikugie.stitcher.exception.SyntaxException
 import dev.kikugie.stitchertest.util.yaml
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DynamicTest
@@ -24,6 +24,6 @@ object ParserTest {
         //?}
         //$}
         """.trimIndent()
-        assertThrows<StitcherSyntaxException>(input::parse)
+        assertThrows<SyntaxException>(input::parse)
     }
 }

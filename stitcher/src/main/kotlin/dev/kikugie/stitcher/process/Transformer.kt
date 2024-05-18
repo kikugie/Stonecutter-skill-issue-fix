@@ -4,7 +4,10 @@ import dev.kikugie.stitcher.data.*
 import dev.kikugie.stitcher.process.Lexer.Companion.lex
 import dev.kikugie.stitcher.process.Parser.Companion.parse
 import dev.kikugie.stitcher.process.Scanner.Companion.scan
-import dev.kikugie.stitcher.process.access.*
+import dev.kikugie.stitcher.process.access.Constants
+import dev.kikugie.stitcher.process.access.ExpressionProcessor
+import dev.kikugie.stitcher.process.access.Expressions
+import dev.kikugie.stitcher.process.access.Swaps
 import dev.kikugie.stitcher.process.recognizer.CommentRecognizer
 import dev.kikugie.stitcher.process.transformer.CommentAdder
 import dev.kikugie.stitcher.process.transformer.CommentRemover
@@ -19,23 +22,20 @@ class Transformer(
     private val source: Scope,
     private val recognizers: Iterable<CommentRecognizer>,
     private val conditions: ConditionVisitor,
-    private val swaps: SwapProcessor,
+    private val swaps: Swaps,
 ) : Block.Visitor<Unit> {
-    companion object {
-        fun create(
-            source: Scope,
-            recognizers: Iterable<CommentRecognizer>,
-            constants: Constants = emptyMap(),
-            expressions: Expressions = emptyList(),
-            swaps: Swaps = emptyMap(),
-        ): Transformer =
-            Transformer(
-                source,
-                recognizers,
-                ConditionVisitor(ExpressionProcessor(constants, expressions)),
-                SwapProcessor(swaps)
-            )
-    }
+    constructor(
+        source: Scope,
+        recognizers: Iterable<CommentRecognizer>,
+        constants: Constants = emptyMap(),
+        expressions: Expressions = emptyList(),
+        swaps: Swaps = emptyMap(),
+    ) : this(
+        source,
+        recognizers,
+        ConditionVisitor(ExpressionProcessor(constants, expressions)),
+        swaps
+    )
 
     private var previousResult: Boolean = false
 
@@ -57,7 +57,7 @@ class Transformer(
         val swap = block.content as Swap
         val scope = Assembler.visitScope(block.scope!!)
         val range = scope.affectedRange(block.scope.enclosure)
-        val newScope = scope.replaceRange(range, swaps.get(swap.identifier.value))
+        val newScope = scope.replaceRange(range, swaps[swap.identifier.value]!!)
         if (scope != newScope) {
             val parsed = newScope.parse()
             withSource(parsed).process()
@@ -85,4 +85,17 @@ class Transformer(
     }
 
     private fun String.parse(): Scope = reader().scan(recognizers).lex().parse()
+
+    companion object {
+        fun Scope.transform(
+            recognizers: Iterable<CommentRecognizer>,
+            constants: Constants = emptyMap(),
+            expressions: Expressions = emptyList(),
+            swaps: Swaps = emptyMap(),
+        ): Scope = this.also {
+            Transformer(this, recognizers, constants, expressions, swaps).apply {
+                process()
+            }
+        }
+    }
 }
