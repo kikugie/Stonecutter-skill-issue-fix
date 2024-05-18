@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "dev.kikugie"
-version = "0.1-alpha.1"
+version = "0.1-alpha.2"
 
 repositories {
     mavenCentral()
