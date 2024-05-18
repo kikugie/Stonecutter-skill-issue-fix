@@ -4,6 +4,7 @@ import dev.kikugie.stitcher.data.*
 import dev.kikugie.stitcher.process.Assembler
 import dev.kikugie.stitcher.process.recognizer.StandardMultiLine
 import dev.kikugie.stitcher.process.transformer.CommentAdder.onAddComment
+import dev.kikugie.stitcher.type.Comment
 import dev.kikugie.stitcher.util.affectedRange
 
 const val KEY = '^'
@@ -22,8 +23,22 @@ object CommentRemover : Block.Visitor<String> {
     override fun visitComment(comment: CommentBlock): String = Assembler.visitComponent(comment.content)
         .replaceAll(onRemoveComment)
 
-    fun accept(scope: Scope) = if (!scope.isCommented()) null else
-        scope.blocks.joinToString(separator = "", transform = ::visitBlock)
+    fun accept(scope: Scope): String? {
+        return when(scope.enclosure) {
+            ScopeType.CLOSED -> if (!scope.isCommented()) null else scope.blocks.joinToString(
+                separator = "",
+                transform = ::visitBlock
+            )
+
+            else -> {
+                val toUncommentIndex = scope.indexOfFirst { !it.isEmpty() }.takeIf { it >= 0 } ?: return null
+                val toUncomment = scope.blocks[toUncommentIndex]
+                if (toUncomment !is CommentBlock) return null
+                scope.blocks[toUncommentIndex] = ContentBlock(Token(visitComment(toUncomment), Comment.CONTENT))
+                Assembler.visitScope(scope)
+            }
+        }
+    }
 }
 
 object CommentAdder : Block.Visitor<String> {

@@ -31,7 +31,7 @@ class Parser(input: Iterable<Token>) {
         else if (match(COMMENT_START))
             matchComment().also { return }
 
-        if (active.enclosure != ScopeType.CLOSED)
+        if (active.enclosure != ScopeType.CLOSED && iter.current!!.value.isNotBlank())
             scopeStack.pop()
     }
 
