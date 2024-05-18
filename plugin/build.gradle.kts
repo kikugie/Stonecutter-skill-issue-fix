@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "dev.kikugie"
-version = "0.4.0-alpha"
+version = "0.4.0-alpha.1"
 
 repositories {
     mavenCentral()
@@ -19,6 +19,7 @@ repositories {
 
 dependencies {
     implementation(project(":stitcher"))
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
     testImplementation(kotlin("test"))
     testImplementation(kotlin("script-runtime"))
 }
@@ -35,7 +36,7 @@ publishing {
     repositories {
         maven {
             name = "kikugieMaven"
-            url = uri("https://maven.kikugie.dev/releases")
+            url = uri("https://maven.kikugie.dev/snapshots")
             credentials(PasswordCredentials::class)
             authentication {
                 create("basic", BasicAuthentication::class)
