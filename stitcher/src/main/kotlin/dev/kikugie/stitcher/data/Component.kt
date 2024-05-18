@@ -15,7 +15,7 @@ sealed interface Component {
     fun <T> accept(visitor: Visitor<T>): T
 
     interface Visitor<T> {
-        fun visitComponent(it: Component) = when(it) {
+        fun visitComponent(it: Component) = when (it) {
             is Empty -> visitEmpty(it)
             is Literal -> visitLiteral(it)
             is Unary -> visitUnary(it)
@@ -73,7 +73,7 @@ data class Unary(
     val operator: Token,
     val target: Component,
 ) : Component {
-    override fun <T> accept(visitor: Visitor<T>)= visitor.visitUnary(this)
+    override fun <T> accept(visitor: Visitor<T>) = visitor.visitUnary(this)
 }
 
 /**
@@ -105,9 +105,9 @@ data class Binary(
  */
 @Serializable
 data class Group(
-    val content: Component
+    val content: Component,
 ) : Component {
-    override fun <T> accept(visitor: Visitor<T>)= visitor.visitGroup(this)
+    override fun <T> accept(visitor: Visitor<T>) = visitor.visitGroup(this)
 }
 
 /**

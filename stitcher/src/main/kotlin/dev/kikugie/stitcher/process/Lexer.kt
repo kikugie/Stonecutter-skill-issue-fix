@@ -1,10 +1,10 @@
 package dev.kikugie.stitcher.process
 
 import dev.kikugie.stitcher.data.Syntax
-import dev.kikugie.stitcher.type.StitcherToken.*
-import dev.kikugie.stitcher.type.Comment
 import dev.kikugie.stitcher.data.Token
 import dev.kikugie.stitcher.process.recognizer.TokenRecognizer
+import dev.kikugie.stitcher.type.Comment
+import dev.kikugie.stitcher.type.StitcherToken.*
 import dev.kikugie.stitcher.type.TokenType
 import dev.kikugie.stitcher.util.leadingSpaces
 import dev.kikugie.stitcher.util.trailingSpaces

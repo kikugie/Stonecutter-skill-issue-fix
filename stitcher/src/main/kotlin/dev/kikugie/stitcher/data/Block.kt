@@ -19,7 +19,7 @@ sealed interface Block {
     }
 
     interface Visitor<T> {
-        fun visitBlock(it: Block) = when(it) {
+        fun visitBlock(it: Block) = when (it) {
             is CommentBlock -> visitComment(it)
             is ContentBlock -> visitContent(it)
         }
@@ -41,7 +41,7 @@ sealed interface Block {
  */
 @Serializable
 data class ContentBlock(
-    val token: Token
+    val token: Token,
 ) : Block {
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitContent(this)
 }
@@ -66,7 +66,7 @@ data class CommentBlock(
     val start: Token,
     val content: Component,
     val end: Token,
-    val scope: Scope? = null
+    val scope: Scope? = null,
 ) : Block {
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitComment(this)
 }

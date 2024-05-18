@@ -31,6 +31,7 @@ object CommentAdder : Block.Visitor<String> {
         "/*" to "/$KEY",
         "*/" to "$KEY/",
     )
+
     override fun visitContent(content: ContentBlock) = Assembler.visitContent(content)
         .replaceAll(onAddComment)
 

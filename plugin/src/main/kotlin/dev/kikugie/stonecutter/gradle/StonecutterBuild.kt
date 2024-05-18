@@ -1,58 +1,72 @@
 package dev.kikugie.stonecutter.gradle
 
-import dev.kikugie.stonecutter.cutter.StonecutterTask
-import dev.kikugie.stonecutter.metadata.StonecutterProject
-import dev.kikugie.stonecutter.processor.Expression
+import dev.kikugie.stitcher.process.access.Expression
 import dev.kikugie.stonecutter.util.buildDirectory
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.Path
 
-/**
- * Provides versioned functionality in the buildscript.
- */
-@Suppress("unused")
-open class StonecutterBuild(internal val project: Project) {
-    internal val setup: ProjectSetup = project.gradle.extensions.getByType<ProjectSetup.SetupContainer>()[project.parent
-        ?: throw StonecutterGradleException(
-            """Project ${project.path} must be a versioned project.
+
+open class StonecutterBuild(private val project: Project) {
+    private val setup = project.parent?.let {
+        project.gradle.extensions.getByType(StonecutterConfiguration.Container::class.java)[it]
+    } ?: throw StonecutterGradleException(
+        """Project ${project.path} must be a versioned project.
             This might've been caused by applying the plugin in standard mod. 
             Read https://github.com/kikugie/stonecutter-kt/wiki for an integration guide.
             """.trimMargin()
-        )]!!
-
-    /**
-     * Version of this buildscript instance. (Unique for each subproject)
-     */
+    )
     val current: StonecutterProject by lazy {
         setup.versions.first { it.project in project.name }.let {
             if (it.project == setup.current.project) it.asActive() else it
         }
     }
+    val active get() = setup.current
+    val versions get() = setup.versions
 
-    /**
-     * Current active version. (Global for all subprojects)
-     */
-    val active: StonecutterProject by lazy { setup.current }
-
-    /**
-     * All registered subprojects.
-     */
-    val versions
-        get() = setup.versions
+    internal val constants = mutableMapOf<String, Boolean>()
     internal val expressions = mutableListOf<Expression>()
+    internal val swaps = mutableMapOf<String, String>()
+    internal val filters = mutableListOf<(Path) -> Boolean>()
 
-    /**
-     * Create a custom expression for the comment processor.
-     *
-     * @param expr function that accepts an expression string and returns a boolean result, or `null` if expression doesn't match.
-     */
-    fun expression(expr: Expression) {
-        expressions += expr
+    fun swap(identifier: String, replacement: String) {
+        swaps[identifier] = replacement
+    }
+
+    fun swap(identifier: String, replacement: () -> String) {
+        swap(identifier, replacement())
+    }
+
+    fun swaps(vararg values: Pair<String, String>) {
+        values.forEach { (id, str) -> swap(id, str) }
+    }
+
+    fun const(identifier: String, value: Boolean) {
+        constants[identifier] = value
+    }
+
+    fun const(identifier: String, value: () -> Boolean) {
+        const(identifier, value())
+    }
+
+    fun consts(vararg values: Pair<String, Boolean>) {
+        values.forEach { (id, str) -> const(id, str) }
+    }
+
+    fun expression(expression: Expression) {
+        expressions += expression
+    }
+
+    fun filter(criteria: (Path) -> Boolean) {
+        filters += criteria
+    }
+
+    fun test(version: String, predicate: String): Boolean {
+        return false
     }
 
     init {
@@ -61,13 +75,14 @@ open class StonecutterBuild(internal val project: Project) {
                 throw StonecutterGradleException("Chiseled task can't be registered for the root project. How did you manage to do it though?")
 
             toVersion.set(current)
+
+            constants.set(this@StonecutterBuild.constants)
             expressions.set(this@StonecutterBuild.expressions)
-            debug.set(setup.debug)
+            swaps.set(this@StonecutterBuild.swaps)
+            filter.set { p -> if (filters.isEmpty()) true else filters.all { it(p) } }
 
             input.set(project.parent!!.file("./src").toPath())
             output.set(project.buildDirectory.toPath().resolve("chiseledSrc"))
-            if (setup.fileFilters.isNotEmpty())
-                fileFilter.set { p -> setup.fileFilters.all { it(p) } }
         }
 
         project.afterEvaluate {

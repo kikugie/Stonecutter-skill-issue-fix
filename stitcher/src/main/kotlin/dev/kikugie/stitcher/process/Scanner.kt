@@ -2,7 +2,8 @@ package dev.kikugie.stitcher.process
 
 import dev.kikugie.stitcher.data.Token
 import dev.kikugie.stitcher.process.recognizer.CommentRecognizer
-import dev.kikugie.stitcher.type.Comment
+import dev.kikugie.stitcher.type.Comment.*
+import dev.kikugie.stitcher.type.TokenType
 import java.io.Reader
 
 /**
@@ -22,7 +23,7 @@ class Scanner(
 
     fun tokenize(): Sequence<Token> = sequence {
         input.readLigatures { scan(it) }
-        if (buffer.isNotEmpty()) yield(buffer, if (current == null) Comment.CONTENT else Comment.COMMENT)
+        if (buffer.isNotEmpty()) yield(buffer, if (current == null) CONTENT else COMMENT)
         yield(Token.EOF)
     }
 
@@ -36,8 +37,8 @@ class Scanner(
             match.range.shift(start)
             buffer.delete(match.range)
             if (buffer.isNotEmpty())
-                yield(buffer, Comment.CONTENT)
-            yield(match.value, Comment.COMMENT_START)
+                yield(buffer, CONTENT)
+            yield(match.value, COMMENT_START)
             buffer.clear()
             current = rec
         } else {
@@ -45,8 +46,8 @@ class Scanner(
             val start = cursor - buffer.length
             match.range.shift(start)
             buffer.delete(match.range)
-            yield(buffer, Comment.COMMENT)
-            yield(match.value, Comment.COMMENT_END)
+            yield(buffer, COMMENT)
+            yield(match.value, COMMENT_END)
             buffer.clear()
             current = null
         }
@@ -83,7 +84,7 @@ class Scanner(
 
     private suspend inline fun SequenceScope<Token>.yield(
         value: CharSequence,
-        type: Comment,
+        type: TokenType,
     ) = yield(Token(value.toString(), type))
 
     private inline fun Reader.readLigatures(action: (String) -> Unit) {
@@ -106,7 +107,7 @@ class Scanner(
     private fun IntRange.shift(value: Int): IntRange =
         first + value..last + value
 
-//    private fun IntRange.shift(other: IntRange): IntRange {
+    //    private fun IntRange.shift(other: IntRange): IntRange {
 //        val shift = last - first
 //        return other.first + first..other.first + shift + first
 //    }

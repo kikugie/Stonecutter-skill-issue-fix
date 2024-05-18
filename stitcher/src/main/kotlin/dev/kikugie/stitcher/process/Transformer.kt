@@ -6,9 +6,12 @@ import dev.kikugie.stitcher.process.Parser.Companion.parse
 import dev.kikugie.stitcher.process.Scanner.Companion.scan
 import dev.kikugie.stitcher.process.access.*
 import dev.kikugie.stitcher.process.recognizer.CommentRecognizer
-import dev.kikugie.stitcher.process.transformer.*
-import dev.kikugie.stitcher.type.Comment
-import dev.kikugie.stitcher.type.StitcherToken
+import dev.kikugie.stitcher.process.transformer.CommentAdder
+import dev.kikugie.stitcher.process.transformer.CommentRemover
+import dev.kikugie.stitcher.process.transformer.ConditionVisitor
+import dev.kikugie.stitcher.type.Comment.CONTENT
+import dev.kikugie.stitcher.type.StitcherToken.CONDITION
+import dev.kikugie.stitcher.type.StitcherToken.SWAP
 import dev.kikugie.stitcher.util.affectedRange
 
 // TODO: Handle different comment styles
@@ -25,10 +28,13 @@ class Transformer(
             constants: Constants = emptyMap(),
             expressions: Expressions = emptyList(),
             swaps: Swaps = emptyMap(),
-        ): Transformer {
-            val processor = ExpressionProcessor(constants, expressions)
-            return Transformer(source, recognizers, ConditionVisitor(processor), SwapProcessor(swaps, processor))
-        }
+        ): Transformer =
+            Transformer(
+                source,
+                recognizers,
+                ConditionVisitor(ExpressionProcessor(constants, expressions)),
+                SwapProcessor(swaps)
+            )
     }
 
     private var previousResult: Boolean = false
@@ -42,8 +48,8 @@ class Transformer(
     override fun visitContent(content: ContentBlock) {}
 
     override fun visitComment(comment: CommentBlock) = when (comment.scope?.type) {
-        StitcherToken.SWAP -> processSwap(comment)
-        StitcherToken.CONDITION -> processCondition(comment)
+        SWAP -> processSwap(comment)
+        CONDITION -> processCondition(comment)
         else -> {}
     }
 
@@ -69,7 +75,7 @@ class Transformer(
         val text = (if (result) CommentRemover.accept(scope) else CommentAdder.accept(scope))
         when {
             text == null -> withSource(scope).process()
-            !result -> scope.blocks = mutableListOf(ContentBlock(Token(text, Comment.CONTENT)))
+            !result -> scope.blocks = mutableListOf(ContentBlock(Token(text, CONTENT)))
             else -> {
                 val parsed = text.parse()
                 withSource(parsed).process()

@@ -64,7 +64,7 @@ enum class ScopeType(val id: String) {
 @Serializable
 open class Scope(
     val type: TokenType = NULL,
-    val enclosure: ScopeType = ScopeType.CLOSED,
+    val enclosure: ScopeType = CLOSED,
 ) : Iterable<Block> {
     var blocks: MutableList<Block> = mutableListOf()
 

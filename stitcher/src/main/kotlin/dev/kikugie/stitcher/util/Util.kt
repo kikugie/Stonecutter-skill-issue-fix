@@ -19,7 +19,6 @@ fun <T : CharSequence> T.trailingSpaces(): Int {
 }
 
 
-
 fun Reader.ligatures(): Iterator<String> = object : Iterator<String> {
     private var char = read()
     private var buffer: Char? = null
@@ -36,6 +35,7 @@ fun Reader.ligatures(): Iterator<String> = object : Iterator<String> {
 
         else -> char.toChar().toString().also { advance() }
     }
+
     private fun advance() {
         char = read()
     }
@@ -55,6 +55,7 @@ inline fun String.filterUntil(predicate: (String) -> Boolean): IntRange {
     }
     return buffer.leadingSpaces()..<buffer.length - buffer.trailingSpaces()
 }
+
 fun <K, V> memoize(provider: (K) -> V): (K) -> V = object : (K) -> V {
     val cache: MutableMap<K, V> = mutableMapOf()
 

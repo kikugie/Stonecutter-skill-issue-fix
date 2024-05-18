@@ -10,12 +10,11 @@ import kotlin.io.path.writeText
 
 private const val KEY = "/* [SC] DO NOT EDIT */"
 
-val Project.controller
-    get() = when (buildFile.name) {
-        GroovyController.filename -> GroovyController
-        KotlinController.filename -> KotlinController
-        else -> null
-    }
+fun Project.controller() = when (buildFile.name) {
+    GroovyController.filename -> GroovyController
+    KotlinController.filename -> KotlinController
+    else -> null
+}
 
 interface ControllerManager {
     val filename: String
