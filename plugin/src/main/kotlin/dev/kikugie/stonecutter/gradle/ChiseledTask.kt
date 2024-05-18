@@ -5,6 +5,9 @@ import org.gradle.api.Task
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Input
 
+/**
+ * Chiseled tasks allow Stonecutter to run specified jobs for all versions.
+ */
 @Suppress("LeakingThis", "unused")
 abstract class ChiseledTask : DefaultTask() {
     private val setup = project.gradle.extensions.getByType(StonecutterConfiguration.Container::class.java)[project]!!
@@ -18,6 +21,11 @@ abstract class ChiseledTask : DefaultTask() {
         versions.convention(setup.versions)
     }
 
+    /**
+     * Specifies, which task this delegates to.
+     *
+     * @param name delegate task
+     */
     fun ofTask(name: String) {
         versions.get().forEach {
             val task = project.project(it.project).tasks.getByName(name)

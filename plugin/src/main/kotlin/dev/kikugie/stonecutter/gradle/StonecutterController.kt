@@ -5,8 +5,10 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getByType
 
-
-open class StonecutterController(project: Project) {
+/**
+ * Runs for `stonecutter.gradle` file, applying project configurations to versions and generating versioned tasks.
+ */
+open class StonecutterController internal constructor(project: Project) {
     private val controller: ControllerManager = project.controller()
         ?: throw StonecutterGradleException("Project ${project.path} is not a Stonecutter controller. What did you even do to get this error?")
     private val setup: StonecutterConfiguration =

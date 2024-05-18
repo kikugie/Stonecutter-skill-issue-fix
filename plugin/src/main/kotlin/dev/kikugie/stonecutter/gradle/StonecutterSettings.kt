@@ -6,14 +6,24 @@ import org.gradle.api.initialization.Settings
 import java.io.File
 import kotlin.io.path.notExists
 
-
+/**
+ * Executed for the `stonecutter` block in `settings.gradle` and responsible for creating versioned subprojects.
+ */
 open class StonecutterSettings(private val settings: Settings) {
     private val projects = settings.gradle.extensions
         .create("stonecutterProjects", StonecutterConfiguration.Container::class.java)
-    private var shared = StonecutterConfiguration.Builder()
+    private var shared = StonecutterConfigurationBuilder()
     private val controller get() = if (kotlinController) KotlinController else GroovyController
 
+    /**
+     * Enables Kotlin buildscripts for the controller.
+     * - `stonecutter.gradle` -> `stonecutter.gradle.kts`
+     */
     var kotlinController = true
+    /**
+     * Buildscript used by all subprojects.
+     * Defaults to `build.gradle`.
+     */
     var centralScript = "build.gradle"
         set(value) {
             if (value.startsWith("stonecutter.gradle"))
@@ -21,18 +31,38 @@ open class StonecutterSettings(private val settings: Settings) {
             field = value
         }
 
-    fun shared(builder: Action<StonecutterConfiguration.Builder>) {
-        shared = StonecutterConfiguration.Builder(shared, builder)
+    /**
+     * Configures the version structure for this project.
+     *
+     * @param builder configuration scope
+     */
+    fun shared(builder: Action<StonecutterConfigurationBuilder>) {
+        shared = StonecutterConfigurationBuilder(shared, builder)
     }
 
+    /**
+     * Assigns the specified configuration to projects.
+     *
+     * @param projects project references
+     */
     fun create(projects: Iterable<ProjectDescriptor>) {
         projects.forEach(::create)
     }
 
+    /**
+     * Assigns the specified configuration to projects.
+     *
+     * @param projects project references
+     */
     fun create(vararg projects: ProjectDescriptor) {
         projects.forEach(::create)
     }
 
+    /**
+     * Assigns the specified configuration to the project.
+     *
+     * @param project project reference
+     */
     fun create(project: ProjectDescriptor) {
         val vcs = shared.vcsProject
         if (!projects.register(project.path, shared))

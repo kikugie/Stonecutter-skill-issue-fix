@@ -6,8 +6,10 @@ import dev.kikugie.stitcher.process.Parser.Companion.parse
 import dev.kikugie.stitcher.process.Scanner.Companion.scan
 import dev.kikugie.stitcher.process.Transformer
 import dev.kikugie.stitcher.process.access.Expression
+import dev.kikugie.stitcher.process.access.ExpressionProcessor
 import dev.kikugie.stitcher.process.recognizer.StandardMultiLine
 import dev.kikugie.stitcher.process.recognizer.StandardSingleLine
+import dev.kikugie.stitcher.process.transformer.ConditionVisitor
 import dev.kikugie.stonecutter.version.FabricVersionChecker
 import dev.kikugie.stonecutter.version.McVersionExpression
 import dev.kikugie.stonecutter.version.VersionChecker
@@ -27,7 +29,7 @@ import kotlin.io.path.*
 
 @Suppress("LeakingThis")
 @OptIn(ExperimentalPathApi::class)
-abstract class StonecutterTask : DefaultTask() {
+internal abstract class StonecutterTask : DefaultTask() {
     @get:Input
     abstract val input: Property<Path>
 
@@ -53,19 +55,20 @@ abstract class StonecutterTask : DefaultTask() {
     abstract val versionChecker: Property<(Project) -> VersionChecker>
 
     @get:Internal
-    internal lateinit var expressionsImpl: List<Expression>
+    internal lateinit var conditionProcessor: ConditionVisitor
 
     @TaskAction
     fun run() {
         if (!input.isPresent || !output.isPresent || !toVersion.isPresent)
             throw IllegalArgumentException("[Stonecutter] StonecutterTask is not fully initialized")
-        expressionsImpl = buildList {
+        val expressionsImpl = buildList {
             val checker = versionChecker.get()(project)
             val target = checker.parseVersion(toVersion.get().version)
 
             addAll(expressions.get())
             add(McVersionExpression(target, checker))
         }
+        conditionProcessor = ConditionVisitor(ExpressionProcessor(constants.get(), expressionsImpl))
         transform(input.get(), output.get(), filter.get())
     }
 
@@ -110,11 +113,10 @@ abstract class StonecutterTask : DefaultTask() {
     private fun process(file: Path): String = try {
         val recognizers = listOf(StandardMultiLine, StandardSingleLine)
         val scope = file.reader(StandardCharsets.ISO_8859_1).scan(recognizers).lex().parse()
-        val transformer = Transformer.create(
+        val transformer = Transformer(
             scope,
             recognizers,
-            constants.get(),
-            expressionsImpl,
+            conditionProcessor,
             swaps.get()
         )
         transformer.process()

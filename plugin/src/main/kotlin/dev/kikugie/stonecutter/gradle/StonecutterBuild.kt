@@ -10,8 +10,12 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 
-
-open class StonecutterBuild(private val project: Project) {
+/**
+ * Stonecutter plugin applied to the versioned build file.
+ *
+ * @property project the effective Gradle project
+ */
+open class StonecutterBuild internal constructor(private val project: Project) {
     private val setup = project.parent?.let {
         project.gradle.extensions.getByType(StonecutterConfiguration.Container::class.java)[it]
     } ?: throw StonecutterGradleException(
@@ -20,12 +24,24 @@ open class StonecutterBuild(private val project: Project) {
             Read https://github.com/kikugie/stonecutter-kt/wiki for an integration guide.
             """.trimMargin()
     )
+
+    /**
+     * Metadata of the currently processed version.
+     */
     val current: StonecutterProject by lazy {
         setup.versions.first { it.project in project.name }.let {
             if (it.project == setup.current.project) it.asActive() else it
         }
     }
+
+    /**
+     * The currently active version. Global for all instances of the build file.
+     */
     val active get() = setup.current
+
+    /**
+     * All available versions.
+     */
     val versions get() = setup.versions
 
     internal val constants = mutableMapOf<String, Boolean>()
@@ -33,40 +49,96 @@ open class StonecutterBuild(private val project: Project) {
     internal val swaps = mutableMapOf<String, String>()
     internal val filters = mutableListOf<(Path) -> Boolean>()
 
+    /**
+     * Creates a swap token.
+     *
+     * Refer to the wiki for a detailed guide.
+     *
+     * @param identifier token identifier
+     * @param replacement replacement string
+     */
     fun swap(identifier: String, replacement: String) {
         swaps[identifier] = replacement
     }
 
+    /**
+     * Creates a swap token.
+     *
+     * Refer to the wiki for a detailed guide.
+     *
+     * @param identifier token identifier
+     * @param replacement replacement string provider
+     */
     fun swap(identifier: String, replacement: () -> String) {
         swap(identifier, replacement())
     }
 
+    /**
+     * Creates a swap token.
+     *
+     * Refer to the wiki for a detailed guide.
+     *
+     * @param values entries of tokens to replacements
+     */
     fun swaps(vararg values: Pair<String, String>) {
         values.forEach { (id, str) -> swap(id, str) }
     }
 
+    /**
+     * Creates a constant accessible in stonecutter conditions.
+     *
+     * Refer to the wiki for a detailed guide.
+     *
+     * @param identifier token identifier
+     * @param value boolean value
+     */
     fun const(identifier: String, value: Boolean) {
         constants[identifier] = value
     }
 
+    /**
+     * Creates a constant accessible in stonecutter conditions.
+     *
+     * Refer to the wiki for a detailed guide.
+     *
+     * @param identifier token identifier
+     * @param value boolean value provider
+     */
     fun const(identifier: String, value: () -> Boolean) {
         const(identifier, value())
     }
 
+    /**
+     * Creates a constant accessible in stonecutter conditions.
+     *
+     * Refer to the wiki for a detailed guide.
+     *
+     * @param values entries of tokens to boolean values
+     */
     fun consts(vararg values: Pair<String, Boolean>) {
         values.forEach { (id, str) -> const(id, str) }
     }
 
+    /**
+     * Creates an expression that allows stonecutter to dynamically evaluate condition requirements.
+     *
+     * Refer to the wiki for a detailed guide.
+     *
+     * @param expression expression function
+     */
     fun expression(expression: Expression) {
         expressions += expression
     }
 
+    /**
+     * Creates a file filter criteria. If no filters are added, all files are processed.
+     *
+     * Refer to the wiki for a detailed guide.
+     *
+     * @param criteria filter function
+     */
     fun filter(criteria: (Path) -> Boolean) {
         filters += criteria
-    }
-
-    fun test(version: String, predicate: String): Boolean {
-        return false
     }
 
     init {

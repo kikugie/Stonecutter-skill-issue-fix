@@ -10,19 +10,19 @@ import kotlin.io.path.writeText
 
 private const val KEY = "/* [SC] DO NOT EDIT */"
 
-fun Project.controller() = when (buildFile.name) {
+internal fun Project.controller() = when (buildFile.name) {
     GroovyController.filename -> GroovyController
     KotlinController.filename -> KotlinController
     else -> null
 }
 
-interface ControllerManager {
+internal interface ControllerManager {
     val filename: String
     fun createHeader(file: Path, version: ProjectName)
     fun updateHeader(file: Path, version: ProjectName)
 }
 
-object GroovyController : ControllerManager {
+internal object GroovyController : ControllerManager {
     override val filename = "stonecutter.gradle"
     override fun createHeader(file: Path, version: ProjectName) {
         file.writeText(
@@ -37,7 +37,7 @@ object GroovyController : ControllerManager {
         updateFileWithKey(file, filename, "stonecutter.active \"$version\" $KEY")
 }
 
-object KotlinController : ControllerManager {
+internal object KotlinController : ControllerManager {
     override val filename = "stonecutter.gradle.kts"
     override fun createHeader(file: Path, version: ProjectName) {
         file.writeText(
