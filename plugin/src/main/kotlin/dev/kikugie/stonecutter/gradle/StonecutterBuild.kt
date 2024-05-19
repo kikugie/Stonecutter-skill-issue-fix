@@ -2,7 +2,6 @@ package dev.kikugie.stonecutter.gradle
 
 import dev.kikugie.stitcher.process.access.Expression
 import dev.kikugie.stonecutter.metadata.Semver
-import dev.kikugie.stonecutter.util.buildDirectory
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSet

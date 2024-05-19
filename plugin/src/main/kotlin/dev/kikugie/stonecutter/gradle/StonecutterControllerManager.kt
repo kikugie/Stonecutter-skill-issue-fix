@@ -85,3 +85,6 @@ private fun invalidScript(name: String, missing: String): Throwable =
         Add `$missing` or delete the file to make Stonecutter regenerate it
         """.trimIndent()
     )
+
+internal val Project.buildDirectory
+    get() = layout.buildDirectory.asFile.get()
