@@ -1,10 +1,5 @@
 package dev.kikugie.stonecutter.gradle
 
-import dev.kikugie.stitcher.process.Assembler
-import dev.kikugie.stitcher.process.Lexer.Companion.lex
-import dev.kikugie.stitcher.process.Parser.Companion.parse
-import dev.kikugie.stitcher.process.Scanner.Companion.scan
-import dev.kikugie.stitcher.process.Transformer
 import dev.kikugie.stitcher.process.access.Expression
 import dev.kikugie.stitcher.process.access.ExpressionProcessor
 import dev.kikugie.stitcher.process.recognizer.StandardMultiLine
@@ -15,6 +10,11 @@ import dev.kikugie.stonecutter.util.buildDirectory
 import dev.kikugie.stonecutter.version.FabricVersionChecker
 import dev.kikugie.stonecutter.version.McVersionExpression
 import dev.kikugie.stonecutter.version.VersionChecker
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.provider.ListProperty
@@ -27,7 +27,10 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
-import kotlin.io.path.*
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.copyTo
+import kotlin.io.path.walk
+import kotlin.io.path.writeText
 import kotlin.system.measureTimeMillis
 
 @Suppress("LeakingThis")
@@ -76,7 +79,7 @@ internal abstract class StonecutterTask : DefaultTask() {
         }
         conditionProcessor = ConditionVisitor(ExpressionProcessor(constants.get(), expressionsImpl))
         val time = measureTimeMillis {
-            transform(input.get(), output.get(), filter.get())
+            transform(input.get(), output.get())
         }
         println("[Stonecutter] Switched to ${toVersion.get().project} in ${time}ms")
     }
@@ -85,16 +88,22 @@ internal abstract class StonecutterTask : DefaultTask() {
         versionChecker.convention { FabricVersionChecker.create(it) }
     }
 
-    private fun transform(input: Path, output: Path, filter: (Path) -> Boolean) {
+    private fun transform(input: Path, output: Path): Unit = runBlocking {
         val inPlace = input == output
+        var panic = false
+        val exception = RuntimeException("Failed to switch to ${toVersion.get().project}")
         val skipped = mutableListOf<Path>()
         val processed = mutableListOf<Pair<Path, String>>()
-
-        for (file in input.walk()) {
-            val result = process(input, file)
+        input.walk().map {
+            it to process(input, it)
+        }.asFlow().flowOn(Dispatchers.Default).catch {
+            panic = true
+            exception.addSuppressed(it)
+        }.collect { (file, result) ->
             if (result == null) skipped.add(file)
             else processed.add(file to result)
         }
+        if (panic) throw exception
         if (!inPlace) skipped.forEach {
             val out = output.resolve(input.relativize(it))
             Files.createDirectories(out.parent)
