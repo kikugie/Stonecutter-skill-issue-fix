@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+import org.jetbrains.dokka.gradle.DokkaTask
+
+
 plugins {
     java
     `kotlin-dsl`
@@ -27,6 +30,18 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.withType<DokkaTask>().configureEach {
+    moduleName.set("Stonecutter Plugin")
+    dokkaSourceSets {
+        configureEach {
+            skipEmptyPackages = true
+            sourceRoots.setFrom(file("src/main/kotlin/dev/kikugie/stonecutter/gradle"))
+            includes.setFrom(fileTree("docs").files)
+            samples.setFrom(fileTree("samples").files)
+        }
+    }
 }
 
 kotlin {
