@@ -7,11 +7,11 @@ plugins {
     `java-gradle-plugin`
     kotlin("jvm")
     kotlin("plugin.serialization")
-    id("org.jetbrains.dokka") version "1.9.10"
+    id("org.jetbrains.dokka") version "1.9.20"
 }
 
 group = "dev.kikugie"
-version = "0.4.0-alpha.2"
+version = "0.4.0-alpha.3"
 
 repositories {
     mavenCentral()
@@ -20,6 +20,9 @@ repositories {
 dependencies {
     implementation(project(":stitcher"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.0.0-RC")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1")
     testImplementation(kotlin("test"))
     testImplementation(kotlin("script-runtime"))
 }

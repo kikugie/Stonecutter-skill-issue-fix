@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "dev.kikugie"
-version = "0.1-alpha.2"
+version = "0.1-alpha.3"
 
 repositories {
     mavenCentral()
@@ -16,8 +16,6 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
     testImplementation("com.charleskorn.kaml:kaml:0.57.0")
-    testImplementation("net.orandja.obor:obor:0.2.0")
-
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.2")
     testImplementation("com.github.ajalt.mordant:mordant:2.2.0")

@@ -1,31 +1,11 @@
 package dev.kikugie.stitchertest
 
-import dev.kikugie.stitcher.data.RootScope
-import dev.kikugie.stitcher.data.Scope
-import dev.kikugie.stitcher.process.Assembler
-import dev.kikugie.stitcher.process.Lexer.Companion.lex
-import dev.kikugie.stitcher.process.Parser.Companion.parse
-import dev.kikugie.stitcher.process.Scanner.Companion.scan
-import dev.kikugie.stitcher.process.Transformer
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.InternalSerializationApi
-import kotlinx.serialization.cbor.Cbor
-import kotlinx.serialization.decodeFromByteArray
-import kotlinx.serialization.encodeToByteArray
-import kotlinx.serialization.protobuf.ProtoBuf
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
 import java.security.MessageDigest
-import kotlin.io.path.*
-import kotlin.system.measureNanoTime
-import kotlin.system.measureTimeMillis
-import kotlin.time.Duration
-import kotlin.time.measureTime
+import kotlin.io.path.inputStream
 
 object Time {
-    @OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class, ExperimentalUnsignedTypes::class,
-        ExperimentalPathApi::class
-    )
     @Test
     fun test() {
     }
