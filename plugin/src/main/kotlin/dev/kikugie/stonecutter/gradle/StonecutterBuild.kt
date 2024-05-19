@@ -9,12 +9,16 @@ import org.gradle.api.tasks.SourceSetContainer
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.deleteRecursively
+import kotlin.io.path.exists
 
 /**
  * Stonecutter plugin applied to the versioned build file.
  *
  * @property project the effective Gradle project
  */
+@OptIn(ExperimentalPathApi::class)
 open class StonecutterBuild internal constructor(val project: Project) {
     private val setup = project.parent?.let {
         project.gradle.extensions.getByType(StonecutterConfiguration.Container::class.java)[it]
@@ -152,7 +156,9 @@ open class StonecutterBuild internal constructor(val project: Project) {
             filter.set { p -> if (filters.isEmpty()) true else filters.all { it(p) } }
 
             input.set(project.parent!!.file("./src").toPath())
-            output.set(project.buildDirectory.toPath().resolve("chiseledSrc"))
+            val out = project.buildDirectory.toPath().resolve("chiseledSrc")
+            if (out.exists()) out.deleteRecursively()
+            output.set(out)
         }
 
         project.afterEvaluate {
