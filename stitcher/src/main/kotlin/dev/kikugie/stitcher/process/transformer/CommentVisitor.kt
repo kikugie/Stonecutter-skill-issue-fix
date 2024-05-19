@@ -14,13 +14,15 @@ private fun String.replaceAll(keys: Iterable<Pair<String, String>>): String {
     return str
 }
 
+private fun Scope.isCommented(): Boolean = !any { it !is CommentBlock && !it.isEmpty() }
+
 object CommentRemover : Block.Visitor<String> {
     val onRemoveComment = onAddComment.map { (k, v) -> v to k }
 
-    override fun visitContent(content: ContentBlock) = Assembler.visitContent(content)
+    override fun visitContent(content: ContentBlock) = content.accept(Assembler)
         .replaceAll(onRemoveComment)
 
-    override fun visitComment(comment: CommentBlock): String = Assembler.visitComponent(comment.content)
+    override fun visitComment(comment: CommentBlock): String = comment.content.accept(Assembler)
         .replaceAll(onRemoveComment)
 
     fun accept(scope: Scope): String? {
@@ -34,8 +36,8 @@ object CommentRemover : Block.Visitor<String> {
                 val toUncommentIndex = scope.indexOfFirst { !it.isEmpty() }.takeIf { it >= 0 } ?: return null
                 val toUncomment = scope.blocks[toUncommentIndex]
                 if (toUncomment !is CommentBlock) return null
-                scope.blocks[toUncommentIndex] = ContentBlock(Token(visitComment(toUncomment), Comment.CONTENT))
-                Assembler.visitScope(scope)
+                scope.blocks[toUncommentIndex] = ContentBlock(Token(toUncomment.accept(this), Comment.CONTENT))
+                scope.accept(Assembler)
             }
         }
     }
@@ -47,10 +49,10 @@ object CommentAdder : Block.Visitor<String> {
         "*/" to "$KEY/",
     )
 
-    override fun visitContent(content: ContentBlock) = Assembler.visitContent(content)
+    override fun visitContent(content: ContentBlock) = content.accept(Assembler)
         .replaceAll(onAddComment)
 
-    override fun visitComment(comment: CommentBlock): String = Assembler.visitComponent(comment.content)
+    override fun visitComment(comment: CommentBlock): String = comment.accept(Assembler)
         .replaceAll(onAddComment)
 
     fun accept(scope: Scope): String? = if (scope.isCommented()) null else buildString {

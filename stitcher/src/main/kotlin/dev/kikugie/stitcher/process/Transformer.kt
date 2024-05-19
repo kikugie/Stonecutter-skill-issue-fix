@@ -69,8 +69,8 @@ class Transformer(
         val condition = block.content as Condition
         val scope = block.scope!!
         var result = condition.accept(conditions)
-        if (condition.extension)
-            result = !previousResult && result
+        if (!condition.extension) previousResult = false
+        else result = !previousResult && result
         previousResult = result || previousResult
         val text = (if (result) CommentRemover.accept(scope) else CommentAdder.accept(scope))
         when {

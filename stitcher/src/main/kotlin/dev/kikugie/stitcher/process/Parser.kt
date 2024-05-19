@@ -26,13 +26,13 @@ class Parser(input: Iterable<Token>) {
     }
 
     private fun process() {
+        if (active.enclosure != ScopeType.CLOSED && active.blocks.lastOrNull()?.isEmpty() == false)
+            scopeStack.pop()
+
         if (match(CONTENT))
             active.add(ContentBlock(iter.next()))
         else if (match(COMMENT_START))
             matchComment().also { return }
-
-        if (active.enclosure != ScopeType.CLOSED && iter.current!!.value.isNotBlank())
-            scopeStack.pop()
     }
 
     private fun matchComment() {
