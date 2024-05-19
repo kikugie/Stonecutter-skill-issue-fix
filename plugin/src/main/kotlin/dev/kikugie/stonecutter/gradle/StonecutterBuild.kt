@@ -124,6 +124,17 @@ open class StonecutterBuild internal constructor(val project: Project) {
     }
 
     /**
+     * Creates a constant accessible in stonecutter conditions.
+     *
+     * Refer to the wiki for a detailed guide.
+     *
+     * @param values entries of tokens to boolean values
+     */
+    fun consts(values: Iterable<Pair<String, Boolean>>) {
+        values.forEach { (id, str) -> const(id, str) }
+    }
+
+    /**
      * Creates an expression that allows stonecutter to dynamically evaluate condition requirements.
      *
      * Refer to the wiki for a detailed guide.
