@@ -6,6 +6,7 @@ import dev.kikugie.stitcher.process.recognizer.StandardMultiLine
 import dev.kikugie.stitcher.process.transformer.CommentAdder.onAddComment
 import dev.kikugie.stitcher.type.Comment
 import dev.kikugie.stitcher.util.affectedRange
+import dev.kikugie.stitcher.util.leadingSpaces
 
 const val KEY = '^'
 private fun String.replaceAll(keys: Iterable<Pair<String, String>>): String {
@@ -57,9 +58,13 @@ object CommentAdder : Block.Visitor<String> {
 
     fun accept(scope: Scope): String? = if (scope.isCommented()) null else buildString {
         val processed = scope.blocks.joinToString(separator = "", transform = ::visitBlock)
-        if (scope.enclosure == ScopeType.CLOSED)
-            return "${StandardMultiLine.start}$processed${StandardMultiLine.end}"
-        else {
+        if (scope.enclosure == ScopeType.CLOSED) {
+            val spaces = processed.leadingSpaces()
+            append(processed.subSequence(0..<spaces))
+            append(StandardMultiLine.start)
+            append(processed.subSequence(spaces..<processed.length))
+            append(StandardMultiLine.end)
+        } else {
             val range = processed.affectedRange(scope.enclosure)
             append(processed.subSequence(0..<range.first))
             append(StandardMultiLine.start)
