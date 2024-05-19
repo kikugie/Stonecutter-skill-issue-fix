@@ -91,10 +91,9 @@ internal abstract class StonecutterTask : DefaultTask() {
 
     private fun transform(input: Path, output: Path): Unit = runBlocking {
         val inPlace = input == output
-        var panic = false
-        val exception = RuntimeException("Failed to switch to ${toVersion.get().project}")
         val skipped = mutableListOf<Path>()
         val processed = mutableListOf<Pair<Path, String>>()
+        val exceptions = mutableListOf<Throwable>()
         input.walk().map {
             it to process(input, it)
         }.asFlow().flowOn(Dispatchers.Default).catch {
@@ -102,9 +101,9 @@ internal abstract class StonecutterTask : DefaultTask() {
         }.transform<Pair<Path, String?>, Unit> { (file, result) ->
             if (result == null) skipped.add(file)
             else processed.add(file to result)
-        }
-        if (panic) throw exception
         }.collect()
+        if (exceptions.isNotEmpty())
+            throw exceptions.composeCauses()
         if (!inPlace) skipped.forEach {
             val out = output.resolve(input.relativize(it))
             Files.createDirectories(out.parent)
@@ -120,6 +119,21 @@ internal abstract class StonecutterTask : DefaultTask() {
                 StandardOpenOption.TRUNCATE_EXISTING
             )
         }
+    }
+
+    private fun List<Throwable>.composeCauses(): Throwable {
+        val cause = buildString {
+            for (err in this@composeCauses) {
+                val primary = err.message ?: "An error occurred"
+                val cause = err.cause
+                val message = StringBuilder()
+                message.append("    > $primary:\n")
+                for (line in (cause?.message ?: "").lines())
+                    message.append("        $line\n")
+                append(message)
+            }
+        }
+        return RuntimeException("Failed to switch to ${toVersion.get().project}:\n$cause")
     }
 
     private fun process(root: Path, file: Path): String? = try {
