@@ -15,7 +15,7 @@ import java.nio.file.Path
  *
  * @property project the effective Gradle project
  */
-open class StonecutterBuild internal constructor(private val project: Project) {
+open class StonecutterBuild internal constructor(val project: Project) {
     private val setup = project.parent?.let {
         project.gradle.extensions.getByType(StonecutterConfiguration.Container::class.java)[it]
     } ?: throw StonecutterGradleException(

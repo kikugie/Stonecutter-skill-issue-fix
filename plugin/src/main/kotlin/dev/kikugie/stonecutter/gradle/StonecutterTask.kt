@@ -117,7 +117,6 @@ internal abstract class StonecutterTask : DefaultTask() {
         val relative = root.relativize(file.parent)
         val subproject = project.let { it.parent ?: it }.project(":${fromVersion.get().project}")
         val cacheDir = subproject.buildDirectory.resolve("stonecutterCache").resolve(relative.toFile()).toPath()
-        Files.createDirectories(cacheDir)
         FileManager.processFile(
             file,
             filter.get(),

@@ -48,6 +48,7 @@ object FileManager {
         if (ast.version != Parser.VERSION)
             ast = text.parse().also { overwrite = true }
         if (overwrite) {
+            Files.createDirectories(cacheDirectory)
             cacheDirectory.listDirectoryEntries().forEach {
                 if (it.fileName.name.startsWith(file.fileName.name)) it.deleteExisting()
             }
