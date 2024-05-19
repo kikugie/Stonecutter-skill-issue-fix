@@ -13,17 +13,12 @@ class FabricVersionChecker @Throws(
     ClassNotFoundException::class,
     NoSuchMethodException::class
 ) constructor(classLoader: ClassLoader) : VersionChecker {
-    private val semverParse: Method
-    private val predicateParse: Method
-
-    init {
-        semverParse = classLoader.loadClass("net.fabricmc.loader.api.SemanticVersion")
-            .getDeclaredMethod("parse", String::class.java)
-            ?: throw IllegalArgumentException("Invalid Fabric Loader jar")
-        predicateParse = classLoader.loadClass("net.fabricmc.loader.api.metadata.version.VersionPredicate")
-            .getDeclaredMethod("parse", String::class.java)
-            ?: throw IllegalArgumentException("Invalid Fabric Loader jar")
-    }
+    private val semverParse: Method = classLoader.loadClass("net.fabricmc.loader.api.SemanticVersion")
+        .getDeclaredMethod("parse", String::class.java)
+        ?: throw IllegalArgumentException("Invalid Fabric Loader jar")
+    private val predicateParse: Method = classLoader.loadClass("net.fabricmc.loader.api.metadata.version.VersionPredicate")
+        .getDeclaredMethod("parse", String::class.java)
+        ?: throw IllegalArgumentException("Invalid Fabric Loader jar")
 
     override fun parseVersion(version: String): Version = semverParse.invoke(null, version)
 
@@ -39,17 +34,11 @@ class FabricVersionChecker @Throws(
 
             if (loaderCopy.exists()) try {
                 return create(loaderCopy)
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
             }
 
             project.logger.error("[Stonecutter] Could not create Fabric Loader version checker")
-            return object : VersionChecker {
-                override fun parseVersion(version: String) = version
-
-                override fun parsePredicate(predicate: String): Predicate<Version> {
-                    throw UnsupportedOperationException()
-                }
-            }
+            return DummyVersionChecker
         }
 
         fun create(loader: Path) = FabricVersionChecker(

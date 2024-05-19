@@ -78,6 +78,7 @@ open class StonecutterController internal constructor(project: Project) {
         constants.set(build.constants)
         expressions.set(build.expressions)
         swaps.set(build.swaps)
+        dependencies.set(build.dependencies)
         filter.set { p -> if (build.filters.isEmpty()) true else build.filters.all { it(p) } }
 
         input.set(root.file("./src").toPath())

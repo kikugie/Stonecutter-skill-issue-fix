@@ -1,6 +1,7 @@
 package dev.kikugie.stonecutter.gradle
 
 import dev.kikugie.stitcher.process.access.Expression
+import dev.kikugie.stonecutter.metadata.Semver
 import dev.kikugie.stonecutter.util.buildDirectory
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
@@ -52,6 +53,7 @@ open class StonecutterBuild internal constructor(val project: Project) {
     internal val expressions = mutableListOf<Expression>()
     internal val swaps = mutableMapOf<String, String>()
     internal val filters = mutableListOf<(Path) -> Boolean>()
+    internal val dependencies = mutableMapOf<String, Semver>()
 
     /**
      * Creates a swap token.
@@ -153,6 +155,18 @@ open class StonecutterBuild internal constructor(val project: Project) {
         filters += { !criteria(it) }
     }
 
+    fun dependency(identifier: String, version: Semver) {
+        dependencies[identifier] = version
+    }
+
+    fun dependencies(vararg values: Pair<String, Semver>) {
+        values.forEach { (id, ver) -> dependencies[id] = ver }
+    }
+
+    fun dependencies(values: Iterable<Pair<String, Semver>>) {
+        values.forEach { (id, ver) -> dependencies[id] = ver }
+    }
+
     init {
         project.tasks.register("setupChiseledBuild", StonecutterTask::class.java) {
             if (project.parent == null)
@@ -164,6 +178,7 @@ open class StonecutterBuild internal constructor(val project: Project) {
             constants.set(this@StonecutterBuild.constants)
             expressions.set(this@StonecutterBuild.expressions)
             swaps.set(this@StonecutterBuild.swaps)
+            dependencies.set(this@StonecutterBuild.dependencies)
             filter.set { p -> if (filters.isEmpty()) true else filters.all { it(p) } }
 
             input.set(project.parent!!.file("./src").toPath())

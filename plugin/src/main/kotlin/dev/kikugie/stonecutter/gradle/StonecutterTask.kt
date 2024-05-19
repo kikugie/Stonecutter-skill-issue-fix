@@ -6,14 +6,13 @@ import dev.kikugie.stitcher.process.recognizer.StandardMultiLine
 import dev.kikugie.stitcher.process.recognizer.StandardSingleLine
 import dev.kikugie.stitcher.process.transformer.ConditionVisitor
 import dev.kikugie.stonecutter.cutter.FileManager
+import dev.kikugie.stonecutter.metadata.Semver
 import dev.kikugie.stonecutter.util.buildDirectory
+import dev.kikugie.stonecutter.version.DependencyChecker
 import dev.kikugie.stonecutter.version.FabricVersionChecker
-import dev.kikugie.stonecutter.version.McVersionExpression
 import dev.kikugie.stonecutter.version.VersionChecker
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -58,6 +57,9 @@ internal abstract class StonecutterTask : DefaultTask() {
     abstract val swaps: MapProperty<String, String>
 
     @get:Input
+    abstract val dependencies: MapProperty<String, Semver>
+
+    @get:Input
     abstract val filter: Property<(Path) -> Boolean>
 
     @get:Input
@@ -70,12 +72,11 @@ internal abstract class StonecutterTask : DefaultTask() {
     fun run() {
         if (!input.isPresent || !output.isPresent || !toVersion.isPresent)
             throw IllegalArgumentException("[Stonecutter] StonecutterTask is not fully initialized")
+        val deps = dependencies.get().toMutableMap()
+        deps.putIfAbsent("minecraft", toVersion.get().version)
         val expressionsImpl = buildList {
-            val checker = versionChecker.get()(project)
-            val target = checker.parseVersion(toVersion.get().version)
-
             addAll(expressions.get())
-            add(McVersionExpression(target, checker))
+            add(DependencyChecker(deps, versionChecker.get()(project)))
         }
         conditionProcessor = ConditionVisitor(ExpressionProcessor(constants.get(), expressionsImpl))
         val time = measureTimeMillis {
@@ -97,13 +98,13 @@ internal abstract class StonecutterTask : DefaultTask() {
         input.walk().map {
             it to process(input, it)
         }.asFlow().flowOn(Dispatchers.Default).catch {
-            panic = true
-            exception.addSuppressed(it)
-        }.collect { (file, result) ->
+            exceptions += it
+        }.transform<Pair<Path, String?>, Unit> { (file, result) ->
             if (result == null) skipped.add(file)
             else processed.add(file to result)
         }
         if (panic) throw exception
+        }.collect()
         if (!inPlace) skipped.forEach {
             val out = output.resolve(input.relativize(it))
             Files.createDirectories(out.parent)
