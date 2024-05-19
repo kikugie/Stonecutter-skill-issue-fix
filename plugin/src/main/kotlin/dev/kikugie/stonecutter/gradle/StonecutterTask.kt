@@ -10,6 +10,8 @@ import dev.kikugie.stitcher.process.access.ExpressionProcessor
 import dev.kikugie.stitcher.process.recognizer.StandardMultiLine
 import dev.kikugie.stitcher.process.recognizer.StandardSingleLine
 import dev.kikugie.stitcher.process.transformer.ConditionVisitor
+import dev.kikugie.stonecutter.cutter.FileManager
+import dev.kikugie.stonecutter.util.buildDirectory
 import dev.kikugie.stonecutter.version.FabricVersionChecker
 import dev.kikugie.stonecutter.version.McVersionExpression
 import dev.kikugie.stonecutter.version.VersionChecker
@@ -26,6 +28,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import kotlin.io.path.*
+import kotlin.system.measureTimeMillis
 
 @Suppress("LeakingThis")
 @OptIn(ExperimentalPathApi::class)
@@ -35,6 +38,9 @@ internal abstract class StonecutterTask : DefaultTask() {
 
     @get:Input
     abstract val output: Property<Path>
+
+    @get:Input
+    abstract val fromVersion: Property<StonecutterProject>
 
     @get:Input
     abstract val toVersion: Property<StonecutterProject>
@@ -69,7 +75,10 @@ internal abstract class StonecutterTask : DefaultTask() {
             add(McVersionExpression(target, checker))
         }
         conditionProcessor = ConditionVisitor(ExpressionProcessor(constants.get(), expressionsImpl))
-        transform(input.get(), output.get(), filter.get())
+        val time = measureTimeMillis {
+            transform(input.get(), output.get(), filter.get())
+        }
+        println("[Stonecutter] Switched to ${toVersion.get().project} in ${time}ms")
     }
 
     init {
@@ -82,16 +91,9 @@ internal abstract class StonecutterTask : DefaultTask() {
         val processed = mutableListOf<Pair<Path, String>>()
 
         for (file in input.walk()) {
-            val filtered = filter(file)
-
-            if (!filtered) {
-                if (!inPlace) skipped.add(file)
-                continue
-            }
-            val original = file.readText(StandardCharsets.ISO_8859_1)
-            val transformed = process(file)
-            if (original == transformed) skipped.add(file)
-            else processed.add(file to transformed)
+            val result = process(input, file)
+            if (result == null) skipped.add(file)
+            else processed.add(file to result)
         }
         if (!inPlace) skipped.forEach {
             val out = output.resolve(input.relativize(it))
@@ -110,17 +112,21 @@ internal abstract class StonecutterTask : DefaultTask() {
         }
     }
 
-    private fun process(file: Path): String = try {
+    private fun process(root: Path, file: Path): String? = try {
         val recognizers = listOf(StandardMultiLine, StandardSingleLine)
-        val scope = file.reader(StandardCharsets.ISO_8859_1).scan(recognizers).lex().parse()
-        val transformer = Transformer(
-            scope,
+        val relative = root.relativize(file.parent)
+        val subproject = project.let { it.parent ?: it }.project(":${fromVersion.get().project}")
+        val cacheDir = subproject.buildDirectory.resolve("stonecutterCache").resolve(relative.toFile()).toPath()
+        Files.createDirectories(cacheDir)
+        FileManager.processFile(
+            file,
+            filter.get(),
+            StandardCharsets.ISO_8859_1,
             recognizers,
             conditionProcessor,
-            swaps.get()
+            swaps.get(),
+            cacheDir
         )
-        transformer.process()
-        Assembler.visitScope(scope)
     } catch (e: Exception) {
         throw RuntimeException("Failed to process $file").apply {
             initCause(e)

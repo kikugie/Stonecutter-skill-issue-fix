@@ -58,6 +58,8 @@ open class StonecutterController internal constructor(project: Project) {
         group = "stonecutter"
 
         toVersion.set(version)
+        fromVersion.set(setup.current)
+
         val build = subproject.extensions.getByType<StonecutterBuild>()
         constants.set(build.constants)
         expressions.set(build.expressions)

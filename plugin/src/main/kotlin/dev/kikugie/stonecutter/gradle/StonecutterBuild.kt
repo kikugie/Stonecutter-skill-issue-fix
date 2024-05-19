@@ -130,15 +130,12 @@ open class StonecutterBuild internal constructor(private val project: Project) {
         expressions += expression
     }
 
-    /**
-     * Creates a file filter criteria. If no filters are added, all files are processed.
-     *
-     * Refer to the wiki for a detailed guide.
-     *
-     * @param criteria filter function
-     */
-    fun filter(criteria: (Path) -> Boolean) {
+    fun whitelist(criteria: (Path) -> Boolean) {
         filters += criteria
+    }
+
+    fun blacklist(criteria: (Path) -> Boolean) {
+        filters += { !criteria(it) }
     }
 
     init {
@@ -147,6 +144,7 @@ open class StonecutterBuild internal constructor(private val project: Project) {
                 throw StonecutterGradleException("Chiseled task can't be registered for the root project. How did you manage to do it though?")
 
             toVersion.set(current)
+            fromVersion.set(active)
 
             constants.set(this@StonecutterBuild.constants)
             expressions.set(this@StonecutterBuild.expressions)
