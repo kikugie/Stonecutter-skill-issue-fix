@@ -71,7 +71,7 @@ class Transformer(
         var result = condition.accept(conditions)
         if (condition.extension)
             result = !previousResult && result
-        previousResult = result
+        previousResult = result || previousResult
         val text = (if (result) CommentRemover.accept(scope) else CommentAdder.accept(scope))
         when {
             text == null -> withSource(scope).process()

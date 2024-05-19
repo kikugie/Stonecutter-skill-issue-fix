@@ -7,10 +7,10 @@ import dev.kikugie.stitcher.process.Parser
 import dev.kikugie.stitcher.process.Parser.Companion.parse
 import dev.kikugie.stitcher.process.Scanner.Companion.scan
 import dev.kikugie.stitcher.process.Transformer
-import dev.kikugie.stitcher.process.Transformer.Companion.transform
 import dev.kikugie.stitcher.process.recognizer.CommentRecognizer
 import dev.kikugie.stitcher.process.transformer.ConditionVisitor
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
@@ -41,18 +41,23 @@ object FileManager {
 
         val cache = cacheDirectory.resolve("${file.fileName.name}_$hash.ast")
         var overwrite = false
-        var ast: RootScope= if (cache.exists() && cache.isReadable())
-            Cbor.Default.decodeFromByteArray(cache.readBytes())
-        else
-            text.parse().also { overwrite = true }
-        if (ast.version != Parser.VERSION)
+        var ast: RootScope? = null
+        if (cache.exists() && cache.isReadable()) try {
+            ast = Cbor.Default.decodeFromByteArray(cache.readBytes())
+        } catch (_: SerializationException) {
+        }
+        if (ast?.version != Parser.VERSION)
             ast = text.parse().also { overwrite = true }
         if (overwrite) {
             Files.createDirectories(cacheDirectory)
             cacheDirectory.listDirectoryEntries().forEach {
                 if (it.fileName.name.startsWith(file.fileName.name)) it.deleteExisting()
             }
-            cache.writeBytes(Cbor.Default.encodeToByteArray(ast), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+            cache.writeBytes(
+                Cbor.Default.encodeToByteArray(ast),
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING
+            )
         }
         Transformer(ast, recognizers, conditions, swaps).process()
         val result = ast.accept(Assembler)
