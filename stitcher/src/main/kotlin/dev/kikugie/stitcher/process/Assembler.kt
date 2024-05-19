@@ -3,28 +3,35 @@ package dev.kikugie.stitcher.process
 import dev.kikugie.stitcher.data.*
 
 @Suppress("MemberVisibilityCanBePrivate")
-object Assembler : Component.Visitor<String>, Block.Visitor<String> {
+object Assembler : Component.Visitor<String>, Block.Visitor<String>, Scope.Visitor<String> {
     private fun StringBuilder.token(token: Token): StringBuilder = append(token.value)
 
     private fun StringBuilder.space(): StringBuilder = append(' ')
+
+    private fun StringBuilder.appendVisit(it: Component) = append(it.accept(Assembler))
+    private fun StringBuilder.appendVisit(it: Block) = append(it.accept(Assembler))
+    private fun StringBuilder.appendVisit(it: Scope) = append(it.accept(Assembler))
 
     override fun visitEmpty(empty: Empty) = ""
 
     override fun visitLiteral(literal: Literal) = literal.token.value
 
-    override fun visitUnary(unary: Unary): String = unary.operator.value + visitComponent(unary.target)
+    override fun visitUnary(unary: Unary): String = buildString {
+        append(unary.operator.value)
+        appendVisit(unary.target)
+    }
 
     override fun visitBinary(binary: Binary) = buildString {
-        append(visitComponent(binary.left))
+        appendVisit(binary.left)
         space()
         token(binary.operator)
         space()
-        append(visitComponent(binary.right))
+        appendVisit(binary.right)
     }
 
     override fun visitGroup(group: Group) = buildString {
         append('(')
-        append(visitComponent(group.content))
+        appendVisit(group.content)
         append(')')
     }
 
@@ -56,7 +63,7 @@ object Assembler : Component.Visitor<String>, Block.Visitor<String> {
 
     override fun visitComment(comment: CommentBlock) = buildString {
         token(comment.start)
-        append(visitComponent(comment.content))
+        appendVisit(comment.content)
         when (val enclosure = comment.scope?.enclosure) {
             ScopeType.CLOSED, ScopeType.WORD -> {
                 space()
@@ -67,10 +74,10 @@ object Assembler : Component.Visitor<String>, Block.Visitor<String> {
         }
         token(comment.end)
         if (comment.scope != null)
-            append(visitScope(comment.scope))
+            appendVisit(comment.scope)
     }
 
-    fun visitScope(scope: Scope): String = buildString {
-        for (it in scope.blocks) append(visitBlock(it))
+    override fun visitScope(scope: Scope): String = buildString {
+        for (it in scope.blocks) appendVisit(it)
     }
 }

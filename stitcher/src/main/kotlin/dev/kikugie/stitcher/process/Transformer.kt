@@ -68,7 +68,7 @@ class Transformer(
     private fun processCondition(block: CommentBlock) {
         val condition = block.content as Condition
         val scope = block.scope!!
-        var result = conditions.visitCondition(condition)
+        var result = condition.accept(conditions)
         if (condition.extension)
             result = !previousResult && result
         previousResult = result

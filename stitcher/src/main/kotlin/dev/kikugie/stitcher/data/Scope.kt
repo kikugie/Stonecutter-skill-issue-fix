@@ -73,8 +73,13 @@ open class Scope(
     }
 
     override fun iterator() = blocks.iterator()
+    fun <T> accept(visitor: Visitor<T>): T = visitor.visitScope(this)
 
     fun isCommented(): Boolean = !any { it !is CommentBlock && !it.isEmpty() }
+
+    interface Visitor<T> {
+        fun visitScope(scope: Scope): T
+    }
 }
 
 /**
