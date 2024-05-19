@@ -14,7 +14,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("reflect"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
     testImplementation("com.charleskorn.kaml:kaml:0.57.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.2")

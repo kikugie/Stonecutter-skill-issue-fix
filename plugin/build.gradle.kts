@@ -19,10 +19,8 @@ repositories {
 
 dependencies {
     implementation(project(":stitcher"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.0.0-RC")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.1")
     testImplementation(kotlin("test"))
     testImplementation(kotlin("script-runtime"))
 }
