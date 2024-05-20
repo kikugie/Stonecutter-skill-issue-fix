@@ -3,6 +3,7 @@ import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  base: '/stonecutter-kt',
   lang: "en-US",
   title: "Stonecutter Wiki",
   themeConfig: {
