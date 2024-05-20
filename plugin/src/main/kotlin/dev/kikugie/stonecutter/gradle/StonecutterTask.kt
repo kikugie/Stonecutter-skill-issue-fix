@@ -7,7 +7,6 @@ import dev.kikugie.stitcher.process.recognizer.StandardSingleLine
 import dev.kikugie.stitcher.process.transformer.ConditionVisitor
 import dev.kikugie.stonecutter.cutter.FileManager
 import dev.kikugie.stonecutter.metadata.Semver
-import dev.kikugie.stonecutter.util.buildDirectory
 import dev.kikugie.stonecutter.version.DependencyChecker
 import dev.kikugie.stonecutter.version.FabricVersionChecker
 import dev.kikugie.stonecutter.version.VersionChecker

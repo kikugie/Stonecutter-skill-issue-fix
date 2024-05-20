@@ -64,8 +64,9 @@ object Assembler : Component.Visitor<String>, Block.Visitor<String>, Scope.Visit
     override fun visitComment(comment: CommentBlock) = buildString {
         token(comment.start)
         appendVisit(comment.content)
-        space()
-        when (val enclosure = comment.scope?.enclosure) {
+        val enclosure = comment.scope?.enclosure
+        if (enclosure != null) space()
+        when (enclosure) {
             ScopeType.CLOSED, ScopeType.WORD -> append(enclosure.id)
             else -> {}
         }
