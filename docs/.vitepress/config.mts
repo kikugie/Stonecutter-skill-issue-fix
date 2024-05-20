@@ -1,5 +1,5 @@
-import { defineConfig } from 'vitepress'
 import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
+import defineVersionedConfig from "vitepress-versioning-plugin";
 
 const req = await fetch(
     'https://raw.githubusercontent.com/nishtahir/language-kotlin/master/dist/Kotlin.JSON-tmLanguage'
@@ -10,10 +10,13 @@ const kotlin2 = JSON.parse(
 )
 
 // https://vitepress.dev/reference/site-config
-export default defineConfig({
+export default defineVersionedConfig(__dirname, {
   base: '/stonecutter-kt',
   lang: "en-US",
   title: "Stonecutter Wiki",
+  versioning: {
+    latestVersion: "0.4.0-alpha.5",
+  },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [

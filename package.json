@@ -1,7 +1,8 @@
 {
   "devDependencies": {
     "vitepress": "^1.2.0",
-    "vitepress-plugin-tabs": "^0.5.0"
+    "vitepress-plugin-tabs": "^0.5.0",
+    "vitepress-versioning-plugin": "^0.10.0"
   },
   "scripts": {
     "docs:dev": "vitepress dev docs",
