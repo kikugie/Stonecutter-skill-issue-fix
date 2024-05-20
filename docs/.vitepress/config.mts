@@ -11,7 +11,6 @@ const kotlin2 = JSON.parse(
 
 // https://vitepress.dev/reference/site-config
 export default defineVersionedConfig(__dirname, {
-  base: '/stonecutter-kt',
   lang: "en-US",
   title: "Stonecutter Wiki",
   versioning: {
