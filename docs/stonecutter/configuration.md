@@ -102,3 +102,8 @@ which is the same for all buildscript instances.
 
 ### All versions
 Accessed with `stonecutter.versions` and returns the list of all registered subversions.
+
+## Global config
+Global options are configured in `stonecutter.gradle[.kts]`.  
+Currently the only available option is `stonecutter.includeResources = true`, 
+which removes the default `.java` and `.kt` file filter.

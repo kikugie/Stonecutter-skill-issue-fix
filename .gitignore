@@ -20,5 +20,5 @@ build
 # other
 eclipse
 run
-/wiki/docs/.vitepress/cache/
-/wiki/node_modules/
+/docs/.vitepress/cache/
+/node_modules/

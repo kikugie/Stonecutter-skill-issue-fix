@@ -205,7 +205,7 @@ This finally covers the contents of `build.gradle[.kts]` :tada:
 
 The very first change you'll need to make is to apply versioned dependencies:
 ::: tabs
-== tab build.gradle.kts
+== build.gradle.kts
 ```kts
 dependencies {
     minecraft("com.mojang:minecraft:${property("deps.minecraft")}")
@@ -223,7 +223,7 @@ loom {
 ```
 Alternatively, assigning variables with `val fabricApi: String by project` is allowed.
 
-== tab build.gradle
+== build.gradle
 ```groovy 
 dependencies {
     minecraft "com.mojang:minecraft:${property('deps.minecraft')}"

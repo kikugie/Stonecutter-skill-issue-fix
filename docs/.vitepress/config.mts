@@ -3,14 +3,19 @@ import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  lang: "en-US",
   title: "Stonecutter Wiki",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Home', link: '/stonecutter/' },
+      { text: 'Home', link: '/' },
+      { text: 'Stonecutter Docs', link: '/stonecutter/introduction' },
     ],
     outline: {
       level: "deep"
+    },
+    search: {
+      provider: 'local'
     },
     sidebar: [
       {
@@ -26,7 +31,8 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
+      { icon: 'github', link: 'https://github.com/kikugie/stonecutter-kt' },
+      { icon: 'discord', link: 'https://discord.gg/TBgNUCfryS' },
     ]
   },
   markdown: {
