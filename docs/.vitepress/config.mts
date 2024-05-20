@@ -1,6 +1,14 @@
 import { defineConfig } from 'vitepress'
 import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 
+const req = await fetch(
+    'https://raw.githubusercontent.com/nishtahir/language-kotlin/master/dist/Kotlin.JSON-tmLanguage'
+)
+
+const kotlin2 = JSON.parse(
+    JSON.stringify(await req.json()).replace(/Kotlin/gi, 'kotlin2')
+)
+
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   base: '/stonecutter-kt',
@@ -39,6 +47,12 @@ export default defineConfig({
   markdown: {
     config(md) {
       md.use(tabsMarkdownPlugin)
+    },
+    languages: [kotlin2],
+    languageAlias: {
+      kotlin: 'kotlin2',
+      kt: 'kotlin2',
+      kts: 'kotlin2'
     }
   }
 })

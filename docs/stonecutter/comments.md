@@ -97,7 +97,7 @@ Handling nested comments is surprisingly difficult, with a big difference betwee
 
 ```kotlin
 /* /* comment */ */
-//      ends here ^ (don't trust VitePress renderer)
+//      ends here ^
 ```
 The comment scanner takes the Java approach, since its simpler, 
 but when processed comments are applied, Stonecutter takes neither side - there shall be no nested multi-line comments.
