@@ -4,6 +4,7 @@ import dev.kikugie.stitcher.process.access.Expression
 import dev.kikugie.stonecutter.metadata.Semver
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
+import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
 import java.io.File
@@ -194,16 +195,30 @@ open class StonecutterBuild internal constructor(val project: Project) {
 
     private fun configureSources(project: Project) {
         try {
-            val formatter: (SourceSet, String) -> Any = if (setup.anyChiseled(project.gradle.startParameter.taskNames))
-                { source, type -> File(project.buildDirectory, "chiseledSrc/${source.name}/$type") }
+            val format: (Path) -> Any = if (setup.anyChiseled(project.gradle.startParameter.taskNames))
+                { src -> File(project.buildDirectory, "chiseledSrc/$src") }
             else if (current.isActive) {
-                { source, type -> "../../src/${source.name}/$type" }
+                { src -> "../../src/$src" }
             } else return
 
-            (project.property("sourceSets") as SourceSetContainer).forEach {
-                it.java.srcDir(formatter(it, "java"))
-                it.resources.srcDir(formatter(it, "resources"))
-                it.java.srcDir(formatter(it, "kotlin"))
+            val parentDir = project.parent!!.projectDir.resolve("src").toPath()
+            val thisDir = project.projectDir.resolve("src").toPath()
+
+            fun applyChiseled(src: SourceDirectorySet) {
+                src.sourceDirectories.mapNotNull {
+                    val relative = thisDir.relativize(it.toPath())
+                    if (relative.startsWith(".."))
+                        return@mapNotNull if (current.isActive) null
+                        else parentDir.relativize(it.toPath())
+                    else relative
+                }.forEach {
+                    src.srcDir(format(it))
+                }
+            }
+
+            for (it in project.property("sourceSets") as SourceSetContainer) {
+                applyChiseled(it.allJava)
+                applyChiseled(it.resources)
             }
         } catch (ignored: MissingPropertyException) {
         }
