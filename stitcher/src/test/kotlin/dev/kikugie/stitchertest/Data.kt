@@ -1,7 +1,8 @@
 package dev.kikugie.stitchertest
 
-import dev.kikugie.stitcher.type.Comment.*
-import dev.kikugie.stitcher.type.StitcherToken.*
+import dev.kikugie.stitcher.data.ContentType.*
+import dev.kikugie.stitcher.data.MarkerType
+import dev.kikugie.stitcher.data.StitcherTokenType.*
 
 val SCANNER_TESTS = buildList {
     add("slash comment", "// comment") {
@@ -89,7 +90,7 @@ val SCANNER_TESTS = buildList {
 val LEXER_TESTS = buildList {
     add("base tokens", "/*? { } ( ) ! || && if else an expression */") {
         token("/*", COMMENT_START)
-        token("?", CONDITION)
+        token("?", MarkerType.CONDITION)
         token("{", SCOPE_OPEN)
         token("}", SCOPE_CLOSE)
         token("(", GROUP_OPEN)
@@ -99,7 +100,6 @@ val LEXER_TESTS = buildList {
         token("&&", AND)
         token("if", IF)
         token("else", ELSE)
-        token("an expression", EXPRESSION)
         token("*/", COMMENT_END)
     }
 }
@@ -118,23 +118,23 @@ val PARSER_TESTS = buildList {
             value: "//"
             type: !<dev.kikugie.stitcher.type.Comment> "COMMENT_START"
           content: !<dev.kikugie.stitcher.data.Literal>
-            token:
+            type:
               value: " this is a function!"
               type: !<dev.kikugie.stitcher.type.Comment> "COMMENT"
           end:
             value: "\n"
             type: !<dev.kikugie.stitcher.type.Comment> "COMMENT_END"
         - !<dev.kikugie.stitcher.data.ContentBlock>
-          token:
+          type:
             value: "func()"
             type: !<dev.kikugie.stitcher.type.Comment> "CONTENT"
         version: 1
         """.trimIndent()
     )
     tuple(
-        "swap token",
+        "swap type",
         """
-        //$ token {
+        //$ type {
         func()
         //$}
         """.trimIndent(),
@@ -146,7 +146,7 @@ val PARSER_TESTS = buildList {
             type: !<dev.kikugie.stitcher.type.Comment> "COMMENT_START"
           content: !<dev.kikugie.stitcher.data.Swap>
             identifier:
-              value: "token"
+              value: "type"
               type: !<dev.kikugie.stitcher.type.StitcherToken> "EXPRESSION"
           end:
             value: "\n"
@@ -155,7 +155,7 @@ val PARSER_TESTS = buildList {
             type: !<dev.kikugie.stitcher.type.StitcherToken> "SWAP"
             blocks:
             - !<dev.kikugie.stitcher.data.ContentBlock>
-              token:
+              type:
                 value: "func()\n"
                 type: !<dev.kikugie.stitcher.type.Comment> "CONTENT"
             - !<dev.kikugie.stitcher.data.CommentBlock>
@@ -171,7 +171,7 @@ val PARSER_TESTS = buildList {
         """.trimIndent()
     )
     tuple(
-        "condition token",
+        "condition type",
         """
         /*? if bool {*/
         func()
@@ -190,7 +190,7 @@ val PARSER_TESTS = buildList {
             - value: "if"
               type: !<dev.kikugie.stitcher.type.StitcherToken> "IF"
             condition: !<dev.kikugie.stitcher.data.Literal>
-              token:
+              type:
                 value: "bool"
                 type: !<dev.kikugie.stitcher.type.StitcherToken> "EXPRESSION"
           end:
@@ -200,7 +200,7 @@ val PARSER_TESTS = buildList {
             type: !<dev.kikugie.stitcher.type.StitcherToken> "CONDITION"
             blocks:
             - !<dev.kikugie.stitcher.data.ContentBlock>
-              token:
+              type:
                 value: "\nfunc()\n"
                 type: !<dev.kikugie.stitcher.type.Comment> "CONTENT"
         - !<dev.kikugie.stitcher.data.CommentBlock>
@@ -219,7 +219,7 @@ val PARSER_TESTS = buildList {
             type: !<dev.kikugie.stitcher.type.StitcherToken> "CONDITION"
             blocks:
             - !<dev.kikugie.stitcher.data.ContentBlock>
-              token:
+              type:
                 value: "\n"
                 type: !<dev.kikugie.stitcher.type.Comment> "CONTENT"
             - !<dev.kikugie.stitcher.data.CommentBlock>
@@ -227,7 +227,7 @@ val PARSER_TESTS = buildList {
                 value: "//"
                 type: !<dev.kikugie.stitcher.type.Comment> "COMMENT_START"
               content: !<dev.kikugie.stitcher.data.Literal>
-                token:
+                type:
                   value: " func2()"
                   type: !<dev.kikugie.stitcher.type.Comment> "COMMENT"
               end:
@@ -266,7 +266,7 @@ val PARSER_TESTS = buildList {
               type: !<dev.kikugie.stitcher.type.StitcherToken> "IF"
             condition: !<dev.kikugie.stitcher.data.Binary>
               left: !<dev.kikugie.stitcher.data.Literal>
-                token:
+                type:
                   value: "bool1"
                   type: !<dev.kikugie.stitcher.type.StitcherToken> "EXPRESSION"
               operator:
@@ -277,7 +277,7 @@ val PARSER_TESTS = buildList {
                   value: "!"
                   type: !<dev.kikugie.stitcher.type.StitcherToken> "NEGATE"
                 target: !<dev.kikugie.stitcher.data.Literal>
-                  token:
+                  type:
                     value: "bool2"
                     type: !<dev.kikugie.stitcher.type.StitcherToken> "EXPRESSION"
           end:
@@ -287,7 +287,7 @@ val PARSER_TESTS = buildList {
             type: !<dev.kikugie.stitcher.type.StitcherToken> "CONDITION"
             blocks:
             - !<dev.kikugie.stitcher.data.ContentBlock>
-              token:
+              type:
                 value: "func1()\n"
                 type: !<dev.kikugie.stitcher.type.Comment> "CONTENT"
             - !<dev.kikugie.stitcher.data.CommentBlock>
@@ -295,7 +295,7 @@ val PARSER_TESTS = buildList {
                 value: "//"
                 type: !<dev.kikugie.stitcher.type.Comment> "COMMENT_START"
               content: !<dev.kikugie.stitcher.data.Literal>
-                token:
+                type:
                   value: " func2()"
                   type: !<dev.kikugie.stitcher.type.Comment> "COMMENT"
               end:
@@ -314,7 +314,7 @@ val PARSER_TESTS = buildList {
             condition: !<dev.kikugie.stitcher.data.Binary>
               left: !<dev.kikugie.stitcher.data.Group>
                 content: !<dev.kikugie.stitcher.data.Literal>
-                  token:
+                  type:
                     value: "bool1"
                     type: !<dev.kikugie.stitcher.type.StitcherToken> "EXPRESSION"
               operator:
@@ -322,7 +322,7 @@ val PARSER_TESTS = buildList {
                 type: !<dev.kikugie.stitcher.type.StitcherToken> "OR"
               right: !<dev.kikugie.stitcher.data.Group>
                 content: !<dev.kikugie.stitcher.data.Literal>
-                  token:
+                  type:
                     value: "bool2"
                     type: !<dev.kikugie.stitcher.type.StitcherToken> "EXPRESSION"
             extension: true
@@ -337,7 +337,7 @@ val PARSER_TESTS = buildList {
             value: "/*"
             type: !<dev.kikugie.stitcher.type.Comment> "COMMENT_START"
           content: !<dev.kikugie.stitcher.data.Literal>
-            token:
+            type:
               value: "func3()"
               type: !<dev.kikugie.stitcher.type.Comment> "COMMENT"
           end:
@@ -367,7 +367,7 @@ val PARSER_TESTS = buildList {
             - value: "if"
               type: !<dev.kikugie.stitcher.type.StitcherToken> "IF"
             condition: !<dev.kikugie.stitcher.data.Literal>
-              token:
+              type:
                 value: "bool1"
                 type: !<dev.kikugie.stitcher.type.StitcherToken> "EXPRESSION"
           end:
@@ -385,7 +385,7 @@ val PARSER_TESTS = buildList {
                 - value: "if"
                   type: !<dev.kikugie.stitcher.type.StitcherToken> "IF"
                 condition: !<dev.kikugie.stitcher.data.Literal>
-                  token:
+                  type:
                     value: "bool2"
                     type: !<dev.kikugie.stitcher.type.StitcherToken> "EXPRESSION"
               end:
@@ -403,7 +403,7 @@ val PARSER_TESTS = buildList {
                     - value: "if"
                       type: !<dev.kikugie.stitcher.type.StitcherToken> "IF"
                     condition: !<dev.kikugie.stitcher.data.Literal>
-                      token:
+                      type:
                         value: "bool3"
                         type: !<dev.kikugie.stitcher.type.StitcherToken> "EXPRESSION"
                   end:
@@ -414,7 +414,7 @@ val PARSER_TESTS = buildList {
                     enclosure: "LINE"
                     blocks:
                     - !<dev.kikugie.stitcher.data.ContentBlock>
-                      token:
+                      type:
                         value: "func()\n"
                         type: !<dev.kikugie.stitcher.type.Comment> "CONTENT"
             - !<dev.kikugie.stitcher.data.CommentBlock>
@@ -452,7 +452,7 @@ val PARSER_TESTS = buildList {
             - value: "if"
               type: !<dev.kikugie.stitcher.type.StitcherToken> "IF"
             condition: !<dev.kikugie.stitcher.data.Literal>
-              token:
+              type:
                 value: ">=1.20"
                 type: !<dev.kikugie.stitcher.type.StitcherToken> "EXPRESSION"
           end:
@@ -463,7 +463,7 @@ val PARSER_TESTS = buildList {
             enclosure: "WORD"
             blocks:
             - !<dev.kikugie.stitcher.data.ContentBlock>
-              token:
+              type:
                 value: " word1 word2"
                 type: !<dev.kikugie.stitcher.type.Comment> "CONTENT"
         version: 1

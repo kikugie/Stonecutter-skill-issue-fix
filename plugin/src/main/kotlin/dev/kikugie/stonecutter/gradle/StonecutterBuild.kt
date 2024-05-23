@@ -56,11 +56,11 @@ open class StonecutterBuild internal constructor(val project: Project) {
     internal val dependencies = mutableMapOf<String, Semver>()
 
     /**
-     * Creates a swap token.
+     * Creates a swap id.
      *
      * Refer to the wiki for a detailed guide.
      *
-     * @param identifier token identifier
+     * @param identifier id identifier
      * @param replacement replacement string
      */
     fun swap(identifier: String, replacement: String) {
@@ -68,11 +68,11 @@ open class StonecutterBuild internal constructor(val project: Project) {
     }
 
     /**
-     * Creates a swap token.
+     * Creates a swap id.
      *
      * Refer to the wiki for a detailed guide.
      *
-     * @param identifier token identifier
+     * @param identifier id identifier
      * @param replacement replacement string provider
      */
     fun swap(identifier: String, replacement: () -> String) {
@@ -80,7 +80,7 @@ open class StonecutterBuild internal constructor(val project: Project) {
     }
 
     /**
-     * Creates a swap token.
+     * Creates a swap id.
      *
      * Refer to the wiki for a detailed guide.
      *
@@ -95,7 +95,7 @@ open class StonecutterBuild internal constructor(val project: Project) {
      *
      * Refer to the wiki for a detailed guide.
      *
-     * @param identifier token identifier
+     * @param identifier id identifier
      * @param value boolean value
      */
     fun const(identifier: String, value: Boolean) {
@@ -107,7 +107,7 @@ open class StonecutterBuild internal constructor(val project: Project) {
      *
      * Refer to the wiki for a detailed guide.
      *
-     * @param identifier token identifier
+     * @param identifier id identifier
      * @param value boolean value provider
      */
     fun const(identifier: String, value: () -> Boolean) {

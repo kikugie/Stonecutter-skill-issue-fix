@@ -8,7 +8,7 @@ fun printCol(str: CharSequence) = str.split('\n').forEach { println(TextColors.c
 fun Sequence<Token>.printSetup() =
     forEach {
         printCol(
-            "token(\"${
+            "type(\"${
                 it.value.replace("\n", "\\n").replace("\"", "\\\"")
             }\", ${it.type})"
         )

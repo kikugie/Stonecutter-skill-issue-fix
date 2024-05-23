@@ -45,6 +45,7 @@ fun String.affectedRange(type: ScopeType): IntRange = when (type) {
     ScopeType.CLOSED -> indices
     ScopeType.LINE -> filterUntil { '\r' in it || '\n' in it }
     ScopeType.WORD -> filterUntil { it.isBlank() }
+    else -> IntRange.EMPTY
 }
 
 inline fun String.filterUntil(predicate: (String) -> Boolean): IntRange {

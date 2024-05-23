@@ -5,14 +5,15 @@ import org.intellij.lang.annotations.Language
 import java.util.regex.Pattern
 
 /**
- * Interface for token recognizers.
+ * Interface for id recognizers.
  *
  * Token recognizers are used to generify the lexical analysis and reduce boilerplate.
  *
  * @see TokenMatch
  */
-interface TokenRecognizer {
-    fun recognize(value: String, start: Int): Match?
+interface TokenRecognizer<T> {
+    val type: T
+    fun match(value: CharSequence, start: Int): Match?
 }
 
 /**
@@ -22,10 +23,10 @@ interface TokenRecognizer {
  *
  * @param regex The regular expression pattern as a Pattern object.
  */
-class RegexRecognizer(val regex: Pattern) : TokenRecognizer {
-    constructor(@Language("RegExp") regex: String) : this(Pattern.compile(regex))
+class RegexRecognizer<T>(val regex: Pattern, override val type: T) : TokenRecognizer<T> {
+    constructor(@Language("RegExp") regex: String, type: T) : this(Pattern.compile(regex), type)
 
-    override fun recognize(value: String, start: Int): Match? {
+    override fun match(value: CharSequence, start: Int): Match? {
         val matcher = regex.matcher(value).apply {
             region(start, value.length)
             useTransparentBounds(true)
@@ -43,8 +44,8 @@ class RegexRecognizer(val regex: Pattern) : TokenRecognizer {
  *
  * @param pattern The pattern to be searched within a string.
  */
-class StringRecognizer(private val pattern: String) : TokenRecognizer {
-    override fun recognize(value: String, start: Int): Match? = when {
+class StringRecognizer<T>(val pattern: String, override val type: T) : TokenRecognizer<T> {
+    override fun match(value: CharSequence, start: Int): Match? = when {
         start + pattern.length > value.length -> null // Not enough space to fit the pattern
         value.substring(start, start + pattern.length) != pattern -> null // No match
         else -> pattern and start..<start + pattern.length
@@ -58,9 +59,44 @@ class StringRecognizer(private val pattern: String) : TokenRecognizer {
  *
  * @param char The character to be recognized.
  */
-class CharRecognizer(val char: Char) : TokenRecognizer {
-    override fun recognize(value: String, start: Int): Match? =
+class CharRecognizer<T>(val char: Char, override val type: T) : TokenRecognizer<T> {
+    override fun match(value: CharSequence, start: Int): Match? =
         if (value[start] == char) char.toString() and start..start else null
 }
 
+class IdentifierRecognizer<T>(override val type: T) : TokenRecognizer<T> {
+    override fun match(value: CharSequence, start: Int): Match? {
+        if (value.getOrNull(start)?.allowed() != true) return null
+        for (i in start until value.length)
+            if (!value[i].allowed())
+                return value.match(start..<i)
+        return value.match(start..<value.length)
+    }
+
+    private fun Char.allowed() = this == '_' || this == '-' || isLetterOrDigit()
+}
+
+// TODO: Expand to be more generic
+class PredicateRecognizer<T>(override val type: T) : TokenRecognizer<T> {
+    override fun match(value: CharSequence, start: Int): Match? {
+        val operator = getOperatorLength(value, start)
+        var index = start + operator
+        while (index < value.length) {
+            if (!value[index].allowed()) break
+            ++index
+        }
+        return if (index == start + operator) null
+        else value.match(start..<index)
+    }
+
+    private fun Char.allowed() = this == '.' || this == '-' || this == '+' || isLetterOrDigit()
+
+    private fun getOperatorLength(value: CharSequence, start: Int): Int = when (value[start]) {
+        '=', '~', '^' -> 1
+        '>', '<' -> if (value.getOrNull(start + 1) == '=') 2 else 1
+        else -> 0
+    }
+}
+
+private fun CharSequence.match(range: IntRange) = Match(substring(range), range)
 private infix fun String.and(p2: IntRange) = Match(this, p2)

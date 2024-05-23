@@ -1,71 +1,59 @@
 package dev.kikugie.stitcher.process
 
-import dev.kikugie.stitcher.data.Syntax
+import Syntax
 import dev.kikugie.stitcher.data.Token
-import dev.kikugie.stitcher.process.recognizer.TokenRecognizer
-import dev.kikugie.stitcher.type.Comment
-import dev.kikugie.stitcher.type.StitcherToken.*
-import dev.kikugie.stitcher.type.TokenType
-import dev.kikugie.stitcher.util.leadingSpaces
-import dev.kikugie.stitcher.util.trailingSpaces
+import dev.kikugie.stitcher.exception.ErrorHandler
+import dev.kikugie.stitcher.process.util.LexSlice
+import dev.kikugie.stitcher.process.util.locateToken
+import dev.kikugie.stitcher.data.ContentType
+import dev.kikugie.stitcher.data.MarkerType.*
 
-class Lexer(private val input: Iterable<Token>) {
-    fun tokenize(): Sequence<Token> = sequence {
-        input.forEach { process(it) }
-    }
+class Lexer(val buffer: CharSequence, val handler: ErrorHandler) {
+    val errors get() = handler.errors
+    private val tokens = mutableListOf<LexSlice>()
+    private var start = 0
+    private var index = -1
 
-    private suspend fun SequenceScope<Token>.process(token: Token) {
-        if (token.type != Comment.COMMENT) {
-            yield(token)
-            return
+    operator fun get(index: Int) = tokens.getOrNull(if (index >= 0) index else tokens.size + index)
+    fun token(slice: LexSlice = tokens[index]) = Token(buffer.substring(slice.range), slice.type)
+    fun advance(): LexSlice? = tokens.getOrNull(++index) ?: advanceInternal()
+
+    fun lookup(offset: Int = 0): LexSlice? = when {
+        offset > 0 -> tokens.getOrNull(index + offset) ?: run {
+            if (start == -1) return@run null
+            for (i in tokens.size..index + offset)
+                advanceInternal()
+            tokens.getOrNull(index + offset)
         }
 
-        when (token.value.firstOrNull()) {
+        else -> tokens.getOrNull(index + offset)
+    }
+
+    private fun advanceInternal(): LexSlice? = when (start) {
+        -1 -> null
+        0 -> when (buffer.firstOrNull()) {
             '?' -> {
-                yield(token.take(0..<1, CONDITION))
-                yieldAll(scanContents(token, Syntax.conditionState))
+                ++start
+                LexSlice(CONDITION, 0..0)
             }
 
             '$' -> {
-                yield(token.take(0..<1, SWAP))
-                yieldAll(scanContents(token, Syntax.swapState))
+                ++start
+                LexSlice(SWAP, 0..0)
             }
 
-            else -> yield(token)
-        }
-    }
-
-    private fun scanContents(token: Token, checkers: List<Pair<TokenType, TokenRecognizer>>): List<Token> {
-        val tokens = mutableListOf<Token>()
-        var index = 1
-        val buffer = StringBuilder()
-
-        fun expressionToken() {
-            if (buffer.isNotBlank()) tokens += token.take(
-                index - buffer.length + buffer.leadingSpaces()..<index - buffer.trailingSpaces(),
-                EXPRESSION
-            )
-        }
-
-        while (index < token.value.length) {
-            var matched = false
-            for ((type, it) in checkers) {
-                val result = it.recognize(token.value, index) ?: continue
-                expressionToken()
-                if (buffer.isNotEmpty()) buffer.clear()
-
-                tokens += token.take(result.range, type)
-                index = result.range.last + 1
-                matched = true
-                break
+            else -> {
+                start = -1
+                LexSlice(ContentType.COMMENT, buffer.indices)
             }
-            if (!matched) buffer.append(token.value[index++])
         }
-        expressionToken()
-        return tokens
-    }
 
-    companion object {
-        fun Sequence<Token>.lex() = Lexer(asIterable()).tokenize()
-    }
+        else -> nextToken()
+    }?.also { tokens += it }
+
+    private fun nextToken(): LexSlice? =
+        locateToken(buffer, start, Syntax.ALL, handler).also {
+            start = if (it == null) -1
+            else it.second.last + 1
+        }?.let { LexSlice(it.first, it.second) }
 }

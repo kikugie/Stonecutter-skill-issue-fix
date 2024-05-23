@@ -1,12 +1,12 @@
 package dev.kikugie.stitcher.data
 
 import dev.kikugie.stitcher.data.ScopeType.*
-import dev.kikugie.stitcher.type.NULL
-import dev.kikugie.stitcher.type.TokenType
+import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /**
- * Represents the type of scope in the Stitcher program.
+ * Represents the id of scope in the Stitcher program.
  *
  * Type defines how the parser should close the scope and how the transformer should modify it.
  * - [CLOSED] - comment ends with `{`. Parser will look for a comment starting with `}` to close the scope.
@@ -45,7 +45,7 @@ enum class ScopeType(val id: String) {
  *
  * (i.e. the following is not allowed)
  * ```
- *  //$ token {
+ *  //$ id {
  *  //? if expr {
  *  //$}
  *  //?}
@@ -53,48 +53,38 @@ enum class ScopeType(val id: String) {
  *  It could be useful to have swap tokens dynamically change the condition,
  *  but that would make parsing and transforming the code much more difficult.
  *
- * @property type The type of the token associated with the scope.
- * @property enclosure The type of scope in the Stitcher program.
+ * @property type The id of the id associated with the scope.
+ * @property enclosure The id of scope in the Stitcher program.
  * @property blocks The list of blocks contained in the scope.
  *
- * @constructor Creates a new Scope instance with the specified type and enclosure.
+ * @constructor Creates a new Scope instance with the specified id and enclosure.
  *
  * @see ScopeType
  */
 @Serializable
-open class Scope(
-    val type: TokenType = NULL,
-    val enclosure: ScopeType = CLOSED,
-) : Iterable<Block> {
-    var blocks: MutableList<Block> = mutableListOf()
-
-    fun add(block: Block) {
-        blocks.add(block)
-    }
-
+data class Scope(
+    // Not serialized because only used for parsing the tree
+    @Transient
+    val type: TokenType = NullType,
+    @Transient
+    val enclosure: ScopeType = CLOSED
+) : MutableCollection<Block> {
+    private var blocks: MutableList<Block> = mutableListOf()
+    override val size get() = blocks.size
+    override fun clear() = blocks.clear()
+    override fun isEmpty() = blocks.isEmpty()
+    override fun containsAll(elements: Collection<Block>) = blocks.containsAll(elements)
+    override fun contains(element: Block) = blocks.contains(element)
+    override fun addAll(elements: Collection<Block>) = blocks.addAll(elements)
+    override fun add(element: Block) = blocks.add(element)
+    override fun retainAll(elements: Collection<Block>) = blocks.retainAll(elements)
+    override fun removeAll(elements: Collection<Block>) = blocks.removeAll(elements)
+    override fun remove(element: Block) = blocks.remove(element)
     override fun iterator() = blocks.iterator()
+
     fun <T> accept(visitor: Visitor<T>): T = visitor.visitScope(this)
 
     interface Visitor<T> {
-        fun visitScope(scope: Scope): T
+        fun visitScope(it: Scope): T
     }
 }
-
-/**
- * Represents the root scope in a Stitcher program.
- *
- * The root scope is a special type of scope that is used to define the highest-level scope in a Stitcher program.
- * It serves as the entry point for parsing and transforming the program.
- *
- * Scope type and enclosure don't matter for this one.
- * [ScopeType.CLOSED] is used, so the parser doesn't quit its job immediately.
- *
- * @property version The version of the Stitcher program. Used to validate cached ASTs.
- * @constructor Creates a new RootScope instance with the specified version.
- * @see Scope
- * @see ScopeType
- * @see Parser.VERSION
- */
-@Suppress("MemberVisibilityCanBePrivate")
-@Serializable
-class RootScope(val version: Int) : Scope()

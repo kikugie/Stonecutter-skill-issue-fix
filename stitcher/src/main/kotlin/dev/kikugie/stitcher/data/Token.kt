@@ -1,32 +1,32 @@
 package dev.kikugie.stitcher.data
 
-import dev.kikugie.stitcher.type.NULL
-import dev.kikugie.stitcher.type.TokenType
 import kotlinx.serialization.Serializable
 
 /**
- * Class representing a lexical token in a Stitcher program.
+ * Class representing a lexical id in a Stitcher program.
  *
- * @property value The string value of the token.
- * @property type The type of the token.
+ * @property value The string value of the id.
+ * @property type The id of the id.
  */
 @Serializable
 data class Token(
     val value: String,
     val type: TokenType,
 ) {
+    fun isBlank() = this === EMPTY || value.isBlank()
+
     fun take(local: IntRange, type: TokenType) =
         Token(value.substring(local), type)
 
     companion object {
-        val EOF = Token("\u0000", NULL)
+        val EMPTY = Token("\u0000", NullType)
     }
 
     /**
-     * Utility class for representing a found token,
+     * Utility class for representing a found id,
      *
-     * @property value The actual value of the token that was matched.
-     * @property range The range of indices within the string where the token was found.
+     * @property value The actual value of the id that was matched.
+     * @property range The range of indices within the string where the id was found.
      */
     data class Match(
         val value: String,

@@ -2,8 +2,8 @@ package dev.kikugie.stitcher.process
 
 import dev.kikugie.stitcher.data.Token
 import dev.kikugie.stitcher.process.recognizer.CommentRecognizer
-import dev.kikugie.stitcher.type.Comment.*
-import dev.kikugie.stitcher.type.TokenType
+import dev.kikugie.stitcher.data.ContentType.*
+import dev.kikugie.stitcher.data.TokenType
 import java.io.Reader
 
 /**
@@ -24,7 +24,6 @@ class Scanner(
     fun tokenize(): Sequence<Token> = sequence {
         input.readLigatures { scan(it) }
         if (buffer.isNotEmpty()) yield(buffer, if (current == null) CONTENT else COMMENT)
-        yield(Token.EOF)
     }
 
     private suspend fun SequenceScope<Token>.scan(str: String) {

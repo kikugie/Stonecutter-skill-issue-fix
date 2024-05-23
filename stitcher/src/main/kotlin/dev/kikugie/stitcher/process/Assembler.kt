@@ -1,6 +1,7 @@
 package dev.kikugie.stitcher.process
 
 import dev.kikugie.stitcher.data.*
+import dev.kikugie.stitcher.data.StitcherTokenType
 
 @Suppress("MemberVisibilityCanBePrivate")
 object Assembler : Component.Visitor<String>, Block.Visitor<String>, Scope.Visitor<String> {
@@ -12,70 +13,84 @@ object Assembler : Component.Visitor<String>, Block.Visitor<String>, Scope.Visit
     private fun StringBuilder.appendVisit(it: Block) = append(it.accept(Assembler))
     private fun StringBuilder.appendVisit(it: Scope) = append(it.accept(Assembler))
 
-    override fun visitEmpty(empty: Empty) = ""
-
-    override fun visitLiteral(literal: Literal) = literal.token.value
-
-    override fun visitUnary(unary: Unary): String = buildString {
-        append(unary.operator.value)
-        appendVisit(unary.target)
+    override fun visitEmpty(it: Empty) = ""
+    override fun visitLiteral(it: Literal) = it.token.value
+    override fun visitUnary(it: Unary): String = buildString {
+        append(it.operator.value)
+        appendVisit(it.target)
     }
 
-    override fun visitBinary(binary: Binary) = buildString {
-        appendVisit(binary.left)
+    override fun visitBinary(it: Binary) = buildString {
+        appendVisit(it.left)
         space()
-        token(binary.operator)
+        token(it.operator)
         space()
-        appendVisit(binary.right)
+        appendVisit(it.right)
     }
 
-    override fun visitGroup(group: Group) = buildString {
+    override fun visitGroup(it: Group) = buildString {
         append('(')
-        appendVisit(group.content)
+        appendVisit(it.content)
         append(')')
     }
 
-    override fun visitCondition(condition: Condition) = buildString {
-        append('?')
-        if (condition.extension)
-            append('}')
-        val components = condition.sugar.map { it.value }.toMutableList()
-        visitComponent(condition.condition).run {
+    override fun visitCondition(it: Condition) = buildString {
+        val components = it.sugar.map { it.value }.toMutableList()
+        it.condition.accept(this@Assembler).run {
             if (isNotBlank()) components.add(this)
         }
-        if (components.isNotEmpty()) {
-            space()
+        if (components.isNotEmpty())
             append(components.joinToString(" "))
-        }
     }
 
-    override fun visitSwap(swap: Swap) = buildString {
-        append('$')
-        if (swap.extension)
-            append('}')
-        else {
-            space()
-            token(swap.identifier)
-        }
+    override fun visitSwap(it: Swap) = buildString {
+        if (!it.identifier.isBlank()) token(it.identifier)
     }
 
-    override fun visitContent(content: ContentBlock) = content.token.value
-
-    override fun visitComment(comment: CommentBlock) = buildString {
-        token(comment.start)
-        appendVisit(comment.content)
-        val enclosure = comment.scope?.enclosure
-        if (enclosure != null) space()
-        when (enclosure) {
-            ScopeType.CLOSED, ScopeType.WORD -> append(enclosure.id)
+    override fun visitDefinition(it: Definition) = buildString {
+        when (it.type) {
+            MarkerType.CONDITION -> append('?')
+            MarkerType.SWAP -> append('$')
             else -> {}
         }
-        token(comment.end)
-        if (comment.scope != null)
-            appendVisit(comment.scope)
+        if (it.extension) append('}')
+        val component = it.component.accept(this@Assembler)
+        if (component.isNotBlank()) {
+            space()
+            append(component)
+        }
+        if (it.enclosure != ScopeType.LINE) {
+            space()
+            append(it.enclosure.id)
+        }
     }
 
-    override fun visitScope(scope: Scope): String = buildString {
-        for (it in scope.blocks) appendVisit(it)
+    override fun visitAssignment(it: Assignment) = buildString {
+        token(it.target)
+        append(':')
+        for (predicate in it.predicates) {
+            space()
+            token(predicate)
+        }
+    }
+
+    override fun visitContent(it: ContentBlock) = buildString {
+        token(it.content)
+    }
+
+    override fun visitComment(it: CommentBlock) = buildString {
+        token(it.start)
+        token(it.content)
+        token(it.end)
+    }
+
+    override fun visitCode(it: CodeBlock) = buildString {
+        token(it.start)
+        appendVisit(it.def)
+        token(it.end)
+    }
+
+    override fun visitScope(it: Scope): String = buildString {
+        it.forEach { bl -> appendVisit(bl) }
     }
 }
