@@ -4,9 +4,12 @@ import Syntax
 import dev.kikugie.stitcher.data.Token
 import dev.kikugie.stitcher.exception.ErrorHandler
 import dev.kikugie.stitcher.process.util.LexSlice
-import dev.kikugie.stitcher.process.util.locateToken
 import dev.kikugie.stitcher.data.ContentType
 import dev.kikugie.stitcher.data.MarkerType.*
+import dev.kikugie.stitcher.exception.accept
+import dev.kikugie.stitcher.process.recognizer.TokenRecognizer
+import dev.kikugie.stitcher.util.leadingSpaces
+import dev.kikugie.stitcher.util.trailingSpaces
 
 class Lexer(val buffer: CharSequence, val handler: ErrorHandler) {
     val errors get() = handler.errors
@@ -56,4 +59,28 @@ class Lexer(val buffer: CharSequence, val handler: ErrorHandler) {
             start = if (it == null) -1
             else it.second.last + 1
         }?.let { LexSlice(it.first, it.second) }
+
+    companion object {
+        fun <T> locateToken(
+            sequence: CharSequence,
+            start: Int,
+            matchers: Iterable<TokenRecognizer<T>>,
+            handler: ErrorHandler,
+        ): Pair<T, IntRange>? {
+            val buffer = StringBuilder()
+            var result: Pair<T, IntRange>? = null
+            outer@ for (i in start..<sequence.length) {
+                for (it in matchers) {
+                    val match = it.match(sequence, i) ?: continue
+                    result = it.type to match.range
+                    break@outer
+                }
+                buffer.append(sequence[i])
+            }
+            if (buffer.isBlank()) return result
+            val range = start + buffer.leadingSpaces()..<start + buffer.length - buffer.trailingSpaces()
+            handler.accept(range, "Unknown token: ${sequence.substring(range)}")
+            return null
+        }
+    }
 }

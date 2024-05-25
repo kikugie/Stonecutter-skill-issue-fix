@@ -1,7 +1,6 @@
 package dev.kikugie.stitcher.process
 
 import dev.kikugie.stitcher.data.*
-import dev.kikugie.stitcher.exception.ErrorHandler
 import dev.kikugie.stitcher.exception.ErrorHandlerImpl
 import dev.kikugie.stitcher.exception.accept
 import dev.kikugie.stitcher.process.Scanner.Companion.scan
@@ -10,13 +9,10 @@ import dev.kikugie.stitcher.process.util.LookaroundIterator
 import java.io.Reader
 import java.util.*
 
-class FileParser(input: Sequence<Token>, private val handler: ErrorHandler) {
-    constructor(input: Reader, handler: ErrorHandler, recognizers: Iterable<CommentRecognizer>) : this(
-        input.scan(
-            recognizers
-        ), handler
-    )
+class FileParser(input: Sequence<Token>) {
+    constructor(input: Reader, recognizers: Iterable<CommentRecognizer>) : this(input.scan(recognizers))
 
+    private val errors = mutableListOf<Throwable>()
     private val iter = LookaroundIterator(input.iterator())
     private val scopes = Stack<Scope>()
         .apply { push(Scope()) }
@@ -35,7 +31,7 @@ class FileParser(input: Sequence<Token>, private val handler: ErrorHandler) {
             else -> throw AssertionError()
         }
 
-    fun parse() = iter.forEach {
+    fun parse(): Scope = iter.forEach {
         when (it.type) {
             ContentType.CONTENT -> add(ContentBlock(it))
             ContentType.COMMENT -> parseComment(it)
@@ -58,10 +54,10 @@ class FileParser(input: Sequence<Token>, private val handler: ErrorHandler) {
             add(CommentBlock(commentStart, token, commentEnd))
             return
         }
-        parser.errors.forEach { handler.addSilent(it.first, it.second) }
+        parser.errors.forEach { errors.add(it.second) }
         if (def.extension)
             if (def.type == active.type) scopes.pop()
-            else handler.accept(0, "${def.type} closes unmatched scope of ${active.type}")
+            else parser.handler.accept(1, "${def.type} closes unmatched scope of ${active.type}")
         val scope = if (def.isEmpty() && def.extension) null else Scope(def.type, def.enclosure)
         add(CodeBlock(commentStart, def, commentEnd, scope))
         if (scope != null) scopes.push(scope)

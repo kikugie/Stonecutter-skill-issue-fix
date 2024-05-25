@@ -66,12 +66,13 @@ object Assembler : Component.Visitor<String>, Block.Visitor<String>, Scope.Visit
     }
 
     override fun visitAssignment(it: Assignment) = buildString {
-        token(it.target)
-        append(':')
-        for (predicate in it.predicates) {
+        if (!it.target.isBlank()) {
+            token(it.target)
+            append(':')
             space()
-            token(predicate)
         }
+        val predicates = it.predicates.map(Token::value)
+        append(predicates.joinToString(" "))
     }
 
     override fun visitContent(it: ContentBlock) = buildString {
@@ -88,6 +89,7 @@ object Assembler : Component.Visitor<String>, Block.Visitor<String>, Scope.Visit
         token(it.start)
         appendVisit(it.def)
         token(it.end)
+        if (it.scope != null) appendVisit(it.scope)
     }
 
     override fun visitScope(it: Scope): String = buildString {

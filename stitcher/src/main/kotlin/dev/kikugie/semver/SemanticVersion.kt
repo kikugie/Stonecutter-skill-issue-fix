@@ -1,13 +1,13 @@
-package dev.kikugie.version.impl
+package dev.kikugie.semver
 
 import java.util.*
 import kotlin.math.max
 
-open class SemanticVersion(
+class SemanticVersion(
     val components: IntArray,
     val preModifier: String,
     val postModifier: String,
-) : Version {
+) : Comparable<SemanticVersion> {
     private val friendlyName = buildString {
         append(components.joinToString("."))
         if (preModifier.isNotEmpty())
@@ -18,16 +18,7 @@ open class SemanticVersion(
 
     operator fun get(index: Int): Int? = components.getOrNull(index)
 
-    override fun compareTo(other: Version): Int = when (other) {
-        is SemanticVersion -> compareToSemver(other)
-        is MinecraftVersion ->
-            if (other.semver == null) null
-            else compareToSemver(other.semver!!)
-
-        else -> null
-    } ?: friendlyName.compareTo(other.toString())
-
-    private fun compareToSemver(other: SemanticVersion): Int {
+    override fun compareTo(other: SemanticVersion): Int {
         val compareComponents = compareToComponents(other)
         return if (compareComponents != 0) compareComponents
         else compareToPreModifier(other)

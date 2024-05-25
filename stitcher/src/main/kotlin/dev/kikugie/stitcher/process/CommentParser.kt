@@ -7,7 +7,7 @@ import dev.kikugie.stitcher.process.util.LexSlice
 import dev.kikugie.stitcher.data.StitcherTokenType.*
 import dev.kikugie.stitcher.data.MarkerType.*
 
-class CommentParser(private val lexer: Lexer, private val handler: ErrorHandler) {
+class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler) {
     val errors get() = lexer.errors.asSequence() + handler.errors
     private val currentRange get() = lookup()?.range ?: lexer[-1]!!.range
     private val currentToken get() = lookup()?.toToken() ?: Token.EMPTY
@@ -23,10 +23,7 @@ class CommentParser(private val lexer: Lexer, private val handler: ErrorHandler)
         val component = when (mode) {
             CONDITION -> parseCondition()
             SWAP -> parseSwap()
-            else -> {
-                handler.accept(lexer[0]!!.range.first, "Unknown mode token: $mode")
-                return null
-            }
+            else -> return null
         }
         if (component.isEmpty()) advance()
         val closer = when (lookup()?.type) {

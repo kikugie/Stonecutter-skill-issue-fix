@@ -79,7 +79,7 @@ data class Definition(
         get() = when (component) {
             is Condition -> MarkerType.CONDITION
             is Swap -> MarkerType.SWAP
-            else -> NullType
+            else -> null
         }
 
     override fun isEmpty(): Boolean = component.isEmpty() && enclosure == ScopeType.LINE

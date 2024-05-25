@@ -24,6 +24,7 @@ class Scanner(
     fun tokenize(): Sequence<Token> = sequence {
         input.readLigatures { scan(it) }
         if (buffer.isNotEmpty()) yield(buffer, if (current == null) CONTENT else COMMENT)
+        yield(Token.EMPTY)
     }
 
     private suspend fun SequenceScope<Token>.scan(str: String) {

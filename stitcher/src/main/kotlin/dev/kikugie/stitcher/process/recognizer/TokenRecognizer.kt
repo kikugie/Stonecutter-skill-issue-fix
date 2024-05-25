@@ -79,7 +79,7 @@ class IdentifierRecognizer<T>(override val type: T) : TokenRecognizer<T> {
 // TODO: Expand to be more generic
 class PredicateRecognizer<T>(override val type: T) : TokenRecognizer<T> {
     override fun match(value: CharSequence, start: Int): Match? {
-        val operator = getOperatorLength(value, start)
+        val operator = value.getOperatorLength(start)
         var index = start + operator
         while (index < value.length) {
             if (!value[index].allowed()) break
@@ -91,10 +91,12 @@ class PredicateRecognizer<T>(override val type: T) : TokenRecognizer<T> {
 
     private fun Char.allowed() = this == '.' || this == '-' || this == '+' || isLetterOrDigit()
 
-    private fun getOperatorLength(value: CharSequence, start: Int): Int = when (value[start]) {
-        '=', '~', '^' -> 1
-        '>', '<' -> if (value.getOrNull(start + 1) == '=') 2 else 1
-        else -> 0
+    companion object {
+        fun CharSequence.getOperatorLength(start: Int = 0): Int = when (this[start]) {
+            '=', '~', '^' -> 1
+            '>', '<' -> if (getOrNull(start + 1) == '=') 2 else 1
+            else -> 0
+        }
     }
 }
 

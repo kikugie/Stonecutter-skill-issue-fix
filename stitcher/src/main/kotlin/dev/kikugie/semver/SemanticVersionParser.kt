@@ -1,15 +1,13 @@
-package dev.kikugie.version.parse
+package dev.kikugie.semver
 
-import dev.kikugie.version.impl.SemanticVersion
-import dev.kikugie.version.exception.VersionParsingException
 
 /**
  * Semantic version parser based on the Fabric Loader implementation, but doesn't allow `.x` wildcards.
  *
  * @see <a href="https://github.com/FabricMC/fabric-loader/blob/master/src/main/java/net/fabricmc/loader/impl/util/version/SemanticVersionImpl.java">SemanticVersionImpl</a>
  */
-object SemanticVersionParser : Parser<SemanticVersion> {
-    override fun parse(input: CharSequence): SemanticVersion {
+object SemanticVersionParser {
+    fun parse(input: CharSequence): SemanticVersion {
         var version = input.toString()
         var preModifier = ""
         var postModifier = ""

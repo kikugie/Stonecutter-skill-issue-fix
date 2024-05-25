@@ -1,9 +1,10 @@
 package dev.kikugie.stitchertest
 
+import dev.kikugie.semver.SemanticVersionParser
+import dev.kikugie.stitcher.data.Token
 import dev.kikugie.stitcher.exception.ErrorHandlerImpl
-import dev.kikugie.stitcher.process.Assembler
-import dev.kikugie.stitcher.process.CommentParser
-import dev.kikugie.stitcher.process.Lexer
+import dev.kikugie.stitcher.process.*
+import dev.kikugie.stitcher.process.transformer.Container
 import dev.kikugie.stitchertest.util.yaml
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
@@ -13,23 +14,28 @@ import kotlin.io.path.inputStream
 object Time {
     @Test
     fun test() {
-        val input = "$ if !identifier: >1.20.2 24w30a && bl1 || (bl2 && bl1) >>"
-        println("Input:  $input")
+        val input = """
+            //? if >1.0.0
+            xd
+        """.trimIndent()
+        println("Input:\n$input\n")
+//        val result = input.scan()
         val parser = createParser(input)
         val result = parser.parse()
-        println("Output: ${result?.accept(Assembler)}")
-//        println(result.yaml())
 
-//        val lexer = createLexer(input)
-//        while (lexer.advance() != null) {
-//            println(lexer.lookup())
-//        }
+        val trans = Transformer(result, recognizers, Container(
+            swaps = mapOf(),
+            dependencies = mapOf(Token.EMPTY.value to SemanticVersionParser.parse("0.1.0")),
+            constants = mapOf()
+        ))
+        trans.process()
+        println(result.yaml())
+        println("\n")
+        println(result.accept(Assembler))
     }
 
-    private fun createParser(str: CharSequence): CommentParser {
-        val handler = ErrorHandlerImpl(str)
-        val lexer = Lexer(str, handler)
-        return CommentParser(lexer, handler)
+    private fun createParser(str: String): FileParser {
+        return FileParser(str.reader(), recognizers)
     }
 
     private fun createLexer(str: CharSequence): Lexer {

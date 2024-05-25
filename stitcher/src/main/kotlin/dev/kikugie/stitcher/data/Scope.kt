@@ -65,11 +65,11 @@ enum class ScopeType(val id: String) {
 data class Scope(
     // Not serialized because only used for parsing the tree
     @Transient
-    val type: TokenType = NullType,
+    val type: MarkerType? = null,
     @Transient
     val enclosure: ScopeType = CLOSED
 ) : MutableCollection<Block> {
-    private var blocks: MutableList<Block> = mutableListOf()
+    var blocks: MutableList<Block> = mutableListOf()
     override val size get() = blocks.size
     override fun clear() = blocks.clear()
     override fun isEmpty() = blocks.isEmpty()
