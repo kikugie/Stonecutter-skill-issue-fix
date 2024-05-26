@@ -1,16 +1,13 @@
 package dev.kikugie.stonecutter.cutter
 
-import dev.kikugie.stitcher.data.RootScope
+import dev.kikugie.stitcher.exception.SyntaxException
 import dev.kikugie.stitcher.process.Assembler
-import dev.kikugie.stitcher.process.Lexer.Companion.lex
-import dev.kikugie.stitcher.process.Parser
-import dev.kikugie.stitcher.process.Parser.Companion.parse
-import dev.kikugie.stitcher.process.Scanner.Companion.scan
+import dev.kikugie.stitcher.process.FileParser
 import dev.kikugie.stitcher.process.Transformer
+import dev.kikugie.stitcher.process.cache.ProcessCache
 import dev.kikugie.stitcher.process.recognizer.CommentRecognizer
-import dev.kikugie.stitcher.process.transformer.ConditionVisitor
+import dev.kikugie.stitcher.process.transformer.Container
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
@@ -29,38 +26,51 @@ object FileManager {
         filter: (Path) -> Boolean,
         charset: Charset = StandardCharsets.ISO_8859_1,
         recognizers: Iterable<CommentRecognizer>,
-        conditions: ConditionVisitor,
-        swaps: Map<String, String>,
+        data: Container,
         cacheDirectory: Path,
     ): String? {
         if (!filter(file)) return null
-        fun String.parse() = reader().scan(recognizers).lex().parse()
+        fun String.parser() = FileParser(reader(), recognizers)
 
         val text = file.readText(charset)
         val hash = text.hash("MD5")
 
-        val cache = cacheDirectory.resolve("${file.fileName.name}_$hash.ast")
+        val cacheFile = cacheDirectory.resolve("${file.fileName.name}_$hash.ast")
         var overwrite = false
-        var ast: RootScope? = null
-        if (cache.exists() && cache.isReadable()) try {
-            ast = Cbor.Default.decodeFromByteArray(cache.readBytes())
-        } catch (_: SerializationException) {
+        fun createCache(): ProcessCache {
+            overwrite = true
+            val parser = text.parser()
+            val ast = parser.parse()
+            return if (parser.errs.isEmpty()) ProcessCache(data, ast)
+            else {
+                val message = buildString {
+                    for (err in parser.errs) {
+                        append(err.message)
+                        append('\n')
+                    }
+                }
+                throw SyntaxException(message)
+            }
         }
-        if (ast?.version != Parser.VERSION)
-            ast = text.parse().also { overwrite = true }
+        val cache: ProcessCache = try {
+            val intermediate: ProcessCache = Cbor.Default.decodeFromByteArray(cacheFile.readBytes())
+            if (intermediate.container == data) intermediate else createCache()
+        } catch (_: Exception) {
+            createCache()
+        }
         if (overwrite) {
             Files.createDirectories(cacheDirectory)
             cacheDirectory.listDirectoryEntries().forEach {
                 if (it.fileName.name.startsWith(file.fileName.name)) it.deleteExisting()
             }
-            cache.writeBytes(
-                Cbor.Default.encodeToByteArray(ast),
+            cacheFile.writeBytes(
+                Cbor.Default.encodeToByteArray(cache.ast),
                 StandardOpenOption.CREATE,
                 StandardOpenOption.TRUNCATE_EXISTING
             )
         }
-        Transformer(ast, recognizers, conditions, swaps).process()
-        val result = ast.accept(Assembler)
+        Transformer(cache.ast, recognizers, cache.container).process()
+        val result = cache.ast.accept(Assembler)
         return if (result == text) null else result
     }
 

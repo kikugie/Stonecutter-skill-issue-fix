@@ -1,13 +1,11 @@
 package dev.kikugie.stonecutter.gradle
 
-import dev.kikugie.stitcher.process.access.Expression
-import dev.kikugie.stitcher.process.access.ExpressionProcessor
+import dev.kikugie.semver.SemanticVersion
+import dev.kikugie.semver.SemanticVersionParser
 import dev.kikugie.stitcher.process.recognizer.StandardMultiLine
 import dev.kikugie.stitcher.process.recognizer.StandardSingleLine
-import dev.kikugie.stitcher.process.transformer.ConditionVisitor
+import dev.kikugie.stitcher.process.transformer.Container
 import dev.kikugie.stonecutter.cutter.FileManager
-import dev.kikugie.stonecutter.metadata.Semver
-import dev.kikugie.stonecutter.version.DependencyChecker
 import dev.kikugie.stonecutter.version.FabricVersionChecker
 import dev.kikugie.stonecutter.version.VersionChecker
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +13,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -50,13 +47,10 @@ internal abstract class StonecutterTask : DefaultTask() {
     abstract val constants: MapProperty<String, Boolean>
 
     @get:Input
-    abstract val expressions: ListProperty<Expression>
-
-    @get:Input
     abstract val swaps: MapProperty<String, String>
 
     @get:Input
-    abstract val dependencies: MapProperty<String, Semver>
+    abstract val dependencies: MapProperty<String, SemanticVersion>
 
     @get:Input
     abstract val filter: Property<(Path) -> Boolean>
@@ -65,19 +59,17 @@ internal abstract class StonecutterTask : DefaultTask() {
     abstract val versionChecker: Property<(Project) -> VersionChecker>
 
     @get:Internal
-    internal lateinit var conditionProcessor: ConditionVisitor
+    internal lateinit var data: Container
 
     @TaskAction
     fun run() {
         if (!input.isPresent || !output.isPresent || !toVersion.isPresent)
             throw IllegalArgumentException("[Stonecutter] StonecutterTask is not fully initialized")
         val deps = dependencies.get().toMutableMap()
-        deps.putIfAbsent("minecraft", toVersion.get().version)
-        val expressionsImpl = buildList {
-            addAll(expressions.get())
-            add(DependencyChecker(deps, versionChecker.get()(project)))
-        }
-        conditionProcessor = ConditionVisitor(ExpressionProcessor(constants.get(), expressionsImpl))
+        val mcVersion = dependencies.get()["minecraft"] ?: SemanticVersionParser.parse(toVersion.get().version)
+        deps["minecraft"] = mcVersion
+        deps["\u0000"] = mcVersion
+        data = Container(swaps.get(), constants.get(), deps)
         val time = measureTimeMillis {
             transform(input.get(), output.get())
         }
@@ -145,8 +137,7 @@ internal abstract class StonecutterTask : DefaultTask() {
             filter.get(),
             StandardCharsets.ISO_8859_1,
             recognizers,
-            conditionProcessor,
-            swaps.get(),
+            data,
             cacheDir
         )
     } catch (e: Exception) {

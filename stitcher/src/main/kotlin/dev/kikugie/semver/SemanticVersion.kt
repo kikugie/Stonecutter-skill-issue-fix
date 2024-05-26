@@ -1,8 +1,10 @@
 package dev.kikugie.semver
 
+import kotlinx.serialization.Serializable
 import java.util.*
 import kotlin.math.max
 
+@Serializable
 class SemanticVersion(
     val components: IntArray,
     val preModifier: String,

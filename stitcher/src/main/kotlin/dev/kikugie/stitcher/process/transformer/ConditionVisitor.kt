@@ -4,6 +4,7 @@ import dev.kikugie.semver.SemanticVersionParser
 import dev.kikugie.semver.VersionComparisonOperator
 import dev.kikugie.stitcher.data.*
 import dev.kikugie.stitcher.process.recognizer.PredicateRecognizer.Companion.getOperatorLength
+import dev.kikugie.stitcher.process.util.VersionPredicate
 
 // TODO: Should check semver beforehand
 class ConditionVisitor(private val container: Container) : Component.Visitor<Boolean> {
@@ -35,11 +36,15 @@ class ConditionVisitor(private val container: Container) : Component.Visitor<Boo
     override fun visitAssignment(it: Assignment): Boolean {
         val target = container.dependencies[it.target.value] ?: throw IllegalArgumentException()
         return it.predicates.all {
-            val str = it.value
-            val len = str.getOperatorLength()
-            val operator = VersionComparisonOperator.MATCHER[if (len == 0) "=" else str.substring(0, len)]!!
-            val vers = SemanticVersionParser.parse(str.substring(len))
-            operator.invoke(target, vers)
+            val info = it[VersionPredicate::class] ?: run {
+                val str = it.value
+                val len = str.getOperatorLength()
+                val op = if (len == 0) VersionComparisonOperator.EQUAL
+                else VersionComparisonOperator.MATCHER[str.substring(0, len)]!!
+                val ver = SemanticVersionParser.parse(str.substring(len))
+                VersionPredicate(op, ver)
+            }
+            info.operator(target, info.version)
         }
     }
 }

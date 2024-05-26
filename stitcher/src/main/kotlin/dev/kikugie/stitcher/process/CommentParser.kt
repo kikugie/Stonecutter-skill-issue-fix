@@ -1,20 +1,29 @@
 package dev.kikugie.stitcher.process
 
+import dev.kikugie.semver.SemanticVersionParser
+import dev.kikugie.semver.VersionComparisonOperator
+import dev.kikugie.semver.VersionParsingException
 import dev.kikugie.stitcher.data.*
+import dev.kikugie.stitcher.data.MarkerType.CONDITION
+import dev.kikugie.stitcher.data.MarkerType.SWAP
+import dev.kikugie.stitcher.data.StitcherTokenType.*
 import dev.kikugie.stitcher.exception.ErrorHandler
 import dev.kikugie.stitcher.exception.accept
+import dev.kikugie.stitcher.process.recognizer.PredicateRecognizer.Companion.getOperatorLength
+import dev.kikugie.stitcher.process.transformer.Container
 import dev.kikugie.stitcher.process.util.LexSlice
-import dev.kikugie.stitcher.data.StitcherTokenType.*
-import dev.kikugie.stitcher.data.MarkerType.*
+import dev.kikugie.stitcher.process.util.VersionPredicate
 
-class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler) {
+class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler, private val data: Container? = null) {
     val errors get() = lexer.errors.asSequence() + handler.errors
     private val currentRange get() = lookup()?.range ?: lexer[-1]!!.range
     private val currentToken get() = lookup()?.toToken() ?: Token.EMPTY
 
     private fun advance() = lexer.advance()
     private fun lookup(offset: Int = 0) = lexer.lookup(offset)
-    private fun LexSlice.toToken() = lexer.token(this)
+    private fun LexSlice.toToken() = lexer.token(this).apply {
+        this[IntRange::class] = this@toToken.range
+    }
 
     fun parse(): Definition? {
         val mode = lexer.advance()?.type ?: return null
@@ -48,6 +57,8 @@ class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler
             IDENTIFIER -> {
                 if (identifier == Token.EMPTY) identifier = lookup()!!.toToken()
                 else handler.accept(currentRange, "Only one swap identifier is allowed")
+                if (data?.dependencies?.containsKey(identifier.value) == false)
+                    handler.accept(currentRange, "Could not find identifier: ${identifier.value}")
             }
 
             else -> handler.accept(currentRange, "Unexpected token: ${currentToken.value}")
@@ -78,8 +89,14 @@ class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler
                 Assignment(Token.EMPTY, matchPredicates())
             else if (advance()?.type == ASSIGN) {
                 advance() // Skip :
+                if (data?.dependencies?.containsKey(id.value) == false)
+                    handler.accept(currentRange, "Could not find identifier: ${id.value}")
                 Assignment(id, matchPredicates())
-            } else Literal(id)
+            } else {
+                if (data?.constants?.containsKey(id.value) == false)
+                    handler.accept(currentRange, "Could not find constant: ${id.value}")
+                Literal(id)
+            }
         }
 
         GROUP_OPEN -> {
@@ -100,6 +117,8 @@ class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler
     private fun matchPredicates(): List<Token> = buildList {
         while (true) when (lookup()?.type) {
             IDENTIFIER, PREDICATE -> {
+                val info = currentToken.value.asVersionPredicate()
+                if (info != null) currentToken[VersionPredicate::class] = info
                 add(currentToken)
                 advance()
             }
@@ -120,5 +139,21 @@ class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler
         }
 
         else -> this
+    }
+
+    private fun String.asVersionPredicate(): VersionPredicate? {
+        val len = getOperatorLength()
+        val op = if (len == 0) VersionComparisonOperator.EQUAL
+        else VersionComparisonOperator.MATCHER[substring(0, len)] ?: run {
+            handler.accept(currentRange.first, "Invalid comparison operator")
+            return null
+        }
+        val ver = try {
+            SemanticVersionParser.parse(substring(len))
+        } catch (e: VersionParsingException) {
+            handler.accept(currentRange, e.message ?: "Invalid semantic version")
+            return null
+        }
+        return VersionPredicate(op, ver)
     }
 }

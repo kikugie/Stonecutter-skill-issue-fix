@@ -1,6 +1,7 @@
 package dev.kikugie.stitcher.process
 
 import dev.kikugie.stitcher.data.*
+import dev.kikugie.stitcher.exception.ErrorHandler
 import dev.kikugie.stitcher.exception.ErrorHandlerImpl
 import dev.kikugie.stitcher.exception.accept
 import dev.kikugie.stitcher.process.Scanner.Companion.scan
@@ -9,7 +10,7 @@ import dev.kikugie.stitcher.process.util.LookaroundIterator
 import java.io.Reader
 import java.util.*
 
-class FileParser(input: Sequence<Token>) {
+class FileParser(input: Sequence<Token>, private val handlerFactory: (CharSequence) -> ErrorHandler = ::ErrorHandlerImpl) {
     constructor(input: Reader, recognizers: Iterable<CommentRecognizer>) : this(input.scan(recognizers))
 
     private val errors = mutableListOf<Throwable>()
@@ -18,6 +19,7 @@ class FileParser(input: Sequence<Token>) {
         .apply { push(Scope()) }
     private val active get() = scopes.peek()
     private val root get() = scopes[0]
+    val errs: List<Throwable> get() = errors
 
     private fun add(block: Block) {
         active.add(block)
@@ -43,7 +45,7 @@ class FileParser(input: Sequence<Token>) {
     }.let { root }
 
     private fun createParser(str: CharSequence): CommentParser {
-        val handler = ErrorHandlerImpl(str)
+        val handler = handlerFactory(str)
         val lexer = Lexer(str, handler)
         return CommentParser(lexer, handler)
     }
@@ -54,12 +56,12 @@ class FileParser(input: Sequence<Token>) {
             add(CommentBlock(commentStart, token, commentEnd))
             return
         }
-        parser.errors.forEach { errors.add(it.second) }
         if (def.extension)
             if (def.type == active.type) scopes.pop()
             else parser.handler.accept(1, "${def.type} closes unmatched scope of ${active.type}")
         val scope = if (def.isEmpty() && def.extension) null else Scope(def.type, def.enclosure)
         add(CodeBlock(commentStart, def, commentEnd, scope))
         if (scope != null) scopes.push(scope)
+        parser.errors.forEach { errors.add(it.second) }
     }
 }

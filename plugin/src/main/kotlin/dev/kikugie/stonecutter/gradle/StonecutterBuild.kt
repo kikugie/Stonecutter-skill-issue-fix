@@ -1,11 +1,10 @@
 package dev.kikugie.stonecutter.gradle
 
-import dev.kikugie.stitcher.process.access.Expression
-import dev.kikugie.stonecutter.metadata.Semver
+import dev.kikugie.semver.SemanticVersion
+import dev.kikugie.semver.SemanticVersionParser
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
-import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
 import java.io.File
 import java.nio.file.Files
@@ -50,10 +49,9 @@ open class StonecutterBuild internal constructor(val project: Project) {
     val versions get() = setup.versions
 
     internal val constants = mutableMapOf<String, Boolean>()
-    internal val expressions = mutableListOf<Expression>()
     internal val swaps = mutableMapOf<String, String>()
     internal val filters = mutableListOf<(Path) -> Boolean>()
-    internal val dependencies = mutableMapOf<String, Semver>()
+    internal val dependencies = mutableMapOf<String, SemanticVersion>()
 
     /**
      * Creates a swap id.
@@ -136,17 +134,6 @@ open class StonecutterBuild internal constructor(val project: Project) {
         values.forEach { (id, str) -> const(id, str) }
     }
 
-    /**
-     * Creates an expression that allows stonecutter to dynamically evaluate condition requirements.
-     *
-     * Refer to the wiki for a detailed guide.
-     *
-     * @param expression expression function
-     */
-    fun expression(expression: Expression) {
-        expressions += expression
-    }
-
     fun whitelist(criteria: (Path) -> Boolean) {
         filters += criteria
     }
@@ -155,16 +142,16 @@ open class StonecutterBuild internal constructor(val project: Project) {
         filters += { !criteria(it) }
     }
 
-    fun dependency(identifier: String, version: Semver) {
-        dependencies[identifier] = version
+    fun dependency(identifier: String, version: String) {
+        dependencies[identifier] = SemanticVersionParser.parse(version)
     }
 
-    fun dependencies(vararg values: Pair<String, Semver>) {
-        values.forEach { (id, ver) -> dependencies[id] = ver }
+    fun dependencies(vararg values: Pair<String, String>) {
+        values.forEach { (id, ver) -> dependencies[id] = SemanticVersionParser.parse(ver) }
     }
 
-    fun dependencies(values: Iterable<Pair<String, Semver>>) {
-        values.forEach { (id, ver) -> dependencies[id] = ver }
+    fun dependencies(values: Iterable<Pair<String, String>>) {
+        values.forEach { (id, ver) -> dependencies[id] = SemanticVersionParser.parse(ver) }
     }
 
     init {
@@ -176,7 +163,6 @@ open class StonecutterBuild internal constructor(val project: Project) {
             fromVersion.set(active)
 
             constants.set(this@StonecutterBuild.constants)
-            expressions.set(this@StonecutterBuild.expressions)
             swaps.set(this@StonecutterBuild.swaps)
             dependencies.set(this@StonecutterBuild.dependencies)
             filter.set { p -> if (filters.isEmpty()) true else filters.all { it(p) } }
