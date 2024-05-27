@@ -3,11 +3,11 @@ package dev.kikugie.stitcher.process.transformer
 import dev.kikugie.semver.SemanticVersionParser
 import dev.kikugie.semver.VersionComparisonOperator
 import dev.kikugie.stitcher.data.*
+import dev.kikugie.stitcher.process.TransformParameters
 import dev.kikugie.stitcher.process.recognizer.PredicateRecognizer.Companion.getOperatorLength
 import dev.kikugie.stitcher.process.util.VersionPredicate
 
-// TODO: Should check semver beforehand
-class ConditionVisitor(private val container: Container) : Component.Visitor<Boolean> {
+class ConditionVisitor(private val params: TransformParameters) : Component.Visitor<Boolean> {
     override fun visitUnary(it: Unary): Boolean = when(it.operator.type) {
         StitcherTokenType.NEGATE -> !it.target.accept(this)
         else -> throw IllegalArgumentException("Invalid operator ${it.operator.type} (${it.operator.value}")
@@ -24,7 +24,7 @@ class ConditionVisitor(private val container: Container) : Component.Visitor<Boo
     override fun visitEmpty(it: Empty): Boolean = true
 
     override fun visitLiteral(it: Literal): Boolean =
-        container.constants[it.token.value] ?: Assignment(Token.EMPTY, listOf(it.token)).accept(this)
+        params.constants[it.token.value] ?: Assignment(Token.EMPTY, listOf(it.token)).accept(this)
 
     override fun visitCondition(it: Condition): Boolean = it.condition.accept(this)
     override fun visitSwap(it: Swap): Boolean {
@@ -34,7 +34,7 @@ class ConditionVisitor(private val container: Container) : Component.Visitor<Boo
     override fun visitDefinition(it: Definition): Boolean = it.component.accept(this)
 
     override fun visitAssignment(it: Assignment): Boolean {
-        val target = container.dependencies[it.target.value] ?: throw IllegalArgumentException()
+        val target = params.dependencies[it.target.value] ?: throw IllegalArgumentException()
         return it.predicates.all {
             val info = it[VersionPredicate::class] ?: run {
                 val str = it.value

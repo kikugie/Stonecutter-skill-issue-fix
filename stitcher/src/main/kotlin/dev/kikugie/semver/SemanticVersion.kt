@@ -1,15 +1,17 @@
 package dev.kikugie.semver
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import java.util.*
 import kotlin.math.max
 
 @Serializable
-class SemanticVersion(
+data class SemanticVersion(
     val components: IntArray,
-    val preModifier: String,
-    val postModifier: String,
+    val preModifier: String = "",
+    val postModifier: String = "",
 ) : Comparable<SemanticVersion> {
+    @Transient
     private val friendlyName = buildString {
         append(components.joinToString("."))
         if (preModifier.isNotEmpty())

@@ -4,13 +4,13 @@ import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.SemanticVersionParser
 import dev.kikugie.stitcher.process.recognizer.StandardMultiLine
 import dev.kikugie.stitcher.process.recognizer.StandardSingleLine
-import dev.kikugie.stitcher.process.transformer.Container
+import dev.kikugie.stitcher.process.TransformParameters
 import dev.kikugie.stonecutter.cutter.FileManager
+import dev.kikugie.stonecutter.metadata.ProjectName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
-import org.gradle.api.Project
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -54,21 +54,34 @@ internal abstract class StonecutterTask : DefaultTask() {
     abstract val filter: Property<(Path) -> Boolean>
 
     @get:Internal
-    internal lateinit var data: Container
+    internal lateinit var manager: FileManager
 
     @TaskAction
     fun run() {
         if (!input.isPresent || !output.isPresent || !toVersion.isPresent)
             throw IllegalArgumentException("[Stonecutter] StonecutterTask is not fully initialized")
-        val deps = dependencies.get().toMutableMap()
-        val mcVersion = dependencies.get()["minecraft"] ?: SemanticVersionParser.parse(toVersion.get().version)
-        deps["minecraft"] = mcVersion
-        deps["\u0000"] = mcVersion
-        data = Container(swaps.get(), constants.get(), deps)
+        manager = createManager()
         val time = measureTimeMillis {
             transform(input.get(), output.get())
         }
         println("[Stonecutter] Switched to ${toVersion.get().project} in ${time}ms")
+    }
+
+    private fun createManager(): FileManager {
+        fun cacheDir(pr: StonecutterProject) = project.let { it.parent ?: it }.project(":${pr.project}").buildDirectory.toPath().resolve("stonecutterCache")
+        val deps = dependencies.get().toMutableMap()
+        val mcVersion = deps["minecraft"] ?: SemanticVersionParser.parse(toVersion.get().version)
+        deps["minecraft"] = mcVersion
+        deps["\u0000"] = mcVersion
+
+        val params = TransformParameters(swaps.get(), constants.get(), deps)
+        return FileManager(
+            inputCache = cacheDir(fromVersion.get()),
+            outputCache = cacheDir(toVersion.get()),
+            filter = filter.get(),
+            recognizers = listOf(StandardMultiLine, StandardSingleLine),
+            params = params
+        )
     }
 
     private fun transform(input: Path, output: Path): Unit = runBlocking {
@@ -77,7 +90,7 @@ internal abstract class StonecutterTask : DefaultTask() {
         val processed = mutableListOf<Pair<Path, String>>()
         val exceptions = mutableListOf<Throwable>()
         input.walk().map {
-            it to process(input, it)
+            it to process(input, input.relativize(it))
         }.asFlow().flowOn(Dispatchers.Default).catch {
             exceptions += it
         }.transform<Pair<Path, String?>, Unit> { (file, result) ->
@@ -119,18 +132,7 @@ internal abstract class StonecutterTask : DefaultTask() {
     }
 
     private fun process(root: Path, file: Path): String? = try {
-        val recognizers = listOf(StandardMultiLine, StandardSingleLine)
-        val relative = root.relativize(file.parent)
-        val subproject = project.let { it.parent ?: it }.project(":${fromVersion.get().project}")
-        val cacheDir = subproject.buildDirectory.resolve("stonecutterCache").resolve(relative.toFile()).toPath()
-        FileManager.processFile(
-            file,
-            filter.get(),
-            StandardCharsets.ISO_8859_1,
-            recognizers,
-            data,
-            cacheDir
-        )
+        manager.process(root, file)
     } catch (e: Exception) {
         throw RuntimeException("Failed to process $file").apply {
             initCause(e)

@@ -10,11 +10,10 @@ import dev.kikugie.stitcher.data.StitcherTokenType.*
 import dev.kikugie.stitcher.exception.ErrorHandler
 import dev.kikugie.stitcher.exception.accept
 import dev.kikugie.stitcher.process.recognizer.PredicateRecognizer.Companion.getOperatorLength
-import dev.kikugie.stitcher.process.transformer.Container
 import dev.kikugie.stitcher.process.util.LexSlice
 import dev.kikugie.stitcher.process.util.VersionPredicate
 
-class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler, private val data: Container? = null) {
+class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler, private val data: TransformParameters? = null) {
     val errors get() = lexer.errors.asSequence() + handler.errors
     private val currentRange get() = lookup()?.range ?: lexer[-1]!!.range
     private val currentToken get() = lookup()?.toToken() ?: Token.EMPTY

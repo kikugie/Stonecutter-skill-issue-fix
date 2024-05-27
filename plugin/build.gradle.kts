@@ -24,6 +24,7 @@ dependencies {
     implementation(project(":stitcher"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.1")
+    implementation("com.charleskorn.kaml:kaml:0.57.0")
     testImplementation(kotlin("test"))
     testImplementation(kotlin("script-runtime"))
 }

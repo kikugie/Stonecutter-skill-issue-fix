@@ -7,14 +7,13 @@ import dev.kikugie.stitcher.process.recognizer.CommentRecognizer
 import dev.kikugie.stitcher.process.transformer.CommentAdder
 import dev.kikugie.stitcher.process.transformer.CommentRemover
 import dev.kikugie.stitcher.process.transformer.ConditionVisitor
-import dev.kikugie.stitcher.process.transformer.Container
 import dev.kikugie.stitcher.util.affectedRange
 
 // TODO: Handle different comment styles
 class Transformer(
     private val source: Scope,
     private val recognizers: Iterable<CommentRecognizer>,
-    private val processor: Container,
+    private val processor: TransformParameters,
 ) : Block.Visitor<Unit> {
     private val visitor = ConditionVisitor(processor)
     private var previousResult: Boolean = false

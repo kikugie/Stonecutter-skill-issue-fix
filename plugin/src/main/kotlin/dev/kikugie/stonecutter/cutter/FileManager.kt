@@ -1,81 +1,125 @@
 package dev.kikugie.stonecutter.cutter
 
+import com.charleskorn.kaml.Yaml
+import dev.kikugie.stitcher.data.Scope
 import dev.kikugie.stitcher.exception.SyntaxException
 import dev.kikugie.stitcher.process.Assembler
 import dev.kikugie.stitcher.process.FileParser
+import dev.kikugie.stitcher.process.TransformParameters
 import dev.kikugie.stitcher.process.Transformer
-import dev.kikugie.stitcher.process.cache.ProcessCache
 import dev.kikugie.stitcher.process.recognizer.CommentRecognizer
-import dev.kikugie.stitcher.process.transformer.Container
-import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.*
 import kotlinx.serialization.cbor.Cbor
-import kotlinx.serialization.decodeFromByteArray
-import kotlinx.serialization.encodeToByteArray
+import org.slf4j.LoggerFactory
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
-import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.security.MessageDigest
 import kotlin.io.path.*
 
-object FileManager {
-    @OptIn(ExperimentalSerializationApi::class)
-    fun processFile(
-        file: Path,
-        filter: (Path) -> Boolean,
-        charset: Charset = StandardCharsets.ISO_8859_1,
-        recognizers: Iterable<CommentRecognizer>,
-        data: Container,
-        cacheDirectory: Path,
-    ): String? {
-        if (!filter(file)) return null
-        fun String.parser() = FileParser(reader(), recognizers)
+@OptIn(ExperimentalSerializationApi::class)
+class FileManager(
+    private val inputCache: Path,
+    private val outputCache: Path,
+    private val filter: (Path) -> Boolean,
+    private val charset: Charset = StandardCharsets.ISO_8859_1,
+    private val recognizers: Iterable<CommentRecognizer>,
+    private val params: TransformParameters,
+    private val debug: Boolean = false,
+) {
+    private val parametersMatch = updateParameters()
 
-        val text = file.readText(charset)
+    fun process(root: Path, source: Path): String? {
+        if (!filter(source)) return null
+        val text = root.resolve(source).readText()
         val hash = text.hash("MD5")
 
-        val cacheFile = cacheDirectory.resolve("${file.fileName.name}_$hash.ast")
-        var overwrite = false
-        fun createCache(): ProcessCache {
-            overwrite = true
-            val parser = text.parser()
-            val ast = parser.parse()
-            return if (parser.errs.isEmpty()) ProcessCache(data, ast)
-            else {
-                val message = buildString {
-                    for (err in parser.errs) {
-                        append(err.message)
-                        append('\n')
-                    }
-                }
-                throw SyntaxException(message)
-            }
+        val cachedOutput = if (parametersMatch) getCachedOutput(source) else null
+        if (cachedOutput != null && cachedOutput == text) return cachedOutput
+
+        val astPath = source.parent.resolve("${source.fileName.name}_$hash.ast")
+        var ast = if (parametersMatch) getCachedAst(astPath) else null
+        val overwrite = ast == null
+        if (ast == null) {
+            val parser = FileParser(text.reader(), recognizers)
+            ast = parser.parse()
+            if (parser.errs.isNotEmpty()) throw SyntaxException(
+                parser.errs.joinToString("\n") { it.message ?: "Error processing statement" }
+            )
         }
-        val cache: ProcessCache = try {
-            val intermediate: ProcessCache = Cbor.Default.decodeFromByteArray(cacheFile.readBytes())
-            if (intermediate.container == data) intermediate else createCache()
-        } catch (_: Exception) {
-            createCache()
+        if (overwrite) runIgnoring {
+            val dest = inputCache.resolve("ast").resolve(astPath)
+            dest.parent.createDirectories()
+            for (it in dest.parent.listDirectoryEntries())
+                if (it.fileName.name.startsWith(source.fileName.name)) it.deleteExisting()
+            dest.encode(ast)
         }
-        if (overwrite) {
-            Files.createDirectories(cacheDirectory)
-            cacheDirectory.listDirectoryEntries().forEach {
-                if (it.fileName.name.startsWith(file.fileName.name)) it.deleteExisting()
-            }
-            cacheFile.writeBytes(
-                Cbor.Default.encodeToByteArray(cache.ast),
+        if (debug) runIgnoring {
+            inputCache.resolve("debugAst").resolve(astPath).writeText(
+                Yaml.default.encodeToString(ast),
+                charset,
                 StandardOpenOption.CREATE,
                 StandardOpenOption.TRUNCATE_EXISTING
             )
         }
-        Transformer(cache.ast, recognizers, cache.container).process()
-        val result = cache.ast.accept(Assembler)
+        Transformer(ast, recognizers, params).process()
+        val result = ast.accept(Assembler)
+        runIgnoring {
+            val dest = outputCache.resolve("result").resolve(source)
+            dest.parent.createDirectories()
+            dest.writeText(result, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+        }
         return if (result == text) null else result
     }
 
+    private fun updateParameters(): Boolean {
+        val dest = outputCache.resolve("transform_parameters.yml")
+        val saved: TransformParameters? = runIgnoring {
+            Yaml.default.decodeFromString(dest.readText(charset))
+        }
+        if (saved != null && saved == params) {
+            LOGGER.debug("Found matching parameters for {}", params)
+            return true
+        }
+        runIgnoring {
+            dest.parent.createDirectories()
+            dest.writeText(
+                Yaml.default.encodeToString(params),
+                charset,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING
+            )
+        }
+        return false
+    }
 
-    fun String.hash(algorithm: String): String = MessageDigest.getInstance(algorithm).apply {
+    private fun getCachedOutput(source: Path): String? = runIgnoring {
+        val res = outputCache.resolve("result").resolve(source).readText(charset)
+        LOGGER.debug("Restored {} from output cache", source)
+        res
+    }
+
+    private fun getCachedAst(source: Path): Scope? = runIgnoring {
+        val res: Scope = inputCache.resolve("ast").resolve(source).decode()
+        LOGGER.debug("Read cached AST from {}", source)
+        res
+    }
+
+    private inline fun <reified T> Path.decode(): T = Cbor.Default.decodeFromByteArray(readBytes())
+    private inline fun <reified T> Path.encode(value: T) = writeBytes(
+        Cbor.Default.encodeToByteArray(value),
+        StandardOpenOption.CREATE,
+        StandardOpenOption.TRUNCATE_EXISTING
+    )
+
+    private inline fun <T> runIgnoring(action: () -> T): T? = try {
+        action()
+    } catch (_: Exception) {
+        null
+    }
+
+    private fun String.hash(algorithm: String): String = MessageDigest.getInstance(algorithm).apply {
         this@hash.byteInputStream().use {
             val buffer = ByteArray(1024)
             var read = it.read(buffer)
@@ -86,4 +130,8 @@ object FileManager {
             }
         }
     }.digest().joinToString("") { "%02x".format(it) }
+
+    companion object {
+        private val LOGGER = LoggerFactory.getLogger("Stonecutter")
+    }
 }

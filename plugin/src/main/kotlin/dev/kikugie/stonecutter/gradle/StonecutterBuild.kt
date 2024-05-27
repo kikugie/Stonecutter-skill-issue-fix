@@ -189,20 +189,20 @@ open class StonecutterBuild internal constructor(val project: Project) {
             val parentDir = project.parent!!.projectDir.resolve("src").toPath()
             val thisDir = project.projectDir.resolve("src").toPath()
 
-            fun applyChiseled(src: SourceDirectorySet) {
-                src.sourceDirectories.mapNotNull {
+            fun applyChiseled(from: SourceDirectorySet, to: SourceDirectorySet = from) {
+                from.sourceDirectories.mapNotNull {
                     val relative = thisDir.relativize(it.toPath())
                     if (relative.startsWith(".."))
                         return@mapNotNull if (current.isActive) null
                         else parentDir.relativize(it.toPath())
                     else relative
                 }.forEach {
-                    src.srcDir(format(it))
+                    to.srcDir(format(it))
                 }
             }
 
             for (it in project.property("sourceSets") as SourceSetContainer) {
-                applyChiseled(it.allJava)
+                applyChiseled(it.allJava, it.java)
                 applyChiseled(it.resources)
             }
         } catch (ignored: MissingPropertyException) {
