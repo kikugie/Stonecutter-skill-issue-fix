@@ -24,6 +24,9 @@ data class Token(
     private val metadata: MutableMap<KClass<*>, Any> by lazy { mutableMapOf() }
 
     fun isBlank() = this === EMPTY || value.isBlank()
+    fun withType(type: TokenType) = Token(value, type).also {
+        it.metadata.putAll(metadata)
+    }
 
     operator fun <T : Any> set(key: KClass<T>, value: T) {
         metadata[key] = value

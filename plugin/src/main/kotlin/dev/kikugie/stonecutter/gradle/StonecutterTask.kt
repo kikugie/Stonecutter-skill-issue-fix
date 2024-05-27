@@ -6,8 +6,6 @@ import dev.kikugie.stitcher.process.recognizer.StandardMultiLine
 import dev.kikugie.stitcher.process.recognizer.StandardSingleLine
 import dev.kikugie.stitcher.process.transformer.Container
 import dev.kikugie.stonecutter.cutter.FileManager
-import dev.kikugie.stonecutter.version.FabricVersionChecker
-import dev.kikugie.stonecutter.version.VersionChecker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
@@ -55,9 +53,6 @@ internal abstract class StonecutterTask : DefaultTask() {
     @get:Input
     abstract val filter: Property<(Path) -> Boolean>
 
-    @get:Input
-    abstract val versionChecker: Property<(Project) -> VersionChecker>
-
     @get:Internal
     internal lateinit var data: Container
 
@@ -74,10 +69,6 @@ internal abstract class StonecutterTask : DefaultTask() {
             transform(input.get(), output.get())
         }
         println("[Stonecutter] Switched to ${toVersion.get().project} in ${time}ms")
-    }
-
-    init {
-        versionChecker.convention { FabricVersionChecker.create(it) }
     }
 
     private fun transform(input: Path, output: Path): Unit = runBlocking {

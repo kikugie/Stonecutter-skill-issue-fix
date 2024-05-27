@@ -174,7 +174,6 @@ open class StonecutterBuild internal constructor(val project: Project) {
         }
 
         project.afterEvaluate {
-            copyFabricLoader(this)
             configureSources(this)
         }
     }
@@ -208,20 +207,5 @@ open class StonecutterBuild internal constructor(val project: Project) {
             }
         } catch (ignored: MissingPropertyException) {
         }
-    }
-
-    private fun copyFabricLoader(project: Project) {
-        var loaderCopy = File(project.rootDir, ".gradle/stonecutter")
-        loaderCopy.mkdirs()
-        loaderCopy = File(loaderCopy, "fabric-loader.jar")
-        // Me when one line. Have a nice day
-        if (!loaderCopy.exists()) loaderSearch@ for (configuration in project.configurations) for (dependency in configuration.dependencies) if ("net.fabricmc" == dependency.group && "fabric-loader" == dependency.name) for (file in configuration.files) if (file.getName()
-                .startsWith("fabric-loader")
-        )
-            try {
-                Files.copy(file.toPath(), loaderCopy.toPath())
-                break@loaderSearch
-            } catch (ignored: Exception) {
-            }
     }
 }

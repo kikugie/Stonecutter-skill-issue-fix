@@ -12,11 +12,10 @@ interface ErrorHandler {
 open class ErrorHandlerImpl(private val sequence: CharSequence) : ErrorHandler {
     override val errors = mutableListOf<Pair<IntRange, Throwable>>()
     override fun accept(range: IntRange, error: Throwable) {
-        errors += range to error
-        println("""
-            [Stitcher] ${error::class.simpleName}: ${error.message}
-            $sequence
-            ${" ".repeat(range.first)}${"^".repeat((1 + range.last - range.first).coerceAtLeast(1))}
+        errors += range to SyntaxException("""
+            ${error::class.simpleName}: ${error.message}
+                $sequence
+                ${" ".repeat(range.first)}${"^".repeat((1 + range.last - range.first).coerceAtLeast(1))}
         """.trimIndent())
     }
 

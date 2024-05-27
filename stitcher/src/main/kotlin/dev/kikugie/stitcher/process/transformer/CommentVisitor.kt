@@ -21,7 +21,7 @@ object CommentRemover : Block.Visitor<String> {
 
     private fun Block.removeComments() = accept(Assembler).replaceAll(onRemoveComment)
     override fun visitContent(it: ContentBlock) = it.removeComments()
-    override fun visitComment(it: CommentBlock): String = it.removeComments()
+    override fun visitComment(it: CommentBlock): String = it.content.value.replaceAll(onRemoveComment)
     override fun visitCode(it: CodeBlock): String = it.removeComments()
 
     fun accept(type: ScopeType, scope: Scope): String? = when (type) {

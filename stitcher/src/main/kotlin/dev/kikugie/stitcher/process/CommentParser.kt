@@ -34,7 +34,6 @@ class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler
             SWAP -> parseSwap()
             else -> return null
         }
-        if (component.isEmpty()) advance()
         val closer = when (lookup()?.type) {
             SCOPE_OPEN -> ScopeType.CLOSED
             EXPECT_WORD -> ScopeType.WORD
@@ -52,8 +51,8 @@ class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler
 
     private fun parseSwap(): Swap {
         var identifier = Token.EMPTY
-        while (lookup(1) != null) when (advance()!!.type) {
-            SCOPE_OPEN, EXPECT_WORD -> break
+        while (lookup() != null) when (advance()?.type) {
+            SCOPE_OPEN, EXPECT_WORD, null -> break
             IDENTIFIER -> {
                 if (identifier == Token.EMPTY) identifier = lookup()!!.toToken()
                 else handler.accept(currentRange, "Only one swap identifier is allowed")
@@ -70,69 +69,77 @@ class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler
         val sugar = mutableListOf<Token>()
         var expression: Component = Empty
 
-        while (lookup(1) != null) when (advance()!!.type) {
-            SCOPE_OPEN, EXPECT_WORD -> break
+        while (lookup() != null) when (advance()?.type) {
+            SCOPE_OPEN, EXPECT_WORD, null -> break
             IF, ELSE, ELIF -> sugar += lookup()!!.toToken()
             IDENTIFIER, PREDICATE, NEGATE, GROUP_OPEN -> expression = matchExpression()
             else -> handler.accept(currentRange, "Unexpected token: ${currentToken.value}")
         }
-
         return Condition(sugar, expression)
     }
 
-    private fun matchExpression(check: Boolean = true): Component = when (lookup()?.type) {
+    private fun matchExpression(checkForBoolean: Boolean = true): Component = when (lookup()?.type) {
         NEGATE -> Unary(currentToken, advance().let { matchExpression(false) })
         PREDICATE -> Assignment(Token.EMPTY, matchPredicates())
         IDENTIFIER -> {
             val id = currentToken
-            if (lookup(1)?.type.let { it == IDENTIFIER || it == PREDICATE })
-                Assignment(Token.EMPTY, matchPredicates())
-            else if (advance()?.type == ASSIGN) {
-                advance() // Skip :
-                if (data?.dependencies?.containsKey(id.value) == false)
-                    handler.accept(currentRange, "Could not find identifier: ${id.value}")
-                Assignment(id, matchPredicates())
-            } else {
-                if (data?.constants?.containsKey(id.value) == false)
-                    handler.accept(currentRange, "Could not find constant: ${id.value}")
-                Literal(id)
+            when (lookup(1)?.type) {
+                IDENTIFIER, PREDICATE -> Assignment(Token.EMPTY, matchPredicates())
+                ASSIGN -> {
+                    if (data?.dependencies?.containsKey(id.value) == false)
+                        handler.accept(currentRange, "Could not find identifier: ${id.value}")
+                    advance() // Skip :
+                    val next = lookup(1)?.type
+                    if (next == IDENTIFIER || next == PREDICATE) {
+                        advance()
+                        Assignment(id, matchPredicates())
+                    } else {
+                        handler.accept(currentRange.last + 1, "Expected to have predicates")
+                        Assignment(id, emptyList())
+                    }
+                }
+
+                else -> {
+                    if (data?.constants?.containsKey(id.value) == false)
+                        handler.accept(currentRange, "Could not find constant: ${id.value}")
+                    Literal(id)
+                }
             }
         }
 
         GROUP_OPEN -> {
             advance() // Skip (
             val group = Group(matchExpression())
-            if (currentToken.type == GROUP_CLOSE) advance() // Skip )
+            if (lookup(1)?.type == GROUP_CLOSE) advance() // Skip )
             else handler.accept(currentRange.last + 1, "Expected closing bracket")
             group
         }
 
         else -> {
             handler.accept(currentRange, "Unexpected token: ${currentToken.value}")
-            advance()
             Empty
         }
-    }.matchBoolean(check)
+    }.let { if (checkForBoolean) it.matchBoolean() else it }
 
     private fun matchPredicates(): List<Token> = buildList {
         while (true) when (lookup()?.type) {
             IDENTIFIER, PREDICATE -> {
                 val info = currentToken.value.asVersionPredicate()
                 if (info != null) currentToken[VersionPredicate::class] = info
-                add(currentToken)
-                advance()
+                add(currentToken.withType(PREDICATE))
+
+                val next = lookup(1)?.type
+                if (next == IDENTIFIER || next == PREDICATE) advance()
+                else break
             }
-            NEGATE -> {
-                handler.accept(currentRange.last, "Unary operator must be before the assignment")
-                advance()
-            }
+
             else -> break
         }
-    }.also { if (it.isEmpty()) handler.accept(currentRange.last, "No predicates") }
+    }
 
-    private fun Component.matchBoolean(check: Boolean): Component = if (!check) this else when (lookup()?.type) {
+    private fun Component.matchBoolean(): Component = when (lookup(1)?.type) {
         OR, AND -> {
-            val operator = currentToken
+            val operator = advance()!!.toToken()
             advance()
             val right = matchExpression()
             Binary(this, operator, right)
