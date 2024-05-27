@@ -23,7 +23,7 @@ data class Token(
      */
     private val metadata: MutableMap<KClass<*>, Any> by lazy { mutableMapOf() }
 
-    fun isBlank() = this === EMPTY || value.isBlank()
+    fun isBlank() = value.isBlank()
     fun withType(type: TokenType) = Token(value, type).also {
         it.metadata.putAll(metadata)
     }
@@ -36,7 +36,7 @@ data class Token(
     operator fun <T : Any> get(key: KClass<T>): T? = metadata[key]?.let { it as? T }
 
     companion object {
-        val EMPTY = Token("\u0000", NullType)
+        val EMPTY = Token("", NullType)
     }
 
     data class Match(

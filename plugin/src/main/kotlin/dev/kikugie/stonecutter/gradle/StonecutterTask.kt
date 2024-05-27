@@ -20,13 +20,13 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.copyTo
 import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import kotlin.system.measureTimeMillis
 
-@Suppress("LeakingThis")
 @OptIn(ExperimentalPathApi::class)
 internal abstract class StonecutterTask : DefaultTask() {
     @get:Input
@@ -53,8 +53,9 @@ internal abstract class StonecutterTask : DefaultTask() {
     @get:Input
     abstract val filter: Property<(Path) -> Boolean>
 
-    @get:Internal
-    internal lateinit var manager: FileManager
+    private lateinit var manager: FileManager
+    private var transformed = AtomicInteger(0)
+    private var total = AtomicInteger(0)
 
     @TaskAction
     fun run() {
@@ -64,7 +65,7 @@ internal abstract class StonecutterTask : DefaultTask() {
         val time = measureTimeMillis {
             transform(input.get(), output.get())
         }
-        println("[Stonecutter] Switched to ${toVersion.get().project} in ${time}ms")
+        println("[Stonecutter] Switched to ${toVersion.get().project} in ${time}ms (${transformed.get()}/${total.get()} modified)")
     }
 
     private fun createManager(): FileManager {
@@ -72,7 +73,7 @@ internal abstract class StonecutterTask : DefaultTask() {
         val deps = dependencies.get().toMutableMap()
         val mcVersion = deps["minecraft"] ?: SemanticVersionParser.parse(toVersion.get().version)
         deps["minecraft"] = mcVersion
-        deps["\u0000"] = mcVersion
+        deps[""] = mcVersion
 
         val params = TransformParameters(swaps.get(), constants.get(), deps)
         return FileManager(
@@ -90,10 +91,12 @@ internal abstract class StonecutterTask : DefaultTask() {
         val processed = mutableListOf<Pair<Path, String>>()
         val exceptions = mutableListOf<Throwable>()
         input.walk().map {
+            total.incrementAndGet()
             it to process(input, input.relativize(it))
         }.asFlow().flowOn(Dispatchers.Default).catch {
             exceptions += it
         }.transform<Pair<Path, String?>, Unit> { (file, result) ->
+            if (result != null) transformed.incrementAndGet()
             if (result == null) skipped.add(file)
             else processed.add(file to result)
         }.collect()

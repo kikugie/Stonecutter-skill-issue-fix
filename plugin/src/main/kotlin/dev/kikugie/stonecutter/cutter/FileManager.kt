@@ -35,10 +35,14 @@ class FileManager(
         val text = root.resolve(source).readText()
         val hash = text.hash("MD5")
 
-        val cachedOutput = if (parametersMatch) getCachedOutput(source) else null
-        if (cachedOutput != null && cachedOutput == text) return cachedOutput
+        val cachePath = source.hashName(hash, source.extension)
+        val cachedOutput = if (parametersMatch) getCachedOutput(cachePath) else null
+        if (cachedOutput != null) {
+            return if (cachedOutput == text) null
+            else cachedOutput
+        }
 
-        val astPath = source.parent.resolve("${source.fileName.name}_$hash.ast")
+        val astPath = source.hashName(hash, "ast")
         var ast = if (parametersMatch) getCachedAst(astPath) else null
         val overwrite = ast == null
         if (ast == null) {
@@ -51,8 +55,7 @@ class FileManager(
         if (overwrite) runIgnoring {
             val dest = inputCache.resolve("ast").resolve(astPath)
             dest.parent.createDirectories()
-            for (it in dest.parent.listDirectoryEntries())
-                if (it.fileName.name.startsWith(source.fileName.name)) it.deleteExisting()
+            dest.cleanMatching(source.fileName.name)
             dest.encode(ast)
         }
         if (debug) runIgnoring {
@@ -66,8 +69,9 @@ class FileManager(
         Transformer(ast, recognizers, params).process()
         val result = ast.accept(Assembler)
         runIgnoring {
-            val dest = outputCache.resolve("result").resolve(source)
+            val dest = outputCache.resolve("result").resolve(cachePath)
             dest.parent.createDirectories()
+            dest.cleanMatching(source.fileName.name)
             dest.writeText(result, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
         }
         return if (result == text) null else result
@@ -93,6 +97,11 @@ class FileManager(
         }
         return false
     }
+
+    private fun Path.cleanMatching(start: String) = parent.listDirectoryEntries().forEach {
+        if (it.fileName.name.startsWith(start)) it.deleteExisting()
+    }
+    private fun Path.hashName(hash: String, ext: String) = parent.resolve("${fileName.name}_$hash.$ext")
 
     private fun getCachedOutput(source: Path): String? = runIgnoring {
         val res = outputCache.resolve("result").resolve(source).readText(charset)
