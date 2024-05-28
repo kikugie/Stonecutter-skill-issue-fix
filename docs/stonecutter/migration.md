@@ -242,15 +242,6 @@ loom {
 In case you wonder, **using `property("...")` is the only way**.
 Due to Gradle being Gradle, using standard `project.fabric_api` etc. won't pull the correct dependency.
 :::
-### Other platforms
-Although examples in this wiki are made for a Fabric mod, Stonecutter works independently.
-However it's using Fabric Loader to parse and test semantic versions.
-If you're developing for another platform, you need to add Fabric Loader as a compile only dependency:
-```kts
-dependencies {
-    compileOnly("net.fabricmc:fabric-loader:${fabric}") // [!code focus]
-}
-```
 
 ### Notes
 Depending on your project you may need to add versioned properties to other places, but the setup is now done.

@@ -4,25 +4,26 @@ For more information, visit the Dokka page.
 
 ## Processor config
 ### Swaps
-Swaps can be added like this:
+Swaps are used to define preset replacements for certain values, 
+which is less boilerplate than copy-pasting the same condition block.
 ::: code-group
 ```kotlin [build.gradle.kts]
 stonecutter.swap("swap_token") {
-    if (stonecutter.current.version > "1.20.1") "func1()" else "func2()"
+    if (stonecutter.compare(stonecutter.current.version, "1.20.1")) "func1()" else "func2()"
 }
 ```
 
 ```groovy [build.gradle]
 stonecutter.swap("swap_token") {
-    stonecutter.current.version > "1.20.1" ? "func1()" : "func2()"
+    stonecutter.compare(stonecutter.current.version, "1.20.1") ? "func1()" : "func2()"
 }
 ```
 :::
-The first argument is the identifier string, used in the comment. The second is the replacement value.
+The first argument is the identifier string, used in the comment. 
+The second is the replacement value.
 
 ### Constants
-Constants add variables, that can be checked in the code. 
-Constant names can contain spaces, but can't contain values from the syntax reference.
+Constants add variables, that can be checked in the code.
 ::: code-group
 ```kotlin [build.gradle[.kts]]
 stonecutter.const("fabric", isFabric)
