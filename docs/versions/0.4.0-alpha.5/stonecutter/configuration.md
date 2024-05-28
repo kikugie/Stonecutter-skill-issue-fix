@@ -34,6 +34,25 @@ println("good")
 ```
 :::
 
+### Expressions
+Expressions are basically constants on steroids, as they are evaluated dynamically at runtime.  
+Expressions have to return a boolean result if the passed value is valid, or otherwise `null`.  
+Expressions must not be random or have side effects, since results are cached.
+::: code-group
+```kotlin [build.gradle[.kts]]
+stonecutter.expression {
+    if (it == "fabric") return isFabric
+    else if (it == "forge") return isForge
+    else return null
+}
+```
+```kotlin [code.kt]
+//? if fabric
+println("good")
+```
+:::
+As you can see, usually constants provide easier syntax, but if you need this functionality - it's there.
+
 ### Dependencies
 Stonecutter dependencies allow specifying additional targets for the version checker.
 ::: code-group
@@ -60,20 +79,12 @@ This may be useful in cases where you have both multi-version and multi-loader s
 ### Filters
 Files can be filtered with the following functions:
 ```kotlin
-stonecutter.whitelist { it: Path ->
+stonecutter.whitelist { it -> // Path
 }
 
-stonecutter.blacklist { it: Path ->
+stonecutter.blacklist { it -> // Path
 }
 ```
-
-### Comparisons
-Sometimes it can be handy to compare semantic versions in the buildscript (in a `swap` or `const` definition).
-For this purpose `stonecutter.compare` exists:
-````kotlin
-val mcVersion = stonecutter.current.version // = 1.19.4
-val isOneTwentyPlus = stonecutter.compare("1.20", mcVersion) >= 0 // false
-````
 
 ## Plugin properties
 ### Project info

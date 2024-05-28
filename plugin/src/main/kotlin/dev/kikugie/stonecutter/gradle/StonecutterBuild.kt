@@ -2,12 +2,12 @@ package dev.kikugie.stonecutter.gradle
 
 import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.SemanticVersionParser
+import dev.kikugie.stitcher.process.recognizer.IdentifierRecognizer.Companion.allowed
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.SourceSetContainer
 import java.io.File
-import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.deleteRecursively
@@ -18,6 +18,7 @@ import kotlin.io.path.exists
  *
  * @property project the effective Gradle project
  */
+@Suppress("MemberVisibilityCanBePrivate", "unused")
 @OptIn(ExperimentalPathApi::class)
 open class StonecutterBuild internal constructor(val project: Project) {
     private val setup = project.parent?.let {
@@ -48,90 +49,119 @@ open class StonecutterBuild internal constructor(val project: Project) {
      */
     val versions get() = setup.versions
 
-    internal val constants = mutableMapOf<String, Boolean>()
-    internal val swaps = mutableMapOf<String, String>()
-    internal val filters = mutableListOf<(Path) -> Boolean>()
-    internal val dependencies = mutableMapOf<String, SemanticVersion>()
-
     /**
      * Creates a swap id.
      *
-     * Refer to the wiki for a detailed guide.
-     *
-     * @param identifier id identifier
+     * @param identifier swap name
      * @param replacement replacement string
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#swaps">Wiki</a>
      */
     fun swap(identifier: String, replacement: String) {
-        swaps[identifier] = replacement
+        swaps[validate(identifier)] = replacement
     }
 
     /**
      * Creates a swap id.
      *
-     * Refer to the wiki for a detailed guide.
-     *
-     * @param identifier id identifier
+     * @param identifier swap name
      * @param replacement replacement string provider
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#swaps">Wiki</a>
      */
     fun swap(identifier: String, replacement: () -> String) {
-        swap(identifier, replacement())
+        swap(validate(identifier), replacement())
     }
 
     /**
-     * Creates a swap id.
+     * Adds provided id to value pairs to the swap map.
      *
-     * Refer to the wiki for a detailed guide.
-     *
-     * @param values entries of tokens to replacements
+     * @param values entries of ids to replacements
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#swaps">Wiki</a>
      */
     fun swaps(vararg values: Pair<String, String>) {
-        values.forEach { (id, str) -> swap(id, str) }
+        values.forEach { (id, str) -> swap(validate(id), str) }
+    }
+
+    /**
+     * Adds provided id to value pairs to the swap map.
+     *
+     * @param values entries of ids to replacements
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#swaps">Wiki</a>
+     */
+    fun swaps(values: Iterable<Pair<String, String>>) {
+        values.forEach { (id, str) -> swap(validate(id), str) }
     }
 
     /**
      * Creates a constant accessible in stonecutter conditions.
      *
-     * Refer to the wiki for a detailed guide.
-     *
-     * @param identifier id identifier
+     * @param identifier constant name
      * @param value boolean value
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
      */
     fun const(identifier: String, value: Boolean) {
-        constants[identifier] = value
+        constants[validate(identifier)] = value
     }
 
     /**
      * Creates a constant accessible in stonecutter conditions.
      *
-     * Refer to the wiki for a detailed guide.
-     *
-     * @param identifier id identifier
+     * @param identifier constant name
      * @param value boolean value provider
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
      */
     fun const(identifier: String, value: () -> Boolean) {
-        const(identifier, value())
+        const(validate(identifier), value())
     }
 
     /**
-     * Creates a constant accessible in stonecutter conditions.
+     * Adds provided id to value pairs to the constant map.
      *
-     * Refer to the wiki for a detailed guide.
-     *
-     * @param values entries of tokens to boolean values
+     * @param values entries of ids to boolean values
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
      */
     fun consts(vararg values: Pair<String, Boolean>) {
-        values.forEach { (id, str) -> const(id, str) }
+        values.forEach { (id, str) -> const(validate(id), str) }
     }
 
     /**
-     * Creates a constant accessible in stonecutter conditions.
+     * Adds provided id to value pairs to the constant map.
      *
-     * Refer to the wiki for a detailed guide.
-     *
-     * @param values entries of tokens to boolean values
+     * @param values entries of ids to boolean values
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
      */
     fun consts(values: Iterable<Pair<String, Boolean>>) {
-        values.forEach { (id, str) -> const(id, str) }
+        values.forEach { (id, str) -> const(validate(id), str) }
+    }
+
+    /**
+     * Adds a dependency to the semver checks.
+     *
+     * @param identifier dependency name
+     * @param version dependency version to check against in semantic version format
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#dependencies">Wiki</a>
+     */
+    fun dependency(identifier: String, version: String) {
+        dependencies[validate(identifier)] = SemanticVersionParser.parse(version)
+    }
+
+    /**
+     * Adds provided id to value pairs to the semver checks.
+     *
+     * @param values entries of ids to versions
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#dependencies">Wiki</a>
+     */
+    fun dependencies(vararg values: Pair<String, String>) {
+        values.forEach { (id, ver) -> dependencies[validate(id)] = SemanticVersionParser.parse(ver) }
+    }
+
+    /**
+     * Adds provided id to value pairs to the semver checks.
+     *
+     * @param values entries of ids to versions
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#dependencies">Wiki</a>
+     */
+    fun dependencies(values: Iterable<Pair<String, String>>) {
+        values.forEach { (id, ver) -> dependencies[validate(id)] = SemanticVersionParser.parse(ver) }
     }
 
     fun whitelist(criteria: (Path) -> Boolean) {
@@ -142,16 +172,25 @@ open class StonecutterBuild internal constructor(val project: Project) {
         filters += { !criteria(it) }
     }
 
-    fun dependency(identifier: String, version: String) {
-        dependencies[identifier] = SemanticVersionParser.parse(version)
-    }
+    /**
+     * Parses both parameters as semantic versions and compares them.
+     *
+     * @param left version on the left side of the comparison
+     * @param right version on the right side of the comparison
+     * @return 1 if the first version is greater, -1 if the second is greater, 0 if they are equal
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
+     */
+    fun compare(left: String, right: String) =
+        SemanticVersionParser.parse(left).compareTo(SemanticVersionParser.parse(right))
 
-    fun dependencies(vararg values: Pair<String, String>) {
-        values.forEach { (id, ver) -> dependencies[id] = SemanticVersionParser.parse(ver) }
-    }
+    internal val constants = mutableMapOf<String, Boolean>()
+    internal val swaps = mutableMapOf<String, String>()
+    internal val filters = mutableListOf<(Path) -> Boolean>()
+    internal val dependencies = mutableMapOf<String, SemanticVersion>()
 
-    fun dependencies(values: Iterable<Pair<String, String>>) {
-        values.forEach { (id, ver) -> dependencies[id] = SemanticVersionParser.parse(ver) }
+    private fun validate(id: String): String {
+        require(id.all { it.allowed() }) { "Invalid identifier: $id" }
+        return id
     }
 
     init {

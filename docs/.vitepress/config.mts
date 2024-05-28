@@ -14,7 +14,7 @@ export default defineVersionedConfig(__dirname, {
   lang: "en-US",
   title: "Stonecutter Wiki",
   versioning: {
-    latestVersion: "0.4.0-alpha.5",
+    latestVersion: "0.4.0-alpha.8",
   },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config

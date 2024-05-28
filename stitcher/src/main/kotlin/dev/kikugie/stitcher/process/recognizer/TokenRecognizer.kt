@@ -73,7 +73,9 @@ class IdentifierRecognizer<T>(override val type: T) : TokenRecognizer<T> {
         return value.match(start..<value.length)
     }
 
-    private fun Char.allowed() = this == '_' || this == '-' || isLetterOrDigit()
+    companion object {
+        fun Char.allowed() = this == '_' || this == '-' || isLetterOrDigit()
+    }
 }
 
 // TODO: Expand to be more generic
