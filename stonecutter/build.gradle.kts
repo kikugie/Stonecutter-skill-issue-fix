@@ -49,6 +49,12 @@ kotlin {
     jvmToolchain(16)
 }
 
+tasks.register<Jar>("dokkaJavadocJar") {
+    dependsOn(tasks.named("dokkaJavadoc"))
+    from(tasks.named("dokkaJavadoc"))
+    archiveClassifier.set("javadoc")
+}
+
 publishing {
     repositories {
         maven {
@@ -67,6 +73,9 @@ publishing {
             artifactId = "stonecutter"
             version = project.version.toString()
             artifact(tasks.getByName("jar"))
+            artifact(tasks.getByName("dokkaJavadocJar")) {
+                classifier = "javadoc"
+            }
         }
     }
 }
@@ -78,7 +87,7 @@ gradlePlugin {
     plugins {
         create("stonecutter") {
             id = "dev.kikugie.stonecutter"
-            implementationClass = "dev.kikugie.stonecutter.gradle.StonecutterPlugin"
+            implementationClass = "dev.kikugie.stonecutter.StonecutterPlugin"
             displayName = "Stonecutter"
             description = "Preprocessor/JCP inspired multi-version environment manager"
             tags.set(listOf("fabric", "fabricmc"))

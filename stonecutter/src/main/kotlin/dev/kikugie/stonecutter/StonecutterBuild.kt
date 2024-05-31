@@ -1,4 +1,4 @@
-package dev.kikugie.stonecutter.gradle
+package dev.kikugie.stonecutter
 
 import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.SemanticVersionParser

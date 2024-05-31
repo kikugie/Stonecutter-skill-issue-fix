@@ -1,4 +1,4 @@
-package dev.kikugie.stonecutter.cutter
+package dev.kikugie.stonecutter
 
 import com.charleskorn.kaml.Yaml
 import dev.kikugie.stitcher.data.Scope

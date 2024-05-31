@@ -1,4 +1,6 @@
-package dev.kikugie.stonecutter.gradle
+@file:Suppress("unused")
+
+package dev.kikugie.stonecutter
 
 import org.gradle.api.Action
 import org.gradle.api.GradleException
@@ -10,6 +12,7 @@ import kotlin.io.path.extension
 /**
  * Runs for `stonecutter.gradle` file, applying project configurations to versions and generating versioned tasks.
  */
+@Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterController internal constructor(project: Project) {
     private val controller: ControllerManager = project.controller()
         ?: throw StonecutterGradleException("Project ${project.path} is not a Stonecutter controller. What did you even do to get this error?")

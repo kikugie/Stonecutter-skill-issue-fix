@@ -1,7 +1,4 @@
-package dev.kikugie.stonecutter.gradle
-
-import dev.kikugie.stonecutter.metadata.ProjectName
-import dev.kikugie.stonecutter.metadata.TargetVersion
+package dev.kikugie.stonecutter
 
 data class StonecutterProject internal constructor(
     val project: ProjectName,

@@ -1,12 +1,10 @@
-package dev.kikugie.stonecutter.gradle
+package dev.kikugie.stonecutter
 
 import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.SemanticVersionParser
 import dev.kikugie.stitcher.process.recognizer.StandardMultiLine
 import dev.kikugie.stitcher.process.recognizer.StandardSingleLine
 import dev.kikugie.stitcher.process.TransformParameters
-import dev.kikugie.stonecutter.cutter.FileManager
-import dev.kikugie.stonecutter.metadata.ProjectName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
@@ -14,7 +12,6 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files

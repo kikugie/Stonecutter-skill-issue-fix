@@ -1,4 +1,4 @@
-package dev.kikugie.stonecutter.metadata
+package dev.kikugie.stonecutter
 
 typealias ProjectName = String
 typealias ProjectPath = String

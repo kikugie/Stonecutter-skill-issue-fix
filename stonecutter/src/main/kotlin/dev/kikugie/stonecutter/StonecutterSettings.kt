@@ -1,4 +1,4 @@
-package dev.kikugie.stonecutter.gradle
+package dev.kikugie.stonecutter
 
 import org.gradle.api.Action
 import org.gradle.api.initialization.ProjectDescriptor
@@ -19,7 +19,7 @@ open class StonecutterSettings(private val settings: Settings) {
      * Enables Kotlin buildscripts for the controller.
      * - `stonecutter.gradle` -> `stonecutter.gradle.kts`
      */
-    var kotlinController = true
+    var kotlinController = false
     /**
      * Buildscript used by all subprojects.
      * Defaults to `build.gradle`.

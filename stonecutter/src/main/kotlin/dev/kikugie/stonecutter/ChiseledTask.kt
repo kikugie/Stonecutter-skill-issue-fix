@@ -1,4 +1,4 @@
-package dev.kikugie.stonecutter.gradle
+package dev.kikugie.stonecutter
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task

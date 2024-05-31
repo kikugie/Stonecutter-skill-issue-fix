@@ -1,6 +1,5 @@
-package dev.kikugie.stonecutter.gradle
+package dev.kikugie.stonecutter
 
-import dev.kikugie.stonecutter.metadata.ProjectName
 import org.gradle.api.Action
 
 /**
