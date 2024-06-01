@@ -5,7 +5,7 @@ You decided to use Stonecutter. My pleasure! Let me take you on a ride!
 ### Settings template
 ::: code-group
 ```kts [settings.gradle.kts]
-import dev.kikugie.stonecutter.StonecutterSettings
+import dev.kikugie.stonecutter.gradle.StonecutterSettings
 
 pluginManagement {
     repositories {
@@ -41,7 +41,7 @@ pluginManagement {
 }
 
 plugins {
-    id "dev.kikugie.stonecutter" version "0.4.0-alpha.9"
+    id "dev.kikugie.stonecutter" version "0.4.+"
 }
 
 stonecutter {
