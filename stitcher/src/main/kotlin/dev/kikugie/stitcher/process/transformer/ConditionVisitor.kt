@@ -2,9 +2,9 @@ package dev.kikugie.stitcher.process.transformer
 
 import dev.kikugie.semver.SemanticVersionParser
 import dev.kikugie.semver.VersionComparisonOperator
+import dev.kikugie.semver.VersionComparisonOperator.Companion.operatorLength
 import dev.kikugie.stitcher.data.*
 import dev.kikugie.stitcher.process.TransformParameters
-import dev.kikugie.stitcher.process.recognizer.PredicateRecognizer.Companion.getOperatorLength
 import dev.kikugie.stitcher.process.util.VersionPredicate
 
 class ConditionVisitor(private val params: TransformParameters) : Component.Visitor<Boolean> {
@@ -38,7 +38,7 @@ class ConditionVisitor(private val params: TransformParameters) : Component.Visi
         return it.predicates.all {
             val info = it[VersionPredicate::class] ?: run {
                 val str = it.value
-                val len = str.getOperatorLength()
+                val len = str.operatorLength()
                 val op = if (len == 0) VersionComparisonOperator.EQUAL
                 else VersionComparisonOperator.MATCHER[str.substring(0, len)]!!
                 val ver = SemanticVersionParser.parse(str.substring(len))

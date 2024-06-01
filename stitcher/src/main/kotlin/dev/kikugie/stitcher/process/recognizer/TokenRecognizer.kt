@@ -1,5 +1,6 @@
 package dev.kikugie.stitcher.process.recognizer
 
+import dev.kikugie.semver.VersionComparisonOperator.Companion.operatorLength
 import dev.kikugie.stitcher.data.Token.Match
 import org.intellij.lang.annotations.Language
 import java.util.regex.Pattern
@@ -81,7 +82,7 @@ class IdentifierRecognizer<T>(override val type: T) : TokenRecognizer<T> {
 // TODO: Expand to be more generic
 class PredicateRecognizer<T>(override val type: T) : TokenRecognizer<T> {
     override fun match(value: CharSequence, start: Int): Match? {
-        val operator = value.getOperatorLength(start)
+        val operator = value.operatorLength(start)
         var index = start + operator
         while (index < value.length) {
             if (!value[index].allowed()) break
@@ -93,13 +94,6 @@ class PredicateRecognizer<T>(override val type: T) : TokenRecognizer<T> {
 
     private fun Char.allowed() = this == '.' || this == '-' || this == '+' || isLetterOrDigit()
 
-    companion object {
-        fun CharSequence.getOperatorLength(start: Int = 0): Int = when (this[start]) {
-            '=', '~', '^' -> 1
-            '>', '<' -> if (getOrNull(start + 1) == '=') 2 else 1
-            else -> 0
-        }
-    }
 }
 
 private fun CharSequence.match(range: IntRange) = Match(substring(range), range)

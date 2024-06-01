@@ -25,5 +25,11 @@ enum class VersionComparisonOperator(val literal: String) : (SemanticVersion, Se
 
     companion object {
         val MATCHER = entries.associateBy { it.literal }
+
+        fun CharSequence.operatorLength(offset: Int = 0): Int = when (this[offset]) {
+            '=', '~', '^' -> 1
+            '>', '<' -> if (getOrNull(offset + 1) == '=') 2 else 1
+            else -> 0
+        }
     }
 }

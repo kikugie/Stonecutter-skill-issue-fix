@@ -2,6 +2,7 @@ package dev.kikugie.stitcher.process
 
 import dev.kikugie.semver.SemanticVersionParser
 import dev.kikugie.semver.VersionComparisonOperator
+import dev.kikugie.semver.VersionComparisonOperator.Companion.operatorLength
 import dev.kikugie.semver.VersionParsingException
 import dev.kikugie.stitcher.data.*
 import dev.kikugie.stitcher.data.MarkerType.CONDITION
@@ -9,7 +10,6 @@ import dev.kikugie.stitcher.data.MarkerType.SWAP
 import dev.kikugie.stitcher.data.StitcherTokenType.*
 import dev.kikugie.stitcher.exception.ErrorHandler
 import dev.kikugie.stitcher.exception.accept
-import dev.kikugie.stitcher.process.recognizer.PredicateRecognizer.Companion.getOperatorLength
 import dev.kikugie.stitcher.process.util.LexSlice
 import dev.kikugie.stitcher.process.util.VersionPredicate
 
@@ -148,7 +148,7 @@ class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler
     }
 
     private fun String.asVersionPredicate(): VersionPredicate? {
-        val len = getOperatorLength()
+        val len = operatorLength()
         val op = if (len == 0) VersionComparisonOperator.EQUAL
         else VersionComparisonOperator.MATCHER[substring(0, len)] ?: run {
             handler.accept(currentRange.first, "Invalid comparison operator")
