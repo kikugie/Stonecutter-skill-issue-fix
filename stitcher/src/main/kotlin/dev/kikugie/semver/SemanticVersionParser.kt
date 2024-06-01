@@ -53,9 +53,7 @@ object SemanticVersionParser {
         if (segments.isEmpty()) return false
         for (str in segments) {
             if (str.isEmpty()) return false
-            for (char in str)
-                if (char.isLetterOrDigit() || char == '-')
-                    return false
+            for (char in str) if (!char.isLetterOrDigit() && char != '-') return false
         }
         return true
     }
