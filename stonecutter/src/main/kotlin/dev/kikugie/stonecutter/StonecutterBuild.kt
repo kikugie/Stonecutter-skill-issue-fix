@@ -34,7 +34,7 @@ open class StonecutterBuild internal constructor(val project: Project) {
      * Metadata of the currently processed version.
      */
     val current: StonecutterProject by lazy {
-        setup.versions.first { it.project in project.name }.let {
+        setup.versions.first { it.project == project.name }.let {
             if (it.project == setup.current.project) it.asActive() else it
         }
     }

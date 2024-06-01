@@ -7,10 +7,7 @@ import org.gradle.api.Action
  */
 @Suppress("LeakingThis")
 open class StonecutterConfigurationBuilder internal constructor() {
-    internal constructor(defaults: StonecutterConfigurationBuilder?, builder: Action<StonecutterConfigurationBuilder>) : this() {
-        defaults?.versionsImpl?.forEach { (k, v) ->
-            versionsImpl.putIfAbsent(k, v)
-        }
+    internal constructor(builder: Action<StonecutterConfigurationBuilder>) : this() {
         builder.execute(this)
     }
 
@@ -27,6 +24,7 @@ open class StonecutterConfigurationBuilder internal constructor() {
             vcsVersionImpl = value
         }
     internal val versions: Iterable<StonecutterProject> = versionsImpl.values
+    internal val vcsProject: StonecutterProject by lazy { versionsImpl[vcsVersion]!! }
 
     /**
      * Creates a subproject with separate directory and Minecraft version.
@@ -60,5 +58,7 @@ open class StonecutterConfigurationBuilder internal constructor() {
         projects.forEach(::vers)
     }
 
-    internal val vcsProject: StonecutterProject by lazy { versionsImpl[vcsVersion]!! }
+    fun vcsVersion(version: String) {
+        vcsVersion = version
+    }
 }
