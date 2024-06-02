@@ -73,9 +73,6 @@ publishing {
             artifactId = "stonecutter"
             version = project.version.toString()
             artifact(tasks.getByName("jar"))
-            artifact(tasks.getByName("dokkaJavadocJar")) {
-                classifier = "javadoc"
-            }
         }
     }
 }
