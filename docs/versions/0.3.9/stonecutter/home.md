@@ -1,4 +1,4 @@
-# Importing the plugin
+## Importing the plugin
 In your `settings.gradle` include following fields:
 ```groovy
 pluginManagement {
@@ -30,11 +30,11 @@ stonecutter {
 ```
 After reloading `stonecutter.gradle` will be added to the root directory.
 
-# Versioned properties
+## Versioned properties
 Create a `versions` directory in your project. For each version specified in `settings.gradle` create a subdirectory with `gradle.properties` file in it.  
 Any value specified in version's properties override the global one. Important one is mappings version (yarn or one of your choice) and you will likely need to specify Minecraft and Fabric API overrides.
 
-# Build script changes
+## Build script changes
 After adding Stonecutter `build.gradle` will run for each version.
 It shouldn't require many changes, but there are some recommended ones:
 ```groovy
@@ -54,9 +54,9 @@ if (stonecutter.current.isActive) { // run configs for non-active version would 
 }
 ```
 
-# Plugin config
+## Plugin config
 Applied to `stonecutter.gradle` file.
-## Chiseled tasks
+### Chiseled tasks
 Chiseled tasks run in parallel for all versions. Example of a chiseled build task:
 ```groovy
 stonecutter.registerChiseled tasks.register("chiseledBuild", stonecutter.chiseled) {

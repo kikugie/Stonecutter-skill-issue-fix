@@ -1,4 +1,4 @@
-# Running active version
+## Running active version
 **DO NOT** launch it from `Tasks -> fabric -> runClient` as it won't include your mod.  
 To launch the active version use `Tasks -> <active version> -> fabric -> runClient`.
 
@@ -25,8 +25,8 @@ if (stonecutter.current.isActive) {
 ```
 This will add `Tasks -> project -> runActive`, which will always run the active project.
 
-# Switching the active version
+## Switching the active version
 Use tasks in `Tasks -> stonecutter` to change the active version. This will apply the correct dependencies and process your files, which is explained in the following sections.
 
-# Resetting the active version
+## Resetting the active version
 `Tasks -> stonecutter -> Reset active version` switches the active version to the `vcsVersion` parameter in `settings.gradle`. It's recommended to run this task before commits either manually or via a commit hook.

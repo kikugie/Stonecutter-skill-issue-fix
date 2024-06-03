@@ -1,8 +1,8 @@
-# StonecutterSettings
+## StonecutterSettings
 
 Executed for the `stonecutter` block in `settings.gradle` and responsible for creating versioned subprojects.
 
-## Functions
+### Functions
 
 | Name     | Summary                                                                                                                                                  |
 |----------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -10,18 +10,18 @@ Executed for the `stonecutter` block in `settings.gradle` and responsible for cr
 | `create` | `fun create(vararg projects: ProjectDescriptor)` Applies Stonecutter to a project, creating `stonecutter.gradle` and applying plugin to the buildscript. |
 | `shared` | `fun shared(builder: Action<ProjectBuilder>)` Specifies version directories and initial active version.                                                  |
 
-# StonecutterController
+## StonecutterController
 
 Runs for `stonecutter.gradle` file, applying project configurations to versions and generating versioned tasks.
 
-## Properties
+### Properties
 
 | Name       | Summary                                                           |
 |------------|-------------------------------------------------------------------|
 | `chiseled` | `val chiseled: Class<ChiseledTask>` Chiseled task type reference. |
 | `versions` | `val versions: List` All registered subprojects.                  |
 
-## Functions
+### Functions
 
 | Name               | Summary                                                                                                                                                 |
 |--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -30,11 +30,11 @@ Runs for `stonecutter.gradle` file, applying project configurations to versions 
 | `registerChiseled` | `fun registerChiseled(provider: TaskProvider)` Registers a chiseled task, which runs in parallel for all versions.                                      |
 | `syncProperties`   | `fun syncProperties(value: Boolean)` Reads `gradle.properties` file and adds any property set to `VERSIONED` to subproject's file. Disabled by default. |
 
-# StonecutterBuild
+## StonecutterBuild
 
 Provides versioned functionality in the buildscript.
 
-## Properties
+### Properties
 
 | Name       | Summary                                                                                          |
 |------------|--------------------------------------------------------------------------------------------------|
@@ -42,15 +42,15 @@ Provides versioned functionality in the buildscript.
 | `current`  | `val current: ProjectVersion` Version of this buildscript instance. (Unique for each subproject) |
 | `versions` | `val versions: List<ProjectVersion>` All registered subprojects.                                 |
 
-## Functions
+### Functions
 
 | Name         | Summary                                                                                   |
 |--------------|-------------------------------------------------------------------------------------------|
 | `expression` | `fun expression(expr: Expression)` Creates a custom expression for the comment processor. |
 
-# ProjectVersion
+## ProjectVersion
 
-## Properties
+### Properties
 
 | Name       | Summary                 |
 |------------|-------------------------|
