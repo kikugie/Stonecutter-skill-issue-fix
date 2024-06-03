@@ -29,6 +29,8 @@ jobs:
           cache: npm
       - name: Setup Pages
         uses: actions/configure-pages@v4
+      - name: Set execute permissions for gradle
+        run: chmod +x ./gradlew
       - name: Run dokkaHtmlCollector
         run: ./gradlew dokkaHtmlCollector
       - name: Create directories
