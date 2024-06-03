@@ -15,6 +15,10 @@ However, trying to do it for other versions will result in an error.
 When setting up a project, you will have a vcs version, 
 which will be your baseline for testing and committing changes.
 
+## Buildscript format
+Although using `{}.gradle.kts` files is recommended when working with Stonecutter because
+Kotlin DSL provides better IDE integration and tooling, Groovy DSL is supported. 
+
 ## Supported files
 Stonecutter supports both Java and Kotlin, with support for resource files coming soon.
 Although the examples are given primarily in Kotlin for a Fabric mod, the used language and mod loader don't matter for the plugin.
