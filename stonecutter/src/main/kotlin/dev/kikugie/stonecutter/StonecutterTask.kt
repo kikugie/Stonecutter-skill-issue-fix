@@ -2,6 +2,7 @@ package dev.kikugie.stonecutter
 
 import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.SemanticVersionParser
+import dev.kikugie.stitcher.exception.SyntaxException
 import dev.kikugie.stitcher.scanner.StandardMultiLine
 import dev.kikugie.stitcher.scanner.StandardSingleLine
 import dev.kikugie.stitcher.transformer.TransformParameters
@@ -53,6 +54,8 @@ internal abstract class StonecutterTask : DefaultTask() {
     private lateinit var manager: FileManager
     private var transformed = AtomicInteger(0)
     private var total = AtomicInteger(0)
+    // TODO
+    private var debug = false
 
     @TaskAction
     fun run() {
@@ -78,7 +81,8 @@ internal abstract class StonecutterTask : DefaultTask() {
             outputCache = cacheDir(toVersion.get()),
             filter = filter.get(),
             recognizers = listOf(StandardMultiLine, StandardSingleLine),
-            params = params
+            params = params,
+            debug = debug
         )
     }
 
@@ -125,6 +129,9 @@ internal abstract class StonecutterTask : DefaultTask() {
                 message.append("    > $primary:\n")
                 for (line in (cause?.message ?: "").lines())
                     message.append("        $line\n")
+                if (debug && err !is SyntaxException) cause?.stackTrace?.forEach {
+                    message.append("            $it\n")
+                }
                 append(message)
             }
         }
