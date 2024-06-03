@@ -13,8 +13,8 @@ This is an outdated version of Stonecutter. The wiki is incomplete and added her
 <!--suppress ES6UnusedImports, HtmlUnknownAttribute -->
 <script setup>
 import { VPTeamMembers } from 'vitepress/theme';
-import modrinth from './assets/modrinth.svg?raw';
-import curseforge from './assets/curseforge.svg?raw';
+import modrinth from '/assets/modrinth.svg?raw';
+import curseforge from '/assets/curseforge.svg?raw';
 
 const members = [
   {

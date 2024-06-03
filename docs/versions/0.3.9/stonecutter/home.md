@@ -1,6 +1,6 @@
 # Importing the plugin
 In your `settings.gradle` include following fields:
-```gradle
+```groovy
 pluginManagement {
 	repositories {
 		mavenCentral()
@@ -37,7 +37,7 @@ Any value specified in version's properties override the global one. Important o
 # Build script changes
 After adding Stonecutter `build.gradle` will run for each version.
 It shouldn't require many changes, but there are some recommended ones:
-```gradle
+```groovy
 version = "${property("mod.version")}+${stonecutter.current.version}" // include game version in the mod filename
 
 dependencies {
@@ -58,7 +58,7 @@ if (stonecutter.current.isActive) { // run configs for non-active version would 
 Applied to `stonecutter.gradle` file.
 ## Chiseled tasks
 Chiseled tasks run in parallel for all versions. Example of a chiseled build task:
-```gradle
+```groovy
 stonecutter.registerChiseled tasks.register("chiseledBuild", stonecutter.chiseled) {
     setGroup "build"
 

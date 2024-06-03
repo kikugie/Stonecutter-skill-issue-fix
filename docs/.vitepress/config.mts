@@ -22,7 +22,7 @@ export default defineVersionedConfig(__dirname, {
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Stonecutter Docs', link: '/stonecutter/introduction' },
-      { text: 'Stonecutter KDoc', link: '/dokka/' },
+      { text: 'Stonecutter KDoc', link: '/dokka/', target: '_self' },
     ],
     outline: {
       level: "deep"
