@@ -72,7 +72,7 @@ class CharRecognizer<T>(val char: Char, override val type: T) : TokenRecognizer<
  */
 class IdentifierRecognizer<T>(override val type: T) : TokenRecognizer<T> {
     override fun match(value: CharSequence, start: Int): Match? {
-        if (allowed(value.firstOrNull())) return null
+        if (!allowed(value.getOrNull(start))) return null
         for (i in start until value.length)
             if (!allowed(value[i]))
                 return value.match(start..<i)
