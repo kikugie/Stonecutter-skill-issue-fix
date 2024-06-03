@@ -1,3 +1,5 @@
+import org.jetbrains.dokka.gradle.DokkaTask
+
 plugins {
     java
     `maven-publish`
@@ -5,8 +7,10 @@ plugins {
     kotlin("plugin.serialization")
 }
 
+val stitcher: String by project
+
 group = "dev.kikugie"
-version = "0.1-alpha.9"
+version = stitcher
 
 repositories {
     mavenCentral()
@@ -23,6 +27,16 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.withType<DokkaTask>().configureEach {
+    moduleName.set("Stitcher")
+    dokkaSourceSets {
+        configureEach {
+            skipEmptyPackages = true
+            sourceRoots.setFrom(file("src/main/kotlin/dev/kikugie/stitcher"), file("src/main/kotlin/dev/kikugie/semver"))
+        }
+    }
 }
 
 kotlin {

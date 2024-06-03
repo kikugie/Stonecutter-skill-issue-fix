@@ -2,9 +2,9 @@ package dev.kikugie.stonecutter
 
 import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.SemanticVersionParser
-import dev.kikugie.stitcher.process.recognizer.StandardMultiLine
-import dev.kikugie.stitcher.process.recognizer.StandardSingleLine
-import dev.kikugie.stitcher.process.TransformParameters
+import dev.kikugie.stitcher.scanner.StandardMultiLine
+import dev.kikugie.stitcher.scanner.StandardSingleLine
+import dev.kikugie.stitcher.transformer.TransformParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking

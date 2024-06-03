@@ -1,12 +1,18 @@
-package dev.kikugie.stitcher.process.transformer
+package dev.kikugie.stitcher.transformer
 
 import dev.kikugie.semver.SemanticVersionParser
 import dev.kikugie.semver.VersionComparisonOperator
 import dev.kikugie.semver.VersionComparisonOperator.Companion.operatorLength
-import dev.kikugie.stitcher.data.*
-import dev.kikugie.stitcher.process.TransformParameters
-import dev.kikugie.stitcher.process.util.VersionPredicate
+import dev.kikugie.semver.VersionPredicate
+import dev.kikugie.stitcher.data.component.*
+import dev.kikugie.stitcher.data.token.StitcherTokenType
+import dev.kikugie.stitcher.data.token.Token
 
+/**
+ * Evaluates the passed [Component]s boolean value.
+ *
+ * @property params input parameters for the used identifiers
+ */
 class ConditionVisitor(private val params: TransformParameters) : Component.Visitor<Boolean> {
     override fun visitUnary(it: Unary): Boolean = when(it.operator.type) {
         StitcherTokenType.NEGATE -> !it.target.accept(this)
@@ -27,6 +33,10 @@ class ConditionVisitor(private val params: TransformParameters) : Component.Visi
         params.constants[it.token.value] ?: Assignment(Token.EMPTY, listOf(it.token)).accept(this)
 
     override fun visitCondition(it: Condition): Boolean = it.condition.accept(this)
+
+    /**
+     * @throws UnsupportedOperationException
+     */
     override fun visitSwap(it: Swap): Boolean {
         throw UnsupportedOperationException("Swaps can't be processed as conditions")
     }

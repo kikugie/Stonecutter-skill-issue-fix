@@ -1,4 +1,4 @@
-package dev.kikugie.stitcher.data
+package dev.kikugie.stitcher.data.token
 
 import kotlinx.serialization.Serializable
 

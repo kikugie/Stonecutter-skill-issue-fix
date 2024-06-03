@@ -2,7 +2,7 @@ package dev.kikugie.stonecutter
 
 import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.SemanticVersionParser
-import dev.kikugie.stitcher.process.recognizer.IdentifierRecognizer.Companion.allowed
+import dev.kikugie.stitcher.lexer.IdentifierRecognizer.Companion.allowed
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
@@ -189,7 +189,7 @@ open class StonecutterBuild internal constructor(val project: Project) {
     internal val dependencies = mutableMapOf<String, SemanticVersion>()
 
     private fun validate(id: String): String {
-        require(id.all { it.allowed() }) { "Invalid identifier: $id" }
+        require(id.all(::allowed)) { "Invalid identifier: $id" }
         return id
     }
 

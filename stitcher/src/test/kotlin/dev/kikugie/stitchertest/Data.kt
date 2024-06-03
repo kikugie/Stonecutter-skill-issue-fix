@@ -1,8 +1,8 @@
 package dev.kikugie.stitchertest
 
-import dev.kikugie.stitcher.data.ContentType.*
-import dev.kikugie.stitcher.data.MarkerType
-import dev.kikugie.stitcher.data.StitcherTokenType.*
+import dev.kikugie.stitcher.data.token.ContentType.*
+import dev.kikugie.stitcher.data.token.MarkerType
+import dev.kikugie.stitcher.data.token.StitcherTokenType.*
 
 val SCANNER_TESTS = buildList {
     add("slash comment", "// comment") {

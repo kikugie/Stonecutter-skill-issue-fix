@@ -1,4 +1,4 @@
-package dev.kikugie.stitcher.process
+package dev.kikugie.stitcher.transformer
 
 import dev.kikugie.semver.SemanticVersion
 import kotlinx.serialization.Serializable

@@ -1,6 +1,6 @@
-package dev.kikugie.stitcher.process.recognizer
+package dev.kikugie.stitcher.scanner
 
-import dev.kikugie.stitcher.data.Token.Match
+import dev.kikugie.stitcher.data.token.Token.Match
 
 enum class CommentType {
     SINGLE_LINE, MULTI_LINE

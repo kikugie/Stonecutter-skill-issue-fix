@@ -1,8 +1,18 @@
-package dev.kikugie.stitcher.process
+package dev.kikugie.stitcher
 
-import dev.kikugie.stitcher.data.*
-import dev.kikugie.stitcher.data.StitcherTokenType
+import dev.kikugie.stitcher.data.block.Block
+import dev.kikugie.stitcher.data.block.CodeBlock
+import dev.kikugie.stitcher.data.block.CommentBlock
+import dev.kikugie.stitcher.data.block.ContentBlock
+import dev.kikugie.stitcher.data.component.*
+import dev.kikugie.stitcher.data.scope.Scope
+import dev.kikugie.stitcher.data.scope.ScopeType
+import dev.kikugie.stitcher.data.token.MarkerType
+import dev.kikugie.stitcher.data.token.Token
 
+/**
+ * Converts any Stitcher structure to its correct string form.
+ */
 @Suppress("MemberVisibilityCanBePrivate")
 object Assembler : Component.Visitor<String>, Block.Visitor<String>, Scope.Visitor<String> {
     private fun StringBuilder.token(token: Token): StringBuilder = append(token.value)

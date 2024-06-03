@@ -1,7 +1,8 @@
-package dev.kikugie.stitcher.data
+package dev.kikugie.stitcher.data.scope
 
-import dev.kikugie.stitcher.data.ScopeType.*
-import kotlinx.serialization.EncodeDefault
+import dev.kikugie.stitcher.data.token.MarkerType
+import dev.kikugie.stitcher.data.scope.ScopeType.*
+import dev.kikugie.stitcher.data.block.Block
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 

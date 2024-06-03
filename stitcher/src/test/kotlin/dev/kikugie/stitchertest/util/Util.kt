@@ -1,7 +1,7 @@
 package dev.kikugie.stitchertest.util
 
 import com.github.ajalt.mordant.rendering.TextColors
-import dev.kikugie.stitcher.data.Token
+import dev.kikugie.stitcher.data.token.Token
 
 fun printCol(str: CharSequence) = str.split('\n').forEach { println(TextColors.cyan(it)) }
 

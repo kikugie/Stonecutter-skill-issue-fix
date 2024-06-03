@@ -1,7 +1,7 @@
-package dev.kikugie.stitcher.process.recognizer
+package dev.kikugie.stitcher.lexer
 
 import dev.kikugie.semver.VersionComparisonOperator.Companion.operatorLength
-import dev.kikugie.stitcher.data.Token.Match
+import dev.kikugie.stitcher.data.token.Token.Match
 import org.intellij.lang.annotations.Language
 import java.util.regex.Pattern
 
@@ -10,7 +10,7 @@ import java.util.regex.Pattern
  *
  * Token recognizers are used to generify the lexical analysis and reduce boilerplate.
  *
- * @see TokenMatch
+ * @see Match
  */
 interface TokenRecognizer<T> {
     val type: T
@@ -65,20 +65,32 @@ class CharRecognizer<T>(val char: Char, override val type: T) : TokenRecognizer<
         if (value[start] == char) char.toString() and start..start else null
 }
 
+/**
+ * Matches a valid Stitcher identifier. Allowed characters are: `[a-ZA-Z0-9_-]`.
+ *
+ * *Why still no regex? Because no one can read regex, right?*
+ */
 class IdentifierRecognizer<T>(override val type: T) : TokenRecognizer<T> {
     override fun match(value: CharSequence, start: Int): Match? {
-        if (value.getOrNull(start)?.allowed() != true) return null
+        if (allowed(value.firstOrNull())) return null
         for (i in start until value.length)
-            if (!value[i].allowed())
+            if (!allowed(value[i]))
                 return value.match(start..<i)
         return value.match(start..<value.length)
     }
 
     companion object {
-        fun Char.allowed() = this == '_' || this == '-' || isLetterOrDigit()
+        fun allowed(char: Char?) = char != null && (char == '_' || char == '-' || char.isLetterOrDigit())
     }
 }
 
+/**
+ * Matches a semi-valid semantic version predicate.
+ *
+ * Predicate may start with `=`, `>`, `<`, `>=`, `<=`, `~`, `^` or nothing, which will be recognized as `=` operator.
+ * The version specification should match `[a-ZA-Z0-9.-+]`, which is not guaranteed to be valid semver,
+ * but running the semver parser in the lexer would kill the performance, so it is done later by the parser.
+ */
 // TODO: Expand to be more generic
 class PredicateRecognizer<T>(override val type: T) : TokenRecognizer<T> {
     override fun match(value: CharSequence, start: Int): Match? {

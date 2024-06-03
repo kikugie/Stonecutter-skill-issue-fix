@@ -1,18 +1,29 @@
-package dev.kikugie.stitcher.process
+package dev.kikugie.stitcher.parser
 
 import dev.kikugie.semver.SemanticVersionParser
 import dev.kikugie.semver.VersionComparisonOperator
 import dev.kikugie.semver.VersionComparisonOperator.Companion.operatorLength
 import dev.kikugie.semver.VersionParsingException
-import dev.kikugie.stitcher.data.*
-import dev.kikugie.stitcher.data.MarkerType.CONDITION
-import dev.kikugie.stitcher.data.MarkerType.SWAP
-import dev.kikugie.stitcher.data.StitcherTokenType.*
+import dev.kikugie.stitcher.data.token.MarkerType.CONDITION
+import dev.kikugie.stitcher.data.token.MarkerType.SWAP
+import dev.kikugie.stitcher.data.token.StitcherTokenType.*
 import dev.kikugie.stitcher.exception.ErrorHandler
 import dev.kikugie.stitcher.exception.accept
-import dev.kikugie.stitcher.process.util.LexSlice
-import dev.kikugie.stitcher.process.util.VersionPredicate
+import dev.kikugie.semver.VersionPredicate
+import dev.kikugie.stitcher.data.component.*
+import dev.kikugie.stitcher.data.scope.ScopeType
+import dev.kikugie.stitcher.data.token.Token
+import dev.kikugie.stitcher.lexer.LexSlice
+import dev.kikugie.stitcher.lexer.Lexer
+import dev.kikugie.stitcher.transformer.TransformParameters
 
+/**
+ * Parses content of an individual comment into a [Definition].
+ *
+ * @property lexer assigned lexer with configured char sequence for the comment
+ * @property handler exception collector
+ * @property data parameters used by the transformer to verify identifiers or `null` if no verification is needed
+ */
 class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler, private val data: TransformParameters? = null) {
     val errors get() = lexer.errors.asSequence() + handler.errors
     private val currentRange get() = lookup()?.range ?: lexer[-1]!!.range
@@ -24,6 +35,11 @@ class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler
         this[IntRange::class] = this@toToken.range
     }
 
+    /**
+     * Parses the token sequence produced by the [lexer].
+     *
+     * @return parsed definition or `null` if the sequence is not a Stitcher expression
+     */
     fun parse(): Definition? {
         val mode = lexer.advance()?.type ?: return null
         val extension = lookup(1)?.type == SCOPE_CLOSE

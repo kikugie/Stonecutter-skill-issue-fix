@@ -10,11 +10,12 @@ plugins {
     `java-gradle-plugin`
     kotlin("jvm")
     kotlin("plugin.serialization")
-    id("org.jetbrains.dokka") version "1.9.20"
 }
 
+val stonecutter: String by project
+
 group = "dev.kikugie"
-version = "0.4.0-alpha.9"
+version = stonecutter
 
 repositories {
     mavenCentral()
@@ -38,21 +39,13 @@ tasks.withType<DokkaTask>().configureEach {
     dokkaSourceSets {
         configureEach {
             skipEmptyPackages = true
-            sourceRoots.setFrom(file("src/main/kotlin/dev/kikugie/stonecutter/gradle"))
-            includes.setFrom(fileTree("docs").files)
-            samples.setFrom(fileTree("samples").files)
+            sourceRoots.setFrom(file("src/main/kotlin/dev/kikugie/stonecutter"))
         }
     }
 }
 
 kotlin {
     jvmToolchain(16)
-}
-
-tasks.register<Jar>("dokkaJavadocJar") {
-    dependsOn(tasks.named("dokkaJavadoc"))
-    from(tasks.named("dokkaJavadoc"))
-    archiveClassifier.set("javadoc")
 }
 
 publishing {

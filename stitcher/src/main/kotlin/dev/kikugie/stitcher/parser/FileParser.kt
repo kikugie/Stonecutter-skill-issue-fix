@@ -1,17 +1,41 @@
-package dev.kikugie.stitcher.process
+package dev.kikugie.stitcher.parser
 
-import dev.kikugie.stitcher.data.*
+import dev.kikugie.stitcher.data.block.Block
+import dev.kikugie.stitcher.data.block.CodeBlock
+import dev.kikugie.stitcher.data.block.CommentBlock
+import dev.kikugie.stitcher.data.block.ContentBlock
+import dev.kikugie.stitcher.data.scope.Scope
+import dev.kikugie.stitcher.data.scope.ScopeType
+import dev.kikugie.stitcher.data.token.ContentType
+import dev.kikugie.stitcher.data.token.NullType
+import dev.kikugie.stitcher.data.token.Token
 import dev.kikugie.stitcher.exception.ErrorHandler
 import dev.kikugie.stitcher.exception.ErrorHandlerImpl
 import dev.kikugie.stitcher.exception.accept
-import dev.kikugie.stitcher.process.Scanner.Companion.scan
-import dev.kikugie.stitcher.process.recognizer.CommentRecognizer
-import dev.kikugie.stitcher.process.util.LookaroundIterator
+import dev.kikugie.stitcher.lexer.Lexer
+import dev.kikugie.stitcher.scanner.CommentRecognizer
+import dev.kikugie.stitcher.scanner.Scanner.Companion.scan
 import java.io.Reader
 import java.util.*
 
-class FileParser(input: Sequence<Token>, private val handlerFactory: (CharSequence) -> ErrorHandler = ::ErrorHandlerImpl) {
-    constructor(input: Reader, recognizers: Iterable<CommentRecognizer>) : this(input.scan(recognizers))
+/**
+ * Parser for the entire file contents.
+ *
+ * @property handlerFactory exception collector function for each comment
+ * @constructor
+ * Creates parser from a reader, directly running the [Scanner]
+ *
+ * @param input a sequence of tokens produced by the scanner or a reader to be scanned
+ */
+class FileParser(
+    input: Sequence<Token>,
+    private val handlerFactory: (CharSequence) -> ErrorHandler = ::ErrorHandlerImpl,
+) {
+    constructor(
+        input: Reader,
+        recognizers: Iterable<CommentRecognizer>,
+        handlerFactory: (CharSequence) -> ErrorHandler = ::ErrorHandlerImpl,
+    ) : this(input.scan(recognizers), handlerFactory)
 
     private val errors = mutableListOf<Throwable>()
     private val iter = LookaroundIterator(input.iterator())
@@ -33,6 +57,11 @@ class FileParser(input: Sequence<Token>, private val handlerFactory: (CharSequen
             else -> throw AssertionError()
         }
 
+    /**
+     * Parses the input sequence, creating an AST of scopes and blocks.
+     *
+     * @return root scope of [NullType], which cannot be closed
+     */
     fun parse(): Scope = iter.forEach {
         when (it.type) {
             ContentType.CONTENT -> add(ContentBlock(it))

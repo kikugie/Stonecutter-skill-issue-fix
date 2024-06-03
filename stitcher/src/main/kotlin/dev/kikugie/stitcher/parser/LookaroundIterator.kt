@@ -1,8 +1,8 @@
-package dev.kikugie.stitcher.process.util
+package dev.kikugie.stitcher.parser
 
 import java.util.NoSuchElementException
 
-class LookaroundIterator<T>(private val iterator: Iterator<T>) : Iterator<T> {
+internal class LookaroundIterator<T>(private val iterator: Iterator<T>) : Iterator<T> {
     constructor(iterable: Iterable<T>) : this(iterable.iterator())
 
     var current: T? = null

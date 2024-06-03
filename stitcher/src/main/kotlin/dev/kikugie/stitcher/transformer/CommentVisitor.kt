@@ -1,12 +1,22 @@
-package dev.kikugie.stitcher.process.transformer
+package dev.kikugie.stitcher.transformer
 
-import dev.kikugie.stitcher.data.*
-import dev.kikugie.stitcher.process.Assembler
-import dev.kikugie.stitcher.process.recognizer.StandardMultiLine
-import dev.kikugie.stitcher.process.transformer.CommentAdder.onAddComment
-import dev.kikugie.stitcher.util.affectedRange
+import dev.kikugie.stitcher.Assembler
+import dev.kikugie.stitcher.data.block.Block
+import dev.kikugie.stitcher.data.block.CodeBlock
+import dev.kikugie.stitcher.data.block.CommentBlock
+import dev.kikugie.stitcher.data.block.ContentBlock
+import dev.kikugie.stitcher.data.scope.Scope
+import dev.kikugie.stitcher.data.scope.ScopeType
+import dev.kikugie.stitcher.data.token.ContentType
+import dev.kikugie.stitcher.data.token.Token
+import dev.kikugie.stitcher.scanner.StandardMultiLine
+import dev.kikugie.stitcher.transformer.CommentAdder.onAddComment
+import dev.kikugie.stitcher.transformer.Transformer.Companion.affectedRange
 import dev.kikugie.stitcher.util.leadingSpaces
 
+/**
+ * Replacement for `*` in multi-line comments used to avoid nested comment issues.
+ */
 const val KEY = '^'
 private fun String.replaceAll(keys: Iterable<Pair<String, String>>): String {
     var str = this

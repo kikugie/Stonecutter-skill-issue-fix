@@ -1,8 +1,15 @@
-package dev.kikugie.stitcher.data
+package dev.kikugie.stitcher.data.block
 
-import dev.kikugie.stitcher.data.Block.Visitor
+import dev.kikugie.stitcher.data.component.Definition
+import dev.kikugie.stitcher.data.scope.Scope
+import dev.kikugie.stitcher.data.token.Token
+import dev.kikugie.stitcher.data.block.Block.Visitor
 import kotlinx.serialization.Serializable
 
+/**
+ * Base building block of the produced AST.
+ * Uses inherited types to define the kind of the block and what kind of data they store.
+ */
 @Serializable
 sealed interface Block {
     fun <T> accept(visitor: Visitor<T>): T
@@ -16,6 +23,11 @@ sealed interface Block {
     }
 }
 
+/**
+ * Literal content of the processed file, i.e. the stuff in-between comments.
+ *
+ * @property content content value
+ */
 @Serializable
 data class ContentBlock(
     val content: Token,
@@ -24,6 +36,14 @@ data class ContentBlock(
     override fun isEmpty(): Boolean = content.value.isBlank()
 }
 
+/**
+ * Regular comment, not recognized to have any Stitcher expressions.
+ * Comment start and end tokens are stored separately to allow easily extracting contents.
+ *
+ * @property start comment start marker
+ * @property content content value
+ * @property end comment end marker
+ */
 @Serializable
 data class CommentBlock(
     val start: Token,
@@ -34,6 +54,15 @@ data class CommentBlock(
     override fun isEmpty(): Boolean = false
 }
 
+/**
+ * Comment recognized as a Stitcher expression.
+ * Stores the parsed code.
+ *
+ * @property start comment start marker
+ * @property def parsed Stitcher code
+ * @property end comment end marker
+ * @property scope scope assigned to the block, or `null` if this is a closer
+ */
 @Serializable
 data class CodeBlock(
     val start: Token,

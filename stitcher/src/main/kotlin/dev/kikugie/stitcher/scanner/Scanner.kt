@@ -1,9 +1,8 @@
-package dev.kikugie.stitcher.process
+package dev.kikugie.stitcher.scanner
 
-import dev.kikugie.stitcher.data.Token
-import dev.kikugie.stitcher.process.recognizer.CommentRecognizer
-import dev.kikugie.stitcher.data.ContentType.*
-import dev.kikugie.stitcher.data.TokenType
+import dev.kikugie.stitcher.data.token.Token
+import dev.kikugie.stitcher.data.token.ContentType.*
+import dev.kikugie.stitcher.data.token.TokenType
 import java.io.Reader
 
 /**
@@ -21,6 +20,11 @@ class Scanner(
     private var current: CommentRecognizer? = null
     private var quote: Quote? = null
 
+    /**
+     * Starts the scanner in lazy evaluation mode (there's no other mode).
+     *
+     * @return lazily evaluated token sequence
+     */
     fun tokenize(): Sequence<Token> = sequence {
         input.readLigatures { scan(it) }
         if (buffer.isNotEmpty()) yield(buffer, if (current == null) CONTENT else COMMENT)
