@@ -26,8 +26,13 @@ internal object GroovyController : ControllerManager {
     override fun createHeader(file: Path, version: ProjectName) {
         file.writeText(
             """
-                plugins.apply "dev.kikugie.stonecutter"
-                stonecutter.active "$version" $KEY
+            plugins.apply "dev.kikugie.stonecutter"
+            stonecutter.active "$version" $KEY
+            
+            stonecutter.registerChiseled tasks.register("chiseledBuild", stonecutter.chiseled) { 
+                setGroup "project"
+                ofTask "build"
+            }
             """.trimIndent(), Charsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING
         )
     }
@@ -41,10 +46,15 @@ internal object KotlinController : ControllerManager {
     override fun createHeader(file: Path, version: ProjectName) {
         file.writeText(
             """
-                plugins {
-                    id("dev.kikugie.stonecutter")
-                }
-                stonecutter active "$version" $KEY
+            plugins {
+                id("dev.kikugie.stonecutter")
+            }
+            stonecutter active "$version" $KEY
+            
+            stonecutter registerChiseled tasks.register("chiseledBuild", stonecutter.chiseled) { 
+                group = "project"
+                ofTask("build")
+            }
             """.trimIndent(), Charsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING
         )
     }
