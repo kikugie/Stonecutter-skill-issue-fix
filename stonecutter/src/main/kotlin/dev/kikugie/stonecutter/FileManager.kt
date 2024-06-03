@@ -46,7 +46,7 @@ class FileManager(
         var ast = if (parametersMatch) getCachedAst(astPath) else null
         val overwrite = ast == null
         if (ast == null) {
-            val parser = FileParser(text.reader(), recognizers)
+            val parser = FileParser(text.reader(), recognizers, params)
             ast = parser.parse()
             if (parser.errs.isNotEmpty()) throw SyntaxException(
                 parser.errs.joinToString("\n") { it.message ?: "Error processing statement" }

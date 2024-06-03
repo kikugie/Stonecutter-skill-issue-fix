@@ -15,6 +15,7 @@ import dev.kikugie.stitcher.exception.accept
 import dev.kikugie.stitcher.lexer.Lexer
 import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.scanner.Scanner.Companion.scan
+import dev.kikugie.stitcher.transformer.TransformParameters
 import java.io.Reader
 import java.util.*
 
@@ -29,13 +30,15 @@ import java.util.*
  */
 class FileParser(
     input: Sequence<Token>,
+    private val params: TransformParameters? = null,
     private val handlerFactory: (CharSequence) -> ErrorHandler = ::ErrorHandlerImpl,
 ) {
     constructor(
         input: Reader,
         recognizers: Iterable<CommentRecognizer>,
+        params: TransformParameters? = null,
         handlerFactory: (CharSequence) -> ErrorHandler = ::ErrorHandlerImpl,
-    ) : this(input.scan(recognizers), handlerFactory)
+    ) : this(input.scan(recognizers), params, handlerFactory)
 
     private val errors = mutableListOf<Throwable>()
     private val iter = LookaroundIterator(input.iterator())
@@ -76,7 +79,7 @@ class FileParser(
     private fun createParser(str: CharSequence): CommentParser {
         val handler = handlerFactory(str)
         val lexer = Lexer(str, handler)
-        return CommentParser(lexer, handler)
+        return CommentParser(lexer, handler, params)
     }
 
     private fun parseComment(token: Token) {
