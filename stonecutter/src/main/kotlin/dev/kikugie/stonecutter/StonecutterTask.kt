@@ -66,7 +66,7 @@ internal abstract class StonecutterTask : DefaultTask() {
     }
 
     private fun createManager(): FileManager {
-        fun cacheDir(pr: StonecutterProject) = project.let { it.parent ?: it }.project(":${pr.project}").buildDirectory.toPath().resolve("stonecutterCache")
+        fun cacheDir(pr: StonecutterProject) = project.project(pr.project).buildDirectory.toPath().resolve("stonecutterCache")
         val deps = dependencies.get().toMutableMap()
         val mcVersion = deps["minecraft"] ?: SemanticVersionParser.parse(toVersion.get().version)
         deps["minecraft"] = mcVersion
