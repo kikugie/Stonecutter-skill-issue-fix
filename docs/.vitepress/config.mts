@@ -16,6 +16,7 @@ export default defineVersionedConfig(__dirname, {
   versioning: {
     latestVersion: "0.4-beta.1",
   },
+  cleanUrls: true,
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
@@ -29,18 +30,20 @@ export default defineVersionedConfig(__dirname, {
     search: {
       provider: 'local'
     },
-    sidebar: [
-      {
-        text: 'Stonecutter',
-        items: [
-          { text: 'Introduction', link: '/stonecutter/introduction' },
-          { text: 'Migrating to Stonecutter', link: '/stonecutter/migration' },
-          { text: 'Developing your mod', link: '/stonecutter/launch' },
-          { text: 'Versioned comments', link: '/stonecutter/comments' },
-          { text: 'Stonecutter configuration', link: '/stonecutter/configuration' },
-        ]
-      }
-    ],
+    sidebar: {
+      '/': [
+        {
+          text: 'Stonecutter',
+          items: [
+            { text: 'Introduction', link: '/stonecutter/introduction' },
+            { text: 'Migrating to Stonecutter', link: '/stonecutter/migration' },
+            { text: 'Developing your mod', link: '/stonecutter/launch' },
+            { text: 'Versioned comments', link: '/stonecutter/comments' },
+            { text: 'Stonecutter configuration', link: '/stonecutter/configuration' },
+          ]
+        }
+      ]
+    },
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/kikugie/stonecutter-kt' },

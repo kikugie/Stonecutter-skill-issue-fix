@@ -1,0 +1,20 @@
+{
+  "/": [
+    {
+      "text": "Home",
+      "link": "/stonecutter/home"
+    },
+    {
+      "text": "Versioned Comments",
+      "link": "/stonecutter/comments"
+    },
+    {
+      "text": "Running Minecraft",
+      "link": "/stonecutter/run"
+    },
+    {
+      "text": "Plugin Documentation",
+      "link": "/stonecutter/plugin"
+    }
+  ]
+}
