@@ -42,7 +42,7 @@ data object Empty : Component {
 /**
  * Represents an endpoint value, such as a constant, version predicate or swap identifier.
  *
- * @property token assigned value
+ * @property token Assigned value
  */
 @Serializable
 data class Literal(val token: Token) : Component {
@@ -53,8 +53,8 @@ data class Literal(val token: Token) : Component {
 /**
  * Represent a unary operation, such as (and currently only) negation `!{token}`
  *
- * @property operator token representing the type of the operation
- * @property target component this operation is applied to
+ * @property operator Token representing the type of the operation
+ * @property target Component this operation is applied to
  */
 @Serializable
 data class Unary(
@@ -68,9 +68,9 @@ data class Unary(
 /**
  * Represents an operation with 2 parameters, such as `&&` and `||`.
  *
- * @property left left side of the operation
- * @property operator token representing the type of the operation
- * @property right right side of the operation
+ * @property left Left side of the operation
+ * @property operator Token representing the type of the operation
+ * @property right Right side of the operation
  */
 @Serializable
 data class Binary(
@@ -85,7 +85,7 @@ data class Binary(
 /**
  * Represents a component encased in parentheses.
  *
- * @property content delegate component
+ * @property content Delegate component
  */
 @Serializable
 data class Group(
@@ -101,8 +101,8 @@ data class Group(
  * With explicit target it is written as `identifier: 0.1.0`.
  * For the default value, assignment operator `:` may be emitted: `0.1.0`
  *
- * @property target identifier of the dependency or [Token.EMPTY] for implicit assignments
- * @property predicates a list of tokens, parsed as a [VersionPredicate]
+ * @property target Identifier of the dependency or [Token.EMPTY] for implicit assignments
+ * @property predicates List of tokens, parsed as a [VersionPredicate]
  */
 @Serializable
 data class Assignment(
@@ -117,8 +117,8 @@ data class Assignment(
  * Top level component of conditions and swaps, encoding the entire content of the original comment.
  *
  * @property component [Condition] or [Swap] component, containing the parsed data
- * @property extension whenever this comment starts with `}`
- * @property enclosure the type of the next [Scope]
+ * @property extension Whenever this comment starts with `}`
+ * @property enclosure The type of the next [Scope]
  */
 @Serializable
 data class Definition(
@@ -140,8 +140,8 @@ data class Definition(
 /**
  * Represents Stitcher condition expression.
  *
- * @property sugar condition sugar added for readability, such as `if`, `else` and `elif`, which is useless for the transformer, but required to reassemble the tree.
- * @property condition underlying condition tree
+ * @property sugar Condition sugar added for readability, such as `if`, `else` and `elif`, which is useless for the transformer, but required to reassemble the tree.
+ * @property condition Inderlying condition tree
  */
 @Serializable
 data class Condition(
@@ -155,7 +155,7 @@ data class Condition(
 /**
  * Represents Stitcher swap comment.
  *
- * @property identifier assigned swap id
+ * @property identifier Assigned swap id
  */
 @Serializable
 data class Swap(

@@ -12,8 +12,8 @@ import dev.kikugie.stitcher.util.trailingSpaces
 /**
  * Lexer for the Stitcher comment contents.
  *
- * @property buffer comment value
- * @property handler exception collector
+ * @property buffer Comment value
+ * @property handler Exception collector
  */
 class Lexer(private val buffer: CharSequence, private val handler: ErrorHandler = ErrorHandlerImpl(buffer)) {
     val errors get() = handler.errors
@@ -24,24 +24,24 @@ class Lexer(private val buffer: CharSequence, private val handler: ErrorHandler 
     /**
      * Accesses the raw token entry from the built list.
      *
-     * @param index index of the token, with negative values supported
-     * @return matched buffer slice or `null` if the index is invalid
+     * @param index Index of the token, with negative values supported
+     * @return Matched buffer slice or `null` if the index is invalid
      */
     operator fun get(index: Int): LexSlice? = tokens.getOrNull(index % tokens.size)
 
     /**
      * Converts a slice to the associated token.
      *
-     * @param slice requested buffer slice or the last one by default
-     * @return token matching the slice parameters
+     * @param slice Requested buffer slice or the last one by default
+     * @return Token matching the slice parameters
      */
     fun token(slice: LexSlice = tokens[index]): Token = Token(buffer.substring(slice.range), slice.type)
 
     /**
      * Gets the token at a given offset without advancing the lexer.
      *
-     * @param offset offset from the current cursor position, where negative values will get previous tokens, positive will generate tokens without advancing the cursor
-     * @return slice at the requested position or `null` if no token is present there
+     * @param offset Offset from the current cursor position, where negative values will get previous tokens, positive will generate tokens without advancing the cursor
+     * @return Slice at the requested position or `null` if no token is present there
      */
     fun lookup(offset: Int = 0): LexSlice? = when {
         offset > 0 -> tokens.getOrNull(index + offset) ?: run {
@@ -57,7 +57,7 @@ class Lexer(private val buffer: CharSequence, private val handler: ErrorHandler 
     /**
      * Advances the lexer cursor and returns the matched slice.
      *
-     * @return the next buffer slice or `null` if no more tokens can be matched
+     * @return The next buffer slice or `null` if no more tokens can be matched
      */
     fun advance(): LexSlice? = tokens.getOrNull(++index) ?: advanceInternal()
 
@@ -95,12 +95,12 @@ class Lexer(private val buffer: CharSequence, private val handler: ErrorHandler 
          * Any leading whitespaces will be ignored,
          * but unmatched values before the first match or end of the sequence will be reported.
          *
-         * @param T type of the token
-         * @param sequence char sequence to scan
-         * @param start start offset
-         * @param matchers assigned token matchers
-         * @param handler exception collector
-         * @return a pair of the matched type to the matched range or `null` if nothing could be matched, in which case [handler] will receive an error.
+         * @param T Type of the token
+         * @param sequence Char sequence to scan
+         * @param start Start offset
+         * @param matchers Assigned token matchers
+         * @param handler Exception collector
+         * @return Pair of the matched type to the matched range or `null` if nothing could be matched, in which case [handler] will receive an error.
          * @see TokenRecognizer
          */
         fun <T> locateToken(

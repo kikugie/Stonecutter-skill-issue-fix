@@ -23,7 +23,7 @@ class Scanner(
     /**
      * Starts the scanner in lazy evaluation mode (there's no other mode).
      *
-     * @return lazily evaluated token sequence
+     * @return Lazily evaluated token sequence
      */
     fun tokenize(): Sequence<Token> = sequence {
         input.readLigatures { scan(it) }

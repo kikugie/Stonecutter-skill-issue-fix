@@ -26,7 +26,7 @@ sealed interface Block {
 /**
  * Literal content of the processed file, i.e. the stuff in-between comments.
  *
- * @property content content value
+ * @property content Content value
  */
 @Serializable
 data class ContentBlock(
@@ -40,9 +40,9 @@ data class ContentBlock(
  * Regular comment, not recognized to have any Stitcher expressions.
  * Comment start and end tokens are stored separately to allow easily extracting contents.
  *
- * @property start comment start marker
- * @property content content value
- * @property end comment end marker
+ * @property start Comment start marker
+ * @property content Content value
+ * @property end Comment end marker
  */
 @Serializable
 data class CommentBlock(
@@ -58,10 +58,10 @@ data class CommentBlock(
  * Comment recognized as a Stitcher expression.
  * Stores the parsed code.
  *
- * @property start comment start marker
- * @property def parsed Stitcher code
- * @property end comment end marker
- * @property scope scope assigned to the block, or `null` if this is a closer
+ * @property start Comment start marker
+ * @property def Parsed Stitcher code
+ * @property end Comment end marker
+ * @property scope Scope assigned to the block, or `null` if this is a closer
  */
 @Serializable
 data class CodeBlock(

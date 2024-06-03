@@ -23,9 +23,9 @@ import java.io.Reader
 /**
  * Evaluates [Definition]s and modifies the AST in-place.
  *
- * @property source scope to modify
- * @property recognizers comment recognizers used to re-parse uncommented blocks
- * @property params input parameters
+ * @property source Scope to modify
+ * @property recognizers Comment recognizers used to reparse uncommented blocks
+ * @property params Input parameters
  */
 // TODO: Handle different comment styles
 class Transformer(

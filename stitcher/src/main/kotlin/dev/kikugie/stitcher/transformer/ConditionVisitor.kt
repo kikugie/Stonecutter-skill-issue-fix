@@ -11,7 +11,7 @@ import dev.kikugie.stitcher.data.token.Token
 /**
  * Evaluates the passed [Component]s boolean value.
  *
- * @property params input parameters for the used identifiers
+ * @property params Input parameters for the used identifiers
  */
 class ConditionVisitor(private val params: TransformParameters) : Component.Visitor<Boolean> {
     override fun visitUnary(it: Unary): Boolean = when(it.operator.type) {

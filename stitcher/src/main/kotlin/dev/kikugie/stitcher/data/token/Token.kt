@@ -21,7 +21,7 @@ data class Token(
      * This is stored for error reporting and to avoid double-parsing some values.
      *
      * Deserialized tokens are assumed to be valid and shouldn't need this.
-     * @property metadata map containing the metadata
+     * @property metadata Map containing the metadata
      */
     private val metadata: MutableMap<KClass<*>, Any> by lazy { mutableMapOf() }
 
@@ -32,7 +32,7 @@ data class Token(
      * This is done by the parser in case lexer has identified the type incorrectly.
      * This method is preferable to manual instance creation, because it preserves [metadata]
      *
-     * @param type new type
+     * @param type New type
      */
     fun withType(type: TokenType) = Token(value, type).also {
         it.metadata.putAll(metadata)

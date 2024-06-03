@@ -21,11 +21,11 @@ import java.util.*
 /**
  * Parser for the entire file contents.
  *
- * @property handlerFactory exception collector function for each comment
+ * @property handlerFactory Exception collector function for each comment
  * @constructor
  * Creates parser from a reader, directly running the [Scanner]
  *
- * @param input a sequence of tokens produced by the scanner or a reader to be scanned
+ * @param input Sequence of tokens produced by the scanner or a reader to be scanned
  */
 class FileParser(
     input: Sequence<Token>,
@@ -60,7 +60,7 @@ class FileParser(
     /**
      * Parses the input sequence, creating an AST of scopes and blocks.
      *
-     * @return root scope of [NullType], which cannot be closed
+     * @return Root scope of [NullType], which cannot be closed
      */
     fun parse(): Scope = iter.forEach {
         when (it.type) {

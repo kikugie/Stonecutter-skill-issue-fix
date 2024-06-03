@@ -20,9 +20,9 @@ import dev.kikugie.stitcher.transformer.TransformParameters
 /**
  * Parses content of an individual comment into a [Definition].
  *
- * @property lexer assigned lexer with configured char sequence for the comment
- * @property handler exception collector
- * @property data parameters used by the transformer to verify identifiers or `null` if no verification is needed
+ * @property lexer Assigned lexer with configured char sequence for the comment
+ * @property handler Exception collector
+ * @property data Parameters used by the transformer to verify identifiers or `null` if no verification is needed
  */
 class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler, private val data: TransformParameters? = null) {
     val errors get() = lexer.errors.asSequence() + handler.errors
@@ -38,7 +38,7 @@ class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler
     /**
      * Parses the token sequence produced by the [lexer].
      *
-     * @return parsed definition or `null` if the sequence is not a Stitcher expression
+     * @return Parsed definition or `null` if the sequence is not a Stitcher expression
      */
     fun parse(): Definition? {
         val mode = lexer.advance()?.type ?: return null

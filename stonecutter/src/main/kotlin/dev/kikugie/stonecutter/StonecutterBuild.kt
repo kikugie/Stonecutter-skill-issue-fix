@@ -16,7 +16,7 @@ import kotlin.io.path.exists
 /**
  * Stonecutter plugin applied to the versioned build file.
  *
- * @property project the effective Gradle project
+ * @property project The effective Gradle project
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 @OptIn(ExperimentalPathApi::class)
