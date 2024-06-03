@@ -5,10 +5,13 @@ layout: home
 hero:
   name: Stonecutter Wiki
   tagline: Modern Gradle plugin for multi-version management
+features:
+  - title: Code documentation
+    icon: 🛠
+    details: This is an outdated version of Stonecutter. The wiki is incomplete and added here only for archival purposes.
+    link: /stonecutter/home
+    linkText: Old wiki
 ---
-
-## Warning
-This is an outdated version of Stonecutter. The wiki is incomplete and added here only for archival purposes.
 
 <!--suppress ES6UnusedImports, HtmlUnknownAttribute -->
 <script setup>
