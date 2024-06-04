@@ -9,7 +9,7 @@ features:
   - title: Code documentation
     icon: 🛠
     details: This is an outdated version of Stonecutter. The wiki is incomplete and added here only for archival purposes.
-    link: /stonecutter/home
+    link: /0.3.9/stonecutter/home
     linkText: Old wiki
 ---
 
