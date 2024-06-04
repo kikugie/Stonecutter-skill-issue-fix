@@ -201,6 +201,7 @@ open class StonecutterBuild internal constructor(val project: Project) {
             toVersion.set(current)
             fromVersion.set(active)
 
+            chiseled.set(true)
             constants.set(this@StonecutterBuild.constants)
             swaps.set(this@StonecutterBuild.swaps)
             dependencies.set(this@StonecutterBuild.dependencies)

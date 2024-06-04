@@ -28,6 +28,9 @@ import kotlin.system.measureTimeMillis
 @OptIn(ExperimentalPathApi::class)
 internal abstract class StonecutterTask : DefaultTask() {
     @get:Input
+    abstract val chiseled: Property<Boolean>
+
+    @get:Input
     abstract val input: Property<Path>
 
     @get:Input
@@ -57,6 +60,11 @@ internal abstract class StonecutterTask : DefaultTask() {
     // TODO
     private var debug = false
 
+    init {
+        @Suppress("LeakingThis")
+        chiseled.convention(false)
+    }
+
     @TaskAction
     fun run() {
         if (!input.isPresent || !output.isPresent || !toVersion.isPresent)
@@ -69,7 +77,8 @@ internal abstract class StonecutterTask : DefaultTask() {
     }
 
     private fun createManager(): FileManager {
-        fun cacheDir(pr: StonecutterProject) = project.project(pr.project).buildDirectory.toPath().resolve("stonecutterCache")
+        val dest = if (chiseled.get()) project.parent!! else project
+        fun cacheDir(pr: StonecutterProject) = dest.project(pr.project).buildDirectory.toPath().resolve("stonecutterCache")
         val deps = dependencies.get().toMutableMap()
         val mcVersion = deps["minecraft"] ?: SemanticVersionParser.parse(toVersion.get().version)
         deps["minecraft"] = mcVersion
