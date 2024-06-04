@@ -113,7 +113,7 @@ internal abstract class StonecutterTask : DefaultTask() {
             Files.createDirectories(out.parent)
             out.writeText(
                 content,
-                StandardCharsets.ISO_8859_1,
+                StandardCharsets.UTF_8,
                 StandardOpenOption.CREATE,
                 StandardOpenOption.TRUNCATE_EXISTING
             )

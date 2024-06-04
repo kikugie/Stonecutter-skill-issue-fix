@@ -23,7 +23,7 @@ class FileManager(
     private val inputCache: Path,
     private val outputCache: Path,
     private val filter: (Path) -> Boolean,
-    private val charset: Charset = StandardCharsets.ISO_8859_1,
+    private val charset: Charset = StandardCharsets.UTF_8,
     private val recognizers: Iterable<CommentRecognizer>,
     private val params: TransformParameters,
     private val debug: Boolean = false,
