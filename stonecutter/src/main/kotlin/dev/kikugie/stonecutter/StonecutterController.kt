@@ -21,6 +21,8 @@ open class StonecutterController internal constructor(project: Project) {
             ?: throw StonecutterGradleException("Project ${project.path} is not registered. This might've been caused by removing a project while its active")
     private var configuration: Action<StonecutterBuild>? = null
 
+    lateinit var current: StonecutterProject
+        private set
     val versions: List<StonecutterProject> get() = setup.versions
     val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
     var includeResources = false
@@ -34,8 +36,10 @@ open class StonecutterController internal constructor(project: Project) {
     }
 
     infix fun active(str: String) {
-        setup.current = setup.versions.find { it.project == str }?.asActive()
+        val selected = setup.versions.find { it.project == str }?.asActive()
             ?: throw GradleException("[Stonecutter] Project $str is not registered")
+        setup.current = selected
+        current = selected
     }
 
     infix fun registerChiseled(provider: TaskProvider<*>) {
