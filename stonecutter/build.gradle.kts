@@ -38,6 +38,7 @@ tasks.withType<DokkaTask>().configureEach {
     moduleName.set("Stonecutter Plugin")
     dokkaSourceSets {
         configureEach {
+            reportUndocumented = true
             skipEmptyPackages = true
             sourceRoots.setFrom(file("src/main/kotlin/dev/kikugie/stonecutter"))
         }

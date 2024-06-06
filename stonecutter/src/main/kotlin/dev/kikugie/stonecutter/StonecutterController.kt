@@ -21,10 +21,25 @@ open class StonecutterController internal constructor(project: Project) {
             ?: throw StonecutterGradleException("Project ${project.path} is not registered. This might've been caused by removing a project while its active")
     private var configuration: Action<StonecutterBuild>? = null
 
+    /**
+     * Project assigned by `stonecutter.active "...".
+     */
     lateinit var current: StonecutterProject
         private set
+
+    /**
+     * All projects registered by [StonecutterSettings].
+     */
     val versions: List<StonecutterProject> get() = setup.versions
+
+    /**
+     * Chiseled task type accessor to avoid imports.
+     */
     val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
+
+    /**
+     * Includes non `.java` and `.kt` files in the comment processing.
+     */
     var includeResources = false
 
     init {
@@ -35,6 +50,13 @@ open class StonecutterController internal constructor(project: Project) {
         project.afterEvaluate { setupProject(this) }
     }
 
+    /**
+     * Assigns the active version to this project.
+     *
+     * **Do not call on your own.**
+     *
+     * @param str Project name
+     */
     infix fun active(str: String) {
         val selected = setup.versions.find { it.project == str }?.asActive()
             ?: throw GradleException("[Stonecutter] Project $str is not registered")
@@ -42,10 +64,20 @@ open class StonecutterController internal constructor(project: Project) {
         current = selected
     }
 
+    /**
+     * Registers a [ChiseledTask] that delegates to the created task.
+     *
+     * @param provider Delegate task provider
+     */
     infix fun registerChiseled(provider: TaskProvider<*>) {
         setup.register(provider.name)
     }
 
+    /**
+     * Allows accessing [StonecutterBuild] in the controller to organize the configuration.
+     *
+     * @param action Versioned configuration action
+     */
     infix fun configureEach(action: Action<StonecutterBuild>) {
         configuration = action
     }

@@ -164,10 +164,12 @@ open class StonecutterBuild internal constructor(val project: Project) {
         values.forEach { (id, ver) -> dependencies[validate(id)] = SemanticVersionParser.parse(ver) }
     }
 
+    @Deprecated("To be reworked")
     fun whitelist(criteria: (Path) -> Boolean) {
         filters += criteria
     }
 
+    @Deprecated("To be reworked")
     fun blacklist(criteria: (Path) -> Boolean) {
         filters += { !criteria(it) }
     }

@@ -19,7 +19,7 @@ import java.security.MessageDigest
 import kotlin.io.path.*
 
 @OptIn(ExperimentalSerializationApi::class)
-class FileManager(
+internal class FileManager(
     private val inputCache: Path,
     private val outputCache: Path,
     private val filter: (Path) -> Boolean,
