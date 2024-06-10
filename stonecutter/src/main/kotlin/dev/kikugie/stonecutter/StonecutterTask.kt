@@ -52,7 +52,7 @@ internal abstract class StonecutterTask : DefaultTask() {
     abstract val dependencies: MapProperty<String, SemanticVersion>
 
     @get:Input
-    abstract val filter: Property<(Path) -> Boolean>
+    abstract val filter: Property<FileFilter>
 
     private lateinit var manager: FileManager
     private var transformed = AtomicInteger(0)

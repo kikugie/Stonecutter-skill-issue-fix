@@ -52,8 +52,8 @@ open class StonecutterBuild internal constructor(val project: Project) {
     /**
      * Creates a swap id.
      *
-     * @param identifier swap name
-     * @param replacement replacement string
+     * @param identifier Swap name
+     * @param replacement Replacement string
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#swaps">Wiki</a>
      */
     fun swap(identifier: String, replacement: String) {
@@ -63,8 +63,8 @@ open class StonecutterBuild internal constructor(val project: Project) {
     /**
      * Creates a swap id.
      *
-     * @param identifier swap name
-     * @param replacement replacement string provider
+     * @param identifier Swap name
+     * @param replacement Replacement string provider
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#swaps">Wiki</a>
      */
     fun swap(identifier: String, replacement: () -> String) {
@@ -74,7 +74,7 @@ open class StonecutterBuild internal constructor(val project: Project) {
     /**
      * Adds provided id to value pairs to the swap map.
      *
-     * @param values entries of ids to replacements
+     * @param values Entries of ids to replacements
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#swaps">Wiki</a>
      */
     fun swaps(vararg values: Pair<String, String>) {
@@ -84,7 +84,7 @@ open class StonecutterBuild internal constructor(val project: Project) {
     /**
      * Adds provided id to value pairs to the swap map.
      *
-     * @param values entries of ids to replacements
+     * @param values Entries of ids to replacements
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#swaps">Wiki</a>
      */
     fun swaps(values: Iterable<Pair<String, String>>) {
@@ -94,8 +94,8 @@ open class StonecutterBuild internal constructor(val project: Project) {
     /**
      * Creates a constant accessible in stonecutter conditions.
      *
-     * @param identifier constant name
-     * @param value boolean value
+     * @param identifier Constant name
+     * @param value Boolean value
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
      */
     fun const(identifier: String, value: Boolean) {
@@ -105,8 +105,8 @@ open class StonecutterBuild internal constructor(val project: Project) {
     /**
      * Creates a constant accessible in stonecutter conditions.
      *
-     * @param identifier constant name
-     * @param value boolean value provider
+     * @param identifier Constant name
+     * @param value Boolean value provider
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
      */
     fun const(identifier: String, value: () -> Boolean) {
@@ -116,7 +116,7 @@ open class StonecutterBuild internal constructor(val project: Project) {
     /**
      * Adds provided id to value pairs to the constant map.
      *
-     * @param values entries of ids to boolean values
+     * @param values Entries of ids to boolean values
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
      */
     fun consts(vararg values: Pair<String, Boolean>) {
@@ -126,7 +126,7 @@ open class StonecutterBuild internal constructor(val project: Project) {
     /**
      * Adds provided id to value pairs to the constant map.
      *
-     * @param values entries of ids to boolean values
+     * @param values Entries of ids to boolean values
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
      */
     fun consts(values: Iterable<Pair<String, Boolean>>) {
@@ -136,8 +136,8 @@ open class StonecutterBuild internal constructor(val project: Project) {
     /**
      * Adds a dependency to the semver checks.
      *
-     * @param identifier dependency name
-     * @param version dependency version to check against in semantic version format
+     * @param identifier Dependency name
+     * @param version Dependency version to check against in semantic version format
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#dependencies">Wiki</a>
      */
     fun dependency(identifier: String, version: String) {
@@ -147,7 +147,7 @@ open class StonecutterBuild internal constructor(val project: Project) {
     /**
      * Adds provided id to value pairs to the semver checks.
      *
-     * @param values entries of ids to versions
+     * @param values Entries of ids to versions
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#dependencies">Wiki</a>
      */
     fun dependencies(vararg values: Pair<String, String>) {
@@ -157,38 +157,62 @@ open class StonecutterBuild internal constructor(val project: Project) {
     /**
      * Adds provided id to value pairs to the semver checks.
      *
-     * @param values entries of ids to versions
+     * @param values Entries of ids to versions
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#dependencies">Wiki</a>
      */
     fun dependencies(values: Iterable<Pair<String, String>>) {
         values.forEach { (id, ver) -> dependencies[validate(id)] = SemanticVersionParser.parse(ver) }
     }
 
-    @Deprecated("To be reworked")
-    fun whitelist(criteria: (Path) -> Boolean) {
-        filters += criteria
-    }
-
-    @Deprecated("To be reworked")
-    fun blacklist(criteria: (Path) -> Boolean) {
-        filters += { !criteria(it) }
-    }
-
     /**
      * Parses both parameters as semantic versions and compares them.
      *
-     * @param left version on the left side of the comparison
-     * @param right version on the right side of the comparison
+     * @param left Version on the left side of the comparison
+     * @param right Version on the right side of the comparison
      * @return 1 if the first version is greater, -1 if the second is greater, 0 if they are equal
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
     fun compare(left: String, right: String) =
         SemanticVersionParser.parse(left).compareTo(SemanticVersionParser.parse(right))
 
+    /**
+     * Excludes a file or directory from being processed.
+     *
+     * @param path Absolute path to the file.
+     */
+    fun exclude(path: File) {
+        excludedPaths.add(path.toPath())
+    }
+
+    /**
+     * Excludes a file or directory from being processed.
+     *
+     * @param path Absolute path to the file.
+     */
+    fun exclude(path: Path) {
+        excludedPaths.add(path)
+    }
+
+    /**
+     * Excludes a file or directory from being processed.
+     *
+     * @param path Path to the file relative to the parent project directory (where `stonecutter.gradle[.kts]` is located)
+     * or a file extension qualifier (i.e. `*.json`).
+     */
+    fun exclude(path: String) {
+        require(path.isNotBlank()) { "Path must not be empty" }
+        if (path.startsWith("*.")) excludedExtensions.add(path.substring(2))
+        else excludedPaths.add(project.parent!!.file(path).toPath())
+    }
+
     internal val constants = mutableMapOf<String, Boolean>()
     internal val swaps = mutableMapOf<String, String>()
-    internal val filters = mutableListOf<(Path) -> Boolean>()
     internal val dependencies = mutableMapOf<String, SemanticVersion>()
+    internal val excludedExtensions = mutableSetOf(
+        "png", "jpg", "jpeg", "webp", "gif", "svg",
+        "mp3", "wav", "ogg",
+    )
+    internal val excludedPaths = mutableSetOf<Path>()
 
     private fun validate(id: String): String {
         require(id.all(::allowed)) { "Invalid identifier: $id" }
@@ -207,7 +231,7 @@ open class StonecutterBuild internal constructor(val project: Project) {
             constants.set(this@StonecutterBuild.constants)
             swaps.set(this@StonecutterBuild.swaps)
             dependencies.set(this@StonecutterBuild.dependencies)
-            filter.set { p -> if (filters.isEmpty()) true else filters.all { it(p) } }
+            filter.set(FileFilter(excludedExtensions, excludedPaths))
 
             input.set(project.parent!!.file("./src").toPath())
             val out = project.buildDirectory.toPath().resolve("chiseledSrc")

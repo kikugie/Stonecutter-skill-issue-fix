@@ -22,7 +22,7 @@ import kotlin.io.path.*
 internal class FileManager(
     private val inputCache: Path,
     private val outputCache: Path,
-    private val filter: (Path) -> Boolean,
+    private val filter: FileFilter,
     private val charset: Charset = StandardCharsets.UTF_8,
     private val recognizers: Iterable<CommentRecognizer>,
     private val params: TransformParameters,
@@ -31,7 +31,7 @@ internal class FileManager(
     private val parametersMatch = updateParameters()
 
     fun process(root: Path, source: Path): String? {
-        if (!filter(source)) return null
+        if (!filter.shouldProcess(source)) return null
         val text = root.resolve(source).readText()
         val hash = text.hash("MD5")
 

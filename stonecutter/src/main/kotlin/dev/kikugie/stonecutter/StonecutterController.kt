@@ -37,11 +37,6 @@ open class StonecutterController internal constructor(project: Project) {
      */
     val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
 
-    /**
-     * Includes non `.java` and `.kt` files in the comment processing.
-     */
-    var includeResources = false
-
     init {
         versions.forEach { project.project(it.project).pluginManager.apply(StonecutterPlugin::class.java) }
         project.tasks.create("chiseledStonecutter") {
@@ -99,10 +94,6 @@ open class StonecutterController internal constructor(project: Project) {
                 "Set active project to ${ver.project}", StonecutterTask::class.java
             ).applyConfig(root, project, ver)
             val build = project.extensions.getByType<StonecutterBuild>()
-            if (!includeResources) build.whitelist {
-                val extension = it.extension
-                extension == "java" || extension == "kt"
-            }
             configuration?.execute(build)
         }
     }
@@ -117,7 +108,7 @@ open class StonecutterController internal constructor(project: Project) {
         constants.set(build.constants)
         swaps.set(build.swaps)
         dependencies.set(build.dependencies)
-        filter.set { p -> if (build.filters.isEmpty()) true else build.filters.all { it(p) } }
+        filter.set(FileFilter(build.excludedExtensions, build.excludedPaths))
 
         input.set(root.file("./src").toPath())
         output.set(input.get())
