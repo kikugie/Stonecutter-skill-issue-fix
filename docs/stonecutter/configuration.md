@@ -59,14 +59,25 @@ stonecutter.dependency("minecraft", "1.20.6")
 This may be useful in cases where you have both multi-version and multi-loader setup, but be careful with this knowledge.
 
 ### Filters
-Files can be filtered with the following functions:
-```kotlin
-stonecutter.whitelist { it: Path ->
-}
+Stonecutter allows excluding files from the comment processor with `stonecutter.exclude()`.
 
-stonecutter.blacklist { it: Path ->
-}
+The first method simply takes a path to the file or directory:
+```kotlin [build.gradle[.kts]]
+stonecutter.exclude(rootProject.file("src/main/resources/assets/lang"))
 ```
+**Be careful with this method!**. If you use `project.file()`, the start directory will be the corresponding entry in `versions/`, 
+not where your `stonecutter.gradle[.kts]` is located.
+
+The second method is safer and provides extra functionality.
+```kotlin [build.gradle[.kts]]
+stonecutter.exclude("src/main/resources/assets/lang")
+```
+This automatically starts in the directory of `stonecutter.gradle[.kts]`. However, it can also exclude file formats entirely:
+```kotlin [build.gradle[.kts]]
+stonecutter.exclude("*.json")
+```
+**`*.` prefix is important for it to differentiate a path from a file extension.**  
+By default, Stonecutter excludes common image and audio formats to avoid occasional byte sequences being recognized as comments.
 
 ### Comparisons
 Sometimes it can be handy to compare semantic versions in the buildscript (in a `swap` or `const` definition).

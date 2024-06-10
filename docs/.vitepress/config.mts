@@ -14,7 +14,7 @@ export default defineVersionedConfig(__dirname, {
   lang: "en-US",
   title: "Stonecutter Wiki",
   versioning: {
-    latestVersion: "0.4-beta.3",
+    latestVersion: "0.4-beta.4",
   },
   cleanUrls: true,
   themeConfig: {
