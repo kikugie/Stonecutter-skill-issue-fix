@@ -49,6 +49,15 @@ kotlin {
     jvmToolchain(16)
 }
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+tasks.named<Jar>("javadocJar") {
+    from(tasks.named("dokkaJavadoc"))
+}
+
 publishing {
     repositories {
         maven {
@@ -66,7 +75,7 @@ publishing {
             groupId = project.group.toString()
             artifactId = "stonecutter"
             version = project.version.toString()
-            artifact(tasks.getByName("jar"))
+            from(components["java"])
         }
     }
 }
