@@ -6,8 +6,8 @@ import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
-import kotlin.io.path.extension
 
 /**
  * Runs for `stonecutter.gradle` file, applying project configurations to versions and generating versioned tasks.
@@ -80,41 +80,43 @@ open class StonecutterController internal constructor(project: Project) {
     private fun setupProject(root: Project) {
         val vcsProject = root.project(setup.vcsVersion.project)
         val vcs = setup.vcsVersion
-        root.tasks.create(
-            "Reset active project", StonecutterTask::class.java
-        ).applyConfig(root, vcsProject, vcs)
+        createStonecutterTask("Reset active project", root, vcsProject, vcs) {
+            "Sets active version to ${vcs.project}. Run this before making a commit."
+        }
         val active = setup.current
-        root.tasks.create(
-            "Refresh active project", StonecutterTask::class.java
-        ).applyConfig(root, root.project(active.project), active)
-
+        createStonecutterTask("Refresh active project", root, root.project(active.project), active) {
+            "Runs the comment processor on the active version. Useful for fixing comments in wrong states."
+        }
         setup.versions.forEach { ver ->
             val project = root.project(ver.project)
-            root.tasks.create(
-                "Set active project to ${ver.project}", StonecutterTask::class.java
-            ).applyConfig(root, project, ver)
+            createStonecutterTask("Set active project to ${ver.project}", root, project, ver) {
+                "Sets the active project to ${ver.project}, processing all versioned comments."
+            }
             val build = project.extensions.getByType<StonecutterBuild>()
             configuration?.execute(build)
         }
     }
 
-    private fun StonecutterTask.applyConfig(root: Project, subproject: Project, version: StonecutterProject) {
-        group = "stonecutter"
+    private inline fun createStonecutterTask(name: String, root: Project, subproject: Project, version: StonecutterProject, crossinline desc: () -> String) {
+        root.tasks.create<StonecutterTask>(name) {
+            group = "stonecutter"
+            description = desc()
 
-        toVersion.set(version)
-        fromVersion.set(setup.current)
+            toVersion.set(version)
+            fromVersion.set(setup.current)
 
-        val build = subproject.extensions.getByType<StonecutterBuild>()
-        constants.set(build.constants)
-        swaps.set(build.swaps)
-        dependencies.set(build.dependencies)
-        filter.set(FileFilter(build.excludedExtensions, build.excludedPaths))
+            val build = subproject.extensions.getByType<StonecutterBuild>()
+            constants.set(build.constants)
+            swaps.set(build.swaps)
+            dependencies.set(build.dependencies)
+            filter.set(FileFilter(build.excludedExtensions, build.excludedPaths))
 
-        input.set(root.file("./src").toPath())
-        output.set(input.get())
+            input.set(root.file("./src").toPath())
+            output.set(input.get())
 
-        doLast {
-            controller.updateHeader(this.project.buildFile.toPath(), version.project)
+            doLast {
+                controller.updateHeader(this.project.buildFile.toPath(), version.project)
+            }
         }
     }
 }
