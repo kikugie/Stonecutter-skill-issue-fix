@@ -14,7 +14,7 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.4-beta.4"
+    id("dev.kikugie.stonecutter") version "0.4-beta.5"
 }
 
 extensions.configure<StonecutterSettings> {
@@ -41,7 +41,7 @@ pluginManagement {
 }
 
 plugins {
-    id "dev.kikugie.stonecutter" version "0.4.0-alpha.9"
+    id "dev.kikugie.stonecutter" version "0.4-beta.5"
 }
 
 stonecutter {
@@ -116,7 +116,7 @@ For example you can add plugins like this:
 ```kts
 plugins {
     id("dev.kikugie.stonecutter")
-    id("fabric-loom") version "1.6-SNAPSHOT" apply false
+    id("fabric-loom") version "0.4-beta.5" apply false
 }
 ```
 This way it prevents Gradle from reconfiguring the plugin for every subproject.
