@@ -21,10 +21,11 @@ open class StonecutterConfigurationBuilder internal constructor() {
     var vcsVersion: ProjectName
         get() = vcsVersionImpl ?: versionsImpl.keys.first()
         set(value) {
+            require(value in versionsImpl) { "VCS version must be one of the registered versions!" }
             vcsVersionImpl = value
         }
     internal val versions: Iterable<StonecutterProject> = versionsImpl.values
-    internal val vcsProject: StonecutterProject by lazy { versionsImpl[vcsVersion]!! }
+    internal val vcsProject: StonecutterProject get() = versionsImpl[vcsVersion]!!
 
     /**
      * Creates a subproject with separate directory and Minecraft version.
@@ -58,6 +59,10 @@ open class StonecutterConfigurationBuilder internal constructor() {
         projects.forEach(::vers)
     }
 
+    /**
+     * The base version for this project.
+     * It is selected on the first setup and targeted by `Reset active project`
+     */
     fun vcsVersion(version: String) {
         vcsVersion = version
     }
