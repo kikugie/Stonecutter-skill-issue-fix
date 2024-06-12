@@ -71,7 +71,7 @@ class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler
             IDENTIFIER -> {
                 if (identifier == Token.EMPTY) identifier = lookup()!!.toToken()
                 else handler.accept(currentRange, "Only one swap identifier is allowed")
-                if (data?.dependencies?.containsKey(identifier.value) == false)
+                if (data?.swaps?.containsKey(identifier.value) == false)
                     handler.accept(currentRange, "Could not find identifier: ${identifier.value}")
             }
 
