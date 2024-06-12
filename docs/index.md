@@ -157,3 +157,5 @@ const members = [
 ## Projects using Stonecutter
 
 <VPTeamMembers size="small" :members="members" />
+
+*Projects are selected as one per author. If you want your project to be included or excluded, open a GitHub issue or contact on Discord.*
