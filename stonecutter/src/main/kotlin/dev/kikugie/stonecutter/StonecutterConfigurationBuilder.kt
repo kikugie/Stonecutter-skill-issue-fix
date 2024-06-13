@@ -30,7 +30,7 @@ open class StonecutterConfigurationBuilder internal constructor() {
     /**
      * Creates a subproject with separate directory and Minecraft version.
      *
-     * @param project subproject directory to be used in `./versions/`. Can't be a duplicate
+     * @param project Subproject directory to be used in `./versions/`. Can't be a duplicate
      * @param version Minecraft version assigned to this subproject. Can be assigned to multiple subprojects
      */
     @JvmOverloads
@@ -43,7 +43,7 @@ open class StonecutterConfigurationBuilder internal constructor() {
      * Subproject directory and version are set to the same value.
      * For more precise controls use [vers].
      *
-     * @param projects subprojects to be included
+     * @param projects Subprojects to be included
      */
     fun versions(vararg projects: ProjectName) =
         versions(projects.asIterable())
@@ -53,7 +53,7 @@ open class StonecutterConfigurationBuilder internal constructor() {
      * Subproject directory and version are set to the same value.
      * For more precise controls use [vers].
      *
-     * @param projects subprojects to be included
+     * @param projects Subprojects to be included
      */
     fun versions(projects: Iterable<ProjectName>) {
         projects.forEach(::vers)

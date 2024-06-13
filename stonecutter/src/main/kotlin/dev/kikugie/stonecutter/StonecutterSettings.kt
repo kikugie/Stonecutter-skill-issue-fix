@@ -35,7 +35,7 @@ open class StonecutterSettings(private val settings: Settings) {
     /**
      * Configures the version structure for this project.
      *
-     * @param builder configuration scope
+     * @param builder Configuration scope
      */
     fun shared(builder: Action<StonecutterConfigurationBuilder>) {
         shared = StonecutterConfigurationBuilder(builder)
@@ -44,7 +44,7 @@ open class StonecutterSettings(private val settings: Settings) {
     /**
      * Assigns the specified configuration to projects.
      *
-     * @param projects project references
+     * @param projects Project references
      */
     fun create(projects: Iterable<ProjectDescriptor>) {
         projects.forEach(::create)
@@ -53,7 +53,7 @@ open class StonecutterSettings(private val settings: Settings) {
     /**
      * Assigns the specified configuration to projects.
      *
-     * @param projects project references
+     * @param projects Project references
      */
     fun create(vararg projects: ProjectDescriptor) {
         projects.forEach(::create)
@@ -62,7 +62,7 @@ open class StonecutterSettings(private val settings: Settings) {
     /**
      * Assigns the specified configuration to the project.
      *
-     * @param project project reference
+     * @param project Project reference
      */
     fun create(project: ProjectDescriptor) {
         val vcs = shared.vcsProject
