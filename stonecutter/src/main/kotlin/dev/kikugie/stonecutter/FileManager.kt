@@ -36,7 +36,7 @@ internal class FileManager(
         val hash = text.hash("MD5")
 
         val cachePath = source.hashName(hash, source.extension)
-        val cachedOutput = if (parametersMatch && !debug) getCachedOutput(cachePath) else null
+        val cachedOutput = if (parametersMatch) getCachedOutput(cachePath) else null
         if (cachedOutput != null)
             return if (cachedOutput == text) null
             else cachedOutput
@@ -76,7 +76,7 @@ internal class FileManager(
         val saved: TransformParameters? = runIgnoring {
             Yaml.default.decodeFromString(dest.readText(charset))
         }
-        if (saved != null && saved == params) {
+        if (!debug && saved != null && saved == params) {
             LOGGER.debug("Found matching parameters for {}", params)
             return true
         }

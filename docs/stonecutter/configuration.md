@@ -82,10 +82,18 @@ By default, Stonecutter excludes common image and audio formats to avoid occasio
 ### Comparisons
 Sometimes it can be handy to compare semantic versions in the buildscript (in a `swap` or `const` definition).
 For this purpose `stonecutter.compare` exists:
-````kotlin
+```kotlin
 val mcVersion = stonecutter.current.version // = 1.19.4
 val isOneTwentyPlus = stonecutter.compare("1.20", mcVersion) >= 0 // false
-````
+```
+
+### Debug mode
+Enabled with `stonecutter.debug(true)` or `stonecutter.debug = true`.  
+Currently, it stores the generated ASTs in subproject's `build/stonecutterCache/debugAst/` 
+and adds exception stack traces to the report.
+
+Don't have it enabled all the time, because it disables the caching optimisations, 
+which will significantly slow down version switching.
 
 ## Plugin properties
 ### Project info
