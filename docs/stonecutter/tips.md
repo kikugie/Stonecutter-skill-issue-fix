@@ -117,7 +117,7 @@ class ModData {
 val mod = ModData()
 val mcVersion = stonecutter.current.version
 
-tasks.processResources { // [!code focus:13]
+tasks.processResources { // [!code focus:14]
     inputs.property("id", mod.id)
     inputs.property("name", mod.name)
     inputs.property("version", mod.version)

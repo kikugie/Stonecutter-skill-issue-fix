@@ -22,7 +22,7 @@ export default defineVersionedConfig(__dirname, {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Stonecutter Docs', link: '/stonecutter/introduction' },
+      { text: 'Stonecutter Wiki', link: '/stonecutter/introduction' },
       { text: 'Stonecutter KDoc', link: '/dokka/', target: '_self' },
     ],
     outline: {
