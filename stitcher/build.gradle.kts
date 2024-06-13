@@ -35,7 +35,6 @@ tasks.withType<DokkaTask>().configureEach {
         configureEach {
             reportUndocumented = true
             skipEmptyPackages = true
-            sourceRoots.setFrom(file("src/main/kotlin/dev/kikugie/stitcher"), file("src/main/kotlin/dev/kikugie/semver"))
         }
     }
 }

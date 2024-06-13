@@ -22,7 +22,7 @@ open class StonecutterController internal constructor(project: Project) {
     private var configuration: Action<StonecutterBuild>? = null
 
     /**
-     * Project assigned by `stonecutter.active "...".
+     * Project assigned by `stonecutter.active "..."`.
      */
     lateinit var current: StonecutterProject
         private set
