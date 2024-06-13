@@ -42,6 +42,35 @@ open class StonecutterSettings(private val settings: Settings) {
     }
 
     /**
+     * Includes the provided project path and assigns the specified configuration to it.
+     *
+     * @param project Project path
+     */
+    fun create(project: String) {
+        val actual = project.removePrefix(":")
+        settings.include(actual)
+        create(settings.project(":$actual"))
+    }
+
+    /**
+     * Includes the provided project paths and assigns the specified configuration to them.
+     *
+     * @param projects Project paths
+     */
+    fun create(vararg projects: String) {
+        projects.forEach(::create)
+    }
+
+    /**
+     * Includes the provided project paths and assigns the specified configuration to them.
+     *
+     * @param projects Project paths
+     */
+    fun create(projects: Iterable<String>) {
+        projects.forEach(::create)
+    }
+
+    /**
      * Assigns the specified configuration to projects.
      *
      * @param projects Project references
