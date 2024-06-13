@@ -6,19 +6,22 @@ import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
+import java.nio.file.Path
 
 /**
  * Runs for `stonecutter.gradle` file, applying project configurations to versions and generating versioned tasks.
  */
 @Suppress("MemberVisibilityCanBePrivate")
-open class StonecutterController internal constructor(private val project: Project) {
-    private val controller: ControllerManager = project.controller()
-        ?: throw StonecutterGradleException("Project ${project.path} is not a Stonecutter controller. What did you even do to get this error?")
+open class StonecutterController internal constructor(root: Project) : StonecutterConfiguration {
+    private val controller: ControllerManager = root.controller()
+        ?: throw StonecutterGradleException("Project ${root.path} is not a Stonecutter controller. What did you even do to get this error?")
     private val setup: StonecutterSetup =
-        project.gradle.extensions.getByType(StonecutterSetup.Container::class.java)[project]
-            ?: throw StonecutterGradleException("Project ${project.path} is not registered. This might've been caused by removing a project while its active")
+        root.gradle.extensions.getByType(StonecutterSetup.Container::class.java)[root]
+            ?: throw StonecutterGradleException("Project ${root.path} is not registered. This might've been caused by removing a project while its active")
+    private var globalDebug: Boolean? = null
 
     /**
      * Project assigned by `stonecutter.active "..."`.
@@ -27,9 +30,14 @@ open class StonecutterController internal constructor(private val project: Proje
         private set
 
     /**
-     * All projects registered by [StonecutterSettings].
+     * All versions registered by [StonecutterSettings].
      */
     val versions: List<StonecutterProject> get() = setup.versions
+
+    /**
+     * All projects registered by [StonecutterSettings].
+     */
+    val projects: List<Project> = setup.versions.map { root.project(it.project) }
 
     /**
      * Chiseled task type accessor to avoid imports.
@@ -37,12 +45,12 @@ open class StonecutterController internal constructor(private val project: Proje
     val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
 
     init {
-        println("Running Stonecutter 0.4-rc.1")
-        versions.forEach { project.project(it.project).pluginManager.apply(StonecutterPlugin::class.java) }
-        project.tasks.create("chiseledStonecutter") {
+        println("Running Stonecutter 0.4-rc.2")
+        versions.forEach { root.project(it.project).pluginManager.apply(StonecutterPlugin::class.java) }
+        root.tasks.create("chiseledStonecutter") {
             setup.versions.forEach { dependsOn("${it.project}:setupChiseledBuild") }
         }
-        project.afterEvaluate { setupProject(this) }
+        root.afterEvaluate { setupProject(this) }
     }
 
     /**
@@ -73,11 +81,19 @@ open class StonecutterController internal constructor(private val project: Proje
      *
      * @param action Versioned configuration action
      */
-    infix fun configureEach(action: Action<StonecutterBuild>) {
-        setup.versions.map { project.project(it.project) }.forEach {
-            action.execute(it.extensions.getByType<StonecutterBuild>())
+    infix fun configureEach(action: Action<StonecutterBuild>) = forEachProject { action.execute(this) }
+    override fun swap(identifier: String, replacement: String) = forEachProject { swap(identifier, replacement) }
+    override fun const(identifier: String, value: Boolean) = forEachProject { const(identifier, value) }
+    override fun dependency(identifier: String, version: String) = forEachProject { dependency(identifier, version) }
+    override fun exclude(path: Path) = forEachProject { exclude(path) }
+    override fun exclude(path: String) = forEachProject { exclude(path) }
+
+    override var debug: Boolean
+        get() = globalDebug ?: false
+        set(value) {
+            globalDebug = value
+            forEachProject { debug = value }
         }
-    }
 
     private fun setupProject(root: Project) {
         val vcsProject = root.project(setup.vcsVersion.project)
@@ -95,6 +111,10 @@ open class StonecutterController internal constructor(private val project: Proje
                 "Sets the active project to ${ver.project}, processing all versioned comments."
             }
         }
+    }
+
+    private inline fun forEachProject(action: StonecutterBuild.() -> Unit) {
+        projects.forEach { it.extensions.getByType<StonecutterBuild>().apply(action) }
     }
 
     private inline fun createStonecutterTask(name: String, root: Project, subproject: Project, version: StonecutterProject, crossinline desc: () -> String) {
