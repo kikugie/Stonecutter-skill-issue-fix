@@ -65,9 +65,11 @@ open class StonecutterSettings(private val settings: Settings) {
      * Includes the provided project paths and assigns the specified configuration to them.
      *
      * @param projects Project paths
+     * @return 🍌 to prevent JVM signature crash. Do whatever you want with it
      */
-    fun create(projects: Iterable<String>) {
+    fun create(projects: Iterable<String>): String {
         projects.forEach(::create)
+        return "🍌"
     }
 
     /**
