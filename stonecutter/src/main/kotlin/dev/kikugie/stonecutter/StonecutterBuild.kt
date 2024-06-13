@@ -149,7 +149,7 @@ open class StonecutterBuild internal constructor(val project: Project) : Stonecu
                 applyChiseled(it.allJava, it.java)
                 applyChiseled(it.resources)
             }
-        } catch (ignored: MissingPropertyException) {
+        } catch (_: MissingPropertyException) {
         }
     }
 }

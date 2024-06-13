@@ -41,6 +41,7 @@ export default defineVersionedConfig(__dirname, {
             { text: 'Developing your mod', link: '/stonecutter/launch' },
             { text: 'Versioned comments', link: '/stonecutter/comments' },
             { text: 'Stonecutter configuration', link: '/stonecutter/configuration' },
+            { text: 'Tips and tricks', link: '/stonecutter/tips' },
           ]
         }
       ]
