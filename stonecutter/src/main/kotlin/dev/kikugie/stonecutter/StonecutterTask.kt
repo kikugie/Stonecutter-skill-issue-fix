@@ -25,10 +25,14 @@ import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import kotlin.system.measureTimeMillis
 
+@Suppress("LeakingThis")
 @OptIn(ExperimentalPathApi::class)
 internal abstract class StonecutterTask : DefaultTask() {
     @get:Input
     abstract val chiseled: Property<Boolean>
+
+    @get:Input
+    abstract val debug: Property<Boolean>
 
     @get:Input
     abstract val input: Property<Path>
@@ -55,14 +59,12 @@ internal abstract class StonecutterTask : DefaultTask() {
     abstract val filter: Property<FileFilter>
 
     private lateinit var manager: FileManager
-    private var transformed = AtomicInteger(0)
-    private var total = AtomicInteger(0)
-    // TODO
-    private var debug = false
+    private val transformed = AtomicInteger(0)
+    private val total = AtomicInteger(0)
 
     init {
-        @Suppress("LeakingThis")
         chiseled.convention(false)
+        debug.convention(false)
     }
 
     @TaskAction
@@ -91,7 +93,7 @@ internal abstract class StonecutterTask : DefaultTask() {
             filter = filter.get(),
             recognizers = listOf(StandardMultiLine, StandardSingleLine),
             params = params,
-            debug = debug
+            debug = debug.get()
         )
     }
 
@@ -138,7 +140,7 @@ internal abstract class StonecutterTask : DefaultTask() {
                 message.append("    > $primary:\n")
                 for (line in (cause?.message ?: "").lines())
                     message.append("        $line\n")
-                if (debug && err !is SyntaxException) cause?.stackTrace?.forEach {
+                if (debug.get() && err !is SyntaxException) cause?.stackTrace?.forEach {
                     message.append("            $it\n")
                 }
                 append(message)

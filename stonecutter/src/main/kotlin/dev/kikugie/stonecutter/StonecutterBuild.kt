@@ -205,6 +205,26 @@ open class StonecutterBuild internal constructor(val project: Project) {
         else excludedPaths.add(project.parent!!.file(path).toPath())
     }
 
+    /**
+     * Enables Stonecutter debugging utilities.
+     *
+     * Currently, it creates human-readable ASTs in the cache folder
+     * and adds stack traces to reported exceptions.
+     *
+     * @param state Whenever the debug mode is enabled. Defaults to `false`
+     */
+    fun debug(state: Boolean) {
+        debug = state
+    }
+
+    /**
+     * Enables Stonecutter debugging utilities.
+     *
+     * Currently, it creates human-readable ASTs in the cache folder
+     * and adds stack traces to reported exceptions.
+     */
+    var debug = false
+
     internal val constants = mutableMapOf<String, Boolean>()
     internal val swaps = mutableMapOf<String, String>()
     internal val dependencies = mutableMapOf<String, SemanticVersion>()
