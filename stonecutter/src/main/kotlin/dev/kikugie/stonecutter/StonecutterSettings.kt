@@ -12,9 +12,9 @@ import kotlin.io.path.notExists
 @Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterSettings(private val settings: Settings) {
     private val projects = settings.gradle.extensions
-        .create("stonecutterProjects", StonecutterConfiguration.Container::class.java)
+        .create("stonecutterProjects", StonecutterSetup.Container::class.java)
     private val controller get() = if (kotlinController) KotlinController else GroovyController
-    private lateinit var shared: StonecutterConfigurationBuilder
+    private lateinit var shared: StonecutterSetupBuilder
 
     /**
      * Enables Kotlin buildscripts for the controller.
@@ -37,8 +37,8 @@ open class StonecutterSettings(private val settings: Settings) {
      *
      * @param builder Configuration scope
      */
-    fun shared(builder: Action<StonecutterConfigurationBuilder>) {
-        shared = StonecutterConfigurationBuilder(builder)
+    fun shared(builder: Action<StonecutterSetupBuilder>) {
+        shared = StonecutterSetupBuilder(builder)
     }
 
     /**

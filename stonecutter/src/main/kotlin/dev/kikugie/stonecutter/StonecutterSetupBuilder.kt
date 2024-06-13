@@ -6,8 +6,8 @@ import org.gradle.api.Action
  * Represents the initial setup defined in `settings.gradle` in the `shared` block.
  */
 @Suppress("LeakingThis")
-open class StonecutterConfigurationBuilder internal constructor() {
-    internal constructor(builder: Action<StonecutterConfigurationBuilder>) : this() {
+open class StonecutterSetupBuilder internal constructor() {
+    internal constructor(builder: Action<StonecutterSetupBuilder>) : this() {
         builder.execute(this)
     }
 

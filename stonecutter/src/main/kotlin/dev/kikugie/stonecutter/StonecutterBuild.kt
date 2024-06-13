@@ -22,7 +22,7 @@ import kotlin.io.path.exists
 @OptIn(ExperimentalPathApi::class)
 open class StonecutterBuild internal constructor(val project: Project) {
     private val setup = project.parent?.let {
-        project.gradle.extensions.getByType(StonecutterConfiguration.Container::class.java)[it]
+        project.gradle.extensions.getByType(StonecutterSetup.Container::class.java)[it]
     } ?: throw StonecutterGradleException(
         """Project ${project.path} must be a versioned project.
             This might've been caused by applying the plugin in standard mod. 

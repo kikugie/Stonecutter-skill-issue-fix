@@ -10,7 +10,7 @@ import org.gradle.api.tasks.Input
  */
 @Suppress("LeakingThis", "unused")
 abstract class ChiseledTask : DefaultTask() {
-    private val setup = project.gradle.extensions.getByType(StonecutterConfiguration.Container::class.java)[project]!!
+    private val setup = project.gradle.extensions.getByType(StonecutterSetup.Container::class.java)[project]!!
     private val setupTask: Task = project.tasks.getByName("chiseledStonecutter")
 
     /**

@@ -3,12 +3,12 @@ package dev.kikugie.stonecutter
 import org.gradle.api.Project
 
 
-internal open class StonecutterConfiguration(
+internal open class StonecutterSetup(
     val versions: List<StonecutterProject>,
     val vcsVersion: StonecutterProject,
     var current: StonecutterProject = vcsVersion,
 ) {
-    constructor(builder: StonecutterConfigurationBuilder) : this(
+    constructor(builder: StonecutterSetupBuilder) : this(
         builder.versions.toList(),
         builder.versionsImpl[builder.vcsVersion]
             ?: throw StonecutterGradleException("Project ${builder.vcsVersion} is not registered")
@@ -26,10 +26,10 @@ internal open class StonecutterConfiguration(
     }
 
     internal open class Container(
-        private val configurations: MutableMap<ProjectPath, StonecutterConfiguration> = mutableMapOf(),
+        private val configurations: MutableMap<ProjectPath, StonecutterSetup> = mutableMapOf(),
     ) {
         operator fun get(project: Project) = configurations[project.path]
-        internal fun register(project: ProjectPath, builder: StonecutterConfigurationBuilder): Boolean =
-            configurations.putIfAbsent(project, StonecutterConfiguration(builder)) == null
+        internal fun register(project: ProjectPath, builder: StonecutterSetupBuilder): Boolean =
+            configurations.putIfAbsent(project, StonecutterSetup(builder)) == null
     }
 }

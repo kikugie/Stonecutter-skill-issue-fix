@@ -16,8 +16,8 @@ import org.gradle.kotlin.dsl.getByType
 open class StonecutterController internal constructor(private val project: Project) {
     private val controller: ControllerManager = project.controller()
         ?: throw StonecutterGradleException("Project ${project.path} is not a Stonecutter controller. What did you even do to get this error?")
-    private val setup: StonecutterConfiguration =
-        project.gradle.extensions.getByType(StonecutterConfiguration.Container::class.java)[project]
+    private val setup: StonecutterSetup =
+        project.gradle.extensions.getByType(StonecutterSetup.Container::class.java)[project]
             ?: throw StonecutterGradleException("Project ${project.path} is not registered. This might've been caused by removing a project while its active")
 
     /**
