@@ -211,6 +211,7 @@ open class StonecutterBuild internal constructor(val project: Project) {
     internal val excludedExtensions = mutableSetOf(
         "png", "jpg", "jpeg", "webp", "gif", "svg",
         "mp3", "wav", "ogg",
+        "DS_Store", // Mac momentos
     )
     internal val excludedPaths = mutableSetOf<Path>()
 
