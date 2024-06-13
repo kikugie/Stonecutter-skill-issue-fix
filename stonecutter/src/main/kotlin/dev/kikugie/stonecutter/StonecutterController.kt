@@ -13,13 +13,12 @@ import org.gradle.kotlin.dsl.getByType
  * Runs for `stonecutter.gradle` file, applying project configurations to versions and generating versioned tasks.
  */
 @Suppress("MemberVisibilityCanBePrivate")
-open class StonecutterController internal constructor(project: Project) {
+open class StonecutterController internal constructor(private val project: Project) {
     private val controller: ControllerManager = project.controller()
         ?: throw StonecutterGradleException("Project ${project.path} is not a Stonecutter controller. What did you even do to get this error?")
     private val setup: StonecutterConfiguration =
         project.gradle.extensions.getByType(StonecutterConfiguration.Container::class.java)[project]
             ?: throw StonecutterGradleException("Project ${project.path} is not registered. This might've been caused by removing a project while its active")
-    private var configuration: Action<StonecutterBuild>? = null
 
     /**
      * Project assigned by `stonecutter.active "..."`.
@@ -75,7 +74,9 @@ open class StonecutterController internal constructor(project: Project) {
      * @param action Versioned configuration action
      */
     infix fun configureEach(action: Action<StonecutterBuild>) {
-        configuration = action
+        setup.versions.map { project.project(it.project) }.forEach {
+            action.execute(it.extensions.getByType<StonecutterBuild>())
+        }
     }
 
     private fun setupProject(root: Project) {
@@ -97,7 +98,6 @@ open class StonecutterController internal constructor(project: Project) {
     }
 
     private inline fun createStonecutterTask(name: String, root: Project, subproject: Project, version: StonecutterProject, crossinline desc: () -> String) {
-        configuration?.execute(subproject.extensions.getByType<StonecutterBuild>())
         root.tasks.create<StonecutterTask>(name) {
             group = "stonecutter"
             description = desc()
