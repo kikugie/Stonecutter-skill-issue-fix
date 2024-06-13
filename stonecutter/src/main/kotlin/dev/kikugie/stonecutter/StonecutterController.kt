@@ -93,12 +93,11 @@ open class StonecutterController internal constructor(project: Project) {
             createStonecutterTask("Set active project to ${ver.project}", root, project, ver) {
                 "Sets the active project to ${ver.project}, processing all versioned comments."
             }
-            val build = project.extensions.getByType<StonecutterBuild>()
-            configuration?.execute(build)
         }
     }
 
     private inline fun createStonecutterTask(name: String, root: Project, subproject: Project, version: StonecutterProject, crossinline desc: () -> String) {
+        configuration?.execute(subproject.extensions.getByType<StonecutterBuild>())
         root.tasks.create<StonecutterTask>(name) {
             group = "stonecutter"
             description = desc()
@@ -107,6 +106,7 @@ open class StonecutterController internal constructor(project: Project) {
             fromVersion.set(setup.current)
 
             val build = subproject.extensions.getByType<StonecutterBuild>()
+            debug.set(build.debug)
             constants.set(build.constants)
             swaps.set(build.swaps)
             dependencies.set(build.dependencies)

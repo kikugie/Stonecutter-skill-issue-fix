@@ -69,8 +69,9 @@ internal abstract class StonecutterTask : DefaultTask() {
 
     @TaskAction
     fun run() {
-        if (!input.isPresent || !output.isPresent || !toVersion.isPresent)
-            throw IllegalArgumentException("[Stonecutter] StonecutterTask is not fully initialized")
+        require(input.isPresent && output.isPresent && toVersion.isPresent) {
+            "[Stonecutter] StonecutterTask is not fully initialized"
+        }
         manager = createManager()
         val time = measureTimeMillis {
             transform(input.get(), output.get())

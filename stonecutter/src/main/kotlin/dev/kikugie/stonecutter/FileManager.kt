@@ -28,7 +28,7 @@ internal class FileManager(
     private val params: TransformParameters,
     private val debug: Boolean = false,
 ) {
-    private val parametersMatch = updateParameters()
+    private val parametersMatch = updateParameters() && !debug
 
     fun process(root: Path, source: Path): String? {
         if (!filter.shouldProcess(source)) return null
@@ -47,7 +47,7 @@ internal class FileManager(
         if (ast == null) {
             val parser = FileParser(text.reader(), recognizers, params)
             ast = parser.parse()
-            if (debug) cleanUpAndWrite(source, inputCache.resolve("debugAst").resolve(astPath)) {
+            if (debug) cleanUpAndWrite(source, inputCache.resolve("debugAst").resolve(source.hashName(hash, "yml"))) {
                 writeConfigured(Yaml.default.encodeToString(ast))
             }
             if (parser.errs.isNotEmpty()) throw SyntaxException(
@@ -76,7 +76,7 @@ internal class FileManager(
         val saved: TransformParameters? = runIgnoring {
             Yaml.default.decodeFromString(dest.readText(charset))
         }
-        if (!debug && saved != null && saved == params) {
+        if (saved != null && saved == params) {
             LOGGER.debug("Found matching parameters for {}", params)
             return true
         }
