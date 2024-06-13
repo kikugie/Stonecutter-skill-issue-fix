@@ -13,6 +13,7 @@ const kotlin2 = JSON.parse(
 export default defineVersionedConfig(__dirname, {
   lang: 'en-US',
   title: 'Stonecutter Wiki',
+  description: 'Modern Gradle plugin for multi-version management',
   versioning: {
     latestVersion: '0.4-beta.5',
   },
