@@ -22,6 +22,11 @@ export default defineVersionedConfig(__dirname, {
   cleanUrls: true,
   appearance: 'dark',
 
+  head: [[
+    'link',
+    { rel: 'icon', sizes: '32x32', href: '/assets/logo.webp' },
+  ]],
+
   // @ts-ignore
   transformPageData: (pageData: PageData, _ctx: TransformPageContext) => {
     applySEO(pageData);
