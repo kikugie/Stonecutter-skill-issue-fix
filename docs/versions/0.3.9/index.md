@@ -2,8 +2,10 @@
 # https://vitepress.dev/reference/default-theme-home-page
 layout: home
 
+titleTemplate: Stonecutter Wiki for 0.3.9
+
 hero:
-  name: Stonecutter Wiki
+  name: Stonecutter Wiki for 0.3.9
   tagline: Modern Gradle plugin for multi-version management
 features:
   - title: Code documentation
