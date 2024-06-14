@@ -3,6 +3,8 @@
 layout: home
 
 titleTemplate: Stonecutter 0.3.9
+title: Stonecutter
+description: (Less) modern Gradle plugin for multi-version management
 
 hero:
   name: Stonecutter 0.3.9
