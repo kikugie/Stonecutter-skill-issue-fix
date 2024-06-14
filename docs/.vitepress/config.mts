@@ -15,7 +15,7 @@ export default defineVersionedConfig(__dirname, {
   title: 'Stonecutter Wiki',
   description: 'Modern Gradle plugin for multi-version management',
   versioning: {
-    latestVersion: '0.4-rc.2',
+    latestVersion: '0.4',
   },
   cleanUrls: true,
   themeConfig: {
