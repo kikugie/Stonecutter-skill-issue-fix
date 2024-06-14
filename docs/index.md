@@ -2,9 +2,14 @@
 # https://vitepress.dev/reference/default-theme-home-page
 layout: home
 
+titleTemplate: Stonecutter
+
 hero:
-  name: Stonecutter Wiki
+  name: Stonecutter
   tagline: Modern Gradle plugin for multi-version management
+  image:
+    src: /assets/logo.webp
+    alt: Stonecutter
 
 features:
   - title: Migrating to Stonecutter
@@ -99,7 +104,7 @@ const members = [
   {
     avatar: 'https://cdn.modrinth.com/data/Kd03i2oU/5bfab0390b4655470b95b80824df9ffe6e280514.png',
     name: 'Enchantment Disabler',
-    title: 'Disable enchantments you don\'t like, and nerf enchanting in multiple ways with an extensive configuration. Supports modded enchantments.',
+    title: 'Disable enchantments you don\'t like, and nerf enchanting in multiple ways with an extensive configuration.',
     links: [
       { icon: 'github', link: 'https://github.com/pajicadvance/enchantmentdisabler' },
       { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/enchantment-disabler' },
