@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://docs.fabricmc.net/sitemap.xml 
+Sitemap: https://stonecutter.kikugie.dev/sitemap.xml 
