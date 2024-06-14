@@ -23,7 +23,7 @@ export function applySEO(pageData: PageData) {
   addTag(pageData, "og:type", "website");
   addTag(pageData, "og:url", `https://stonecutter.kikugie.dev/${pageData.relativePath}`);
   addTag(pageData, "og:description", pageData.description);
-  addTag(pageData, "og:image", "/logo.webp");
+  addTag(pageData, "og:image", "/assets/logo.webp");
   addTag(pageData, "og:image:width", "128");
   addTag(pageData, "og:image:height", "128");
 
