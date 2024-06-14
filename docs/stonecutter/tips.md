@@ -189,3 +189,190 @@ And add the correct path to the `fabric.mod.json`:
 ```json [fabric.mod.json]
   "accessWidener": "aw/${aw}.accesswidener",
 ```
+
+## Architectury setup
+
+> [!WARNING]
+> Enabling Architectury along with Stonecutter requires significant project structure changes and decent Gradle knowledge.  
+> The proper Architectury support is being worked on for Stonecutter 0.5.
+> 
+> (Basically if you look at the [Elytra Trims build file](https://github.com/kikugie/elytra-trims/blob/kotlin/build.gradle.kts) 
+> and think "yea I get it", feel free to try).
+
+Since there's a great variety of setups, there's no plug-in template. 
+This guide covers the most barebone setup for Fabric/Forge on 1.20.1 and Fabric/Neoforge on 1.20.6, 
+but be ready to adjust it to you project's needs.
+
+### Structure changes
+
+In this setup the common Architectury structure of `:common`, `:fabric`, `:neoforge` projects doesn't exist. 
+Instead, everything is in the `src/` folder.  
+This begs the question "How do I make the code for different loaders then?" - With comments! *Welcome to Stonecutter, comments are the solution to every problem!*
+```
+// TODO: Make this wiki more serious
+```
+
+### Buildscript setup
+
+#### Settings
+
+Settings finally got a use for `vers()` function! (Almost as if it was made for this use case)
+
+::: code-group
+```kotlin [settings.gradle.kts]
+extensions.configure<StonecutterSettings> {
+    kotlinController = true
+    centralScript = "build.gradle.kts"
+    shared {
+        vers("1.20.1-fabric", "1.20.1")
+        vers("1.20.1-forge", "1.20.1")
+        vers("1.20.6-fabric", "1.20.6")
+        vers("1.20.6-neoforge", "1.20.6")
+    }
+    create(rootProject)
+}
+```
+```groovy [settings.gradle]
+stonecutter {
+    shared {
+        vers("1.20.1-fabric", "1.20.1")
+        vers("1.20.1-forge", "1.20.1")
+        vers("1.20.6-fabric", "1.20.6")
+        vers("1.20.6-neoforge", "1.20.6")
+    }
+    create rootProject
+}
+```
+:::
+
+#### Controller
+
+To toggle code based on the loader, we need to define Stonecutter constants.
+::: code-group
+```kotlin [stonecutter.gradle.kts]
+stonecutter configureEach {
+    val platform = project.property("loom.platform").toString()
+    stonecutter.const("fabric", platform == "fabric" )
+    stonecutter.const("forge", platform == "forge" )
+    stonecutter.const("neoforge", platform == "neoforge" )
+}
+```
+```groovy [stonecutter.gradle]
+stonecutter.configureEach {
+    def platform = project.property("loom.platform").toString()
+    stonecutter.const("fabric", platform == "fabric")
+    stonecutter.const("forge", platform == "forge")
+    stonecutter.const("neoforge", platform == "neoforge")
+}
+```
+:::
+
+#### Build file
+
+The biggest mess is definitely here, since you need to manage multiple dependency sets.
+::: code-group
+```kotlin [build.gradle.kts]
+val modId = property("mod.id").toString()
+val modLoader = property("loom.platform").toString()
+val mcVersion = stonecutter.current.version
+
+dependencies {
+    minecraft("com.mojang:minecraft:${mcVersion}")
+    mappings("net.fabricmc:yarn:${property("deps.yarn")}:v2")
+    if (modLoader == "fabric") {
+        modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
+    } else if (modLoader == "forge") {
+        "forge"("net.minecraftforge:forge:${mcVersion}-${property("deps.fml")}")
+    } else {
+        "neoForge"("net.neoforged:neoforge:${property("deps.fml")}")
+    }
+}
+
+loom {
+    accessWidenerPath.set(rootProject.file("src/main/resources/$modId.accesswidener"))
+    
+    if (modLoader == "forge") forge {
+        convertAccessWideners.set(true)
+        mixinConfigs(
+            "$modId.mixins.json",
+        )
+    }
+}
+```
+```groovy [build.gradle]
+def modId = property("mod.id").toString()
+def modLoader = property("loom.platform").toString()
+def mcVersion = stonecutter.current.version
+
+dependencies {
+    minecraft "com.mojang:minecraft:${mcVersion}"
+    mappings "net.fabricmc:yarn:${property("deps.yarn")}:v2"
+    if (modLoader == "fabric") {
+        modImplementation "net.fabricmc:fabric-loader:${property("deps.fabric_loader")}"
+    } else if (modLoader == "forge") {
+        forge "net.minecraftforge:forge:${mcVersion}-${property("deps.fml")}"
+    } else {
+        neoForge "net.neoforged:neoforge:${property("deps.fml")}"
+    }
+}
+
+loom {
+    accessWidenerPath.set(getRootProject().file("src/main/resources/${modId}.accesswidener"))
+    
+    if (modLoader == "forge") forge {
+        convertAccessWideners.set(true)
+        mixinConfigs(
+            "${modId}.mixins.json",
+        )
+    }
+}
+```
+:::
+
+### Resources
+
+Similarly, resources have to be put together as well:
+``` 
+- src/main/resources
+  |- META-INF
+  |  |- mods.toml
+  |  \- neoforge.mods.toml
+  |- modid.accesswidener
+  |- modid.mixins.json
+  |- fabric.mod.json
+  \- pack.mcmeta
+```
+
+You can apply previous tips to modify these files to your needs.
+
+### Code changes
+
+It is recommended to separate your loader-dependent logic into helper classes, such as:
+```java [ModAccess.java]
+//? if fabric {
+import net.fabricmc.loader.api.FabricLoader;
+
+public class ModAccess {
+    public static boolean isLoaded(String mod) {
+        return FabricLoader.getInstance().isModLoaded(mod);
+    }
+}
+//?} elif forge {
+/*import net.minecraftforge.fml.loading.FMLLoader;
+
+public class ModAccess {
+    public static boolean isLoaded(String mod) {
+        return FMLLoader.getModList().getModFileById(mod) != null;
+    }
+}
+*///?} else {
+/*import net.neoforged.fml.loading.FMLLoader
+
+public class ModAccess {
+    public static boolean isLoaded(String mod) {
+        return FMLLoader.getModList().getModFileById(mod) != null;
+    }
+}
+*///?}
+```
+As long as the specified methods are the same, swapping the class definition won't cause any issues.
