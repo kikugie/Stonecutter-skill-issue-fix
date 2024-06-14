@@ -15,9 +15,9 @@ export function applySEO(pageData: PageData) {
   addTag(
     pageData,
     "og:title",
-    pageData.title === "Stonecutter Wiki"
-      ? `Stonecutter Wiki`
-      : `${pageData.title} | Stonecutter Wiki`
+    pageData.title === "Stonecutter"
+      ? `Stonecutter`
+      : `${pageData.title} | Stonecutter`
   );
 
   addTag(pageData, "og:type", "website");

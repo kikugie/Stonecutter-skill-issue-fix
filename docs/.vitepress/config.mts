@@ -14,7 +14,7 @@ const kotlin2 = JSON.parse(
 // https://vitepress.dev/reference/site-config
 export default defineVersionedConfig(__dirname, {
   lang: 'en-US',
-  title: 'Stonecutter Wiki',
+  title: 'Stonecutter',
   description: 'Modern Gradle plugin for multi-version management',
   versioning: {
     latestVersion: '0.4',

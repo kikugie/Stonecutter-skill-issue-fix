@@ -2,10 +2,10 @@
 # https://vitepress.dev/reference/default-theme-home-page
 layout: home
 
-titleTemplate: Stonecutter Wiki
+titleTemplate: Stonecutter
 
 hero:
-  name: Stonecutter Wiki
+  name: Stonecutter
   tagline: Modern Gradle plugin for multi-version management
   image:
     src: /assets/logo.webp
