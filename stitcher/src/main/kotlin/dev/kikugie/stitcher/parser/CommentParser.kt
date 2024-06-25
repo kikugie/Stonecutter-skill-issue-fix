@@ -166,7 +166,9 @@ class CommentParser(private val lexer: Lexer, internal val handler: ErrorHandler
     private fun String.asVersionPredicate(): VersionPredicate? {
         val len = operatorLength()
         val op = if (len == 0) VersionComparisonOperator.EQUAL
-        else VersionComparisonOperator.MATCHER[substring(0, len)] ?: run {
+        else try {
+            VersionComparisonOperator.match(substring(0, len))
+        } catch (e: IllegalArgumentException) {
             handler.accept(currentRange.first, "Invalid comparison operator")
             return null
         }

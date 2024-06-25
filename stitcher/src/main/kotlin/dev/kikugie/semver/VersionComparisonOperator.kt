@@ -1,6 +1,9 @@
 package dev.kikugie.semver
 
 enum class VersionComparisonOperator(val literal: String) : (SemanticVersion, SemanticVersion) -> Boolean {
+    IMPLICIT_EQUAL("") {
+        override fun invoke(p1: SemanticVersion, p2: SemanticVersion): Boolean = p1.compareTo(p2) == 0
+    },
     EQUAL("=") {
         override fun invoke(p1: SemanticVersion, p2: SemanticVersion): Boolean = p1.compareTo(p2) == 0
     },
@@ -24,7 +27,17 @@ enum class VersionComparisonOperator(val literal: String) : (SemanticVersion, Se
     };
 
     companion object {
-        val MATCHER = entries.associateBy { it.literal }
+        fun match(operator: String) = when(operator) {
+            "" -> IMPLICIT_EQUAL
+            "=" -> EQUAL
+            ">" -> GREATER
+            ">=" -> GREATER_EQUAL
+            "<" -> LESS
+            "<=" -> LESS_EQUAL
+            "~" -> SAME_TO_NEXT_MINOR
+            "^" -> SAME_TO_NEXT_MAJOR
+            else -> throw IllegalArgumentException("Unknown operator: $operator")
+        }
 
         fun CharSequence.operatorLength(offset: Int = 0): Int = when (this[offset]) {
             '=', '~', '^' -> 1
