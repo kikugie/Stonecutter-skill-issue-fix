@@ -1,6 +1,10 @@
 package dev.kikugie.stonecutter
 
+import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.SemanticVersionParser
+import dev.kikugie.semver.VersionComparisonOperator
+import dev.kikugie.semver.VersionComparisonOperator.Companion.operatorLength
+import dev.kikugie.semver.VersionPredicate
 import java.io.File
 import java.nio.file.Path
 
@@ -19,7 +23,7 @@ interface StonecutterConfiguration {
      * Creates a swap id.
      *
      * @param identifier Swap name
-     * @param replacement Replacement string provider
+     * @param replacement Replacement string
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#swaps">Wiki</a>
      */
     fun swap(identifier: String, replacement: () -> String) {
@@ -59,7 +63,7 @@ interface StonecutterConfiguration {
      * Creates a constant accessible in stonecutter conditions.
      *
      * @param identifier Constant name
-     * @param value Boolean value provider
+     * @param value Boolean value
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
      */
     fun const(identifier: String, value: () -> Boolean) {
@@ -94,6 +98,17 @@ interface StonecutterConfiguration {
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#dependencies">Wiki</a>
      */
     fun dependency(identifier: String, version: String)
+
+    /**
+     * Adds a dependency to the semver checks.
+     *
+     * @param identifier Dependency name
+     * @param version Dependency version to check against in semantic version format
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#dependencies">Wiki</a>
+     */
+    fun dependency(identifier: String, version: () -> String) {
+        dependency(identifier, version())
+    }
 
     /**
      * Adds provided id to value pairs to the semver checks.
@@ -181,4 +196,18 @@ interface StonecutterConfiguration {
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
     infix fun String.comp(other: String) = compare(this, other)
+
+    /**
+     * Evaluates the passed version as [SemanticVersion] and compares to the given predicate(s).
+     *
+     * @param version Version to test against
+     * @param predicate One or multiple version predicates separated with spaces. Predicates may have an operator (=, >, <=, ~, etc; defaults to =), followed by a version
+     * @return `true` if all predicates succeed.
+     */
+    fun eval(version: String, predicate: String): Boolean {
+        val target = SemanticVersionParser.parse(version)
+        return predicate.split(' ').all {
+            VersionPredicate.parse(it).eval(target)
+        }
+    }
 }
