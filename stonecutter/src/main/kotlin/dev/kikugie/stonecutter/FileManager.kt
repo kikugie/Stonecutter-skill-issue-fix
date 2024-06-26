@@ -19,28 +19,27 @@ import java.security.MessageDigest
 import kotlin.io.path.*
 
 @OptIn(ExperimentalSerializationApi::class)
-class FileManager(
+internal class FileManager(
     private val inputCache: Path,
     private val outputCache: Path,
-    private val filter: (Path) -> Boolean,
-    private val charset: Charset = StandardCharsets.ISO_8859_1,
+    private val filter: FileFilter,
+    private val charset: Charset = StandardCharsets.UTF_8,
     private val recognizers: Iterable<CommentRecognizer>,
     private val params: TransformParameters,
     private val debug: Boolean = false,
 ) {
-    private val parametersMatch = updateParameters()
+    private val parametersMatch = updateParameters() && !debug
 
     fun process(root: Path, source: Path): String? {
-        if (!filter(source)) return null
+        if (!filter.shouldProcess(source)) return null
         val text = root.resolve(source).readText()
         val hash = text.hash("MD5")
 
         val cachePath = source.hashName(hash, source.extension)
         val cachedOutput = if (parametersMatch) getCachedOutput(cachePath) else null
-        if (cachedOutput != null) {
+        if (cachedOutput != null)
             return if (cachedOutput == text) null
             else cachedOutput
-        }
 
         val astPath = source.hashName(hash, "ast")
         var ast = if (parametersMatch) getCachedAst(astPath) else null
@@ -48,33 +47,28 @@ class FileManager(
         if (ast == null) {
             val parser = FileParser(text.reader(), recognizers, params)
             ast = parser.parse()
+            if (debug) cleanUpAndWrite(source, inputCache.resolve("debugAst").resolve(source.hashName(hash, "yml"))) {
+                writeConfigured(Yaml.default.encodeToString(ast))
+            }
             if (parser.errs.isNotEmpty()) throw SyntaxException(
                 parser.errs.joinToString("\n") { it.message ?: "Error processing statement" }
             )
         }
-        if (overwrite) runIgnoring {
-            val dest = inputCache.resolve("ast").resolve(astPath)
-            dest.parent.createDirectories()
-            dest.cleanMatching(source.fileName.name)
-            dest.encode(ast)
-        }
-        if (debug) runIgnoring {
-            inputCache.resolve("debugAst").resolve(astPath).writeText(
-                Yaml.default.encodeToString(ast),
-                charset,
-                StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING
-            )
+        if (overwrite) cleanUpAndWrite(source, inputCache.resolve("ast").resolve(astPath)) {
+            encode(ast)
         }
         Transformer(ast, recognizers, params).process()
         val result = ast.accept(Assembler)
-        runIgnoring {
-            val dest = outputCache.resolve("result").resolve(cachePath)
-            dest.parent.createDirectories()
-            dest.cleanMatching(source.fileName.name)
-            dest.writeText(result, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+        cleanUpAndWrite(source, outputCache.resolve("result").resolve(cachePath)) {
+            writeConfigured(result)
         }
         return if (result == text) null else result
+    }
+
+    private inline fun cleanUpAndWrite(source: Path, dest: Path, action: Path.() -> Unit) = runIgnoring {
+        dest.parent?.createDirectories()
+        dest.cleanMatching(source.fileName.name)
+        action(dest)
     }
 
     private fun updateParameters(): Boolean {
@@ -88,16 +82,14 @@ class FileManager(
         }
         runIgnoring {
             dest.parent.createDirectories()
-            dest.writeText(
-                Yaml.default.encodeToString(params),
-                charset,
-                StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING
-            )
+            dest.writeConfigured(Yaml.default.encodeToString(params))
         }
         return false
     }
 
+    private fun Path.writeConfigured(string: String) {
+        writeText(string, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+    }
     private fun Path.cleanMatching(start: String) = parent.listDirectoryEntries().forEach {
         if (it.fileName.name.startsWith(start)) it.deleteExisting()
     }

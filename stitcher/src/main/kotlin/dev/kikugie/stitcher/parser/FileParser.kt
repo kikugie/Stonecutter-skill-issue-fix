@@ -56,8 +56,8 @@ class FileParser(
     private val commentEnd
         get() = when (iter.peek?.type) {
             ContentType.COMMENT_END -> iter.peek!!
-            null -> Token("", ContentType.COMMENT_END)
-            else -> throw AssertionError()
+            null, NullType -> Token("", ContentType.COMMENT_END)
+            else -> throw AssertionError("Unexpected token: ${iter.peek}")
         }
 
     /**
@@ -70,7 +70,7 @@ class FileParser(
             ContentType.CONTENT -> add(ContentBlock(it))
             ContentType.COMMENT -> parseComment(it)
             ContentType.COMMENT_START, ContentType.COMMENT_END -> {}
-            else -> throw AssertionError()
+            else -> throw AssertionError("Unexpected token: $it")
         }
         if (active.enclosure != ScopeType.CLOSED && active.lastOrNull()?.isNotEmpty() == true)
             scopes.pop()

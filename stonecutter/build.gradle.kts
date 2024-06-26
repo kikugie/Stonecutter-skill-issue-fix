@@ -26,8 +26,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.1")
     implementation("com.charleskorn.kaml:kaml:0.57.0")
-    testImplementation(kotlin("test"))
-    testImplementation(kotlin("script-runtime"))
 }
 
 tasks.test {
@@ -38,8 +36,8 @@ tasks.withType<DokkaTask>().configureEach {
     moduleName.set("Stonecutter Plugin")
     dokkaSourceSets {
         configureEach {
+            reportUndocumented = true
             skipEmptyPackages = true
-            sourceRoots.setFrom(file("src/main/kotlin/dev/kikugie/stonecutter"))
         }
     }
 }
@@ -48,11 +46,20 @@ kotlin {
     jvmToolchain(16)
 }
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+tasks.named<Jar>("javadocJar") {
+    from(tasks.named("dokkaJavadoc"))
+}
+
 publishing {
     repositories {
         maven {
             name = "kikugieMaven"
-            url = uri("https://maven.kikugie.dev/snapshots")
+            url = uri("https://maven.kikugie.dev/releases")
             credentials(PasswordCredentials::class)
             authentication {
                 create("basic", BasicAuthentication::class)
@@ -65,7 +72,7 @@ publishing {
             groupId = project.group.toString()
             artifactId = "stonecutter"
             version = project.version.toString()
-            artifact(tasks.getByName("jar"))
+            from(components["java"])
         }
     }
 }

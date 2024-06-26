@@ -10,9 +10,13 @@ import org.gradle.api.tasks.Input
  */
 @Suppress("LeakingThis", "unused")
 abstract class ChiseledTask : DefaultTask() {
-    private val setup = project.gradle.extensions.getByType(StonecutterConfiguration.Container::class.java)[project]!!
+    private val setup = project.gradle.extensions.getByType(StonecutterSetup.Container::class.java)[project]!!
     private val setupTask: Task = project.tasks.getByName("chiseledStonecutter")
 
+    /**
+     * Specifies projects this task runs on.
+     * Use in combination with `stonecutter.versions.filter { }`.
+     */
     @get:Input
     abstract val versions: ListProperty<StonecutterProject>
 

@@ -25,8 +25,15 @@ import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import kotlin.system.measureTimeMillis
 
+@Suppress("LeakingThis")
 @OptIn(ExperimentalPathApi::class)
 internal abstract class StonecutterTask : DefaultTask() {
+    @get:Input
+    abstract val chiseled: Property<Boolean>
+
+    @get:Input
+    abstract val debug: Property<Boolean>
+
     @get:Input
     abstract val input: Property<Path>
 
@@ -49,18 +56,22 @@ internal abstract class StonecutterTask : DefaultTask() {
     abstract val dependencies: MapProperty<String, SemanticVersion>
 
     @get:Input
-    abstract val filter: Property<(Path) -> Boolean>
+    abstract val filter: Property<FileFilter>
 
     private lateinit var manager: FileManager
-    private var transformed = AtomicInteger(0)
-    private var total = AtomicInteger(0)
-    // TODO
-    private var debug = false
+    private val transformed = AtomicInteger(0)
+    private val total = AtomicInteger(0)
+
+    init {
+        chiseled.convention(false)
+        debug.convention(false)
+    }
 
     @TaskAction
     fun run() {
-        if (!input.isPresent || !output.isPresent || !toVersion.isPresent)
-            throw IllegalArgumentException("[Stonecutter] StonecutterTask is not fully initialized")
+        require(input.isPresent && output.isPresent && toVersion.isPresent) {
+            "[Stonecutter] StonecutterTask is not fully initialized"
+        }
         manager = createManager()
         val time = measureTimeMillis {
             transform(input.get(), output.get())
@@ -69,7 +80,8 @@ internal abstract class StonecutterTask : DefaultTask() {
     }
 
     private fun createManager(): FileManager {
-        fun cacheDir(pr: StonecutterProject) = project.project(pr.project).buildDirectory.toPath().resolve("stonecutterCache")
+        val dest = if (chiseled.get()) project.parent!! else project
+        fun cacheDir(pr: StonecutterProject) = dest.project(pr.project).buildDirectory.toPath().resolve("stonecutterCache")
         val deps = dependencies.get().toMutableMap()
         val mcVersion = deps["minecraft"] ?: SemanticVersionParser.parse(toVersion.get().version)
         deps["minecraft"] = mcVersion
@@ -82,7 +94,7 @@ internal abstract class StonecutterTask : DefaultTask() {
             filter = filter.get(),
             recognizers = listOf(StandardMultiLine, StandardSingleLine),
             params = params,
-            debug = debug
+            debug = debug.get()
         )
     }
 
@@ -113,7 +125,7 @@ internal abstract class StonecutterTask : DefaultTask() {
             Files.createDirectories(out.parent)
             out.writeText(
                 content,
-                StandardCharsets.ISO_8859_1,
+                StandardCharsets.UTF_8,
                 StandardOpenOption.CREATE,
                 StandardOpenOption.TRUNCATE_EXISTING
             )
@@ -129,7 +141,7 @@ internal abstract class StonecutterTask : DefaultTask() {
                 message.append("    > $primary:\n")
                 for (line in (cause?.message ?: "").lines())
                     message.append("        $line\n")
-                if (debug && err !is SyntaxException) cause?.stackTrace?.forEach {
+                if (debug.get() && err !is SyntaxException) cause?.stackTrace?.forEach {
                     message.append("            $it\n")
                 }
                 append(message)

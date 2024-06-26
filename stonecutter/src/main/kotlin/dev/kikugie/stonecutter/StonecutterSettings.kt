@@ -12,9 +12,9 @@ import kotlin.io.path.notExists
 @Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterSettings(private val settings: Settings) {
     private val projects = settings.gradle.extensions
-        .create("stonecutterProjects", StonecutterConfiguration.Container::class.java)
+        .create("stonecutterProjects", StonecutterSetup.Container::class.java)
     private val controller get() = if (kotlinController) KotlinController else GroovyController
-    private lateinit var shared: StonecutterConfigurationBuilder
+    private lateinit var shared: StonecutterSetupBuilder
 
     /**
      * Enables Kotlin buildscripts for the controller.
@@ -35,16 +35,47 @@ open class StonecutterSettings(private val settings: Settings) {
     /**
      * Configures the version structure for this project.
      *
-     * @param builder configuration scope
+     * @param builder Configuration scope
      */
-    fun shared(builder: Action<StonecutterConfigurationBuilder>) {
-        shared = StonecutterConfigurationBuilder(builder)
+    fun shared(builder: Action<StonecutterSetupBuilder>) {
+        shared = StonecutterSetupBuilder(builder)
+    }
+
+    /**
+     * Includes the provided project path and assigns the specified configuration to it.
+     *
+     * @param project Project path
+     */
+    fun create(project: String) {
+        val actual = project.removePrefix(":")
+        settings.include(actual)
+        create(settings.project(":$actual"))
+    }
+
+    /**
+     * Includes the provided project paths and assigns the specified configuration to them.
+     *
+     * @param projects Project paths
+     */
+    fun create(vararg projects: String) {
+        projects.forEach(::create)
+    }
+
+    /**
+     * Includes the provided project paths and assigns the specified configuration to them.
+     *
+     * @param projects Project paths
+     * @return 🍌 to prevent JVM signature crash. Do whatever you want with it
+     */
+    fun create(projects: Iterable<String>): String {
+        projects.forEach(::create)
+        return "🍌"
     }
 
     /**
      * Assigns the specified configuration to projects.
      *
-     * @param projects project references
+     * @param projects Project references
      */
     fun create(projects: Iterable<ProjectDescriptor>) {
         projects.forEach(::create)
@@ -53,7 +84,7 @@ open class StonecutterSettings(private val settings: Settings) {
     /**
      * Assigns the specified configuration to projects.
      *
-     * @param projects project references
+     * @param projects Project references
      */
     fun create(vararg projects: ProjectDescriptor) {
         projects.forEach(::create)
@@ -62,7 +93,7 @@ open class StonecutterSettings(private val settings: Settings) {
     /**
      * Assigns the specified configuration to the project.
      *
-     * @param project project reference
+     * @param project Project reference
      */
     fun create(project: ProjectDescriptor) {
         val vcs = shared.vcsProject

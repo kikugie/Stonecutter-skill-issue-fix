@@ -33,8 +33,8 @@ tasks.withType<DokkaTask>().configureEach {
     moduleName.set("Stitcher")
     dokkaSourceSets {
         configureEach {
+            reportUndocumented = true
             skipEmptyPackages = true
-            sourceRoots.setFrom(file("src/main/kotlin/dev/kikugie/stitcher"), file("src/main/kotlin/dev/kikugie/semver"))
         }
     }
 }
@@ -47,7 +47,7 @@ publishing {
     repositories {
         maven {
             name = "kikugieMaven"
-            url = uri("https://maven.kikugie.dev/snapshots")
+            url = uri("https://maven.kikugie.dev/releases")
             credentials(PasswordCredentials::class)
             authentication {
                 create("basic", BasicAuthentication::class)
