@@ -44,7 +44,7 @@ open class StonecutterController internal constructor(root: Project) : Stonecutt
     val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
 
     init {
-        println("Running Stonecutter 0.4")
+        println("Running Stonecutter 0.4.1")
         versions.forEach { root.project(it.project).pluginManager.apply(StonecutterPlugin::class.java) }
         root.tasks.create("chiseledStonecutter") {
             setup.versions.forEach { dependsOn("${it.project}:setupChiseledBuild") }

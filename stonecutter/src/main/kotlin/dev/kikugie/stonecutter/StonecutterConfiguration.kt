@@ -2,8 +2,6 @@ package dev.kikugie.stonecutter
 
 import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.SemanticVersionParser
-import dev.kikugie.semver.VersionComparisonOperator
-import dev.kikugie.semver.VersionComparisonOperator.Companion.operatorLength
 import dev.kikugie.semver.VersionPredicate
 import java.io.File
 import java.nio.file.Path
@@ -202,7 +200,8 @@ interface StonecutterConfiguration {
      *
      * @param version Version to test against
      * @param predicate One or multiple version predicates separated with spaces. Predicates may have an operator (=, >, <=, ~, etc; defaults to =), followed by a version
-     * @return `true` if all predicates succeed.
+     * @return `true` if all predicates succeed
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
     fun eval(version: String, predicate: String): Boolean {
         val target = SemanticVersionParser.parse(version)
