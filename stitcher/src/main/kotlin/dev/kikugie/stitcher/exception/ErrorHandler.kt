@@ -1,25 +1,17 @@
 package dev.kikugie.stitcher.exception
 
-fun ErrorHandler.accept(pos: Int, error: String) = accept(pos..<pos, error)
-fun ErrorHandler.accept(range: IntRange, error: String) = accept(range, SyntaxException(error))
+import dev.kikugie.stitcher.lexer.Lexer.Slice
 
 interface ErrorHandler {
-    val errors: Iterable<Pair<IntRange, Throwable>>
-    fun accept(range: IntRange, error: Throwable)
-    fun addSilent(range: IntRange, error: Throwable)
+    val errors: Iterable<Pair<Slice, String>>
+    fun accept(token: Slice, message: String)
 }
 
-open class ErrorHandlerImpl(private val sequence: CharSequence) : ErrorHandler {
-    override val errors = mutableListOf<Pair<IntRange, Throwable>>()
-    override fun accept(range: IntRange, error: Throwable) {
-        errors += range to SyntaxException("""
-            ${error::class.simpleName}: ${error.message}
-                $sequence
-                ${" ".repeat(range.first)}${"^".repeat((1 + range.last - range.first).coerceAtLeast(1))}
-        """.trimIndent())
+open class ErrorHandlerImpl : ErrorHandler {
+    override val errors: MutableList<Pair<Slice, String>> = mutableListOf()
+
+    override fun accept(token: Slice, message: String) {
+        errors += token to message
     }
 
-    override fun addSilent(range: IntRange, error: Throwable) {
-        errors += range to error
-    }
 }

@@ -46,14 +46,8 @@ class ConditionVisitor(private val params: TransformParameters) : Component.Visi
     override fun visitAssignment(it: Assignment): Boolean {
         val target = params.dependencies[it.target.value] ?: throw IllegalArgumentException()
         return it.predicates.all {
-            val info = it[VersionPredicate::class] ?: run {
-                val str = it.value
-                val len = str.operatorLength()
-                val op = if (len == 0) VersionComparisonOperator.EQUAL
-                else VersionComparisonOperator.MATCHER[str.substring(0, len)]!!
-                val ver = SemanticVersionParser.parse(str.substring(len))
-                VersionPredicate(op, ver)
-            }
+            val info = it[VersionPredicate::class] ?:
+                VersionPredicate.parse(it.value)
             info.operator(target, info.version)
         }
     }

@@ -7,6 +7,7 @@ sealed interface TokenType
 
 @Serializable
 data object NullType : TokenType
+data object WhitespaceType : TokenType
 
 @Serializable
 enum class ContentType : TokenType {
@@ -15,6 +16,7 @@ enum class ContentType : TokenType {
     COMMENT,
     CONTENT
 }
+
 enum class MarkerType : TokenType {
     CONDITION, SWAP, // ? and $
 }

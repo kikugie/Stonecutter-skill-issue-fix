@@ -9,6 +9,8 @@ data class VersionPredicate(
 ) {
     fun eval(target: SemanticVersion) = operator(target, version)
 
+    override fun toString(): String = "${operator.literal}$version"
+
     companion object {
         @Throws(VersionParsingException::class)
         fun parse(predicate: String): VersionPredicate {

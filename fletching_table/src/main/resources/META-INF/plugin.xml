@@ -19,11 +19,12 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <languageInjector implementation="dev.kikugie.stonecutter.intellj.extension.StitcherInjector"/>
-        <colorSettingsPage implementation="dev.kikugie.stonecutter.intellj.extension.StitcherColorSettingsPage"/>
-        <editorHighlighterProvider filetype="Stitcher" implementationClass="dev.kikugie.stonecutter.intellj.extension.StitcherEditorHighlighter"/>
-        <fileTypeOverrider implementation="dev.kikugie.stonecutter.intellj.extension.StitcherFileTypeOverrider"/>
-        <lang.parserDefinition language="Stitcher" implementationClass="dev.kikugie.stonecutter.intellj.language.StitcherDef"/>
-        <lang.syntaxHighlighter language="Stitcher" implementationClass="dev.kikugie.stonecutter.intellj.extension.StitcherHighlighter"/>
+        <languageInjector implementation="dev.kikugie.fletching_table.impl.StitcherInjector"/>
+        <colorSettingsPage implementation="dev.kikugie.fletching_table.impl.StitcherColorSettingsPage"/>
+        <editorHighlighterProvider filetype="Stitcher" implementationClass="dev.kikugie.fletching_table.impl.StitcherEditorHighlighter"/>
+        <fileTypeOverrider implementation="dev.kikugie.fletching_table.impl.StitcherFileTypeOverrider"/>
+        <lang.parserDefinition language="Stitcher" implementationClass="dev.kikugie.fletching_table.lang.StitcherDef"/>
+        <lang.syntaxHighlighter language="Stitcher" implementationClass="dev.kikugie.fletching_table.impl.StitcherHighlighter"/>
+        <annotator language="Stitcher" implementationClass="dev.kikugie.fletching_table.impl.StitcherAnnotator"/>
     </extensions>
 </idea-plugin>

@@ -28,6 +28,10 @@ sealed interface Component {
         fun visitDefinition(it: Definition): T
         fun visitAssignment(it: Assignment): T
     }
+
+    interface Builder<T : Component> {
+        fun build(): T
+    }
 }
 
 /**
@@ -37,6 +41,10 @@ sealed interface Component {
 data object Empty : Component {
     override fun isEmpty() = true
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitEmpty(this)
+
+    class Builder : Component.Builder<Empty> {
+        override fun build() = Empty
+    }
 }
 
 /**
@@ -48,6 +56,11 @@ data object Empty : Component {
 data class Literal(val token: Token) : Component {
     override fun isEmpty(): Boolean = token.isBlank()
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitLiteral(this)
+
+    class Builder : Component.Builder<Literal> {
+        lateinit var token: Token
+        override fun build() = Literal(token)
+    }
 }
 
 /**
@@ -63,6 +76,12 @@ data class Unary(
 ) : Component {
     override fun isEmpty(): Boolean = operator.isBlank() && target.isEmpty()
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitUnary(this)
+
+    class Builder : Component.Builder<Unary> {
+        lateinit var operator: Token
+        lateinit var target: Component
+        override fun build() = Unary(operator, target)
+    }
 }
 
 /**
@@ -80,6 +99,13 @@ data class Binary(
 ) : Component {
     override fun isEmpty(): Boolean = left.isEmpty() && operator.isBlank() && right.isEmpty()
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitBinary(this)
+
+    class Builder : Component.Builder<Binary> {
+        lateinit var left: Component
+        lateinit var operator: Token
+        lateinit var right: Component
+        override fun build() = Binary(left, operator, right)
+    }
 }
 
 /**
@@ -93,6 +119,11 @@ data class Group(
 ) : Component {
     override fun isEmpty(): Boolean = content.isEmpty()
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitGroup(this)
+
+    class Builder : Component.Builder<Group> {
+        lateinit var content: Component
+        override fun build() = Group(content)
+    }
 }
 
 /**
@@ -111,6 +142,12 @@ data class Assignment(
 ) : Component {
     override fun isEmpty(): Boolean = target.isBlank() && !predicates.any { !it.isBlank() }
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visitAssignment(this)
+
+    class Builder : Component.Builder<Assignment> {
+        var target: Token = Token.EMPTY
+        val predicates = mutableListOf<Token>()
+        override fun build() = Assignment(target, predicates)
+    }
 }
 
 /**
@@ -141,7 +178,7 @@ data class Definition(
  * Represents Stitcher condition expression.
  *
  * @property sugar Condition sugar added for readability, such as `if`, `else` and `elif`, which is useless for the transformer, but required to reassemble the tree.
- * @property condition Inderlying condition tree
+ * @property condition Underlying condition tree
  */
 @Serializable
 data class Condition(

@@ -11,7 +11,6 @@ import dev.kikugie.stitcher.data.token.NullType
 import dev.kikugie.stitcher.data.token.Token
 import dev.kikugie.stitcher.exception.ErrorHandler
 import dev.kikugie.stitcher.exception.ErrorHandlerImpl
-import dev.kikugie.stitcher.exception.accept
 import dev.kikugie.stitcher.lexer.Lexer
 import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.scanner.Scanner.Companion.scan
@@ -31,22 +30,19 @@ import java.util.*
 class FileParser(
     input: Sequence<Token>,
     private val params: TransformParameters? = null,
-    private val handlerFactory: (CharSequence) -> ErrorHandler = ::ErrorHandlerImpl,
+    private val handlerFactory: () -> ErrorHandler = ::ErrorHandlerImpl,
 ) {
     constructor(
         input: Reader,
         recognizers: Iterable<CommentRecognizer>,
         params: TransformParameters? = null,
-        handlerFactory: (CharSequence) -> ErrorHandler = ::ErrorHandlerImpl,
+        handlerFactory: () -> ErrorHandler = ::ErrorHandlerImpl,
     ) : this(input.scan(recognizers), params, handlerFactory)
-
-    private val errors = mutableListOf<Throwable>()
     private val iter = LookaroundIterator(input.iterator())
     private val scopes = Stack<Scope>()
         .apply { push(Scope()) }
     private val active get() = scopes.peek()
     private val root get() = scopes[0]
-    val errs: List<Throwable> get() = errors
 
     private fun add(block: Block) {
         active.add(block)
@@ -77,8 +73,8 @@ class FileParser(
     }.let { root }
 
     private fun createParser(str: CharSequence): CommentParser {
-        val handler = handlerFactory(str)
-        val lexer = Lexer(str, handler)
+        val handler = handlerFactory()
+        val lexer = Lexer(str)
         return CommentParser(lexer, handler, params)
     }
 
@@ -88,12 +84,8 @@ class FileParser(
             add(CommentBlock(commentStart, token, commentEnd))
             return
         }
-        if (def.extension)
-            if (def.type == active.type) scopes.pop()
-            else parser.handler.accept(1, "${def.type} closes unmatched scope of ${active.type}")
         val scope = if (def.isEmpty() && def.extension) null else Scope(def.type, def.enclosure)
         add(CodeBlock(commentStart, def, commentEnd, scope))
         if (scope != null) scopes.push(scope)
-        parser.errors.forEach { errors.add(it.second) }
     }
 }
