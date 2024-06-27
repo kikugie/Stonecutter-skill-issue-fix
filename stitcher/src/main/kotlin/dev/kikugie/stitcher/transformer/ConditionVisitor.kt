@@ -50,7 +50,7 @@ class ConditionVisitor(private val params: TransformParameters) : Component.Visi
                 val str = it.value
                 val len = str.operatorLength()
                 val op = if (len == 0) VersionComparisonOperator.EQUAL
-                else VersionComparisonOperator.MATCHER[str.substring(0, len)]!!
+                else VersionComparisonOperator.match(str.substring(0, len))
                 val ver = SemanticVersionParser.parse(str.substring(len))
                 VersionPredicate(op, ver)
             }
