@@ -239,8 +239,6 @@ loom {
     }
 }
 ```
-In case you wonder, **using `property("...")` is the only way**.
-Due to Gradle being Gradle, using standard `project.fabric_api` etc. won't pull the correct dependency.
 :::
 
 ### Notes
