@@ -16,10 +16,11 @@ class CommentParser(
     private val handler: ErrorHandler,
     private val params: TransformParameters? = null,
 ) {
+    private val currentType get() = lexer.lookup()?.type
     private val nextType get() = lexer.lookup(1)?.type
 
     fun parse(): Definition? {
-        val mode = lexer.advance()?.type ?: return null
+        val mode = lexer.lookup()?.type ?: return null
         val extension = nextType == SCOPE_CLOSE
         if (extension) lexer.advance()
         val component = when (mode) {
@@ -27,7 +28,7 @@ class CommentParser(
             SWAP -> parseSwap()
             else -> return null
         }
-        val closer = when (nextType) {
+        val closer = when (lexer.advance()?.type) {
             SCOPE_OPEN -> consume { ScopeType.CLOSED }
             EXPECT_WORD -> consume { ScopeType.WORD }
             null -> ScopeType.LINE
@@ -38,7 +39,7 @@ class CommentParser(
         return Definition(component, extension, closer)
     }
 
-    fun parseSwap(): Swap {
+    private fun parseSwap(): Swap {
         var identifier = Token.EMPTY
         while (true) when (nextType) {
             WhitespaceType -> consume()
@@ -109,6 +110,7 @@ class CommentParser(
     }
 
     private fun matchBoolean(left: Component): Component = when (nextType) {
+        WhitespaceType -> consume { matchBoolean(left) }
         OR, AND -> consume { Binary(left, it.token, matchExpression()) }
         else -> left
     }

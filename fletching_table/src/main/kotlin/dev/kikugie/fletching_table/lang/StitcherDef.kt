@@ -21,7 +21,7 @@ class StitcherDef : ParserDefinition {
 
     override fun getStringLiteralElements(): TokenSet = TokenSet.EMPTY
 
-    override fun getWhitespaceTokens(): TokenSet = TokenSet.create(WHITESPACE)
+    override fun getWhitespaceTokens(): TokenSet = TokenSet.EMPTY
 
     override fun getCommentTokens(): TokenSet = TokenSet.EMPTY
 
