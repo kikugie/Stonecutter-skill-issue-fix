@@ -4,6 +4,8 @@ import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.SemanticVersionParser
 import dev.kikugie.semver.VersionParsingException
 import dev.kikugie.stitcher.lexer.IdentifierRecognizer.Companion.allowed
+import dev.kikugie.stonecutter.configuration.StonecutterConfiguration
+import dev.kikugie.stonecutter.configuration.StonecutterData
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
@@ -22,7 +24,7 @@ import kotlin.io.path.exists
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 @OptIn(ExperimentalPathApi::class)
 open class StonecutterBuild internal constructor(val project: Project) : StonecutterConfiguration {
-    private val setup = project.parent?.let {
+    internal val setup = project.parent?.let {
         project.gradle.extensions.getByType(StonecutterSetup.Container::class.java)[it]
     } ?: throw StonecutterGradleException(
         """Project ${project.path} must be a versioned project.
@@ -30,6 +32,7 @@ open class StonecutterBuild internal constructor(val project: Project) : Stonecu
             Read https://github.com/kikugie/stonecutter-kt/wiki for an integration guide.
             """.trimMargin()
     )
+    internal val data = StonecutterData()
 
     /**
      * Metadata of the currently processed version.
@@ -51,37 +54,30 @@ open class StonecutterBuild internal constructor(val project: Project) : Stonecu
     val versions get() = setup.versions
 
     override fun swap(identifier: String, replacement: String) {
-        swaps[validateId(identifier)] = replacement
+        data.swaps[validateId(identifier)] = replacement
     }
 
     override fun const(identifier: String, value: Boolean) {
-        constants[validateId(identifier)] = value
+        data.constants[validateId(identifier)] = value
     }
 
     override fun dependency(identifier: String, version: String) {
-        dependencies[validateId(identifier)] = validateSemver(version)
+        data.dependencies[validateId(identifier)] = validateSemver(version)
     }
 
     override fun exclude(path: Path) {
-        excludedPaths.add(path)
+        data.excludedPaths.add(path)
     }
 
     override fun exclude(path: String) {
         require(path.isNotBlank()) { "Path must not be empty" }
-        if (path.startsWith("*.")) excludedExtensions.add(path.substring(2))
-        else excludedPaths.add(project.parent!!.file(path).toPath())
+        if (path.startsWith("*.")) data.excludedExtensions.add(path.substring(2))
+        else data.excludedPaths.add(project.parent!!.file(path).toPath())
     }
 
-    override var debug = false
-    internal val constants = mutableMapOf<String, Boolean>()
-    internal val swaps = mutableMapOf<String, String>()
-    internal val dependencies = mutableMapOf<String, SemanticVersion>()
-    internal val excludedExtensions = mutableSetOf(
-        "png", "jpg", "jpeg", "webp", "gif", "svg",
-        "mp3", "wav", "ogg",
-        "DS_Store", // Mac momentos
-    )
-    internal val excludedPaths = mutableSetOf<Path>()
+    override var debug: Boolean
+        get() = data.debug
+        set(value) {data.debug = value}
 
     init {
         project.tasks.register("setupChiseledBuild", StonecutterTask::class.java) {
@@ -92,11 +88,7 @@ open class StonecutterBuild internal constructor(val project: Project) : Stonecu
             fromVersion.set(active)
 
             chiseled.set(true)
-            debug.set(this@StonecutterBuild.debug)
-            constants.set(this@StonecutterBuild.constants)
-            swaps.set(this@StonecutterBuild.swaps)
-            dependencies.set(this@StonecutterBuild.dependencies)
-            filter.set(FileFilter(excludedExtensions, excludedPaths))
+            data.set(this@StonecutterBuild.data)
 
             input.set(project.parent!!.file("./src").toPath())
             val out = project.buildDirectory.toPath().resolve("chiseledSrc")

@@ -15,6 +15,7 @@
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.gradle</depends>
 
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
@@ -26,5 +27,8 @@
         <lang.parserDefinition language="Stitcher" implementationClass="dev.kikugie.fletching_table.lang.StitcherDef"/>
         <lang.syntaxHighlighter language="Stitcher" implementationClass="dev.kikugie.fletching_table.impl.StitcherHighlighter"/>
         <annotator language="Stitcher" implementationClass="dev.kikugie.fletching_table.impl.StitcherAnnotator"/>
+    </extensions>
+    <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
+        <projectResolve implementation="dev.kikugie.fletching_table.impl.ReloadListener"/>
     </extensions>
 </idea-plugin>

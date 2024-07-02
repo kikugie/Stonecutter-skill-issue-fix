@@ -3,7 +3,7 @@ package dev.kikugie.stonecutter
 import org.gradle.api.Project
 
 
-internal open class StonecutterSetup(
+open class StonecutterSetup(
     val versions: List<StonecutterProject>,
     val vcsVersion: StonecutterProject,
     var current: StonecutterProject = vcsVersion,

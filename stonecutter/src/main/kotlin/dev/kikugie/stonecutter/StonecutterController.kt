@@ -2,6 +2,7 @@
 
 package dev.kikugie.stonecutter
 
+import dev.kikugie.stonecutter.configuration.StonecutterConfiguration
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -125,11 +126,7 @@ open class StonecutterController internal constructor(root: Project) : Stonecutt
             fromVersion.set(setup.current)
 
             val build = subproject.extensions.getByType<StonecutterBuild>()
-            debug.set(build.debug)
-            constants.set(build.constants)
-            swaps.set(build.swaps)
-            dependencies.set(build.dependencies)
-            filter.set(FileFilter(build.excludedExtensions, build.excludedPaths))
+            data.set(build.data)
 
             input.set(root.file("./src").toPath())
             output.set(input.get())

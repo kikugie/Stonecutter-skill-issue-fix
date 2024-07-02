@@ -4,6 +4,7 @@ import com.charleskorn.kaml.Yaml
 import dev.kikugie.stitcher.data.scope.Scope
 import dev.kikugie.stitcher.exception.SyntaxException
 import dev.kikugie.stitcher.Assembler
+import dev.kikugie.stitcher.exception.join
 import dev.kikugie.stitcher.parser.FileParser
 import dev.kikugie.stitcher.transformer.TransformParameters
 import dev.kikugie.stitcher.transformer.Transformer
@@ -50,8 +51,8 @@ internal class FileManager(
             if (debug) cleanUpAndWrite(source, inputCache.resolve("debugAst").resolve(source.hashName(hash, "yml"))) {
                 writeConfigured(Yaml.default.encodeToString(ast))
             }
-            if (parser.errs.isNotEmpty()) throw SyntaxException(
-                parser.errs.joinToString("\n") { it.message ?: "Error processing statement" }
+            if (parser.hasErrors) throw SyntaxException(
+                parser.errors.joinToString("\n\n") { it.join() }
             )
         }
         if (overwrite) cleanUpAndWrite(source, inputCache.resolve("ast").resolve(astPath)) {

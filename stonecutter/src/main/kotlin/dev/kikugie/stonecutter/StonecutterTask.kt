@@ -6,6 +6,7 @@ import dev.kikugie.stitcher.exception.SyntaxException
 import dev.kikugie.stitcher.scanner.StandardMultiLine
 import dev.kikugie.stitcher.scanner.StandardSingleLine
 import dev.kikugie.stitcher.transformer.TransformParameters
+import dev.kikugie.stonecutter.configuration.StonecutterDataView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
@@ -32,9 +33,6 @@ internal abstract class StonecutterTask : DefaultTask() {
     abstract val chiseled: Property<Boolean>
 
     @get:Input
-    abstract val debug: Property<Boolean>
-
-    @get:Input
     abstract val input: Property<Path>
 
     @get:Input
@@ -47,16 +45,7 @@ internal abstract class StonecutterTask : DefaultTask() {
     abstract val toVersion: Property<StonecutterProject>
 
     @get:Input
-    abstract val constants: MapProperty<String, Boolean>
-
-    @get:Input
-    abstract val swaps: MapProperty<String, String>
-
-    @get:Input
-    abstract val dependencies: MapProperty<String, SemanticVersion>
-
-    @get:Input
-    abstract val filter: Property<FileFilter>
+    abstract val data: Property<StonecutterDataView>
 
     private lateinit var manager: FileManager
     private val transformed = AtomicInteger(0)
@@ -64,7 +53,6 @@ internal abstract class StonecutterTask : DefaultTask() {
 
     init {
         chiseled.convention(false)
-        debug.convention(false)
     }
 
     @TaskAction

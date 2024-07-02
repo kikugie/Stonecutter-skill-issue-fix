@@ -1,11 +1,17 @@
-package dev.kikugie.stonecutter
+package dev.kikugie.stonecutter.configuration
 
 import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.SemanticVersionParser
 import dev.kikugie.semver.VersionPredicate
+import dev.kikugie.stonecutter.StonecutterBuild
+import dev.kikugie.stonecutter.StonecutterController
 import java.io.File
 import java.nio.file.Path
 
+/**
+ * Provides functions to configure Stonecutter.
+ * Shared by [StonecutterBuild] and [StonecutterController]
+ */
 @Suppress("unused")
 interface StonecutterConfiguration {
     /**

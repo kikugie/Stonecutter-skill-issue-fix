@@ -43,6 +43,9 @@ class FileParser(
         .apply { push(Scope()) }
     private val active get() = scopes.peek()
     private val root get() = scopes[0]
+    private val handlers: MutableList<ErrorHandler> = mutableListOf()
+    val hasErrors get() = handlers.any { it.errors.isNotEmpty() }
+    val errors get() = handlers.asSequence().flatMap { it.errors }
 
     private fun add(block: Block) {
         active.add(block)
