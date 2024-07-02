@@ -87,6 +87,12 @@ val mcVersion = stonecutter.current.version // = 1.19.4
 val isOneTwentyPlus = stonecutter.compare("1.20", mcVersion) >= 0 // false
 ```
 
+Alternatively, you can use the `eval` function:
+```kotlin
+val mcVersion = stonecutter.current.version // = 1.19.4
+val isOneTwentyPlus = stonecutter.eval(mcVersion, ">=1.20")
+```
+
 ### Debug mode
 Enabled with `stonecutter.debug(true)` or `stonecutter.debug = true`.  
 Currently, it stores the generated ASTs in subproject's `build/stonecutterCache/debugAst/` 

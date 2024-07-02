@@ -14,7 +14,7 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.4"
+    id("dev.kikugie.stonecutter") version "0.4.2"
 }
 
 extensions.configure<StonecutterSettings> {
@@ -41,7 +41,7 @@ pluginManagement {
 }
 
 plugins {
-    id "dev.kikugie.stonecutter" version "0.4"
+    id "dev.kikugie.stonecutter" version "0.4.2"
 }
 
 stonecutter {
@@ -239,8 +239,6 @@ loom {
     }
 }
 ```
-In case you wonder, **using `property("...")` is the only way**.
-Due to Gradle being Gradle, using standard `project.fabric_api` etc. won't pull the correct dependency.
 :::
 
 ### Notes
