@@ -3,12 +3,14 @@ package dev.kikugie.fletching_table.impl
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
+import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
-import dev.kikugie.stonecutter.StonecutterController
+import com.intellij.openapi.roots.ModuleRootManager
+import dev.kikugie.stonecutter.configuration.StonecutterModel
 import org.gradle.tooling.GradleConnector
-import org.gradle.tooling.model.GradleProject
+import org.jetbrains.plugins.gradle.model.ExternalProject
 import org.jetbrains.plugins.gradle.service.project.AbstractProjectResolverExtension
 import org.jetbrains.plugins.gradle.service.project.data.ExternalProjectDataCache
 import java.io.File
@@ -21,21 +23,46 @@ class ReloadListener : AbstractProjectResolverExtension() {
 }
 
 @Service(Service.Level.PROJECT)
-class StonecutterService(private val project: Project) {
-    private val controllers: MutableMap<Module, StonecutterController> = mutableMapOf()
-    private val connector = GradleConnector.newConnector().apply {
-        forProjectDirectory(project.basePath?.let(::File) ?: return@apply)
-    }
+class StonecutterService(private val root: Project) {
+    private val models: MutableMap<Module, StonecutterModel> = mutableMapOf()
 
     init {
         reload()
     }
 
     internal fun reload() {
-        val cache = ExternalProjectDataCache.getInstance(project)
-        val manager = ModuleManager.getInstance(project)
+        models.clear()
+        val cache = ExternalProjectDataCache.getInstance(root)
+        val manager = ModuleManager.getInstance(root)
+        val modules = mutableMapOf<File, Module>()
 
-        val connection = connector.connect()
-        val model = connection.model(GradleProject::class.java)
+        for (module in manager.modules) module.getComponent(ModuleRootManager::class.java).contentRoots.forEach {
+            modules[File(it.path)] = module
+        }
+
+        for (module in manager.modules) module.getComponent(ModuleRootManager::class.java).contentRoots.forEach {
+            val child = cache.getRootExternalProject(it.path) ?: return@forEach
+            loadProject(child, modules)
+        }
     }
+
+    private fun loadProject(project: ExternalProject, modules: Map<File, Module>) {
+        try {
+            val buildFile = project.buildFile
+            if (buildFile?.name != "stonecutter.gradle" && buildFile?.name != "stonecutter.gradle.kts")
+                throw Exception()
+            loadVersions(project, modules)
+        } catch (_: Exception) {}
+    }
+
+    private fun loadVersions(project: ExternalProject, modules: Map<File, Module>) =
+        project.childProjects.values.forEach { child ->
+            val connector = GradleConnector.newConnector()
+            connector.forProjectDirectory(child.projectDir)
+            connector.connect().use {
+                val model = it.getModel(StonecutterModel::class.java)
+                val module = modules[child.projectDir] ?: return@use
+                models[module] = model
+            }
+        }
 }

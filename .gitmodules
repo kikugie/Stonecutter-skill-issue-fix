@@ -1,0 +1,3 @@
+[submodule "testmod"]
+	path = testmod
+	url = https://github.com/kikugie/stonecutter-template-fabric.git
