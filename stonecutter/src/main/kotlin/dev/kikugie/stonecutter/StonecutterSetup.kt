@@ -1,8 +1,9 @@
 package dev.kikugie.stonecutter
 
+import kotlinx.serialization.Serializable
 import org.gradle.api.Project
 
-
+@Serializable
 open class StonecutterSetup(
     val versions: List<StonecutterProject>,
     val vcsVersion: StonecutterProject,

@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":stitcher"))
     implementation(project(":stonecutter"))
     implementation("org.gradle:gradle-tooling-api:8.8")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.1")
     runtimeOnly("org.slf4j:slf4j-simple:1.7.10")
 }
 

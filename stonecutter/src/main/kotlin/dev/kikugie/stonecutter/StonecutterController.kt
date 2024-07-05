@@ -3,6 +3,7 @@
 package dev.kikugie.stonecutter
 
 import dev.kikugie.stonecutter.configuration.StonecutterConfiguration
+import dev.kikugie.stonecutter.process.StonecutterTask
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -45,7 +46,7 @@ open class StonecutterController internal constructor(root: Project) : Stonecutt
     val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
 
     init {
-        println("Running Stonecutter 0.4.2")
+        println("Running Stonecutter 0.5-alpha.1")
         versions.forEach { root.project(it.project).pluginManager.apply(StonecutterPlugin::class.java) }
         root.tasks.create("chiseledStonecutter") {
             setup.versions.forEach { dependsOn("${it.project}:setupChiseledBuild") }

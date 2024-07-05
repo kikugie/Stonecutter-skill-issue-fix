@@ -6,6 +6,10 @@ import dev.kikugie.semver.VersionParsingException
 import dev.kikugie.stitcher.lexer.IdentifierRecognizer.Companion.allowed
 import dev.kikugie.stonecutter.configuration.StonecutterConfiguration
 import dev.kikugie.stonecutter.configuration.StonecutterData
+import dev.kikugie.stonecutter.configuration.StonecutterModel
+import dev.kikugie.stonecutter.process.StonecutterTask
+import dev.kikugie.stonecutter.process.encode
+import dev.kikugie.stonecutter.process.runIgnoring
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
@@ -13,6 +17,7 @@ import org.gradle.api.tasks.SourceSetContainer
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 
@@ -97,7 +102,8 @@ open class StonecutterBuild internal constructor(val project: Project) : Stonecu
         }
 
         project.afterEvaluate {
-            configureSources(this)
+            configureSources()
+            serializeModel()
         }
     }
 
@@ -114,7 +120,7 @@ open class StonecutterBuild internal constructor(val project: Project) : Stonecu
         }
     }
 
-    private fun configureSources(project: Project) {
+    private fun configureSources() {
         try {
             val format: (Path) -> Any = if (setup.anyChiseled(project.gradle.startParameter.taskNames))
                 { src -> File(project.buildDirectory, "chiseledSrc/$src") }
@@ -143,5 +149,11 @@ open class StonecutterBuild internal constructor(val project: Project) : Stonecu
             }
         } catch (_: MissingPropertyException) {
         }
+    }
+
+    private fun serializeModel() = runIgnoring {
+        val file = project.buildDirectory.resolve("stonecutterCache/model.bin").toPath()
+        file.parent.createDirectories()
+        file.encode(StonecutterModel(this))
     }
 }

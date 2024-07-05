@@ -1,7 +1,9 @@
 package dev.kikugie.stonecutter
 
 import dev.kikugie.semver.SemanticVersion
+import kotlinx.serialization.Serializable
 
+@Serializable
 class StonecutterProject internal constructor(
     /**
      * The name of this project's directory, as in `versions/${project}`.
@@ -11,13 +13,12 @@ class StonecutterProject internal constructor(
      * The assigned version of this project. Must be a valid [SemanticVersion].
      * By default, its equal to [project], unless assigned by using `vers()` in the project settings.
      */
-    val version: TargetVersion,
-    isActive: Boolean = false
+    val version: TargetVersion
 ) {
     /**
      * Whenever this project is selected as active.
      */
-    var isActive: Boolean = isActive
+    var isActive: Boolean = false
         internal set
 
     internal fun asActive() = this.also { isActive = true }

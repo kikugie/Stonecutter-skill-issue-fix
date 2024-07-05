@@ -3,22 +3,21 @@ package dev.kikugie.fletching_table.impl
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
-import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.roots.ModuleRootManager
 import dev.kikugie.stonecutter.configuration.StonecutterModel
-import org.gradle.tooling.GradleConnector
 import org.jetbrains.plugins.gradle.model.ExternalProject
 import org.jetbrains.plugins.gradle.service.project.AbstractProjectResolverExtension
 import org.jetbrains.plugins.gradle.service.project.data.ExternalProjectDataCache
 import java.io.File
+import com.intellij.openapi.module.Module
 
 class ReloadListener : AbstractProjectResolverExtension() {
     @Suppress("UnstableApiUsage")
     override fun resolveFinished(node: DataNode<ProjectData>) = ProjectManager.getInstance().openProjects.forEach {
-        it.getServiceIfCreated(StonecutterService::class.java)?.reload()
+        it.getService(StonecutterService::class.java).reload()
     }
 }
 
@@ -52,17 +51,12 @@ class StonecutterService(private val root: Project) {
             if (buildFile?.name != "stonecutter.gradle" && buildFile?.name != "stonecutter.gradle.kts")
                 throw Exception()
             loadVersions(project, modules)
-        } catch (_: Exception) {}
+        } catch (_: Exception) {
+        }
     }
 
     private fun loadVersions(project: ExternalProject, modules: Map<File, Module>) =
-        project.childProjects.values.forEach { child ->
-            val connector = GradleConnector.newConnector()
-            connector.forProjectDirectory(child.projectDir)
-            connector.connect().use {
-                val model = it.getModel(StonecutterModel::class.java)
-                val module = modules[child.projectDir] ?: return@use
-                models[module] = model
-            }
+        project.childProjects.values.forEach {
+            val file = it.buildDir.resolve("stonecutterCache/model.bin")
         }
 }

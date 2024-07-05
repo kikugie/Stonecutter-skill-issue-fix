@@ -1,4 +1,4 @@
-package dev.kikugie.stonecutter
+package dev.kikugie.stonecutter.process
 
 import com.charleskorn.kaml.Yaml
 import dev.kikugie.stitcher.data.scope.Scope
@@ -27,7 +27,8 @@ internal class FileManager(
     private val charset: Charset = StandardCharsets.UTF_8,
     private val recognizers: Iterable<CommentRecognizer>,
     private val params: TransformParameters,
-    private val debug: Boolean = false,
+    private val debug: Boolean,
+    private val statistics: Statistics
 ) {
     private val parametersMatch = updateParameters() && !debug
 
@@ -54,6 +55,7 @@ internal class FileManager(
             if (parser.hasErrors) throw SyntaxException(
                 parser.errors.joinToString("\n\n") { it.join() }
             )
+            statistics.parsed += 1
         }
         if (overwrite) cleanUpAndWrite(source, inputCache.resolve("ast").resolve(astPath)) {
             encode(ast)
@@ -106,19 +108,6 @@ internal class FileManager(
         val res: Scope = inputCache.resolve("ast").resolve(source).decode()
         LOGGER.debug("Read cached AST from {}", source)
         res
-    }
-
-    private inline fun <reified T> Path.decode(): T = Cbor.Default.decodeFromByteArray(readBytes())
-    private inline fun <reified T> Path.encode(value: T) = writeBytes(
-        Cbor.Default.encodeToByteArray(value),
-        StandardOpenOption.CREATE,
-        StandardOpenOption.TRUNCATE_EXISTING
-    )
-
-    private inline fun <T> runIgnoring(action: () -> T): T? = try {
-        action()
-    } catch (_: Exception) {
-        null
     }
 
     private fun String.hash(algorithm: String): String = MessageDigest.getInstance(algorithm).apply {

@@ -1,9 +1,11 @@
 package dev.kikugie.stonecutter.configuration
 
 import dev.kikugie.semver.SemanticVersion
+import kotlinx.serialization.Serializable
 import java.nio.file.Path
 
-interface StonecutterDataView {
+@Serializable
+sealed interface StonecutterDataView {
     val debug: Boolean
     val constants: Map<String, Boolean>
     val swaps: Map<String, String>
@@ -12,6 +14,7 @@ interface StonecutterDataView {
     val excludedPaths: Set<Path>
 }
 
+@Serializable
 data class StonecutterData(
     override var debug: Boolean = false,
     override var constants: MutableMap<String, Boolean> = mutableMapOf(),

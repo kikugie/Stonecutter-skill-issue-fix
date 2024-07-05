@@ -1,17 +1,17 @@
-package dev.kikugie.stonecutter
+package dev.kikugie.stonecutter.process
 
-import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.SemanticVersionParser
 import dev.kikugie.stitcher.exception.SyntaxException
 import dev.kikugie.stitcher.scanner.StandardMultiLine
 import dev.kikugie.stitcher.scanner.StandardSingleLine
 import dev.kikugie.stitcher.transformer.TransformParameters
+import dev.kikugie.stonecutter.StonecutterProject
+import dev.kikugie.stonecutter.buildDirectory
 import dev.kikugie.stonecutter.configuration.StonecutterDataView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
-import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
@@ -48,8 +48,7 @@ internal abstract class StonecutterTask : DefaultTask() {
     abstract val data: Property<StonecutterDataView>
 
     private lateinit var manager: FileManager
-    private val transformed = AtomicInteger(0)
-    private val total = AtomicInteger(0)
+    private val statistics = Statistics()
 
     init {
         chiseled.convention(false)
@@ -61,28 +60,31 @@ internal abstract class StonecutterTask : DefaultTask() {
             "[Stonecutter] StonecutterTask is not fully initialized"
         }
         manager = createManager()
-        val time = measureTimeMillis {
+        statistics.duration = measureTimeMillis {
             transform(input.get(), output.get())
         }
-        println("[Stonecutter] Switched to ${toVersion.get().project} in ${time}ms (${transformed.get()}/${total.get()} modified)")
+        println("[Stonecutter] Switched to ${toVersion.get().project} in ${statistics.duration}ms (${statistics.total - statistics.skipped}/${statistics.total} modified)")
     }
 
     private fun createManager(): FileManager {
+        val dataView = data.get()
         val dest = if (chiseled.get()) project.parent!! else project
         fun cacheDir(pr: StonecutterProject) = dest.project(pr.project).buildDirectory.toPath().resolve("stonecutterCache")
-        val deps = dependencies.get().toMutableMap()
+
+        val deps = dataView.dependencies.toMutableMap()
         val mcVersion = deps["minecraft"] ?: SemanticVersionParser.parse(toVersion.get().version)
         deps["minecraft"] = mcVersion
         deps[""] = mcVersion
 
-        val params = TransformParameters(swaps.get(), constants.get(), deps)
+        val params = TransformParameters(dataView.swaps, dataView.constants, deps)
         return FileManager(
             inputCache = cacheDir(fromVersion.get()),
             outputCache = cacheDir(toVersion.get()),
-            filter = filter.get(),
+            filter = FileFilter(dataView.excludedExtensions, dataView.excludedPaths),
             recognizers = listOf(StandardMultiLine, StandardSingleLine),
             params = params,
-            debug = debug.get()
+            debug = dataView.debug,
+            statistics = statistics
         )
     }
 
@@ -92,14 +94,16 @@ internal abstract class StonecutterTask : DefaultTask() {
         val processed = mutableListOf<Pair<Path, String>>()
         val exceptions = mutableListOf<Throwable>()
         input.walk().map {
-            total.incrementAndGet()
+            statistics.total += 1
             it to process(input, input.relativize(it))
         }.asFlow().flowOn(Dispatchers.Default).catch {
             exceptions += it
         }.transform<Pair<Path, String?>, Unit> { (file, result) ->
-            if (result != null) transformed.incrementAndGet()
-            if (result == null) skipped.add(file)
-            else processed.add(file to result)
+            if (result != null) processed.add(file to result)
+            else {
+                statistics.skipped += 1
+                skipped.add(file)
+            }
         }.collect()
         if (exceptions.isNotEmpty())
             throw exceptions.composeCauses()
@@ -129,7 +133,7 @@ internal abstract class StonecutterTask : DefaultTask() {
                 message.append("    > $primary:\n")
                 for (line in (cause?.message ?: "").lines())
                     message.append("        $line\n")
-                if (debug.get() && err !is SyntaxException) cause?.stackTrace?.forEach {
+                if (data.get().debug && err !is SyntaxException) cause?.stackTrace?.forEach {
                     message.append("            $it\n")
                 }
                 append(message)
