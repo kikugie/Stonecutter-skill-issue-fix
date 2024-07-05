@@ -169,7 +169,7 @@ const members = [
     ]
   },
   {
-    avatar: 'https://github.com/CallMeEchoCodes/CabinetAPI/blob/main/src/main/resources/assets/cabinetapi/icon.png',
+    avatar: 'https://github.com/CallMeEchoCodes/CabinetAPI/blob/main/src/main/resources/assets/cabinetapi/icon.png?raw=true',
     name: 'Cabinet API',
     title: 'A library mod with a bunch of useful utilities for modders. ',
     links: [
