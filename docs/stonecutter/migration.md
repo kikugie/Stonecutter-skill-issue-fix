@@ -61,7 +61,7 @@ Stonecutter settings block is the first entrypoint for the project. It informs t
 
 ::: tabs
 == Kotlin DSL
-In the Kotlin example these parameters are used if you want the rest of your project to use Kotlin DSL:  
+In the Kotlin example, these parameters are used if you want the rest of your project to use Kotlin DSL:  
 ```kts
 kotlinController = true
 centralScript = "build.gradle.kts"
@@ -77,9 +77,9 @@ shared {
 }
 ```
 It has 3 available functions:
-- `versions` - simple setup, which creates project with the same directory name and minecraft version.
+- `versions` - simple setup, which creates projects with the same directory name and minecraft version.
 - `vers` - adds a project with separate directory and version.
-- `vcsVersion` *(optional)* - sets which project is considered to be main. By default, it's the first registered project.
+- `vcsVersion` *(optional)* - sets which project is considered to be the main one. By default, it's the first registered project.
 
 == Assigning project
 Assigns the current configuration to a project. In the standard setup it's `rootProject`, but depending on the structure you can set it to any subproject you have.
@@ -111,8 +111,8 @@ You may notice the `/* [SC] DO NOT EDIT */` sign and I repeat:
 > **Do not edit that line at all.**
 
 ### Global plugins
-Apart from that the purpose of this file it to have a global configuration entrypoint.
-For example you can add plugins like this:
+Apart from that, the purpose of this file is to have a global configuration entrypoint.
+For example, you can add plugins like this:
 ```kts
 plugins {
     id("dev.kikugie.stonecutter")
@@ -161,7 +161,8 @@ stonecutter.configureEach {
 There you get an implicit receiver (AKA called with `this.`) of the `build.gradle[.kts]` plugin, where you can call all its methods.
 
 ## Versioned properties
-Before we configure the build file, we need to set up versioned properties. For example the basic setup for a Fabric mod would look like this:
+Before we configure the build file, we need to set up versioned properties.
+For example, the basic setup for a Fabric mod would look like this:
 ::: code-group
 ```properties [gradle.properties]
 # See latest at https://fabricmc.net/develop/
@@ -239,8 +240,9 @@ loom {
     }
 }
 ```
+You can also you `project.property` accessors if names don't contain any punctuation.
 :::
 
 ### Notes
-Depending on your project you may need to add versioned properties to other places, but the setup is now done.
+Depending on your project, you may need to add versioned properties to other places, but the setup is now done.
 Refer to other sections to learn how to test and manage versioned code.
