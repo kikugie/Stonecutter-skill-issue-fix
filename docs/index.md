@@ -158,6 +158,79 @@ const members = [
       { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/better-boat-movement' }
     ]
   },
+  {
+    avatar: 'https://cdn.modrinth.com/data/FrZIkosK/914fbe1f142a3fbe7488d0064e252f08f10c4a93.png',
+    name: 'Forgotten Graves',
+    title: 'Minecraft (Fabric) mod that stores items and XP in a decaying grave upon death.',
+    links: [
+      { icon: 'github', link: 'https://github.com/ginsm/forgotten-graves' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/forgotten-graves' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/forgotten-graves' }
+    ]
+  },
+  {
+    avatar: 'https://github.com/CallMeEchoCodes/CabinetAPI/blob/main/src/main/resources/assets/cabinetapi/icon.png',
+    name: 'Cabinet API',
+    title: 'A library mod with a bunch of useful utilities for modders. ',
+    links: [
+      { icon: 'github', link: 'https://github.com/CallMeEchoCodes/CabinetAPI' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/TBQr8ROh/b092cf15b0e51b27740df11220d4a8c51fd0b08e.png',
+    name: 'MCC Island Nametag Mod',
+    title: 'A mod that displays your own name tag on MCC Island in the exact way the server does it.',
+    links: [
+      { icon: 'github', link: 'https://github.com/anastarawneh/MCCINametagMod' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/mcc-island-nametag-mod' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/GON0Fdk5/047b7bfec30d245cd7d5972affe208e6b0f8da98.png',
+    name: 'Skin Overrides',
+    title: 'A simple mod for locally changing skins and capes.',
+    links: [
+      { icon: 'github', link: 'https://github.com/orifu/skin-overrides' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/skin-overrides' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/PztDP6Mf/b4734849fa5b15e7bd86d0cad353cab356cef542.png',
+    name: 'Player Statistics',
+    title: 'Adds a command to your Fabric server that gives players insights into everyone\'s statistics.',
+    links: [
+      { icon: 'github', link: 'https://github.com/kr8gz/PlayerStatistics' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/playerstatistics' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/XKh6bbqf/220523ec73cb6172bb4e01c3368c5998d4470631.webp',
+    name: 'Forgotten Graves',
+    title: 'Brings back the old world loading progress bar to Modern Minecraft.',
+    links: [
+      { icon: 'github', link: 'https://github.com/FokshaWasTaken/loading-bar' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/old-loading-progress-bar' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/hHVaPgFK/723c55a27d7d633024fdfe14464a44c84bf05d48.png',
+    name: 'Mob Armor Trims',
+    title: 'Makes mobs be able to spawn with naturally trimmed armor.',
+    links: [
+      { icon: 'github', link: 'https://github.com/Imajo24I/Mob-Armor-Trims' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/mob-armor-trims' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/mob-armor-trims' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/9auOqb3o/a0abec247c17a55fb4826f9b641fefdebd794339.png',
+    name: 'CyanSetHome',
+    title: 'Adds the /sethome command and a system of trust between player to allow them to teleport to their respective homes.',
+    links: [
+      { icon: 'github', link: 'https://github.com/Aeldit/CyanSetHome' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/cyansethome' }
+    ]
+  },
 ]
 </script>
 
