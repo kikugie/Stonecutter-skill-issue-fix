@@ -64,7 +64,7 @@ export default defineVersionedConfig(__dirname, {
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/kikugie/stonecutter-kt' },
+      { icon: 'github', link: 'https://github.com/kikugie/stonecutter' },
       { icon: 'discord', link: 'https://discord.gg/TBgNUCfryS' },
     ]
   },
