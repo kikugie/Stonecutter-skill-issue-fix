@@ -2,11 +2,13 @@ import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.versioning.VersioningConfiguration
 import org.jetbrains.dokka.versioning.VersioningPlugin
+import kotlin.io.path.readLines
+import kotlin.io.path.writeText
 
 plugins {
-    kotlin("jvm") version "1.9.22" apply false
-    kotlin("plugin.serialization") version "1.9.22" apply false
-    id("org.jetbrains.dokka") version "1.9.20"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.dokka)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 buildscript {
@@ -15,8 +17,8 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.dokka:dokka-base:1.9.20")
-        classpath("org.jetbrains.dokka:versioning-plugin:1.9.20")
+        classpath(libs.dokka.base)
+        classpath(libs.dokka.versioning)
     }
 }
 
@@ -25,11 +27,7 @@ repositories {
 }
 
 dependencies {
-    dokkaHtmlPlugin("org.jetbrains.dokka:versioning-plugin:1.9.20")
-}
-
-subprojects {
-    apply(plugin = "org.jetbrains.dokka")
+    dokkaHtmlPlugin(libs.dokka.versioning)
 }
 
 tasks.dokkaHtmlCollector {
@@ -45,20 +43,52 @@ tasks.dokkaHtmlCollector {
 }
 
 tasks.register("updateVersion") {
-    fun replaceAndWrite(path: String, pattern: String, replacement: String) {
-        val location = project.file(path)
-        require(location.exists() && location.isFile && location.canRead()) { "Path $path is invalid" }
-        val text = location.readText()
-        val new = text.replace(Regex(pattern, RegexOption.MULTILINE), replacement)
-        if (new != text) location.writeText(new)
-    }
+    doLast {
+        fun replaceAndWrite(path: String, pattern: String, replacement: String) {
+            val location = project.file(path)
+            require(location.exists() && location.isFile && location.canRead()) { "Path $path is invalid" }
+            val text = location.readText()
+            val new = text.replace(Regex(pattern, RegexOption.MULTILINE), replacement)
+            if (new != text) location.writeText(new)
+        }
 
-    val version = project.property("stonecutter")
-    replaceAndWrite("docs/.vitepress/config.mts", "latestVersion: '.+'", "latestVersion: '$version'")
-    replaceAndWrite("docs/stonecutter/migration.md", "version \".+\"$", "version \"$version\"")
-    replaceAndWrite(
-        "stonecutter/src/main/kotlin/dev/kikugie/stonecutter/StonecutterController.kt",
-        "\"Running Stonecutter .+\"",
-        "\"Running Stonecutter $version\""
-    )
+        val version = project.property("stonecutter")
+        replaceAndWrite("docs/.vitepress/config.mts", "latestVersion: '.+'", "latestVersion: '$version'")
+        replaceAndWrite("docs/stonecutter/migration.md", "version \".+\"$", "version \"$version\"")
+        replaceAndWrite(
+            "stonecutter/src/main/kotlin/dev/kikugie/stonecutter/StonecutterController.kt",
+            "\"Running Stonecutter .+\"",
+            "\"Running Stonecutter $version\""
+        )
+    }
+}
+
+tasks.register("updateHallOfFame") {
+    doLast {
+        val dest = project.file("docs/index.md").toPath()
+        val mods = project.file("hall-of-fame.txt").toPath()
+        fun cleanLines(): List<String> {
+            var yeet = false
+            return dest.readLines().filterNot {
+                if (it.trimStart().startsWith("let start")) {
+                    yeet = true
+                    return@filterNot false
+                } else if (it.trimStart().startsWith("let end"))
+                    yeet = false
+                yeet
+            }
+        }
+        val projects = ProjectFinder
+            .find(*mods.readLines().toTypedArray())
+            .sortedBy { -it.downloads }
+            .joinToString(",\n") { it.toJS() }
+        val text = cleanLines().joinToString("\n").replaceFirst(
+            "let start = \"here\";",
+            """let start = "here";
+const members = [
+$projects
+];
+""")
+        dest.writeText(text)
+    }
 }
