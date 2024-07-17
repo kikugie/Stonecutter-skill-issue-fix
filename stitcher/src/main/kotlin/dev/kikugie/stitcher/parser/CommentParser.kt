@@ -7,7 +7,7 @@ import dev.kikugie.stitcher.data.token.StitcherTokenType.*
 import dev.kikugie.stitcher.data.token.Token
 import dev.kikugie.stitcher.data.token.WhitespaceType
 import dev.kikugie.stitcher.exception.ErrorHandler
-import dev.kikugie.stitcher.lexer.Lexer
+import dev.kikugie.stitcher.lexer.LexSlice
 import dev.kikugie.stitcher.lexer.LexerAccess
 import dev.kikugie.stitcher.transformer.TransformParameters
 
@@ -119,7 +119,7 @@ class CommentParser(
         lexer.advance()
     }
 
-    private inline fun <T> consume(action: (Lexer.Slice) -> T): T {
+    private inline fun <T> consume(action: (LexSlice) -> T): T {
         return action(lexer.advance() ?: lexer.lookupOrDefault())
     }
 }

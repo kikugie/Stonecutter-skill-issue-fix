@@ -13,8 +13,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface Block {
     fun <T> accept(visitor: Visitor<T>): T
-    fun isEmpty(): Boolean
-    fun isNotEmpty(): Boolean = !isEmpty()
 
     interface Visitor<T> {
         fun visitContent(it: ContentBlock): T
@@ -33,7 +31,6 @@ data class ContentBlock(
     val content: Token,
 ) : Block {
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitContent(this)
-    override fun isEmpty(): Boolean = content.value.isBlank()
 }
 
 /**
@@ -51,7 +48,6 @@ data class CommentBlock(
     val end: Token
 ) : Block {
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitComment(this)
-    override fun isEmpty(): Boolean = false
 }
 
 /**
@@ -71,5 +67,4 @@ data class CodeBlock(
     val scope: Scope? = null,
 ) : Block {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visitCode(this)
-    override fun isEmpty(): Boolean = false
 }

@@ -1,4 +1,4 @@
-package dev.kikugie.stitcher
+package dev.kikugie.stitcher.eval
 
 import dev.kikugie.stitcher.data.block.Block
 import dev.kikugie.stitcher.data.block.CodeBlock
@@ -16,9 +16,7 @@ import dev.kikugie.stitcher.data.token.Token
 @Suppress("MemberVisibilityCanBePrivate")
 object Assembler : Component.Visitor<String>, Block.Visitor<String>, Scope.Visitor<String> {
     private fun StringBuilder.token(token: Token): StringBuilder = append(token.value)
-
     private fun StringBuilder.space(): StringBuilder = append(' ')
-
     private fun StringBuilder.appendVisit(it: Component) = append(it.accept(Assembler))
     private fun StringBuilder.appendVisit(it: Block) = append(it.accept(Assembler))
     private fun StringBuilder.appendVisit(it: Scope) = append(it.accept(Assembler))
@@ -103,6 +101,6 @@ object Assembler : Component.Visitor<String>, Block.Visitor<String>, Scope.Visit
     }
 
     override fun visitScope(it: Scope): String = buildString {
-        it.forEach { bl -> appendVisit(bl) }
+        for (block in it.blocks) appendVisit(block)
     }
 }

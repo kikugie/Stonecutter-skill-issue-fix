@@ -6,7 +6,7 @@ import dev.kikugie.stitcher.data.token.MarkerType
 import dev.kikugie.stitcher.exception.ErrorHandlerImpl
 import dev.kikugie.stitcher.lexer.Lexer
 import dev.kikugie.stitcher.parser.CommentParser
-import dev.kikugie.stitcher.transformer.ConditionVisitor
+import dev.kikugie.stitcher.eval.ConditionChecker
 import dev.kikugie.stonecutter.configuration.StonecutterModel
 import dev.kikugie.stonecutter.process.toParams
 
@@ -28,7 +28,7 @@ fun String.findMatching(module: Module): List<StonecutterModel> {
         ?.takeIf { it.type == MarkerType.CONDITION }
         ?: return emptyList()
     return service.models.values.filter {
-        val visitor = ConditionVisitor(it.data.toParams(it.current.version))
+        val visitor = ConditionChecker(it.data.toParams(it.current.version))
         visitor.visitDefinition(def)
     }
 }

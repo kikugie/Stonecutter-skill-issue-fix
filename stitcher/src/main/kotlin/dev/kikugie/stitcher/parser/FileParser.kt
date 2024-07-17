@@ -9,51 +9,37 @@ import dev.kikugie.stitcher.data.scope.ScopeType
 import dev.kikugie.stitcher.data.token.ContentType
 import dev.kikugie.stitcher.data.token.NullType
 import dev.kikugie.stitcher.data.token.Token
+import dev.kikugie.stitcher.eval.isBlank
+import dev.kikugie.stitcher.eval.isNotBlank
 import dev.kikugie.stitcher.exception.ErrorHandler
-import dev.kikugie.stitcher.exception.ErrorHandlerImpl
+import dev.kikugie.stitcher.exception.StoringErrorHandler
+import dev.kikugie.stitcher.lexer.LexSlice
 import dev.kikugie.stitcher.lexer.Lexer
-import dev.kikugie.stitcher.scanner.CommentRecognizer
-import dev.kikugie.stitcher.scanner.Scanner.Companion.scan
 import dev.kikugie.stitcher.transformer.TransformParameters
-import java.io.Reader
 import java.util.*
 
 /**
  * Parser for the entire file contents.
  *
  * @property handlerFactory Exception collector function for each comment
- * @constructor
- * Creates parser from a reader, directly running the [Scanner]
  *
  * @param input Sequence of tokens produced by the scanner or a reader to be scanned
  */
 class FileParser(
     input: Sequence<Token>,
     private val params: TransformParameters? = null,
-    private val handlerFactory: () -> ErrorHandler = ::ErrorHandlerImpl,
+    private val handlerFactory: () -> ErrorHandler = ::StoringErrorHandler,
 ) {
-    constructor(
-        input: Reader,
-        recognizers: Iterable<CommentRecognizer>,
-        params: TransformParameters? = null,
-        handlerFactory: () -> ErrorHandler = ::ErrorHandlerImpl,
-    ) : this(input.scan(recognizers), params, handlerFactory)
-    private val iter = LookaroundIterator(input.iterator())
-    private val scopes = Stack<Scope>()
-        .apply { push(Scope()) }
-    private val active get() = scopes.peek()
-    private val root get() = scopes[0]
+    private val iter: LookaroundIterator<Token> = LookaroundIterator(input.iterator())
+    private val scopes: Stack<Scope> = Stack<Scope>().apply { push(Scope()) }
+    private val active: Scope get() = scopes.peek()
+    private val root: Scope get() = scopes[0]
     private val handlers: MutableList<ErrorHandler> = mutableListOf()
-    val hasErrors get() = handlers.any { it.errors.isNotEmpty() }
-    val errors get() = handlers.asSequence().flatMap { it.errors }
-
-    private fun add(block: Block) {
-        active.add(block)
-    }
+    val hasErrors: Boolean get() = handlers.any { it.errors.isNotEmpty() }
+    val errors: Sequence<Pair<LexSlice, String>> get() = handlers.asSequence().flatMap { it.errors }
 
     private val commentStart get() = iter.prev!!
-    private val commentEnd
-        get() = when (iter.peek?.type) {
+    private val commentEnd get() = when (iter.peek?.type) {
             ContentType.COMMENT_END -> iter.peek!!
             null, NullType -> Token("", ContentType.COMMENT_END)
             else -> throw AssertionError("Unexpected token: ${iter.peek}")
@@ -66,12 +52,12 @@ class FileParser(
      */
     fun parse(): Scope = iter.forEach {
         when (it.type) {
-            ContentType.CONTENT -> add(ContentBlock(it))
+            ContentType.CONTENT -> active.blocks.add(ContentBlock(it))
             ContentType.COMMENT -> parseComment(it)
             ContentType.COMMENT_START, ContentType.COMMENT_END -> {}
             else -> throw AssertionError("Unexpected token: $it")
         }
-        if (active.enclosure != ScopeType.CLOSED && active.lastOrNull()?.isNotEmpty() == true)
+        if (active.enclosure != ScopeType.CLOSED && active.blocks.lastOrNull()?.isNotBlank() == true)
             scopes.pop()
     }.let { root }
 
@@ -84,11 +70,11 @@ class FileParser(
     private fun parseComment(token: Token) {
         val parser = createParser(token.value)
         val def = parser.parse() ?: run {
-            add(CommentBlock(commentStart, token, commentEnd))
+            active.blocks.add(CommentBlock(commentStart, token, commentEnd))
             return
         }
-        val scope = if (def.isEmpty() && def.extension) null else Scope(def.type, def.enclosure)
-        add(CodeBlock(commentStart, def, commentEnd, scope))
+        val scope = if (def.isBlank() && def.extension) null else Scope(def.type, def.enclosure)
+        active.blocks.add(CodeBlock(commentStart, def, commentEnd, scope))
         if (scope != null) scopes.push(scope)
     }
 }

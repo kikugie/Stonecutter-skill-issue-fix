@@ -11,6 +11,7 @@ import dev.kikugie.stitcher.data.component.Component
  * @property type associated token type
  * @see [TokenType]
  */
+@Suppress("UNCHECKED_CAST")
 @Serializable
 data class Token(
     val value: String,
@@ -23,13 +24,11 @@ data class Token(
      * Deserialized tokens are assumed to be valid and shouldn't need this.
      * @property metadata Map containing the metadata
      */
-    private val metadata: MutableMap<KClass<*>, Any> by lazy { mutableMapOf() }
-
-    fun isBlank() = value.isBlank()
+    private val metadata: MutableMap<String, Any> by lazy { mutableMapOf() }
 
     /**
      * Copies this token, changing the type.
-     * This is done by the parser in case lexer has identified the type incorrectly.
+     * The parser does this in case lexer has identified the type incorrectly.
      * This method is preferable to manual instance creation, because it preserves [metadata]
      *
      * @param type New type
@@ -38,13 +37,11 @@ data class Token(
         it.metadata.putAll(metadata)
     }
 
-    operator fun <T : Any> set(key: KClass<T>, value: T) {
-        metadata[key] = value
-    }
+    operator fun <T : Any> set(key: KClass<T>, value: T) = metadata.put(key.qualifiedName!!, value)
+    operator fun <T : Any> get(key: KClass<T>) = metadata[key.qualifiedName!!] as? T
 
-    @Suppress("UNCHECKED_CAST")
-    operator fun <T : Any> get(key: KClass<T>): T? = metadata[key]?.let { it as? T }
-    inline fun <reified T : Any> get(): T? = get(T::class)
+    operator fun <T : Any> set(key: String, value: T) = metadata.put(key, value)
+    operator fun <T : Any> get(key: String) = metadata[key] as? T
 
     companion object {
         /**
@@ -53,8 +50,4 @@ data class Token(
         val EMPTY = Token("", NullType)
     }
 
-    data class Match(
-        val value: String,
-        val range: IntRange,
-    )
 }

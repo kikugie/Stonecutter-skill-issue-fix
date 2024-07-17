@@ -1,6 +1,6 @@
 package dev.kikugie.stitcher.transformer
 
-import dev.kikugie.stitcher.Assembler
+import dev.kikugie.stitcher.eval.Assembler
 import dev.kikugie.stitcher.data.block.Block
 import dev.kikugie.stitcher.data.block.CodeBlock
 import dev.kikugie.stitcher.data.block.CommentBlock
@@ -14,8 +14,10 @@ import dev.kikugie.stitcher.data.token.ContentType
 import dev.kikugie.stitcher.data.token.MarkerType.CONDITION
 import dev.kikugie.stitcher.data.token.MarkerType.SWAP
 import dev.kikugie.stitcher.data.token.Token
+import dev.kikugie.stitcher.eval.ConditionChecker
 import dev.kikugie.stitcher.parser.FileParser
 import dev.kikugie.stitcher.scanner.CommentRecognizer
+import dev.kikugie.stitcher.scanner.Scanner
 import dev.kikugie.stitcher.util.leadingSpaces
 import dev.kikugie.stitcher.util.trailingSpaces
 import java.io.Reader
@@ -33,7 +35,7 @@ class Transformer(
     private val recognizers: Iterable<CommentRecognizer>,
     private val params: TransformParameters,
 ) : Block.Visitor<Unit> {
-    private val visitor = ConditionVisitor(params)
+    private val visitor = ConditionChecker(params)
     private var previousResult: Boolean = false
 
     /**
@@ -41,7 +43,7 @@ class Transformer(
      *
      * @return input scope
      */
-    fun process() = source.forEach { it.accept(this) }.let { source }
+    fun process() = source.blocks.forEach { it.accept(this) }.let { source }
     private fun withSource(source: Scope) = Transformer(source, recognizers, params)
     override fun visitContent(it: ContentBlock) {}
     override fun visitComment(it: CommentBlock) {}
@@ -61,7 +63,7 @@ class Transformer(
         if (contents != new) {
             val parsed = new.parse()
             withSource(parsed).process()
-            it.scope.blocks = parsed.blocks
+            it.scope.assign(parsed.blocks)
         }
     }
 
@@ -78,16 +80,21 @@ class Transformer(
         else CommentAdder.accept(def.enclosure, scope)
         when {
             text == null -> withSource(scope).process()
-            !bool -> scope.blocks = mutableListOf(ContentBlock(Token(text, ContentType.CONTENT)))
+            !bool -> scope.assign(listOf(ContentBlock(Token(text, ContentType.CONTENT))))
             else -> {
                 val parsed = text.parse()
                 withSource(parsed).process()
-                scope.blocks = parsed.blocks
+                it.scope.assign(parsed.blocks)
             }
         }
     }
 
-    private fun String.parse() = FileParser(reader(), recognizers).parse()
+    private fun String.parse() = FileParser(Scanner(reader(), recognizers).tokenize()).parse()
+
+    private fun Scope.assign(new: Iterable<Block>) {
+        blocks.clear()
+        blocks.addAll(new)
+    }
 
     companion object {
         internal fun String.affectedRange(type: ScopeType): IntRange = when (type) {

@@ -3,14 +3,13 @@ package dev.kikugie.stonecutter.process
 import com.charleskorn.kaml.Yaml
 import dev.kikugie.stitcher.data.scope.Scope
 import dev.kikugie.stitcher.exception.SyntaxException
-import dev.kikugie.stitcher.Assembler
+import dev.kikugie.stitcher.eval.Assembler
 import dev.kikugie.stitcher.exception.join
 import dev.kikugie.stitcher.parser.FileParser
 import dev.kikugie.stitcher.transformer.TransformParameters
 import dev.kikugie.stitcher.transformer.Transformer
 import dev.kikugie.stitcher.scanner.CommentRecognizer
 import kotlinx.serialization.*
-import kotlinx.serialization.cbor.Cbor
 import org.slf4j.LoggerFactory
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets

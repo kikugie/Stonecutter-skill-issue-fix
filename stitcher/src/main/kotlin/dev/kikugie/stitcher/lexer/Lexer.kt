@@ -6,11 +6,11 @@ class Lexer(
     private val input: CharSequence,
     private val matchers: Iterable<TokenRecognizer> = ALL,
 ) : LexerAccess {
-    private val tokens = mutableListOf<Slice>()
+    private val tokens = mutableListOf<LexSlice>()
     private var index = 0
     private var cursor = 0
 
-    override fun lookupOrDefault(offset: Int): Slice = lookup(offset) ?: Slice(NullType, input.lastIndex..<input.length, input)
+    override fun lookupOrDefault(offset: Int): LexSlice = lookup(offset) ?: LexSlice(NullType, input.lastIndex..<input.length, input)
     override fun lookup(offset: Int) = when {
         offset >= 0 -> tokens.getOrNull(index + offset) ?: run {
             if (cursor == -1) return@run null
@@ -22,12 +22,12 @@ class Lexer(
         else -> tokens.getOrNull(index + offset)
     }
 
-    override fun advance(): Slice? = (tokens.getOrNull(index) ?: advanceInternal()).also {
+    override fun advance(): LexSlice? = (tokens.getOrNull(index) ?: advanceInternal()).also {
         if (it == null || cursor >= input.length) cursor = -1
         if (it != null) index++
     }
 
-    private fun advanceInternal(): Slice? = when (cursor) {
+    private fun advanceInternal(): LexSlice? = when (cursor) {
         -1 -> null
         0 -> when (input.firstOrNull()) {
             '?' -> {
@@ -51,9 +51,9 @@ class Lexer(
         else -> locateToken()
     }
 
-    private fun locateToken(): Slice? {
+    private fun locateToken(): LexSlice? {
         if (cursor >= input.length) return null
-        fun find(): Slice? = matchers.firstNotNullOfOrNull {
+        fun find(): LexSlice? = matchers.firstNotNullOfOrNull {
             val match = it.match(input, cursor) ?: return@firstNotNullOfOrNull null
             val slice = slice(it.type, match)
             cursor = slice.range.last + 1
@@ -83,20 +83,6 @@ class Lexer(
         return unknown
     }
 
-    private fun slice(type: TokenType, range: IntRange) = Slice(type, range, input)
+    private fun slice(type: TokenType, range: IntRange) = LexSlice(type, range, input)
 
-    data class Slice(
-        val type: TokenType,
-        val range: IntRange,
-        val source: CharSequence
-    ) {
-        val value get() = source.substring(range)
-        val token get() = Token(value, type)
-
-        override fun toString(): String = "Slice(type=$type, range=${range.first}..<${range.last + 1}, value=$value)"
-        
-        companion object {
-            val EMPTY = Slice(NullType, 0..0, "")
-        }
-    }
 }

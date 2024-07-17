@@ -32,5 +32,6 @@ enum class StitcherTokenType : TokenType {
     // Multi-char
     AND, OR, IF, ELSE, ELIF, // && , || and self-explanatory
     EXPECT_WORD, // >>
-    IDENTIFIER, PREDICATE,
+    IDENTIFIER,
+    PREDICATE,
 }

@@ -10,12 +10,12 @@ import kotlinx.serialization.Transient
  * Represents the id of scope in the Stitcher program.
  *
  * Type defines how the parser should close the scope and how the transformer should modify it.
- * - [CLOSED] - comment ends with `{`. Parser will look for a comment starting with `}` to close the scope.
- * - [LINE] - comment doesn't have a key character for the ending.
+ * - [CLOSED] - Comment ends with `{`. Parser will look for a comment starting with `}` to close the scope.
+ * - [LINE] - Comment doesn't have a key character for the ending.
  * Parser will assign the next [Block] to the scope and close it.
  * Transformer will apply the change to the next logical line.
  * (i.e. the current line or the next one if the current one has nothing after the condition)
- * - [WORD] - comment ends with `>>`.
+ * - [WORD] - Comment ends with `>>`.
  * Parser will assign the next [Block] to the scope and close it.
  * Transformer will apply the change to the next uninterrupted string.
  * (i.e. a string that ends with a whitespace or a line break)
@@ -44,7 +44,7 @@ enum class ScopeType(val id: String) {
  * Stitcher expressions start with a unique identifier, which determines the syntax.
  * Closed scopes must end with a comment of the same identifier.
  *
- * (i.e. the following is not allowed)
+ * (i.e., the following is not allowed)
  * ```
  *  //$ id {
  *  //? if expr {
@@ -65,23 +65,10 @@ enum class ScopeType(val id: String) {
 @Serializable
 data class Scope(
     // Not serialized because only used for parsing the tree
-    @Transient
-    val type: MarkerType? = null,
-    @Transient
-    val enclosure: ScopeType = CLOSED
-) : MutableCollection<Block> {
-    var blocks: MutableList<Block> = mutableListOf()
-    override val size get() = blocks.size
-    override fun clear() = blocks.clear()
-    override fun isEmpty() = blocks.isEmpty()
-    override fun containsAll(elements: Collection<Block>) = blocks.containsAll(elements)
-    override fun contains(element: Block) = blocks.contains(element)
-    override fun addAll(elements: Collection<Block>) = blocks.addAll(elements)
-    override fun add(element: Block) = blocks.add(element)
-    override fun retainAll(elements: Collection<Block>) = blocks.retainAll(elements)
-    override fun removeAll(elements: Collection<Block>) = blocks.removeAll(elements)
-    override fun remove(element: Block) = blocks.remove(element)
-    override fun iterator() = blocks.iterator()
+    @Transient val type: MarkerType? = null,
+    @Transient val enclosure: ScopeType = CLOSED
+) {
+    val blocks: MutableList<Block> = mutableListOf()
 
     fun <T> accept(visitor: Visitor<T>): T = visitor.visitScope(this)
 
