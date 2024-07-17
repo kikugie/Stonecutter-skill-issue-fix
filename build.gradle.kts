@@ -84,11 +84,12 @@ tasks.register("updateHallOfFame") {
             .joinToString(",\n") { it.toJS() }
         val text = cleanLines().joinToString("\n").replaceFirst(
             "let start = \"here\";",
-            """let start = "here";
-const members = [
-$projects
-];
-""")
+            """
+                let start = "here";
+                const members = [
+                %s
+                ];
+            """.trimIndent().format(projects))
         dest.writeText(text)
     }
 }
