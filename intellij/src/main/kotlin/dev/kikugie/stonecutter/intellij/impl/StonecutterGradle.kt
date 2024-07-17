@@ -1,4 +1,4 @@
-package dev.kikugie.fletching_table.impl
+package dev.kikugie.stonecutter.intellij.impl
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.externalSystem.model.DataNode
@@ -28,14 +28,17 @@ class ReloadListener : AbstractProjectResolverExtension() {
 
 @Service(Service.Level.PROJECT)
 class StonecutterService(private val root: Project) {
-    private val models: MutableMap<Module, StonecutterModel> = WeakHashMap()
+    private val _models: MutableMap<Module, StonecutterModel> = WeakHashMap()
+    val models: Map<Module, StonecutterModel> get() = _models
 
     init {
         reload()
     }
 
+    operator fun get(module: Module) = _models[module]
+
     internal fun reload() {
-        models.clear()
+        _models.clear()
         val cache = ExternalProjectDataCache.getInstance(root)
         val manager = ModuleManager.getInstance(root)
         val modules = mutableMapOf<File, Module>()
@@ -50,6 +53,7 @@ class StonecutterService(private val root: Project) {
             if (buildFileName == "stonecutter.gradle" || buildFileName == "stonecutter.gradle.kts")
                 loadVersions(project, modules)
         }
+        println(_models)
     }
 
     private fun loadVersions(project: ExternalProject, modules: Map<File, Module>) {
@@ -58,7 +62,7 @@ class StonecutterService(private val root: Project) {
             val file = it.buildDir.resolve("stonecutterCache/model.bin").toPath()
             if (file.notExists() || !file.isReadable()) continue
             runIgnoring {
-                models[module] = file.decode()
+                _models[module] = file.decode()
             }
         }
     }

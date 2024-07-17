@@ -1,4 +1,4 @@
-package dev.kikugie.fletching_table.lang
+package dev.kikugie.stonecutter.intellij.lang
 
 import com.intellij.psi.tree.IElementType
 import dev.kikugie.stitcher.data.token.*

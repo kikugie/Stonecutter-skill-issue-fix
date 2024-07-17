@@ -19,7 +19,6 @@ import java.nio.file.StandardOpenOption
 import java.security.MessageDigest
 import kotlin.io.path.*
 
-@OptIn(ExperimentalSerializationApi::class)
 internal class FileManager(
     private val inputCache: Path,
     private val outputCache: Path,

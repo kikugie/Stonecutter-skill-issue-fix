@@ -2,6 +2,9 @@
 
 package dev.kikugie.stonecutter.process
 
+import dev.kikugie.semver.SemanticVersionParser
+import dev.kikugie.stitcher.transformer.TransformParameters
+import dev.kikugie.stonecutter.configuration.StonecutterDataView
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
@@ -22,4 +25,12 @@ inline fun <T> runIgnoring(action: () -> T): T? = try {
     action()
 } catch (_: Exception) {
     null
+}
+
+fun StonecutterDataView.toParams(version: String, key: String = "minecraft"): TransformParameters {
+    val deps = dependencies.toMutableMap()
+    val dest = deps[key] ?: SemanticVersionParser.parse(version)
+    deps[key] = dest
+    deps[""] = dest
+    return TransformParameters(swaps, constants, deps)
 }

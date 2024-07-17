@@ -1,4 +1,4 @@
-package dev.kikugie.fletching_table.lang
+package dev.kikugie.stonecutter.intellij.lang
 
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType

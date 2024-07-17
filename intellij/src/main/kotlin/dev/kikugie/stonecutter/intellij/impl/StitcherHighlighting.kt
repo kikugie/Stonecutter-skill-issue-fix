@@ -1,4 +1,4 @@
-package dev.kikugie.fletching_table.impl
+package dev.kikugie.stonecutter.intellij.impl
 
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
@@ -22,7 +22,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.elementType
-import dev.kikugie.fletching_table.lang.*
+import dev.kikugie.stonecutter.intellij.lang.*
 import javax.swing.Icon
 
 class StitcherHighlighter : SyntaxHighlighterBase() {

@@ -20,15 +20,16 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <languageInjector implementation="dev.kikugie.fletching_table.impl.StitcherInjector"/>
-        <colorSettingsPage implementation="dev.kikugie.fletching_table.impl.StitcherColorSettingsPage"/>
-        <editorHighlighterProvider filetype="Stitcher" implementationClass="dev.kikugie.fletching_table.impl.StitcherEditorHighlighter"/>
-        <fileTypeOverrider implementation="dev.kikugie.fletching_table.impl.StitcherFileTypeOverrider"/>
-        <lang.parserDefinition language="Stitcher" implementationClass="dev.kikugie.fletching_table.lang.StitcherDef"/>
-        <lang.syntaxHighlighter language="Stitcher" implementationClass="dev.kikugie.fletching_table.impl.StitcherHighlighter"/>
-        <annotator language="Stitcher" implementationClass="dev.kikugie.fletching_table.impl.StitcherAnnotator"/>
+        <languageInjector implementation="dev.kikugie.stonecutter.intellij.impl.StitcherInjector"/>
+        <colorSettingsPage implementation="dev.kikugie.stonecutter.intellij.impl.StitcherColorSettingsPage"/>
+        <editorHighlighterProvider filetype="Stitcher" implementationClass="dev.kikugie.stonecutter.intellij.impl.StitcherEditorHighlighter"/>
+        <fileTypeOverrider implementation="dev.kikugie.stonecutter.intellij.impl.StitcherFileTypeOverrider"/>
+        <lang.parserDefinition language="Stitcher" implementationClass="dev.kikugie.stonecutter.intellij.lang.StitcherDef"/>
+        <lang.syntaxHighlighter language="Stitcher" implementationClass="dev.kikugie.stonecutter.intellij.impl.StitcherHighlighter"/>
+        <annotator language="Stitcher" implementationClass="dev.kikugie.stonecutter.intellij.impl.StitcherAnnotator"/>
+        <codeInsight.lineMarkerProvider language="Stitcher" implementationClass="dev.kikugie.stonecutter.intellij.impl.StitcherLineMarkerProvider"/>
     </extensions>
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
-        <projectResolve implementation="dev.kikugie.fletching_table.impl.ReloadListener"/>
+        <projectResolve implementation="dev.kikugie.stonecutter.intellij.impl.ReloadListener"/>
     </extensions>
 </idea-plugin>

@@ -1,4 +1,4 @@
-package dev.kikugie.fletching_table.lang
+package dev.kikugie.stonecutter.intellij.lang
 
 import com.intellij.lang.PsiBuilder
 import com.intellij.psi.tree.IElementType

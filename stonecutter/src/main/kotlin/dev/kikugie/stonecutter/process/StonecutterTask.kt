@@ -71,12 +71,7 @@ internal abstract class StonecutterTask : DefaultTask() {
         val dest = if (chiseled.get()) project.parent!! else project
         fun cacheDir(pr: StonecutterProject) = dest.project(pr.project).buildDirectory.toPath().resolve("stonecutterCache")
 
-        val deps = dataView.dependencies.toMutableMap()
-        val mcVersion = deps["minecraft"] ?: SemanticVersionParser.parse(toVersion.get().version)
-        deps["minecraft"] = mcVersion
-        deps[""] = mcVersion
-
-        val params = TransformParameters(dataView.swaps, dataView.constants, deps)
+        val params = dataView.toParams(toVersion.get().version)
         return FileManager(
             inputCache = cacheDir(fromVersion.get()),
             outputCache = cacheDir(toVersion.get()),
