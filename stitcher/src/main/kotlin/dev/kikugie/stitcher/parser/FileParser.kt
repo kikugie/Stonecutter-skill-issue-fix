@@ -1,6 +1,5 @@
 package dev.kikugie.stitcher.parser
 
-import dev.kikugie.stitcher.data.block.Block
 import dev.kikugie.stitcher.data.block.CodeBlock
 import dev.kikugie.stitcher.data.block.CommentBlock
 import dev.kikugie.stitcher.data.block.ContentBlock

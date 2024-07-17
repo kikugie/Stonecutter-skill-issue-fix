@@ -1,5 +1,6 @@
 package dev.kikugie.stonecutter
 
+import dev.kikugie.stonecutter.configuration.StonecutterInitialization
 import org.gradle.api.Action
 import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings
@@ -10,7 +11,7 @@ import kotlin.io.path.notExists
  * Executed for the `stonecutter` block in `settings.gradle` and responsible for creating versioned subprojects.
  */
 @Suppress("MemberVisibilityCanBePrivate")
-open class StonecutterSettings(private val settings: Settings) {
+open class StonecutterSettings(private val settings: Settings) : StonecutterInitialization {
     private val projects = settings.gradle.extensions
         .create("stonecutterProjects", StonecutterSetup.Container::class.java)
     private val controller get() = if (kotlinController) KotlinController else GroovyController
@@ -32,78 +33,28 @@ open class StonecutterSettings(private val settings: Settings) {
             field = value
         }
 
-    /**
-     * Configures the version structure for this project.
-     *
-     * @param builder Configuration scope
-     */
-    fun shared(builder: Action<StonecutterSetupBuilder>) {
+    override fun shared(builder: Action<StonecutterSetupBuilder>) {
         shared = StonecutterSetupBuilder(builder)
     }
 
-    /**
-     * Includes the provided project path and assigns the specified configuration to it.
-     *
-     * @param project Project path
-     */
-    fun create(project: String) {
-        val actual = project.removePrefix(":")
-        settings.include(actual)
-        create(settings.project(":$actual"))
+    override fun create(project: String) = create(project, shared)
+
+    override fun create(project: String, setup: StonecutterSetupBuilder) = with(project.removePrefix(":")) {
+        settings.include(this)
+        create(settings.project(":$this"), setup)
     }
 
-    /**
-     * Includes the provided project paths and assigns the specified configuration to them.
-     *
-     * @param projects Project paths
-     */
-    fun create(vararg projects: String) {
-        projects.forEach(::create)
-    }
+    override fun create(project: ProjectDescriptor) = create(project, shared)
 
-    /**
-     * Includes the provided project paths and assigns the specified configuration to them.
-     *
-     * @param projects Project paths
-     * @return 🍌 to prevent JVM signature crash. Do whatever you want with it
-     */
-    fun create(projects: Iterable<String>): String {
-        projects.forEach(::create)
-        return "🍌"
-    }
-
-    /**
-     * Assigns the specified configuration to projects.
-     *
-     * @param projects Project references
-     */
-    fun create(projects: Iterable<ProjectDescriptor>) {
-        projects.forEach(::create)
-    }
-
-    /**
-     * Assigns the specified configuration to projects.
-     *
-     * @param projects Project references
-     */
-    fun create(vararg projects: ProjectDescriptor) {
-        projects.forEach(::create)
-    }
-
-    /**
-     * Assigns the specified configuration to the project.
-     *
-     * @param project Project reference
-     */
-    fun create(project: ProjectDescriptor) {
-        val vcs = shared.vcsProject
-        if (!projects.register(project.path, shared))
+    override fun create(project: ProjectDescriptor, setup: StonecutterSetupBuilder) {
+        val vcs = setup.vcsProject
+        if (!projects.register(project.path, setup))
             throw StonecutterGradleException("Project ${project.path} is already registered")
 
         project.buildFileName = controller.filename
         val file = project.projectDir.resolve(controller.filename).toPath()
         if (file.notExists()) controller.createHeader(file, vcs.project)
-        shared.versions.forEach { createProject(project, it) }
+        setup.versions.forEach { createProject(project, it) }
     }
 
     private fun createProject(root: ProjectDescriptor, version: StonecutterProject) {
