@@ -4,6 +4,9 @@ import dev.kikugie.semver.SemanticVersion
 import kotlinx.serialization.Serializable
 import java.nio.file.Path
 
+/**
+ * Parameters used by the file processor.
+ */
 @Serializable
 sealed interface StonecutterDataView {
     val debug: Boolean
@@ -14,6 +17,9 @@ sealed interface StonecutterDataView {
     val excludedPaths: Set<Path>
 }
 
+/**
+ * Defaulted mutable implementation of [StonecutterDataView]
+ */
 @Serializable
 data class StonecutterData(
     override var debug: Boolean = false,

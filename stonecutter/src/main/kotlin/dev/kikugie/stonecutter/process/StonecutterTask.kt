@@ -1,10 +1,8 @@
 package dev.kikugie.stonecutter.process
 
-import dev.kikugie.semver.SemanticVersionParser
 import dev.kikugie.stitcher.exception.SyntaxException
 import dev.kikugie.stitcher.scanner.StandardMultiLine
 import dev.kikugie.stitcher.scanner.StandardSingleLine
-import dev.kikugie.stitcher.transformer.TransformParameters
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.buildDirectory
 import dev.kikugie.stonecutter.configuration.StonecutterDataView
@@ -19,7 +17,6 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.copyTo
 import kotlin.io.path.walk

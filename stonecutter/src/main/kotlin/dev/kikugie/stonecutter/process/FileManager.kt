@@ -9,6 +9,7 @@ import dev.kikugie.stitcher.parser.FileParser
 import dev.kikugie.stitcher.transformer.TransformParameters
 import dev.kikugie.stitcher.transformer.Transformer
 import dev.kikugie.stitcher.scanner.CommentRecognizer
+import dev.kikugie.stitcher.scanner.Scanner
 import kotlinx.serialization.*
 import org.slf4j.LoggerFactory
 import java.nio.charset.Charset
@@ -45,7 +46,7 @@ internal class FileManager(
         var ast = if (parametersMatch) getCachedAst(astPath) else null
         val overwrite = ast == null
         if (ast == null) {
-            val parser = FileParser(text.reader(), recognizers, params)
+            val parser = FileParser(Scanner(text.reader(), recognizers).tokenize(), params)
             ast = parser.parse()
             if (debug) cleanUpAndWrite(source, inputCache.resolve("debugAst").resolve(source.hashName(hash, "yml"))) {
                 writeConfigured(Yaml.default.encodeToString(ast))
