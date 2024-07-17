@@ -59,7 +59,9 @@ class Transformer(
             ?: return
         val replacement = params.swaps[(def.component as Swap).identifier.value]
             ?: return // TODO
-        val new = contents.replaceRange(contents.affectedRange(def.enclosure), replacement)
+        val range = contents.affectedRange(def.enclosure)
+        val target = contents.substring(range)
+        val new = contents.replaceRange(range, replacement.replaceKeepIndent(target))
         if (contents != new) {
             val parsed = new.parse()
             withSource(parsed).process()
@@ -97,12 +99,35 @@ class Transformer(
     }
 
     companion object {
+        private fun String.indentWidth(): Int {
+            var count = 0
+            for (c in this) when (c) {
+                '\t' -> count += 4
+                ' ' -> count++
+                else -> break
+            }
+            return count
+        }
+
+        private fun String.replaceKeepIndent(value: String): String {
+            val tabIndents = firstOrNull() == '\t'
+            val minCommonIndent = lines()
+                .filter(String::isNotBlank)
+                .minOfOrNull { it.indentWidth() }
+                ?: 0
+            val prepend = if (!tabIndents) " ".repeat(minCommonIndent)
+            else buildString {
+                append("\t".repeat(minCommonIndent / 4))
+                append(" ".repeat(minCommonIndent % 4))
+            }
+            return value.prependIndent(prepend)
+        }
+
         internal fun String.affectedRange(type: ScopeType): IntRange = when (type) {
             ScopeType.CLOSED -> indices
             ScopeType.LINE -> filterUntil { '\r' in it || '\n' in it }
             ScopeType.WORD -> filterUntil { it.isBlank() }
         }
-
 
         private inline fun String.filterUntil(predicate: (String) -> Boolean): IntRange {
             val buffer = StringBuilder()
