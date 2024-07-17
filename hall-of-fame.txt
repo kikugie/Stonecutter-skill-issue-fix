@@ -1,6 +1,7 @@
 allthetrims
 autodrop
 autowhitelist
+better-clouds
 better-boat-movement
 blocky-bubbles
 camerapture

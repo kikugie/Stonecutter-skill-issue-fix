@@ -115,6 +115,15 @@ const members = [
     ]
   },
   {
+    avatar: 'https://cdn.modrinth.com/data/5srFLIaK/03454d120e13a3a25579bd74fe4bd761fed19431.png',
+    name: 'Better Clouds',
+    title: 'Beautiful clouds in touch with the vanilla style',
+    links: [
+      { icon: 'github', link: 'https://github.com/Qendolin/better-clouds' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/better-clouds' }
+    ]
+  },
+  {
     avatar: 'https://cdn.modrinth.com/data/FrZIkosK/914fbe1f142a3fbe7488d0064e252f08f10c4a93.png',
     name: 'Forgotten Graves',
     title: 'Minecraft (Fabric) mod that stores items and XP in a decaying grave upon death',
