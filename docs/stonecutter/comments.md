@@ -17,7 +17,7 @@ func()
 The comment above will technically fail, since we haven't told Stonecutter what `bl1`, `bl2` and `bl3` are, 
 but it shows the principle. If the condition fails, the function below will be commented, or otherwise the comment will be removed.
 
-By default the only available values are Minecraft version predicates, such as `>=1.20.1`, `<1.21`, `=1.20.6`, etc.
+By default, the only available values are Minecraft version predicates, such as `>=1.20.1`, `<1.21`, `=1.20.6`, etc.
 
 ### Swap
 Swaps replace the value with a predefined parameter.
@@ -30,7 +30,7 @@ func1()
 //$ swap_token
 func2()
 ```
-They are replacements to doing the same with an if-else boilerplate:
+They’re replacements to doing the same with an if-else boilerplate:
 ```kotlin
 //? if <1.20.6 {
 func1()
@@ -42,7 +42,8 @@ The way to configure swaps is described in the next chapter.
 
 ## Comment scopes
 You may have noticed a comment ending with `{` above, which is a part of defining a comment scope.  
-Scope is the part of the code your versioned comment affects. There are 3 types:
+Scope is the part of the code your versioned comment affects.
+There are three types:
 - Closed - section from a condition/swap ending with `{` to another condition/swap starting with `}`.
 - Word - condition/swap ending with `>>`, targets the next uninterrupted sequence of characters.
 - Line - empty end, targets the next non-empty line.
@@ -89,7 +90,7 @@ replace
 However, as of Stonecutter `0.4`, contents can only be commented with a multi-line comment.
 
 ## Nested comments
-Handling nested comments is surprisingly difficult, with a big difference between Java and Kotlin:
+Handling nested comments is surprisingly challenging, with a big difference between Java and Kotlin:
 ```java
 /* /* comment */ */
 //   ends here ^
@@ -99,7 +100,7 @@ Handling nested comments is surprisingly difficult, with a big difference betwee
 /* /* comment */ */
 //      ends here ^
 ```
-The comment scanner takes the Java approach, since its simpler, 
+The comment scanner takes the Java approach, since it's simpler, 
 but when processed comments are applied, Stonecutter takes neither side - there shall be no nested multi-line comments.
 After being processed by stonecutter the example above will look like this:
 ```

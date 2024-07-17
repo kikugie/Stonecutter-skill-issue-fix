@@ -18,11 +18,8 @@ repositories {
 
 dependencies {
     implementation(kotlin("reflect"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
-    testImplementation("com.charleskorn.kaml:kaml:0.57.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.2")
-    testImplementation("com.github.ajalt.mordant:mordant:2.2.0")
+    implementation(libs.kotlin.serialization)
+    testImplementation(libs.kaml)
 }
 
 tasks.test {

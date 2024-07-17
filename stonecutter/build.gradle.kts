@@ -8,8 +8,9 @@ plugins {
     `kotlin-dsl`
     `maven-publish`
     `java-gradle-plugin`
-    kotlin("jvm")
-    kotlin("plugin.serialization")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.dokka)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 val stonecutter: String by project
@@ -23,9 +24,10 @@ repositories {
 
 dependencies {
     implementation(project(":stitcher"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.1")
-    implementation("com.charleskorn.kaml:kaml:0.57.0")
+    implementation(libs.kotlin.serialization)
+    implementation(libs.kotlin.coroutines)
+    implementation(libs.kaml)
+    implementation(libs.cbor)
 }
 
 tasks.test {
@@ -78,8 +80,8 @@ publishing {
 }
 
 gradlePlugin {
-    website = "https://github.com/kikugie/stonecutter-kt"
-    vcsUrl = "https://github.com/kikugie/stonecutter-kt"
+    website = "https://github.com/kikugie/stonecutter"
+    vcsUrl = "https://github.com/kikugie/stonecutter"
 
     plugins {
         create("stonecutter") {
@@ -87,7 +89,6 @@ gradlePlugin {
             implementationClass = "dev.kikugie.stonecutter.StonecutterPlugin"
             displayName = "Stonecutter"
             description = "Preprocessor/JCP inspired multi-version environment manager"
-            tags.set(listOf("fabric", "fabricmc"))
         }
     }
 }

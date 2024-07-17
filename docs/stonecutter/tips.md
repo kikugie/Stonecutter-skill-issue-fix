@@ -1,7 +1,6 @@
 # Stonecutter tips & tricks
 
-This section is not essential for working with Stonecutter, 
-but describes some common addons and practices.
+This section is not essential for working with Stonecutter but describes some common addons and practices.
 
 ## Versioned files
 
@@ -9,9 +8,9 @@ Although your versioned code is stored in the root project's `src` folder,
 directories under `versions/` are valid Gradle projects too.
 
 This means you can put files in those folders, and they will be applied for each version separately. 
-However, it is quite redundant, since you need a copy for each version, which becomes harder to maintain.
+However, it is quite redundant since you need a copy for each version, which becomes harder to maintain.
 
-The following sections will cover more efficient ways to accomplish it, 
+The following sections will cover more efficient ways to achieve it, 
 but in case you need this method - now you know!
 
 ## J52J processing
@@ -52,7 +51,7 @@ plugins {
 :::
 
 JSON5 files support both `//` and `/* */` comments, which makes processing them the same as the rest of the code. 
-J52J converts those files to plain JSON after Stonecutter has done it's work. 
+J52J converts those files to plain JSON after Stonecutter has done its work. 
 If needed, files can be kept as JSON5 with a `// no j52j` header.
 
 ## Blossom replacements
@@ -139,7 +138,7 @@ For example, if you develop for `1.19.4`, `1.20.1`, `1.20.4`, `1.20.6` and `1.21
 If you need to change the file only when going from `1.19` to `1.20` and from `1.20.6` to `1.21`, 
 making a versioned access widener will be very redundant.
 
-This can solved with versioned resource expansion:
+This can be solved with versioned resource expansion:
 ::: code-group
 ```kotlin [build.gradle.kts]
 def mcVersion = stonecutter.current.version
@@ -196,18 +195,20 @@ And add the correct path to the `fabric.mod.json`:
 > Enabling Architectury along with Stonecutter requires significant project structure changes and decent Gradle knowledge.  
 > The proper Architectury support is being worked on for Stonecutter 0.5.
 > 
-> (Basically if you look at the [Elytra Trims build file](https://github.com/kikugie/elytra-trims/blob/kotlin/build.gradle.kts) 
-> and think "yea I get it", feel free to try).
+> (Basically,
+> if you look at the [Elytra Trims build file](https://github.com/kikugie/elytra-trims/blob/kotlin/build.gradle.kts) 
+> and think "yea, I get it", feel free to try).
 
 Since there's a great variety of setups, there's no plug-in template. 
-This guide covers the most barebone setup for Fabric/Forge on 1.20.1 and Fabric/Neoforge on 1.20.6, 
-but be ready to adjust it to you project's needs.
+This guide covers the most bare-bone setup for Fabric/Forge on 1.20.1 and Fabric/Neoforge on 1.20.6, 
+but be ready to adjust it to your project's needs.
 
 ### Structure changes
 
 In this setup the common Architectury structure of `:common`, `:fabric`, `:neoforge` projects doesn't exist. 
 Instead, everything is in the `src/` folder.  
-This begs the question "How do I make the code for different loaders then?" - With comments! *Welcome to Stonecutter, comments are the solution to every problem!*
+This begs the question "How do I make the code for different loaders then?" - With comments!
+Welcome to Stonecutter, comments are the solution to every problem!*
 ```
 // TODO: Make this wiki more serious
 ```

@@ -5,7 +5,7 @@ For more information, visit the Dokka page.
 ## Processor config
 ### Swaps
 Swaps are used to define preset replacements for certain values, 
-which is less boilerplate than copy-pasting the same condition block.
+which are less boilerplate than copy-pasting the same condition block.
 ::: code-group
 ```kotlin [build.gradle.kts]
 stonecutter.swap("swap_token") {
@@ -23,7 +23,7 @@ The first argument is the identifier string, used in the comment.
 The second is the replacement value.
 
 ### Constants
-Constants add variables, that can be checked in the code.
+Constants add variables that can be checked in the code.
 ::: code-group
 ```kotlin [build.gradle[.kts]]
 stonecutter.const("fabric", isFabric)
@@ -77,7 +77,8 @@ This automatically starts in the directory of `stonecutter.gradle[.kts]`. Howeve
 stonecutter.exclude("*.json")
 ```
 **`*.` prefix is important for it to differentiate a path from a file extension.**  
-By default, Stonecutter excludes common image and audio formats to avoid occasional byte sequences being recognized as comments.
+By default,
+Stonecutter excludes common image and audio formats to avoid occasional byte sequences being recognized as comments.
 
 ### Comparisons
 Sometimes it can be handy to compare semantic versions in the buildscript (in a `swap` or `const` definition).
@@ -98,7 +99,7 @@ Enabled with `stonecutter.debug(true)` or `stonecutter.debug = true`.
 Currently, it stores the generated ASTs in subproject's `build/stonecutterCache/debugAst/` 
 and adds exception stack traces to the report.
 
-Don't have it enabled all the time, because it disables the caching optimisations, 
+Don't have it enabled all the time because it disables the caching optimizations, 
 which will significantly slow down version switching.
 
 ## Plugin properties
@@ -117,8 +118,3 @@ which is the same for all buildscript instances.
 
 ### All versions
 Accessed with `stonecutter.versions` and returns the list of all registered subversions.
-
-## Global config
-Global options are configured in `stonecutter.gradle[.kts]`.  
-Currently the only available option is `stonecutter.includeResources = true`, 
-which removes the default `.java` and `.kt` file filter.

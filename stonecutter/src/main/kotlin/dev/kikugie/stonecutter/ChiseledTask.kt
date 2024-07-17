@@ -26,7 +26,7 @@ abstract class ChiseledTask : DefaultTask() {
     }
 
     /**
-     * Specifies, which task this delegates to.
+     * Specifies which task this delegates to.
      *
      * @param name delegate task
      */
