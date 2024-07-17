@@ -28,7 +28,7 @@ class StitcherLineMarkerProvider : RelatedItemLineMarkerProvider(), GutterIconNa
             .map { it.current.project }
             .takeIf { it.isNotEmpty() }
             ?: return
-        element.putUserData(KEY, matching)
+        element.putUserData(Constants.KEY, matching)
 
         val marker = NavigationGutterIconBuilder.create(icon)
             .setTargets(element)
@@ -38,11 +38,11 @@ class StitcherLineMarkerProvider : RelatedItemLineMarkerProvider(), GutterIconNa
     }
 
     override fun navigate(event: MouseEvent, element: PsiElement) {
-        val matching = element.getUserData(KEY) ?: return
+        val matching = element.getUserData(Constants.KEY) ?: return
 
     }
 
-    private companion object {
-        private val KEY = Key.create<List<String>>("stonecutter.matching-projects")
+    private object Constants {
+        val KEY = Key.create<List<String>>("stonecutter.matching-projects")
     }
 }

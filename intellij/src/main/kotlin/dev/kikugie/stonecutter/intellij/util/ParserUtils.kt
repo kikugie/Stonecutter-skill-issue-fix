@@ -3,22 +3,22 @@ package dev.kikugie.stonecutter.intellij.util
 import com.intellij.openapi.module.Module
 import dev.kikugie.stitcher.data.component.Definition
 import dev.kikugie.stitcher.data.token.MarkerType
-import dev.kikugie.stitcher.exception.ErrorHandlerImpl
 import dev.kikugie.stitcher.lexer.Lexer
 import dev.kikugie.stitcher.parser.CommentParser
 import dev.kikugie.stitcher.eval.ConditionChecker
+import dev.kikugie.stitcher.exception.StoringErrorHandler
 import dev.kikugie.stonecutter.configuration.StonecutterModel
 import dev.kikugie.stonecutter.process.toParams
 
 fun String.parse(model: StonecutterModel): Definition? {
     val lexer = Lexer(this)
-    val parser = CommentParser(lexer, ErrorHandlerImpl(), model.data.toParams(model.current.version))
+    val parser = CommentParser(lexer, StoringErrorHandler(), model.data.toParams(model.current.version))
     return parser.parse()
 }
 
 fun String.parse(): Definition? {
     val lexer = Lexer(this)
-    val parser = CommentParser(lexer, ErrorHandlerImpl())
+    val parser = CommentParser(lexer, StoringErrorHandler())
     return parser.parse()
 }
 
