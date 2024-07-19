@@ -1,7 +1,6 @@
 [versions]
 # Plugins
 kotlin = "2.0.0"
-jrelease = "1.13.1"
 # Dependencies
 serialization = "1.7.1"
 coroutines = "1.9.0-RC"
@@ -13,7 +12,6 @@ junit = "5.9.2"
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-jrelease = { id = "org.jreleaser", version.ref = "jrelease" }
 
 [libraries]
 kotlin-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "serialization" }

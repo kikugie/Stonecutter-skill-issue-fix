@@ -2,7 +2,6 @@
 
 import org.jetbrains.dokka.gradle.DokkaTask
 
-
 plugins {
     java
     `kotlin-dsl`
@@ -12,7 +11,6 @@ plugins {
     alias(libs.plugins.kotlin.dokka)
     alias(libs.plugins.kotlin.serialization)
 }
-
 
 repositories {
     mavenCentral()
@@ -76,7 +74,7 @@ publishing {
 }
 
 gradlePlugin {
-    website = "https://github.com/kikugie/stonecutter"
+    website = "https://stonecutter.kikugie.dev/"
     vcsUrl = "https://github.com/kikugie/stonecutter"
 
     plugins {
@@ -84,7 +82,7 @@ gradlePlugin {
             id = "dev.kikugie.stonecutter"
             implementationClass = "dev.kikugie.stonecutter.StonecutterPlugin"
             displayName = "Stonecutter"
-            description = "Preprocessor/JCP inspired multi-version environment manager"
+            description = "Modern Gradle plugin for multi-version management"
         }
     }
 }
