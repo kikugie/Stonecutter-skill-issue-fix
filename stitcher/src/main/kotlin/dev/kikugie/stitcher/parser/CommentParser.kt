@@ -41,13 +41,13 @@ class CommentParser(
             SCOPE_OPEN -> consume { ScopeType.CLOSED }
             EXPECT_WORD -> consume { ScopeType.WORD }
             null -> ScopeType.LINE
-            else -> consume { handler.accept(it, "Invalid comment closer"); ScopeType.LINE }
+            else -> consume { handler.accept(it, Messages.WRONG_CLOSER); ScopeType.LINE }
         }
         if (closerToken != null && component.isEmpty())
-            handler.accept(closerToken, "Scope specifiers are not allowed in closer blocks")
+            handler.accept(closerToken, Messages.EMPTY_BODY)
 
         if (lexer.lookup() != null)
-            handler.accept(lexer.lookup()!!.end(NullType), "Expected end of comment")
+            handler.accept(lexer.lookup()!!.end(NullType), Messages.NO_END)
         return Definition(component, extension, closer)
     }
 
@@ -57,15 +57,13 @@ class CommentParser(
             WhitespaceType -> consume()
             SCOPE_OPEN, EXPECT_WORD, null -> break
             IDENTIFIER -> consume {
-                if (isExtension) return@consume handler.accept(
-                    it, "Swap identifiers are not allowed in closer blocks")
+                if (isExtension) return@consume handler.accept(it, Messages.CLOSER_SWAP)
                 if (identifier == Token.EMPTY) identifier = it.token
-                else handler.accept(it, "Duplicate identifier")
+                else handler.accept(it, Messages.DUPLICATE_SWAP)
                 if (params != null && it.value !in params.swaps)
-                    handler.accept(it, "Unknown swap")
+                    handler.accept(it, Messages.WRONG_SWAP)
             }
-
-            else -> consume { handler.accept(it, "Unexpected token") }
+            else -> consume { handler.accept(it, Messages.WRONG_TOKEN) }
         }
         return Swap(identifier)
     }
@@ -79,7 +77,7 @@ class CommentParser(
             SCOPE_OPEN, EXPECT_WORD, NullType, null -> break
             IF, ELSE, ELIF -> consume { sugar += it }
             IDENTIFIER, PREDICATE, NEGATE, GROUP_OPEN -> expression = matchExpression()
-            else -> consume { handler.accept(it, "Unexpected token") }
+            else -> consume { handler.accept(it, Messages.WRONG_TOKEN) }
         }
         validateCondition(isExtension, sugar, expression)
         return Condition(sugar.map { it.token }, expression)
@@ -94,24 +92,24 @@ class CommentParser(
             if (nextType == ASSIGN) consume {
                 val predicates = matchPredicates()
                 if (params != null && id.value !in params.dependencies)
-                    handler.accept(id, "Unknown dependency")
+                    handler.accept(id, Messages.WRONG_DEP)
                 if (predicates.isEmpty())
-                    handler.accept(it, "No predicates")
+                    handler.accept(it, Messages.NO_PREDICATES)
                 matchBoolean(Assignment(id.token, predicates))
             } else {
                 if (params != null && id.value !in params.constants)
-                    handler.accept(id, "Unknown dependency")
+                    handler.accept(id, Messages.WRONG_CONST)
                 matchBoolean(Literal(id.token))
             }
         }
         GROUP_OPEN -> consume {
             val group = Group(matchExpression())
             if (nextType == GROUP_CLOSE) consume()
-            else handler.accept(lexer.lookupOrDefault(), "Expected ')' to close the group")
+            else handler.accept(lexer.lookupOrDefault().end(GROUP_CLOSE), Messages.NO_GROUP_END)
             matchBoolean(group)
         }
         else -> consume {
-            handler.accept(it, "Unexpected token")
+            handler.accept(it, Messages.WRONG_TOKEN)
             Empty
         }
     }
@@ -131,31 +129,28 @@ class CommentParser(
     }
 
     private fun validateCondition(isExtension: Boolean, sugar: List<LexSlice>, component: Component) {
-        fun reportRest(n: Int) = sugar.drop(n).forEach { handler.accept(it, "Invalid condition statement") }
+        fun reportRest(n: Int) = sugar.drop(n).forEach { handler.accept(it, Messages.WRONG_SUGAR) }
 
         when (sugar.firstOrNull()?.type) {
             IF -> {
-                if (isExtension) handler.accept(sugar.first(), "Expected 'else' or 'elif' to follow the extension")
-                if (component.isEmpty()) handler.accept(sugar.last().end(), "Must have a condition statement")
+                if (isExtension) handler.accept(sugar.first(), Messages.PLS_NO_EXTENSION)
+                if (component.isEmpty()) handler.accept(sugar.last().end(), Messages.NO_CONDITION)
                 reportRest(1)
             }
             ELIF -> {
-                if (!isExtension) handler.accept(sugar.first(), "Expected to follow '}' to extend the condition")
-                if (component.isEmpty()) handler.accept(sugar.last().end(), "Must have a condition statement")
+                if (!isExtension) handler.accept(sugar.first(), Messages.NO_EXTENSION)
+                if (component.isEmpty()) handler.accept(sugar.last().end(), Messages.NO_CONDITION)
                 reportRest(1)
             }
             ELSE -> {
-                if (!isExtension) handler.accept(sugar.first(), "Expected to follow '}' to extend the condition")
+                if (!isExtension) handler.accept(sugar.first(), Messages.NO_EXTENSION)
                 when (sugar.getOrNull(1)?.type) {
                     IF -> {
-                        if (component.isEmpty()) handler.accept(sugar.last().end(), "Must have a condition statement")
+                        if (component.isEmpty()) handler.accept(sugar.last().end(), Messages.NO_CONDITION)
                         reportRest(2)
                     }
                     null -> {
-                        if (component.isNotEmpty()) handler.accept(
-                            sugar.last().end(),
-                            "Must not have a condition statement"
-                        )
+                        if (component.isNotEmpty()) handler.accept(sugar.last().end(), Messages.PLS_NO_CONDITION)
                         reportRest(1)
                     }
                     else -> reportRest(1)
