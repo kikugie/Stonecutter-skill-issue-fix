@@ -17,12 +17,13 @@ import java.nio.file.Path
  */
 @Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterController internal constructor(root: Project) : StonecutterConfiguration {
-    private val controller: ControllerManager = root.controller()
+    private val manager: ControllerManager = root.controller()
         ?: throw StonecutterGradleException("Project ${root.path} is not a Stonecutter controller. What did you even do to get this error?")
-    private val setup: StonecutterSetup =
+    internal val setup: StonecutterSetup =
         root.gradle.extensions.getByType(StonecutterSetup.Container::class.java)[root]
             ?: throw StonecutterGradleException("Project ${root.path} is not registered. This might've been caused by removing a project while its active")
     private var globalDebug: Boolean? = null
+    private val delegatedActions: MutableList<StonecutterBuild.() -> Unit> = mutableListOf()
 
     /**
      * Project assigned by `stonecutter.active "..."`.
@@ -108,17 +109,25 @@ open class StonecutterController internal constructor(root: Project) : Stonecutt
         }
         setup.versions.forEach { ver ->
             val project = root.project(ver.project)
+            val build = project.extensions.getByType<StonecutterBuild>()
             createStonecutterTask("Set active project to ${ver.project}", root, project, ver) {
                 "Sets the active project to ${ver.project}, processing all versioned comments."
             }
+            for (it in delegatedActions) it(build)
         }
     }
 
-    private inline fun forEachProject(action: StonecutterBuild.() -> Unit) {
-        projects.forEach { it.extensions.getByType<StonecutterBuild>().apply(action) }
+    private fun forEachProject(action: StonecutterBuild.() -> Unit) {
+        delegatedActions += action
     }
 
-    private inline fun createStonecutterTask(name: String, root: Project, subproject: Project, version: StonecutterProject, crossinline desc: () -> String) {
+    private inline fun createStonecutterTask(
+        name: String,
+        root: Project,
+        subproject: Project,
+        version: StonecutterProject,
+        crossinline desc: () -> String,
+    ) {
         root.tasks.create<StonecutterTask>(name) {
             group = "stonecutter"
             description = desc()
@@ -133,7 +142,7 @@ open class StonecutterController internal constructor(root: Project) : Stonecutt
             output.set(input.get())
 
             doLast {
-                controller.updateHeader(this.project.buildFile.toPath(), version.project)
+                manager.updateHeader(this.project.buildFile.toPath(), version.project)
             }
         }
     }

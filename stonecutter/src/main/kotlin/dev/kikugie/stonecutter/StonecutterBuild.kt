@@ -16,6 +16,10 @@ import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.SourceSetContainer
 import java.io.File
 import java.nio.file.Path
+import kotlin.collections.first
+import kotlin.collections.forEach
+import kotlin.collections.mapNotNull
+import kotlin.collections.set
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteRecursively
@@ -32,10 +36,7 @@ open class StonecutterBuild internal constructor(val project: Project) : Stonecu
     internal val setup = project.parent?.let {
         project.gradle.extensions.getByType(StonecutterSetup.Container::class.java)[it]
     } ?: throw StonecutterGradleException(
-        """Project ${project.path} must be a versioned project.
-            This might've been caused by applying the plugin in standard mod. 
-            Read https://github.com/kikugie/stonecutter-kt/wiki for an integration guide.
-            """.trimMargin()
+        "Project ${project.path} must be a versioned project."
     )
     internal val data = StonecutterData()
 
@@ -82,12 +83,15 @@ open class StonecutterBuild internal constructor(val project: Project) : Stonecu
 
     override var debug: Boolean
         get() = data.debug
-        set(value) {data.debug = value}
+        set(value) {
+            data.debug = value
+        }
 
     init {
         project.tasks.register("setupChiseledBuild", StonecutterTask::class.java) {
-            if (project.parent == null)
-                throw StonecutterGradleException("Chiseled task can't be registered for the root project. How did you manage to do it though?")
+            if (project.parent == null) throw StonecutterGradleException(
+                "Chiseled task can't be registered for the root project. How did you manage to do it though?"
+            )
 
             toVersion.set(current)
             fromVersion.set(active)
@@ -112,21 +116,22 @@ open class StonecutterBuild internal constructor(val project: Project) : Stonecu
         return id
     }
 
-    private fun validateSemver(ver: String): SemanticVersion {
-        try {
-            return SemanticVersionParser.parse(ver)
-        } catch (e: VersionParsingException) {
-            throw IllegalArgumentException("Invalid semantic version: $ver")
+    private fun validateSemver(ver: String): SemanticVersion = try {
+        SemanticVersionParser.parse(ver)
+    } catch (e: VersionParsingException) {
+        throw IllegalArgumentException("Invalid semantic version: $ver").apply {
+            initCause(e)
         }
     }
 
     private fun configureSources() {
         try {
-            val format: (Path) -> Any = if (setup.anyChiseled(project.gradle.startParameter.taskNames))
-                { src -> File(project.buildDirectory, "chiseledSrc/$src") }
-            else if (current.isActive) {
-                { src -> "../../src/$src" }
-            } else return
+            val useChiseledSrc = setup.anyChiseled(project.gradle.startParameter.taskNames)
+            val formatter: (Path) -> Any = when {
+                useChiseledSrc   -> { src -> File(project.buildDirectory, "chiseledSrc/$src") }
+                current.isActive -> { src -> "../../src/$src" }
+                else             -> return
+            }
 
             val parentDir = project.parent!!.projectDir.resolve("src").toPath()
             val thisDir = project.projectDir.resolve("src").toPath()
@@ -139,7 +144,7 @@ open class StonecutterBuild internal constructor(val project: Project) : Stonecu
                         else parentDir.relativize(it.toPath())
                     else relative
                 }.forEach {
-                    to.srcDir(format(it))
+                    to.srcDir(formatter(it))
                 }
             }
 
