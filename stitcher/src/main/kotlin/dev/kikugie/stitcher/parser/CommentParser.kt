@@ -3,17 +3,19 @@ package dev.kikugie.stitcher.parser
 import dev.kikugie.stitcher.data.component.*
 import dev.kikugie.stitcher.data.scope.ScopeType
 import dev.kikugie.stitcher.data.token.MarkerType.*
+import dev.kikugie.stitcher.data.token.NullType
 import dev.kikugie.stitcher.data.token.StitcherTokenType.*
 import dev.kikugie.stitcher.data.token.Token
 import dev.kikugie.stitcher.data.token.WhitespaceType
 import dev.kikugie.stitcher.exception.ErrorHandler
+import dev.kikugie.stitcher.exception.StoringErrorHandler
 import dev.kikugie.stitcher.lexer.LexSlice
 import dev.kikugie.stitcher.lexer.LexerAccess
 import dev.kikugie.stitcher.transformer.TransformParameters
 
 class CommentParser(
     private val lexer: LexerAccess,
-    private val handler: ErrorHandler,
+    private val handler: ErrorHandler = StoringErrorHandler(),
     private val params: TransformParameters? = null,
 ) {
     private val currentType get() = lexer.lookup()?.type
@@ -22,13 +24,13 @@ class CommentParser(
     fun parse(): Definition? {
         val mode = lexer.lookup()?.type ?: return null
         val extension = nextType == SCOPE_CLOSE
-        if (extension) lexer.advance()
+        if (extension) consume()
         val component = when (mode) {
             CONDITION -> parseCondition()
             SWAP -> parseSwap()
             else -> return null
         }
-        val closer = when (lexer.advance()?.type) {
+        val closer = when (consume()?.type) {
             SCOPE_OPEN -> consume { ScopeType.CLOSED }
             EXPECT_WORD -> consume { ScopeType.WORD }
             null -> ScopeType.LINE
@@ -62,7 +64,7 @@ class CommentParser(
 
         while (true) when (nextType) {
             WhitespaceType -> consume()
-            SCOPE_OPEN, EXPECT_WORD, null -> break
+            SCOPE_OPEN, EXPECT_WORD, NullType, null -> break
             IF, ELSE, ELIF -> consume { sugar += it.token }
             IDENTIFIER, PREDICATE, NEGATE, GROUP_OPEN -> expression = matchExpression()
             else -> consume { handler.accept(it, "Unexpected token") }
@@ -115,8 +117,8 @@ class CommentParser(
         else -> left
     }
 
-    private fun consume() {
-        lexer.advance()
+    private fun consume(): LexSlice? {
+        return lexer.advance()
     }
 
     private inline fun <T> consume(action: (LexSlice) -> T): T {

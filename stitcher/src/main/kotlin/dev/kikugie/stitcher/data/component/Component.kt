@@ -128,7 +128,7 @@ data class Condition(
  */
 @Serializable
 data class Swap(
-    val identifier: Token,
+    val identifier: Token = Token.EMPTY,
 ) : Component {
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitSwap(this)
 }

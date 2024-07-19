@@ -8,8 +8,8 @@ import dev.kikugie.stitcher.data.scope.ScopeType
 import dev.kikugie.stitcher.data.token.ContentType
 import dev.kikugie.stitcher.data.token.NullType
 import dev.kikugie.stitcher.data.token.Token
-import dev.kikugie.stitcher.eval.isBlank
-import dev.kikugie.stitcher.eval.isNotBlank
+import dev.kikugie.stitcher.eval.isEmpty
+import dev.kikugie.stitcher.eval.isNotEmpty
 import dev.kikugie.stitcher.exception.ErrorHandler
 import dev.kikugie.stitcher.exception.StoringErrorHandler
 import dev.kikugie.stitcher.lexer.LexSlice
@@ -56,23 +56,25 @@ class FileParser(
             ContentType.COMMENT_START, ContentType.COMMENT_END -> {}
             else -> throw AssertionError("Unexpected token: $it")
         }
-        if (active.enclosure != ScopeType.CLOSED && active.blocks.lastOrNull()?.isNotBlank() == true)
+        if (active.enclosure != ScopeType.CLOSED && active.blocks.lastOrNull()?.isNotEmpty() == true)
             scopes.pop()
     }.let { root }
 
-    private fun createParser(str: CharSequence): CommentParser {
-        val handler = handlerFactory()
-        val lexer = Lexer(str)
-        return CommentParser(lexer, handler, params)
-    }
-
     private fun parseComment(token: Token) {
-        val parser = createParser(token.value)
+        val handler = handlerFactory()
+        val lexer = Lexer(token.value)
+        val parser = CommentParser(lexer, handler, params)
         val def = parser.parse() ?: run {
             active.blocks.add(CommentBlock(commentStart, token, commentEnd))
             return
         }
-        val scope = if (def.isBlank() && def.extension) null else Scope(def.type, def.enclosure)
+
+        if (def.extension)
+            if (def.type == active.type) scopes.pop()
+            else handler.accept(lexer.tokens()[1], "${def.type} closes unmatched scope of ${active.type}")
+
+        val scope = if (def.isEmpty() && def.extension && def.enclosure == ScopeType.LINE) null else Scope(def.type, def
+            .enclosure)
         active.blocks.add(CodeBlock(commentStart, def, commentEnd, scope))
         if (scope != null) scopes.push(scope)
     }

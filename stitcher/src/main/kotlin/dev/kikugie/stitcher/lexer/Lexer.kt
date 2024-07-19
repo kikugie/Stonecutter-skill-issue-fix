@@ -22,9 +22,9 @@ class Lexer(
         else -> tokens.getOrNull(index + offset)
     }
 
-    override fun advance(): LexSlice? = (tokens.getOrNull(index) ?: advanceInternal()).also {
+    override fun advance(): LexSlice? = (tokens.getOrNull(index + 1) ?: advanceInternal()).also {
         if (it == null || cursor >= input.length) cursor = -1
-        if (it != null) index++
+        if (it != null) ++index
     }
 
     private fun advanceInternal(): LexSlice? = when (cursor) {
@@ -83,6 +83,6 @@ class Lexer(
         return unknown
     }
 
-    private fun slice(type: TokenType, range: IntRange) = LexSlice(type, range, input)
-
+    internal fun slice(type: TokenType, range: IntRange) = LexSlice(type, range, input)
+    internal fun tokens() = tokens
 }

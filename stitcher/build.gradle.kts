@@ -7,11 +7,6 @@ plugins {
     kotlin("plugin.serialization")
 }
 
-val stitcher: String by project
-
-group = "dev.kikugie"
-version = stitcher
-
 repositories {
     mavenCentral()
 }
@@ -19,11 +14,10 @@ repositories {
 dependencies {
     implementation(kotlin("reflect"))
     implementation(libs.kotlin.serialization)
-    testImplementation(libs.kaml)
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.2")
-    testImplementation("com.github.ajalt.mordant:mordant:2.2.0")
+    testImplementation(libs.kaml)
+    testImplementation(libs.junit.api)
+    testImplementation(libs.junit.engine)
 }
 
 tasks.test {

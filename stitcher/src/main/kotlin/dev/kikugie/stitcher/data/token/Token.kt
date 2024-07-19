@@ -49,5 +49,4 @@ data class Token(
          */
         val EMPTY = Token("", NullType)
     }
-
 }

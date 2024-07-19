@@ -9,8 +9,8 @@ import dev.kikugie.stitcher.data.scope.Scope
 import dev.kikugie.stitcher.data.scope.ScopeType
 import dev.kikugie.stitcher.data.token.ContentType
 import dev.kikugie.stitcher.data.token.Token
-import dev.kikugie.stitcher.eval.isBlank
-import dev.kikugie.stitcher.eval.isNotBlank
+import dev.kikugie.stitcher.eval.isEmpty
+import dev.kikugie.stitcher.eval.isNotEmpty
 import dev.kikugie.stitcher.scanner.StandardMultiLine
 import dev.kikugie.stitcher.transformer.CommentAdder.onAddComment
 import dev.kikugie.stitcher.transformer.Transformer.Companion.affectedRange
@@ -26,7 +26,7 @@ private fun String.replaceAll(keys: Iterable<Pair<String, String>>): String {
     return str
 }
 
-private fun Scope.isCommented(): Boolean = blocks.all { it is CommentBlock || it.isBlank() }
+private fun Scope.isCommented(): Boolean = blocks.all { it is CommentBlock || it.isEmpty() }
 
 object CommentRemover : Block.Visitor<String> {
     private val onRemoveComment = onAddComment.map { (k, v) -> v to k }
@@ -40,7 +40,7 @@ object CommentRemover : Block.Visitor<String> {
         ScopeType.CLOSED -> if (!scope.isCommented()) null else scope.blocks.joinToString("") { it.accept(this) }
 
         else -> {
-            val toUncommentIndex = scope.blocks.indexOfFirst(Block::isNotBlank).takeIf { it >= 0 }
+            val toUncommentIndex = scope.blocks.indexOfFirst(Block::isNotEmpty).takeIf { it >= 0 }
             if (toUncommentIndex == null) null
             else {
                 val toUncomment = scope.blocks[toUncommentIndex]

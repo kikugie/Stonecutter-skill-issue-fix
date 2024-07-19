@@ -11,6 +11,9 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+group = property("group").toString()
+version = property("version").toString()
+
 buildscript {
     repositories {
         mavenCentral()
@@ -36,9 +39,8 @@ tasks.dokkaHtmlCollector {
         homepageLink = "https://stonecutter.kikugie.dev/"
         footerMessage = "(c) 2024 KikuGie"
     }
-    val stonecutter = rootProject.property("stonecutter").toString()
     pluginConfiguration<VersioningPlugin, VersioningConfiguration> {
-        version = stonecutter
+        version = project.version.toString()
     }
 }
 

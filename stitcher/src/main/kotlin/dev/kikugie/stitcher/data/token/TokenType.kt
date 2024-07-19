@@ -4,11 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface TokenType
-
 @Serializable
 data object NullType : TokenType
+@Serializable
 data object WhitespaceType : TokenType
-
 @Serializable
 enum class ContentType : TokenType {
     COMMENT_START,
@@ -17,6 +16,7 @@ enum class ContentType : TokenType {
     CONTENT
 }
 
+@Serializable
 enum class MarkerType : TokenType {
     CONDITION, SWAP, // ? and $
 }

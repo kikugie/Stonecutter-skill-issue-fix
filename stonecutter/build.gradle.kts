@@ -13,10 +13,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-val stonecutter: String by project
-
-group = "dev.kikugie"
-version = stonecutter
 
 repositories {
     mavenCentral()

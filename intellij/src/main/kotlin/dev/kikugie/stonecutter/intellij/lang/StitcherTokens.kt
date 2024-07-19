@@ -43,7 +43,7 @@ fun convert(type: TokenType): StitcherType = when (type) {
     StitcherTokenType.IF -> IF
     StitcherTokenType.ELSE -> ELSE
     StitcherTokenType.ELIF -> ELIF
-    else -> throw IllegalArgumentException("Inconvertible type $type")
+    else -> UNKNOWN
 }
 
 fun convert(type: StitcherType): TokenType = when (type) {
@@ -65,5 +65,5 @@ fun convert(type: StitcherType): TokenType = when (type) {
     NEGATE -> StitcherTokenType.NEGATE
     AND -> StitcherTokenType.AND
     OR -> StitcherTokenType.OR
-    else -> throw IllegalArgumentException("Inconvertible type $type")
+    else -> NullType
 }

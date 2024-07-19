@@ -8,10 +8,16 @@ import dev.kikugie.stitcher.transformer.TransformParameters
 fun Token.isBlank() = value.isBlank()
 fun Token.isNotBlank() = !isBlank()
 
-fun Block.isBlank() = accept(BlankChecker)
+fun Block.isEmpty() = accept(EmptyChecker)
+fun Block.isNotEmpty() = !isEmpty()
+
+fun Component.isEmpty() = accept(EmptyChecker)
+fun Component.isNotEmpty() = !isEmpty()
+
+fun Block.isBlank() = accept(Assembler).isBlank()
 fun Block.isNotBlank() = !isBlank()
 
-fun Component.isBlank() = accept(BlankChecker)
+fun Component.isBlank() = accept(Assembler).isBlank()
 fun Component.isNotBlank() = !isBlank()
 
 fun Component.join() = accept(Assembler)
