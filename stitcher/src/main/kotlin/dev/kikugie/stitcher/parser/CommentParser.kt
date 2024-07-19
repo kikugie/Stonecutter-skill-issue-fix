@@ -9,6 +9,7 @@ import dev.kikugie.stitcher.data.token.StitcherTokenType.*
 import dev.kikugie.stitcher.data.token.Token
 import dev.kikugie.stitcher.data.token.TokenType
 import dev.kikugie.stitcher.data.token.WhitespaceType
+import dev.kikugie.stitcher.eval.isBlank
 import dev.kikugie.stitcher.eval.isEmpty
 import dev.kikugie.stitcher.eval.isNotEmpty
 import dev.kikugie.stitcher.exception.ErrorHandler
@@ -45,9 +46,10 @@ class CommentParser(
         }
         if (closerToken != null && component.isEmpty())
             handler.accept(closerToken, Messages.EMPTY_BODY)
-
+        if (currentType == WhitespaceType)
+            consume()
         if (lexer.lookup() != null)
-            handler.accept(lexer.lookup()!!.end(NullType), Messages.NO_END)
+            handler.accept(lexer.lookup()!!.start(), Messages.NO_END)
         return Definition(component, extension, closer)
     }
 
@@ -69,6 +71,8 @@ class CommentParser(
     }
 
     private fun parseCondition(isExtension: Boolean): Condition {
+        // Save to report after the sugar errors
+        val errors = mutableListOf<LexSlice>()
         val sugar = mutableListOf<LexSlice>()
         var expression: Component = Empty
 
@@ -76,10 +80,13 @@ class CommentParser(
             WhitespaceType -> consume()
             SCOPE_OPEN, EXPECT_WORD, NullType, null -> break
             IF, ELSE, ELIF -> consume { sugar += it }
-            IDENTIFIER, PREDICATE, NEGATE, GROUP_OPEN -> expression = matchExpression()
-            else -> consume { handler.accept(it, Messages.WRONG_TOKEN) }
+            IDENTIFIER, PREDICATE, NEGATE, GROUP_OPEN ->
+                if (expression.isBlank()) expression = matchExpression()
+                else consume { errors += it }
+            else -> consume { errors += it }
         }
         validateCondition(isExtension, sugar, expression)
+        errors.forEach { handler.accept(it, Messages.WRONG_TOKEN) }
         return Condition(sugar.map { it.token }, expression)
     }
 
@@ -163,6 +170,9 @@ class CommentParser(
 
     private fun LexSlice.end(new: TokenType = type): LexSlice =
         min(source.lastIndex, range.last + 1).let { LexSlice(new, it..it, source) }
+
+    private fun LexSlice.start(new: TokenType = type): LexSlice =
+        min(source.lastIndex, range.first).let { LexSlice(new, it..it, source) }
 
     private fun consume(): LexSlice? {
         return lexer.advance()

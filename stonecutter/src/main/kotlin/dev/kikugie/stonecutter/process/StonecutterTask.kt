@@ -60,7 +60,10 @@ internal abstract class StonecutterTask : DefaultTask() {
         statistics.duration = measureTimeMillis {
             transform(input.get(), output.get())
         }
-        println("[Stonecutter] Switched to ${toVersion.get().project} in ${statistics.duration}ms (${statistics.total - statistics.skipped}/${statistics.total} modified)")
+        println("""
+            [Stonecutter] Switched to ${toVersion.get().project} in ${statistics.duration}ms 
+            (${statistics.total - statistics.skipped} processed | ${statistics.parsed} parsed ${statistics.total} total)
+            """.trimIndent())
     }
 
     private fun createManager(): FileManager {
