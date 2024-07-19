@@ -1,6 +1,7 @@
 package dev.kikugie.stitcher.lexer
 
 import dev.kikugie.stitcher.data.token.*
+import kotlin.math.min
 
 class Lexer(
     private val input: CharSequence,
@@ -24,7 +25,7 @@ class Lexer(
 
     override fun advance(): LexSlice? = (tokens.getOrNull(index + 1) ?: advanceInternal()).also {
         if (it == null || cursor >= input.length) cursor = -1
-        if (it != null) ++index
+        index = min(index + 1, tokens.size)
     }
 
     private fun advanceInternal(): LexSlice? = when (cursor) {

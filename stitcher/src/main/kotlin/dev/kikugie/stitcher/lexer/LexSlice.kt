@@ -9,7 +9,7 @@ data class LexSlice(
     val range: IntRange,
     val source: CharSequence
 ) {
-    val value get() = source.substring(range)
+    val value get() = if (range.first >= 0 && range.last < source.length) source.substring(range) else ""
     val token get() = Token(value, type)
 
     override fun toString(): String = "LexSlice(type=$type, range=${range.first}..<${range.last + 1}, value=$value)"

@@ -40,8 +40,11 @@ open class StonecutterSettings(private val settings: Settings) : StonecutterInit
     override fun create(project: String) = create(project, shared)
 
     override fun create(project: String, setup: StonecutterSetupBuilder) = with(project.removePrefix(":")) {
-        settings.include(this)
-        create(settings.project(":$this"), setup)
+        if (isEmpty()) create(settings.rootProject)
+        else {
+            settings.include(this)
+            create(settings.project(":$this"), setup)
+        }
     }
 
     override fun create(project: ProjectDescriptor) = create(project, shared)

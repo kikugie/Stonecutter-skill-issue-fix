@@ -18,7 +18,6 @@ import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.scanner.Scanner
 import dev.kikugie.stitcher.util.affectedRange
 import dev.kikugie.stitcher.util.replaceKeepIndent
-import dev.kikugie.stitcher.util.trailingSpaces
 
 /**
  * Evaluates [Definition]s and modifies the AST in-place.
@@ -59,8 +58,7 @@ class Transformer(
             ?: return // TODO
         val range = contents.affectedRange(def.enclosure)
         val target = contents.substring(range)
-        val spaces = contents.trailingSpaces()
-        val new = contents.replaceRange(range, target.replaceKeepIndent(replacement)) + spaces
+        val new = contents.replaceRange(range, target.replaceKeepIndent(replacement))
         if (contents != new) {
             val parsed = new.parse()
             withSource(parsed).process()
