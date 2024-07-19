@@ -13,7 +13,7 @@ import dev.kikugie.stitcher.eval.isEmpty
 import dev.kikugie.stitcher.eval.isNotEmpty
 import dev.kikugie.stitcher.scanner.StandardMultiLine
 import dev.kikugie.stitcher.transformer.CommentAdder.onAddComment
-import dev.kikugie.stitcher.transformer.Transformer.Companion.affectedRange
+import dev.kikugie.stitcher.util.affectedRange
 import dev.kikugie.stitcher.util.leadingSpaces
 
 /**
@@ -68,7 +68,7 @@ object CommentAdder : Block.Visitor<String> {
     fun accept(type: ScopeType, scope: Scope): String? = if (scope.isCommented()) null else buildString {
         val processed = scope.blocks.joinToString("") { it.accept(this@CommentAdder) }
         if (type == ScopeType.CLOSED) {
-            val spaces = processed.leadingSpaces()
+            val spaces = processed.leadingSpaces().length
             append(processed.subSequence(0..<spaces))
             append(StandardMultiLine.start)
             append(processed.subSequence(spaces..<processed.length))

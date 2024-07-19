@@ -2,6 +2,7 @@ package dev.kikugie.stitcher.eval
 
 import dev.kikugie.stitcher.data.block.Block
 import dev.kikugie.stitcher.data.component.Component
+import dev.kikugie.stitcher.data.scope.Scope
 import dev.kikugie.stitcher.data.token.Token
 import dev.kikugie.stitcher.transformer.TransformParameters
 
@@ -20,5 +21,7 @@ fun Block.isNotBlank() = !isBlank()
 fun Component.isBlank() = accept(Assembler).isBlank()
 fun Component.isNotBlank() = !isBlank()
 
+fun Scope.join() = accept(Assembler)
+fun Block.join() = accept(Assembler)
 fun Component.join() = accept(Assembler)
 fun Component.eval(params: TransformParameters) = accept(ConditionChecker(params))

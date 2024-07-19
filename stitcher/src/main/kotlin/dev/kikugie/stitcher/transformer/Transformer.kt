@@ -1,26 +1,24 @@
 package dev.kikugie.stitcher.transformer
 
-import dev.kikugie.stitcher.eval.Assembler
 import dev.kikugie.stitcher.data.block.Block
 import dev.kikugie.stitcher.data.block.CodeBlock
 import dev.kikugie.stitcher.data.block.CommentBlock
 import dev.kikugie.stitcher.data.block.ContentBlock
 import dev.kikugie.stitcher.data.component.Condition
 import dev.kikugie.stitcher.data.component.Definition
-import dev.kikugie.stitcher.data.component.Swap
 import dev.kikugie.stitcher.data.scope.Scope
-import dev.kikugie.stitcher.data.scope.ScopeType
 import dev.kikugie.stitcher.data.token.ContentType
 import dev.kikugie.stitcher.data.token.MarkerType.CONDITION
 import dev.kikugie.stitcher.data.token.MarkerType.SWAP
 import dev.kikugie.stitcher.data.token.Token
+import dev.kikugie.stitcher.eval.Assembler
 import dev.kikugie.stitcher.eval.ConditionChecker
 import dev.kikugie.stitcher.parser.FileParser
 import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.scanner.Scanner
-import dev.kikugie.stitcher.util.leadingSpaces
+import dev.kikugie.stitcher.util.affectedRange
+import dev.kikugie.stitcher.util.replaceKeepIndent
 import dev.kikugie.stitcher.util.trailingSpaces
-import java.io.Reader
 
 /**
  * Evaluates [Definition]s and modifies the AST in-place.
@@ -57,11 +55,12 @@ class Transformer(
         val def = it.def
         val contents = it.scope?.accept(Assembler)
             ?: return
-        val replacement = params.swaps[(def.component as Swap).identifier.value]
+        val replacement = params.swaps[def.swap!!.identifier.value]
             ?: return // TODO
         val range = contents.affectedRange(def.enclosure)
         val target = contents.substring(range)
-        val new = contents.replaceRange(range, replacement.replaceKeepIndent(target))
+        val spaces = contents.trailingSpaces()
+        val new = contents.replaceRange(range, target.replaceKeepIndent(replacement)) + spaces
         if (contents != new) {
             val parsed = new.parse()
             withSource(parsed).process()
@@ -96,68 +95,5 @@ class Transformer(
     private fun Scope.assign(new: Iterable<Block>) {
         blocks.clear()
         blocks.addAll(new)
-    }
-
-    companion object {
-        private fun String.indentWidth(): Int {
-            var count = 0
-            for (c in this) when (c) {
-                '\t' -> count += 4
-                ' ' -> count++
-                else -> break
-            }
-            return count
-        }
-
-        private fun String.replaceKeepIndent(value: String): String {
-            val tabIndents = firstOrNull() == '\t'
-            val minCommonIndent = lines()
-                .filter(String::isNotBlank)
-                .minOfOrNull { it.indentWidth() }
-                ?: 0
-            val prepend = if (!tabIndents) " ".repeat(minCommonIndent)
-            else buildString {
-                append("\t".repeat(minCommonIndent / 4))
-                append(" ".repeat(minCommonIndent % 4))
-            }
-            return value.prependIndent(prepend)
-        }
-
-        internal fun String.affectedRange(type: ScopeType): IntRange = when (type) {
-            ScopeType.CLOSED -> indices
-            ScopeType.LINE -> filterUntil { '\r' in it || '\n' in it }
-            ScopeType.WORD -> filterUntil { it.isBlank() }
-        }
-
-        private inline fun String.filterUntil(predicate: (String) -> Boolean): IntRange {
-            val buffer = StringBuilder()
-            for (it in reader().ligatures()) {
-                if (buffer.isNotBlank() && predicate(it)) break
-                buffer.append(it)
-            }
-            return buffer.leadingSpaces()..<buffer.length - buffer.trailingSpaces()
-        }
-
-        private fun Reader.ligatures(): Iterator<String> = object : Iterator<String> {
-            private var char = read()
-            private var buffer: Char? = null
-
-            override fun hasNext() = char != -1 && buffer == null
-
-            override fun next() = when {
-                buffer != null -> buffer.toString().also { buffer = null }
-                char == '\r'.code -> {
-                    val next = read()
-                    if (next == '\n'.code) "\r\n".also { char = read() }
-                    else "\r".also { buffer = next.toChar() }
-                }
-
-                else -> char.toChar().toString().also { advance() }
-            }
-
-            private fun advance() {
-                char = read()
-            }
-        }
     }
 }

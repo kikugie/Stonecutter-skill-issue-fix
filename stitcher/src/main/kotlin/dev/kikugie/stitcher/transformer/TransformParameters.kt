@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TransformParameters(
-    val swaps: Map<String, String>,
-    val constants: Map<String, Boolean>,
-    val dependencies: Map<String, SemanticVersion>
+    val swaps: Map<String, String> = emptyMap(),
+    val constants: Map<String, Boolean> = emptyMap(),
+    val dependencies: Map<String, SemanticVersion> = emptyMap()
 )
