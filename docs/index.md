@@ -44,6 +44,16 @@ import curseforge from '/assets/curseforge.svg?raw';
 
 let start = "here";
 const members = [
+    {
+    avatar: 'https://cdn.modrinth.com/data/XpzGz7KD/8ff6751948e096f540e320681742d0b3b918931e.png',
+    name: 'Elytra Trims',
+    title: 'Customizable elytra mod with trims, banner patterns and more!',
+    links: [
+      { icon: 'github', link: 'https://github.com/Kikugie/elytra-trims' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/elytra-trims' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/elytra-trims' }
+    ]
+  },
   {
     avatar: 'https://cdn.modrinth.com/data/1eAoo2KR/1e43d5714f87ac6b20622e73b3ba7209be5ebafb.png',
     name: 'YetAnotherConfigLib',
@@ -105,13 +115,22 @@ const members = [
     ]
   },
   {
-    avatar: 'https://cdn.modrinth.com/data/XpzGz7KD/8ff6751948e096f540e320681742d0b3b918931e.png',
-    name: 'Elytra Trims',
-    title: 'Customizable elytra mod with trims, banner patterns and more!',
+    avatar: 'https://cdn.modrinth.com/data/IwCkru1D/53eee5642c7c426729b8313628b83f8513322484.png',
+    name: 'CICADA',
+    title: 'Confusing, Interesting and Considerably Agnostic Development Aid',
     links: [
-      { icon: 'github', link: 'https://github.com/Kikugie/elytra-trims' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/elytra-trims' },
-      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/elytra-trims' }
+      { icon: 'github', link: 'https://github.com/enjarai/cicada-lib' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/cicada' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/cicada' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/5srFLIaK/03454d120e13a3a25579bd74fe4bd761fed19431.png',
+    name: 'Better Clouds',
+    title: 'Beautiful clouds in touch with the vanilla style',
+    links: [
+      { icon: 'github', link: 'https://github.com/Qendolin/better-clouds' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/better-clouds' }
     ]
   },
   {
@@ -158,9 +177,19 @@ const members = [
     name: 'Skin Shuffle',
     title: 'Easily change your skin in-game without having to leave the world.',
     links: [
-      { icon: 'github', link: 'https://github.com/mineblock11/SkinShuffle' },
+      { icon: 'github', link: 'https://github.com/IMB11/SkinShuffle' },
       { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/skinshuffle' },
       { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/skinshuffle' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/k68glP2e/1cee94d3e17436d409839a79fa5d6bced5993023.png',
+    name: 'AutoModpack',
+    title: 'Enjoy a seamless modpack installation process and effortless updates with a user-friendly solution that simplifies management, making your gaming experience a breeze.',
+    links: [
+      { icon: 'github', link: 'https://github.com/Skidamek/AutoModpack' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/automodpack' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/automodpack' }
     ]
   },
   {
@@ -183,15 +212,6 @@ const members = [
     ]
   },
   {
-    avatar: 'https://cdn.modrinth.com/data/RCjGlCDj/icon.png',
-    name: 'Mod-erate Loading Screen',
-    title: 'An "alternative" to Mod Menu that\'s a lot less usable.',
-    links: [
-      { icon: 'github', link: 'https://github.com/enjarai/moderate-loading-screen' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/moderate-loading-screen' }
-    ]
-  },
-  {
     avatar: 'https://cdn.modrinth.com/data/m5T5xmUy/c67c1f900e8344e462bb5c21fb512579f3b0be46.png',
     name: 'FabricBetterGrass',
     title: 'Gamers can finally touch grass!?  OptiFine\'s Fancy and Fast better grass implemented on Fabric!',
@@ -199,6 +219,16 @@ const members = [
       { icon: 'github', link: 'https://github.com/UltimatChamp/FabricBetterGrass' },
       { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/fabricbettergrass' },
       { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/fabricbettergrass' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/RCjGlCDj/icon.png',
+    name: 'Mod-erate Loading Screen',
+    title: 'An "alternative" to Mod Menu that\'s a lot less usable.',
+    links: [
+      { icon: 'github', link: 'https://github.com/enjarai/moderate-loading-screen' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/moderate-loading-screen' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/mod-erate-loading-screen' }
     ]
   },
   {
@@ -221,16 +251,6 @@ const members = [
     ]
   },
   {
-    avatar: 'https://cdn.modrinth.com/data/8CsGxc95/f1d33853af9a7c9a05f2562fc72750187b3ed988.png',
-    name: 'Shared Resources',
-    title: 'A mod for sharing game files like resource packs, shaders, saves and more between separate Minecraft instances.',
-    links: [
-      { icon: 'github', link: 'https://github.com/enjarai/shared-resources' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/shared-resources' },
-      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/shared-resources' }
-    ]
-  },
-  {
     avatar: 'https://cdn.modrinth.com/data/9dzLWnmZ/3a7ea28ca4aa82708c23d0f1f7189661eb2ea363.png',
     name: 'Camerapture',
     title: 'Take pictures using a working camera, show them to other players and hang them on your wall in picture frames!',
@@ -238,6 +258,16 @@ const members = [
       { icon: 'github', link: 'https://github.com/chrrs/camerapture' },
       { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/camerapture' },
       { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/camerapture' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/8CsGxc95/f1d33853af9a7c9a05f2562fc72750187b3ed988.png',
+    name: 'Shared Resources',
+    title: 'A mod for sharing game files like resource packs, shaders, saves and more between separate Minecraft instances.',
+    links: [
+      { icon: 'github', link: 'https://github.com/enjarai/shared-resources' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/shared-resources' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/shared-resources' }
     ]
   },
   {
@@ -324,6 +354,15 @@ const members = [
     ]
   },
   {
+    avatar: 'https://cdn.modrinth.com/data/YS3ZignI/f8056e4ce6ac00a50c431eac915509d14a0e90b4.png',
+    name: 'TT20 (TPS Fixer)',
+    title: 'TT20 helps reduce lag by optimizing how ticks work when the server\'s TPS is low.',
+    links: [
+      { icon: 'github', link: 'https://github.com/snackbag/tt20' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/tt20' }
+    ]
+  },
+  {
     avatar: 'https://cdn.modrinth.com/data/yXAvIk0x/a8e206afee8b866700008f18b57212f0d6ce17c6.png',
     name: 'Scribble',
     title: 'Expertly edit your books with rich formatting options, page utilities and more! And it\'s all client-side!',
@@ -331,6 +370,16 @@ const members = [
       { icon: 'github', link: 'https://github.com/chrrs/scribble' },
       { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/scribble' },
       { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/scribble' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/ygYU16dG/cd7e06456a341a345a6d2be1e2a057745d293969.png',
+    name: 'My Totem Doll',
+    title: 'Simple Fabric mod which replaces all totems with player dolls. Rename your totem to player\'s nickname to use it\'s skin.',
+    links: [
+      { icon: 'github', link: 'https://github.com/LopyMine/My-Totem-Doll' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/my_totem_doll' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/my-totem-doll' }
     ]
   },
   {
@@ -344,12 +393,12 @@ const members = [
     ]
   },
   {
-    avatar: 'https://cdn.modrinth.com/data/YS3ZignI/f8056e4ce6ac00a50c431eac915509d14a0e90b4.png',
-    name: 'TT20 (TPS Fixer)',
-    title: 'TT20 helps reduce lag by optimizing how ticks work when the server\'s TPS is low.',
+    avatar: 'https://cdn.modrinth.com/data/3KmV3g7F/7705715ccaa9306dcaf02ac7b7c121016bde8dbe.png',
+    name: 'Florum Sporum',
+    title: 'Breathing new life into the spore blossom without undoing any of Mojang\'s work!',
     links: [
-      { icon: 'github', link: 'https://github.com/snackbag/tt20' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/tt20' }
+      { icon: 'github', link: 'https://github.com/axialeaa/FlorumSporum' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/florum-sporum' }
     ]
   },
   {
@@ -371,12 +420,12 @@ const members = [
     ]
   },
   {
-    avatar: 'https://cdn.modrinth.com/data/ygYU16dG/cd7e06456a341a345a6d2be1e2a057745d293969.png',
-    name: 'My Totem Doll',
-    title: 'Simple Fabric mod which replaces all totems with player dolls. Rename your totem to player\'s nickname to use it\'s skin.',
+    avatar: 'https://cdn.modrinth.com/data/vEyyiUWA/4c3f1393e4885be462eaa0e984d9c2f08562d8cf.png',
+    name: 'Random Fishing',
+    title: 'A simple mod that adds an enchantment for fishing rods that makes fishing produce random items.',
     links: [
-      { icon: 'github', link: 'https://github.com/LopyMine/My-Totem-Doll' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/my_totem_doll' }
+      { icon: 'github', link: 'https://github.com/Overcontrol1/RandomFishing' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/random-fishing' }
     ]
   },
   {
@@ -389,6 +438,16 @@ const members = [
     ]
   },
   {
+    avatar: 'https://cdn.modrinth.com/data/yItp8TXg/c0a28bc0b0027385ec15f694e341d683f3a24eb7.png',
+    name: 'Fast Recipe',
+    title: 'Ctrl + LMB on recipe for instantly crafting, according to it. Fabric.',
+    links: [
+      { icon: 'github', link: 'https://github.com/LopyMine/fast-recipe' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/fast-recipe' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/fast-recipe' }
+    ]
+  },
+  {
     avatar: 'https://cdn.modrinth.com/data/joSM3OBw/d678ad694601af535d957b535bce1510b2690dee.png',
     name: 'New Creative Inventory',
     title: 'A recreation of the creative inventory from version 1.19.3',
@@ -396,18 +455,8 @@ const members = [
       { icon: 'github', link: 'https://github.com/Plastoid501/NewCreativeInventory' },
       { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/new-creative-inventory' }
     ]
-  },
-  {
-    avatar: 'https://cdn.modrinth.com/data/pNpkYUIH/59d47cca5c3dd2beb8d2f20823cbb6ad521c58a6.png',
-    name: 'Daisy\'s Mod Collection',
-    title: 'A collection of different mods',
-    links: [
-      { icon: 'github', link: 'https://github.com/DaisyDogs07/MyMod' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/daisycollection' }
-    ]
   }
 ];
-
 let end = "here";
 </script>
 

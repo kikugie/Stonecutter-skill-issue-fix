@@ -2,41 +2,43 @@ allthetrims
 automodpack
 autodrop
 autowhitelist
-better-clouds
-better-boat-movement
-blocky-bubbles
+better clouds
+better boat movement
+blocky bubbles
 camerapture
-chais-inventory-sorter
+chais inventory sorter
 cicada
 controlify
 ctmselector
 cyan
 cyansethome
-daisycollection
-elytra-trims
+elytra trims
 enchantmentdisabler
 fabricbettergrass
+fast recipe
 flow
 fog
-forgotten-graves
+forgotten graves
 fsit
+florum sporum
 loadmychunks
-mcc-island-nametag-mod
-mob-armor-trims
-moderate-loading-screen
+mcc island nametag mod
+mob armor trims
+moderate loading screen
 mru
-my_totem_doll
+my totem doll
 neruina
-new-creative-inventory
+new creative inventory
 playerstatistics
-position-display
+position display
+random fishing
 scribble
-shared-resources
-skin-overrides
+shared resources
+skin overrides
 skinshuffle
 skylper
-snow-under-trees-remastered
-sushi-bar
+snow under trees remastered
+sushi bar
 telekinesis
 tt20
 yacl
