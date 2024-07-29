@@ -1,10 +1,12 @@
 allthetrims
+automodpack
 autodrop
 autowhitelist
 better-boat-movement
 blocky-bubbles
 camerapture
 chais-inventory-sorter
+cicada
 controlify
 ctmselector
 cyan
