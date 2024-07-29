@@ -79,7 +79,10 @@ class CommentParser(
         while (true) when (nextType) {
             WhitespaceType -> consume()
             SCOPE_OPEN, EXPECT_WORD, NullType, null -> break
-            IF, ELSE, ELIF -> consume { sugar += it }
+            IF, ELSE, ELIF -> consume {
+                if (expression.isBlank()) sugar += it
+                else errors += it
+            }
             IDENTIFIER, PREDICATE, NEGATE, GROUP_OPEN ->
                 if (expression.isBlank()) expression = matchExpression()
                 else consume { errors += it }

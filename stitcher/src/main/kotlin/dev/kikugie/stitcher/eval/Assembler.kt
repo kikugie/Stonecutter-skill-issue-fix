@@ -17,9 +17,9 @@ import dev.kikugie.stitcher.data.token.Token
 object Assembler : Component.Visitor<String>, Block.Visitor<String>, Scope.Visitor<String> {
     private fun StringBuilder.token(token: Token): StringBuilder = append(token.value)
     private fun StringBuilder.space(): StringBuilder = append(' ')
-    private fun StringBuilder.appendVisit(it: Component) = append(it.accept(Assembler))
-    private fun StringBuilder.appendVisit(it: Block) = append(it.accept(Assembler))
-    private fun StringBuilder.appendVisit(it: Scope) = append(it.accept(Assembler))
+    private fun StringBuilder.appendVisit(it: Component) = append(it.join())
+    private fun StringBuilder.appendVisit(it: Block) = append(it.join())
+    private fun StringBuilder.appendVisit(it: Scope) = append(it.join())
 
     override fun visitEmpty(it: Empty) = ""
     override fun visitLiteral(it: Literal) = it.token.value

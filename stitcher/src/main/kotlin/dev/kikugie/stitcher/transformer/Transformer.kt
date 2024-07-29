@@ -13,6 +13,7 @@ import dev.kikugie.stitcher.data.token.MarkerType.SWAP
 import dev.kikugie.stitcher.data.token.Token
 import dev.kikugie.stitcher.eval.Assembler
 import dev.kikugie.stitcher.eval.ConditionChecker
+import dev.kikugie.stitcher.eval.join
 import dev.kikugie.stitcher.parser.FileParser
 import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.scanner.Scanner
@@ -52,7 +53,7 @@ class Transformer(
 
     private fun processSwap(it: CodeBlock) {
         val def = it.def
-        val contents = it.scope?.accept(Assembler)
+        val contents = it.scope?.join()
             ?: return
         val replacement = params.swaps[def.swap!!.identifier.value]
             ?: return // TODO

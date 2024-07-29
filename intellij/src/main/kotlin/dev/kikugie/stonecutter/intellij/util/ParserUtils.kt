@@ -6,9 +6,11 @@ import dev.kikugie.stitcher.data.token.MarkerType
 import dev.kikugie.stitcher.lexer.Lexer
 import dev.kikugie.stitcher.parser.CommentParser
 import dev.kikugie.stitcher.eval.ConditionChecker
+import dev.kikugie.stitcher.eval.isNotEmpty
 import dev.kikugie.stitcher.exception.StoringErrorHandler
 import dev.kikugie.stonecutter.configuration.StonecutterModel
 import dev.kikugie.stonecutter.process.toParams
+import org.jetbrains.plugins.gradle.service.project.data.ExternalProjectDataCache
 
 fun String.parse(model: StonecutterModel): Definition? {
     val lexer = Lexer(this)
@@ -25,7 +27,7 @@ fun String.parse(): Definition? {
 fun String.findMatching(module: Module): List<StonecutterModel> {
     val service = module.stonecutterService ?: return emptyList()
     val def = parse()
-        ?.takeIf { it.type == MarkerType.CONDITION }
+        ?.takeIf { it.type == MarkerType.CONDITION && it.isNotEmpty() }
         ?: return emptyList()
     return service.models.values.filter {
         val visitor = ConditionChecker(it.data.toParams(it.current.version))

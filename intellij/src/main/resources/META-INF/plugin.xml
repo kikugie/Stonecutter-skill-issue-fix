@@ -28,6 +28,7 @@
         <lang.syntaxHighlighter language="Stitcher" implementationClass="dev.kikugie.stonecutter.intellij.impl.StitcherHighlighter"/>
         <annotator language="Stitcher" implementationClass="dev.kikugie.stonecutter.intellij.impl.StitcherAnnotator"/>
         <codeInsight.lineMarkerProvider language="Stitcher" implementationClass="dev.kikugie.stonecutter.intellij.impl.StitcherLineMarkerProvider"/>
+        <projectService serviceImplementation="dev.kikugie.stonecutter.intellij.impl.StonecutterService"/>
     </extensions>
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
         <projectResolve implementation="dev.kikugie.stonecutter.intellij.impl.ReloadListener"/>

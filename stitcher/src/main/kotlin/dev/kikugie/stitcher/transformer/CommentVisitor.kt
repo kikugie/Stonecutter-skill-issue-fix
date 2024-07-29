@@ -11,6 +11,7 @@ import dev.kikugie.stitcher.data.token.ContentType
 import dev.kikugie.stitcher.data.token.Token
 import dev.kikugie.stitcher.eval.isEmpty
 import dev.kikugie.stitcher.eval.isNotEmpty
+import dev.kikugie.stitcher.eval.join
 import dev.kikugie.stitcher.scanner.StandardMultiLine
 import dev.kikugie.stitcher.transformer.CommentAdder.onAddComment
 import dev.kikugie.stitcher.util.affectedRange
@@ -47,7 +48,7 @@ object CommentRemover : Block.Visitor<String> {
                 if (toUncomment !is CommentBlock) null
                 else {
                     scope.blocks[toUncommentIndex] = ContentBlock(Token(toUncomment.accept(this), ContentType.COMMENT))
-                    scope.accept(Assembler)
+                    scope.join()
                 }
             }
         }

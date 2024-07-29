@@ -15,7 +15,9 @@ import org.jetbrains.plugins.gradle.model.ExternalProject
 import org.jetbrains.plugins.gradle.service.project.AbstractProjectResolverExtension
 import org.jetbrains.plugins.gradle.service.project.data.ExternalProjectDataCache
 import java.io.File
-import java.util.WeakHashMap
+import java.nio.file.Path
+import java.util.*
+import kotlin.io.path.Path
 import kotlin.io.path.isReadable
 import kotlin.io.path.notExists
 
@@ -26,25 +28,28 @@ class ReloadListener : AbstractProjectResolverExtension() {
     }
 }
 
-@Service(Service.Level.PROJECT)
 class StonecutterService(private val root: Project) {
     private val _models: MutableMap<Module, StonecutterModel> = WeakHashMap()
+    private val _roots: MutableMap<Module, Path> = WeakHashMap()
     val models: Map<Module, StonecutterModel> get() = _models
+    val roots: Map<Module, Path>  get() = _roots
 
     init {
         reload()
     }
 
-    operator fun get(module: Module) = _models[module]
+    operator fun get(module: Module) = models[module]
 
     internal fun reload() {
         _models.clear()
+        _roots.clear()
         val cache = ExternalProjectDataCache.getInstance(root)
         val manager = ModuleManager.getInstance(root)
         val modules = mutableMapOf<File, Module>()
 
         for (module in manager.modules) module.getComponent(ModuleRootManager::class.java).contentRoots.forEach {
             modules[File(it.path)] = module
+            _roots[module] = Path(it.path)
         }
 
         for (module in manager.modules) module.getComponent(ModuleRootManager::class.java).contentRoots.forEach {
@@ -53,7 +58,6 @@ class StonecutterService(private val root: Project) {
             if (buildFileName == "stonecutter.gradle" || buildFileName == "stonecutter.gradle.kts")
                 loadVersions(project, modules)
         }
-        println(_models)
     }
 
     private fun loadVersions(project: ExternalProject, modules: Map<File, Module>) {

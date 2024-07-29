@@ -8,8 +8,7 @@ import dev.kikugie.stitcher.data.component.*
 import dev.kikugie.stitcher.data.token.Token
 
 /**
- * Checks if a given Stitcher component is blank.
- * Blank components are those that do not contain any meaningful content.
+ * Checks if a given Stitcher component doesn't contain any meaningful content.
  *
  * @see Component
  */

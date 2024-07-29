@@ -10,5 +10,5 @@ val PsiElement.module get() = ModuleUtil.findModuleForPsiElement(this)
 val PsiFile.module get() = ModuleUtil.findModuleForFile(this)
 
 val PsiElement.stonecutterService get() = project.getServiceIfCreated(StonecutterService::class.java)
-val Module.stonecutterService get() = getServiceIfCreated(StonecutterService::class.java)
+val Module.stonecutterService get() = project.getServiceIfCreated(StonecutterService::class.java)
 val Module.stonecutterModel get() = stonecutterService?.get(this)
