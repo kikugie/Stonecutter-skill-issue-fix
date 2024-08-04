@@ -27,10 +27,8 @@
         <lang.parserDefinition language="Stitcher" implementationClass="dev.kikugie.stonecutter.intellij.lang.StitcherDef"/>
         <lang.syntaxHighlighter language="Stitcher" implementationClass="dev.kikugie.stonecutter.intellij.impl.StitcherHighlighter"/>
         <annotator language="Stitcher" implementationClass="dev.kikugie.stonecutter.intellij.impl.StitcherAnnotator"/>
-        <codeInsight.lineMarkerProvider language="Stitcher" implementationClass="dev.kikugie.stonecutter.intellij.impl.StitcherLineMarkerProvider"/>
-        <projectService serviceImplementation="dev.kikugie.stonecutter.intellij.impl.StonecutterService"/>
+        <lang.importOptimizer language="JAVA" order="first" implementationClass="dev.kikugie.stonecutter.intellij.impl.StitcherImportManager"/>
     </extensions>
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
-        <projectResolve implementation="dev.kikugie.stonecutter.intellij.impl.ReloadListener"/>
     </extensions>
 </idea-plugin>
