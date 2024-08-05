@@ -27,3 +27,8 @@ intellij {
     type = "IC" // Target IDE Platform
     plugins = listOf("com.intellij.java", "org.jetbrains.plugins.gradle")
 }
+
+tasks.patchPluginXml {
+    sinceBuild = "223"
+    untilBuild = "242.*"
+}
