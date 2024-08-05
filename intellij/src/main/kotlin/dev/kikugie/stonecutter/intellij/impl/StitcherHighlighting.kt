@@ -58,6 +58,7 @@ class StitcherEditorHighlighter : EditorHighlighterProvider {
 
 class StitcherAnnotator : Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+        element.getStonecutterService() // Temp to invoke it
         if (element.elementType == UNKNOWN) holder
             .newAnnotation(HighlightSeverity.ERROR, "Unknown token")
             .range(element)

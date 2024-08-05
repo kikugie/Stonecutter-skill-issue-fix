@@ -44,5 +44,6 @@
         <lang.importOptimizer language="JAVA" order="first" implementationClass="dev.kikugie.stonecutter.intellij.impl.StitcherImportManager"/>
     </extensions>
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
+        <projectResolve implementation="dev.kikugie.stonecutter.intellij.impl.ReloadListener"/>
     </extensions>
 </idea-plugin>

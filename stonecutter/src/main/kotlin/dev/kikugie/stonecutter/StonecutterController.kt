@@ -3,6 +3,7 @@
 package dev.kikugie.stonecutter
 
 import dev.kikugie.stonecutter.configuration.StonecutterConfiguration
+import dev.kikugie.stonecutter.configuration.StonecutterControllerModelBuilder
 import dev.kikugie.stonecutter.configuration.StonecutterGlobalParameters
 import dev.kikugie.stonecutter.configuration.StonecutterUtility
 import dev.kikugie.stonecutter.process.StonecutterTask
@@ -12,14 +13,16 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.tooling.provider.model.ToolingModelBuilderRegistry
 import org.jetbrains.annotations.ApiStatus
 import java.nio.file.Path
+import javax.inject.Inject
 
 /**
  * Runs for `stonecutter.gradle` file, applying project configurations to versions and generating versioned tasks.
  */
 @Suppress("MemberVisibilityCanBePrivate")
-open class StonecutterController internal constructor(root: Project) : StonecutterConfiguration, StonecutterUtility, StonecutterGlobalParameters {
+open class StonecutterController @Inject internal constructor(registry: ToolingModelBuilderRegistry, root: Project) : StonecutterConfiguration, StonecutterUtility, StonecutterGlobalParameters {
     private val manager: ControllerManager = root.controller()
         ?: throw StonecutterGradleException("Project ${root.path} is not a Stonecutter controller. What did you even do to get this error?")
     internal val setup: StonecutterSetup =
@@ -53,7 +56,8 @@ open class StonecutterController internal constructor(root: Project) : Stonecutt
     override var automaticPlatformConstants: Boolean = false
 
     init {
-        println("Running Stonecutter 0.5-alpha.1")
+        println("Running Stonecutter 0.5-alpha.3")
+        registry.register(StonecutterControllerModelBuilder())
         versions.forEach { root.project(it.project).pluginManager.apply(StonecutterPlugin::class.java) }
         root.tasks.create("chiseledStonecutter") {
             setup.versions.forEach { dependsOn("${it.project}:setupChiseledBuild") }
