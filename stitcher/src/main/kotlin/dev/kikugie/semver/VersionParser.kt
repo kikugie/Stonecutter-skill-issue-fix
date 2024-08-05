@@ -6,7 +6,10 @@ package dev.kikugie.semver
  *
  * @see <a href="https://github.com/FabricMC/fabric-loader/blob/master/src/main/java/net/fabricmc/loader/impl/util/version/SemanticVersionImpl.java">SemanticVersionImpl</a>
  */
-object SemanticVersionParser {
+object VersionParser {
+    fun parseLenient(input: CharSequence): Version =
+        runCatching { parse(input) }.getOrElse { StringVersion(input.toString()) }
+
     fun parse(input: CharSequence): SemanticVersion {
         var version = input.toString()
         var preModifier = ""

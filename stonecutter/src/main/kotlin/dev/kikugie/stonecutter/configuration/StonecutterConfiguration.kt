@@ -1,7 +1,7 @@
 package dev.kikugie.stonecutter.configuration
 
 import dev.kikugie.semver.SemanticVersion
-import dev.kikugie.semver.SemanticVersionParser
+import dev.kikugie.semver.VersionParser
 import dev.kikugie.semver.VersionPredicate
 import dev.kikugie.stonecutter.StonecutterBuild
 import dev.kikugie.stonecutter.StonecutterController
@@ -209,7 +209,7 @@ interface StonecutterConfiguration {
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
     fun compare(left: String, right: String) =
-        SemanticVersionParser.parse(left).compareTo(SemanticVersionParser.parse(right))
+        VersionParser.parse(left).compareTo(VersionParser.parse(right))
 
     /**
      * Parses both parameters as semantic versions and compares them.
@@ -232,7 +232,7 @@ interface StonecutterConfiguration {
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
     fun eval(version: String, predicate: String): Boolean {
-        val target = SemanticVersionParser.parse(version)
+        val target = VersionParser.parse(version)
         return predicate.split(' ').all {
             VersionPredicate.parse(it).eval(target)
         }

@@ -39,10 +39,11 @@ class ConditionChecker(private val params: TransformParameters) : Component.Visi
         ?: Assignment(Token.EMPTY, listOf(it.token)).accept(this)
 
     override fun visitAssignment(it: Assignment): Boolean {
-        val target = params.dependencies[it.target.value] ?: throw IllegalArgumentException()
+        val target = params.dependencies[it.target.value]
+            ?: throw IllegalArgumentException("Invalid dependency ${it.target.value}")
         return it.predicates.all {
-            val info = it[VersionPredicate::class] ?: VersionPredicate.parse(it.value)
-            info.operator(target, info.version)
+            val info = it[VersionPredicate::class] ?: VersionPredicate.parseLenient(it.value)
+            info.eval(target)
         }
     }
 }

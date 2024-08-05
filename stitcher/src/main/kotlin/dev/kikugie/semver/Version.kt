@@ -6,11 +6,22 @@ import java.util.*
 import kotlin.math.max
 
 @Serializable
+sealed interface Version : Comparable<Version>
+
+@Serializable
+data class StringVersion(val string: String) : Version {
+    override fun compareTo(other: Version): Int = when(other) {
+        is StringVersion -> string.compareTo(other.string)
+        is SemanticVersion -> string.compareTo(other.toString())
+    }
+}
+
+@Serializable
 data class SemanticVersion(
     val components: IntArray,
     val preModifier: String = "",
     val postModifier: String = "",
-) : Comparable<SemanticVersion> {
+) : Version {
     @Transient
     private val friendlyName = buildString {
         append(components.joinToString("."))
@@ -22,10 +33,13 @@ data class SemanticVersion(
 
     operator fun get(index: Int): Int? = components.getOrNull(index)
 
-    override fun compareTo(other: SemanticVersion): Int {
-        val compareComponents = compareToComponents(other)
-        return if (compareComponents != 0) compareComponents
-        else compareToPreModifier(other)
+    override fun compareTo(other: Version): Int = when(other) {
+        is StringVersion -> friendlyName.compareTo(other.string)
+        is SemanticVersion -> {
+            val compareComponents = compareToComponents(other)
+            if (compareComponents != 0) compareComponents
+            else compareToPreModifier(other)
+        }
     }
 
     private fun compareToComponents(other: SemanticVersion): Int {

@@ -1,7 +1,7 @@
 package dev.kikugie.stonecutter
 
 import dev.kikugie.semver.SemanticVersion
-import dev.kikugie.semver.SemanticVersionParser
+import dev.kikugie.semver.VersionParser
 import dev.kikugie.semver.VersionParsingException
 import dev.kikugie.stitcher.lexer.IdentifierRecognizer.Companion.allowed
 import dev.kikugie.stonecutter.configuration.StonecutterConfiguration
@@ -117,7 +117,7 @@ open class StonecutterBuild internal constructor(val project: Project) : Stonecu
     }
 
     private fun validateSemver(ver: String): SemanticVersion = try {
-        SemanticVersionParser.parse(ver)
+        VersionParser.parse(ver)
     } catch (e: VersionParsingException) {
         throw IllegalArgumentException("Invalid semantic version: $ver").apply {
             initCause(e)

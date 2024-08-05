@@ -1,11 +1,11 @@
 package dev.kikugie.semver.minecraft
 
 import dev.kikugie.semver.SemanticVersion
-import dev.kikugie.semver.SemanticVersionParser
+import dev.kikugie.semver.VersionParser
 
 class MinecraftVersionNormalizer(private val supplier: MinecraftVersionInfo) {
     fun parse(input: CharSequence): SemanticVersion =
-        SemanticVersionParser.parse(getValidVersion(input.toString()))
+        VersionParser.parse(getValidVersion(input.toString()))
 
     private fun getValidVersion(version: String): String {
         if (version.isRelease()) // Full releases like 1.19 or 1.20

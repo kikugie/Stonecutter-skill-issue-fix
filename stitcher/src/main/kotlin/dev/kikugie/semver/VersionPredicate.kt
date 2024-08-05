@@ -5,9 +5,9 @@ import dev.kikugie.semver.VersionComparisonOperator.Companion.operatorLength
 
 data class VersionPredicate(
     val operator: VersionComparisonOperator,
-    val version: SemanticVersion
+    val version: Version
 ) {
-    fun eval(target: SemanticVersion) = operator(target, version)
+    fun eval(target: Version) = operator(target, version)
 
     override fun toString(): String = "${operator.literal}$version"
 
@@ -16,7 +16,15 @@ data class VersionPredicate(
         fun parse(predicate: String): VersionPredicate {
             val len = predicate.operatorLength()
             val op = match(predicate.substring(0, len))
-            val ver = SemanticVersionParser.parse(predicate.substring(len))
+            val ver = VersionParser.parse(predicate.substring(len))
+            return VersionPredicate(op, ver)
+        }
+
+        @Throws(VersionParsingException::class)
+        fun parseLenient(predicate: String): VersionPredicate {
+            val len = predicate.operatorLength()
+            val op = match(predicate.substring(0, len))
+            val ver = VersionParser.parseLenient(predicate.substring(len))
             return VersionPredicate(op, ver)
         }
     }
