@@ -2,12 +2,11 @@
 
 import org.jetbrains.dokka.gradle.DokkaTask
 
-
 plugins {
     java
     `kotlin-dsl`
-    `maven-publish`
-    `java-gradle-plugin`
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.gradle.publishing)
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.dokka)
     alias(libs.plugins.kotlin.serialization)
@@ -23,15 +22,11 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":stitcher"))
+    api(project(":stitcher"))
     implementation(libs.kotlin.serialization)
     implementation(libs.kotlin.coroutines)
     implementation(libs.kaml)
     implementation(libs.cbor)
-}
-
-tasks.test {
-    useJUnitPlatform()
 }
 
 tasks.withType<DokkaTask>().configureEach {
@@ -51,6 +46,12 @@ kotlin {
 java {
     withSourcesJar()
     withJavadocJar()
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("shadow")
+    archiveClassifier.set("")
+    archiveVersion.set("")
 }
 
 tasks.named<Jar>("javadocJar") {
@@ -80,7 +81,7 @@ publishing {
 }
 
 gradlePlugin {
-    website = "https://github.com/kikugie/stonecutter"
+    website = "https://stonecutter.kikugie.dev/"
     vcsUrl = "https://github.com/kikugie/stonecutter"
 
     plugins {
@@ -88,7 +89,8 @@ gradlePlugin {
             id = "dev.kikugie.stonecutter"
             implementationClass = "dev.kikugie.stonecutter.StonecutterPlugin"
             displayName = "Stonecutter"
-            description = "Preprocessor/JCP inspired multi-version environment manager"
+            description = "Modern Gradle plugin for multi-version management"
+            tags = setOf("minecraft", "mods")
         }
     }
 }
