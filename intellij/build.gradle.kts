@@ -1,11 +1,11 @@
 plugins {
     java
     kotlin("jvm")
-    id("org.jetbrains.intellij") version "1.17.3"
+    alias(libs.plugins.intellij)
 }
 
 group = "dev.kikugie"
-version = "0.1.0-alpha.1"
+version = "0.1.0-beta.1"
 
 repositories {
     mavenCentral()
@@ -22,7 +22,8 @@ dependencies {
 
 // See https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2023.2.6")
-    type.set("IC") // Target IDE Platform
-    plugins.set(listOf("org.jetbrains.plugins.gradle"))
+    pluginName = "stonecutter-dev"
+    version = "2024.1.4"
+    type = "IC" // Target IDE Platform
+    plugins = listOf("com.intellij.java", "org.jetbrains.plugins.gradle")
 }

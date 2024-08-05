@@ -3,6 +3,7 @@
 kotlin = "2.0.0"
 gradlepub = "1.2.1"
 shadow = "8.1.1"
+intellij = "1.17.3"
 # Dependencies
 serialization = "1.7.1"
 coroutines = "1.9.0-RC"
@@ -16,6 +17,7 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 kotlin-dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 gradle-publishing = { id = "com.gradle.plugin-publish", version.ref = "gradlepub" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+intellij = { id = "org.jetbrains.intellij", version.ref = "intellij" }
 
 [libraries]
 kotlin-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "serialization" }
