@@ -95,6 +95,28 @@ interface StonecutterConfiguration {
     }
 
     /**
+     * Adds multiple constants to the constant map.
+     *
+     * @param value The value to compare against.
+     * @param choices The list of choices to create constants for.
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
+     */
+    fun consts(value: String, vararg choices: String) {
+        choices.forEach { const(it, it == value) }
+    }
+
+    /**
+     * Adds multiple constants to the constant map.
+     *
+     * @param value The value to compare against.
+     * @param choices The list of choices to create constants for.
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
+     */
+    fun consts(value: String, choices: Iterable<String>) {
+        choices.forEach { const(it, it == value) }
+    }
+
+    /**
      * Adds a dependency to the semver checks.
      *
      * @param identifier Dependency name
