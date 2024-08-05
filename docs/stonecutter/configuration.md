@@ -29,11 +29,23 @@ Constants add variables that can be checked in the code.
 stonecutter.const("fabric", isFabric)
 stonecutter.const("forge", isForge)
 ```
-```kotlin [code.kt]
+```java [code.java]
 //? if fabric
-println("good")
+System.out.println("good");
 ```
 :::
+
+Platform-specific setup can also be simplified to:
+```kotlin [build.gradle[.kts]]
+val platform = property("loom.platform").toString()
+stonecutter.consts(platform, "fabric", "forge")
+```
+
+To ease the setup, enable automatic platform constants:
+```kotlin [stonecutter.gradle[.kts]]
+stonecutter.automaticPlatformConstants = true
+```
+This finds all enabled platform and assigns corresponding constants.
 
 ### Dependencies
 Stonecutter dependencies allow specifying additional targets for the version checker.

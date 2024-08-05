@@ -7,6 +7,7 @@ import dev.kikugie.stitcher.lexer.IdentifierRecognizer.Companion.allowed
 import dev.kikugie.stonecutter.configuration.StonecutterConfiguration
 import dev.kikugie.stonecutter.configuration.StonecutterData
 import dev.kikugie.stonecutter.configuration.StonecutterModel
+import dev.kikugie.stonecutter.configuration.StonecutterUtility
 import dev.kikugie.stonecutter.process.StonecutterTask
 import dev.kikugie.stonecutter.process.encode
 import dev.kikugie.stonecutter.process.runIgnoring
@@ -32,7 +33,7 @@ import kotlin.io.path.exists
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 @OptIn(ExperimentalPathApi::class)
-open class StonecutterBuild internal constructor(val project: Project) : StonecutterConfiguration {
+open class StonecutterBuild internal constructor(val project: Project) : StonecutterConfiguration, StonecutterUtility {
     internal val setup = project.parent?.let {
         project.gradle.extensions.getByType(StonecutterSetup.Container::class.java)[it]
     } ?: throw StonecutterGradleException(
