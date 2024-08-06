@@ -11,10 +11,12 @@
         Multi-version management Gradle plugin.
         </br>
         Stonecutter is a Gradle plugin that allows working on a project that targets multiple compatible release versions of a dependency.
-        It's mostly meant for mods Minecraft mods, but on itself the plugin is platform-independent.
+        It's mostly meant for Minecraft mods, but on itself the plugin is platform-independent.
         </br>
         This project is inspired by <a href="https://github.com/ReplayMod/preprocessor">Preprocessor</a>, <a href="https://github.com/raydac/java-comment-preprocessor">JCP</a> and <a href="https://github.com/SHsuperCM/Stonecutter">The original Stonecutter</a>,
         expanding on their features and providing new ones.
+        </br>
+        The intellij plugin provides addition functionality for the Gradle plugin.
         </br>
         For more information visit the <a href="https://stonecutter.kikugie.dev/">Stonecutter website</a>.
     ]]></description>
