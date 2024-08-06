@@ -7,6 +7,7 @@ import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.psi.PsiElement
 import dev.kikugie.stonecutter.StonecutterProject
@@ -16,12 +17,16 @@ import dev.kikugie.stonecutter.configuration.readControllerModel
 import dev.kikugie.stonecutter.intellij.util.memoize
 import org.jetbrains.plugins.gradle.service.project.AbstractProjectResolverExtension
 import java.nio.file.Path
+import java.util.Optional
 import kotlin.io.path.Path
+import kotlin.jvm.optionals.getOrNull
 
 private const val CACHE_PATH = "build/stonecutter-cache/model.yml"
 
-fun PsiElement.getStonecutterService() =
+val PsiElement.stonecutterService get() =
     project.service<StonecutterService>()
+
+val PsiElement.module get() = ModuleUtil.findModuleForPsiElement(this)
 
 class ReloadListener : AbstractProjectResolverExtension() {
     @Suppress("UnstableApiUsage")
@@ -32,32 +37,32 @@ class ReloadListener : AbstractProjectResolverExtension() {
 
 @Service(PROJECT)
 class StonecutterService {
-    internal val modulePaths = memoize<Module, _> {
-        val path = ExternalSystemApiUtil.getExternalProjectPath(it)
-            ?: return@memoize Result.failure(IllegalArgumentException("Module ${it.name} doesn't have a path"))
-        Result.success(Path(path))
+    private val modulePaths = memoize<Module, _> {
+        Optional.ofNullable(ExternalSystemApiUtil.getExternalProjectPath(it)?.let(::Path))
     }
-    internal val controllerModels = memoize<Path, _> {
+    private val controllerModels = memoize<Path, _> {
         readControllerModel(it.resolve(CACHE_PATH))
     }
-    internal val buildModels = memoize<Path, _> {
+    private val buildModels = memoize<Path, _> {
         readBuildModel(it.resolve(CACHE_PATH))
     }
-
-    internal fun getModuleModel(module: Module) = modulePaths(module).getOrNull()?.let(buildModels)
-    internal fun getProjectModels(module: Module): Map<StonecutterProject, StonecutterDataView>? {
-        val parentPath = modulePaths(module).getOrNull()?.parent?.parent ?: return null
-        val controllerModel = controllerModels(parentPath).getOrNull() ?: return null
-        return controllerModel.versions.mapNotNull {
-            val subDir = parentPath.resolve("versions/${it.project}")
+    private val collectedBuildModels = memoize<Module, _> {
+        val parentPath = modulePaths(it).getOrNull()?.parent?.parent ?: return@memoize emptyMap()
+        val controllerModel = controllerModels(parentPath).getOrNull() ?: return@memoize emptyMap()
+        controllerModel.versions.mapNotNull { proj ->
+            val subDir = parentPath.resolve("versions/${proj.project}")
             val buildModel = buildModels(subDir).getOrNull() ?: return@mapNotNull null
-            it to buildModel
-        }.takeIf { it.isNotEmpty() }?.toMap()
+            proj to buildModel
+        }.toMap()
     }
+
+    fun getModuleModel(module: Module) = modulePaths(module).getOrNull()?.let(buildModels)
+    fun getProjectModels(module: Module): Map<StonecutterProject, StonecutterDataView> = collectedBuildModels(module)
 
     internal fun reset() {
         modulePaths.clear()
         controllerModels.clear()
         buildModels.clear()
+        collectedBuildModels.clear()
     }
 }
