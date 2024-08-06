@@ -2,6 +2,7 @@ package dev.kikugie.stonecutter.intellij.impl
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.Service.Level.PROJECT
+import com.intellij.openapi.components.service
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.module.Module
@@ -21,13 +22,13 @@ val REGEX = Regex("stonecutter\\.gradle(\\.kts)?")
 
 fun PsiElement.getStonecutterService() = ModuleUtil
     .findModuleForPsiElement(this)?.let {
-        project.getServiceIfCreated(StonecutterService::class.java)?.getControllerModel(it)
+        project.service<StonecutterService>().getControllerModel(it)
     }
 
 class ReloadListener : AbstractProjectResolverExtension() {
     @Suppress("UnstableApiUsage")
     override fun resolveFinished(node: DataNode<ProjectData>) = ProjectManager.getInstance().openProjects.forEach {
-        it.getServiceIfCreated(StonecutterService::class.java)?.reset()
+        it.service<StonecutterService>().reset()
     }
 }
 
