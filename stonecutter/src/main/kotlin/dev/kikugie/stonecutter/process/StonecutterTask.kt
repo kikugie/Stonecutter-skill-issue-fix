@@ -4,8 +4,8 @@ import dev.kikugie.stitcher.exception.SyntaxException
 import dev.kikugie.stitcher.scanner.StandardMultiLine
 import dev.kikugie.stitcher.scanner.StandardSingleLine
 import dev.kikugie.stonecutter.StonecutterProject
-import dev.kikugie.stonecutter.buildDirectory
 import dev.kikugie.stonecutter.configuration.StonecutterDataView
+import dev.kikugie.stonecutter.configuration.stonecutterCacheDir
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
@@ -69,7 +69,7 @@ internal abstract class StonecutterTask : DefaultTask() {
     private fun createManager(): FileManager {
         val dataView = data.get()
         val dest = if (chiseled.get()) project.parent!! else project
-        fun cacheDir(pr: StonecutterProject) = dest.project(pr.project).buildDirectory.toPath().resolve("stonecutterCache")
+        fun cacheDir(pr: StonecutterProject) = dest.project(pr.project).stonecutterCacheDir.toPath()
 
         val params = dataView.toParams(toVersion.get().version)
         return FileManager(

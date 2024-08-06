@@ -1,6 +1,9 @@
-package dev.kikugie.stonecutter
+package dev.kikugie.stonecutter.configuration
 
+import dev.kikugie.stonecutter.*
+import dev.kikugie.stonecutter.StonecutterGradleException
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import org.gradle.api.Project
 
 @Serializable
@@ -15,6 +18,7 @@ open class StonecutterSetup(
             ?: throw StonecutterGradleException("Project ${builder.vcsVersion} is not registered")
     )
 
+    @Transient
     private val chiseledTasks: MutableSet<TaskName> = mutableSetOf()
 
     fun register(task: TaskName) {

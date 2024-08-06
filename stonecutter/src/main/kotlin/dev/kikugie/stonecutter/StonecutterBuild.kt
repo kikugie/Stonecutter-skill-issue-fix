@@ -4,19 +4,14 @@ import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.VersionParser
 import dev.kikugie.semver.VersionParsingException
 import dev.kikugie.stitcher.lexer.IdentifierRecognizer.Companion.allowed
-import dev.kikugie.stonecutter.configuration.StonecutterBuildModelBuilder
-import dev.kikugie.stonecutter.configuration.StonecutterConfiguration
-import dev.kikugie.stonecutter.configuration.StonecutterData
-import dev.kikugie.stonecutter.configuration.StonecutterUtility
+import dev.kikugie.stonecutter.configuration.*
 import dev.kikugie.stonecutter.process.StonecutterTask
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.tooling.provider.model.ToolingModelBuilderRegistry
 import java.io.File
 import java.nio.file.Path
-import javax.inject.Inject
 import kotlin.collections.set
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.deleteRecursively
@@ -29,7 +24,7 @@ import kotlin.io.path.exists
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 @OptIn(ExperimentalPathApi::class)
-open class StonecutterBuild @Inject internal constructor(registry: ToolingModelBuilderRegistry, val project: Project) : StonecutterConfiguration, StonecutterUtility {
+open class StonecutterBuild internal constructor(val project: Project) : StonecutterConfiguration, StonecutterUtility {
     internal val setup = project.parent?.let {
         project.gradle.extensions.getByType(StonecutterSetup.Container::class.java)[it]
     } ?: throw StonecutterGradleException(
@@ -85,7 +80,6 @@ open class StonecutterBuild @Inject internal constructor(registry: ToolingModelB
         }
 
     init {
-        registry.register(StonecutterBuildModelBuilder())
         project.tasks.register("setupChiseledBuild", StonecutterTask::class.java) {
             if (project.parent == null) throw StonecutterGradleException(
                 "Chiseled task can't be registered for the root project. How did you manage to do it though?"
@@ -103,7 +97,10 @@ open class StonecutterBuild @Inject internal constructor(registry: ToolingModelB
             output.set(out)
         }
 
-        project.afterEvaluate { configureSources() }
+        project.afterEvaluate {
+            configureSources()
+            writeBuildModel(this@StonecutterBuild)
+        }
     }
 
     private fun validateId(id: String): String {

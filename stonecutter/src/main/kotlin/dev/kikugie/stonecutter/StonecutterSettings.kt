@@ -1,6 +1,7 @@
 package dev.kikugie.stonecutter
 
 import dev.kikugie.stonecutter.configuration.StonecutterInitialization
+import dev.kikugie.stonecutter.configuration.StonecutterSetup
 import org.gradle.api.Action
 import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings

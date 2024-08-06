@@ -7,29 +7,21 @@ import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.module.ModuleUtil
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.psi.PsiElement
-import dev.kikugie.stonecutter.configuration.StonecutterControllerModel
+import dev.kikugie.stonecutter.StonecutterProject
+import dev.kikugie.stonecutter.configuration.StonecutterDataView
+import dev.kikugie.stonecutter.configuration.readBuildModel
+import dev.kikugie.stonecutter.configuration.readControllerModel
 import dev.kikugie.stonecutter.intellij.util.memoize
-import org.gradle.tooling.GradleConnector
-import org.gradle.tooling.model.Model
 import org.jetbrains.plugins.gradle.service.project.AbstractProjectResolverExtension
-import java.io.File
+import java.nio.file.Path
 import kotlin.io.path.Path
-import kotlin.reflect.KClass
 
-val REGEX = Regex("stonecutter\\.gradle(\\.kts)?")
+private const val CACHE_PATH = "build/stonecutter-cache/model.yml"
 
-fun PsiElement.getStonecutterService() = ModuleUtil
-    .findModuleForPsiElement(this)?.let {module ->
-        // Temp unpack for debugging
-        val project = project
-        val service = project.service<StonecutterService>()
-        val model = service.controllerModels(module)
-        model
-    }
+fun PsiElement.getStonecutterService() =
+    project.service<StonecutterService>()
 
 class ReloadListener : AbstractProjectResolverExtension() {
     @Suppress("UnstableApiUsage")
@@ -39,27 +31,33 @@ class ReloadListener : AbstractProjectResolverExtension() {
 }
 
 @Service(PROJECT)
-class StonecutterService(root: Project) {
-    internal val controllerModels = memoize<Module, _> {
-        val dir = Path(ExternalSystemApiUtil.getExternalProjectPath(it) ?: return@memoize null)
-        val parentPath = dir.parent.parent // Drop /versions/<this>
-        getModel<StonecutterControllerModel>(parentPath.toFile())
+class StonecutterService {
+    internal val modulePaths = memoize<Module, _> {
+        val path = ExternalSystemApiUtil.getExternalProjectPath(it)
+            ?: return@memoize Result.failure(IllegalArgumentException("Module ${it.name} doesn't have a path"))
+        Result.success(Path(path))
+    }
+    internal val controllerModels = memoize<Path, _> {
+        readControllerModel(it.resolve(CACHE_PATH))
+    }
+    internal val buildModels = memoize<Path, _> {
+        readBuildModel(it.resolve(CACHE_PATH))
+    }
+
+    internal fun getModuleModel(module: Module) = modulePaths(module).getOrNull()?.let(buildModels)
+    internal fun getProjectModels(module: Module): Map<StonecutterProject, StonecutterDataView>? {
+        val parentPath = modulePaths(module).getOrNull()?.parent?.parent ?: return null
+        val controllerModel = controllerModels(parentPath).getOrNull() ?: return null
+        return controllerModel.versions.mapNotNull {
+            val subDir = parentPath.resolve("versions/${it.project}")
+            val buildModel = buildModels(subDir).getOrNull() ?: return@mapNotNull null
+            it to buildModel
+        }.takeIf { it.isNotEmpty() }?.toMap()
     }
 
     internal fun reset() {
+        modulePaths.clear()
         controllerModels.clear()
+        buildModels.clear()
     }
-
-    private inline fun <reified T : Model> getModel(dir: File): T? = getModel(dir, T::class)
-
-    private fun <T : Model> getModel(dir: File, type: KClass<T>): T? = runCatching {
-        val connector = GradleConnector.newConnector().apply {
-            forProjectDirectory(dir)
-        }
-        connector.connect().use {
-            it.getModel(type.java)
-        }
-    }.onFailure {
-        it.printStackTrace()
-    }.getOrNull()
 }

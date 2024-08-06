@@ -2,51 +2,28 @@ package dev.kikugie.stonecutter.configuration
 
 import dev.kikugie.stonecutter.StonecutterBuild
 import dev.kikugie.stonecutter.StonecutterController
-import dev.kikugie.stonecutter.StonecutterProject
+import dev.kikugie.stonecutter.process.*
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.tooling.model.Model
-import org.gradle.tooling.provider.model.ToolingModelBuilder
-import java.io.Serializable
+import java.nio.file.Path
 
-interface StonecutterBuildModel : Model {
-    val current: StonecutterProject
-    val data: StonecutterDataView
+internal val Project.buildDirectory
+    get() = layout.buildDirectory.asFile.get()
+
+internal val Project.stonecutterCacheDir
+    get() = buildDirectory.resolve("stonecutter-cache")
+
+internal fun writeBuildModel(plugin: StonecutterBuild) = runIgnoring {
+    plugin.project.stonecutterCacheDir.resolve("model.yml").toPath().encodeYaml(plugin.data as StonecutterDataView)
 }
 
-data class StonecutterBuildModelImpl(
-    override val current: StonecutterProject,
-    override val data: StonecutterDataView
-) : StonecutterBuildModel, Serializable {
-   internal constructor(plugin: StonecutterBuild) : this(plugin.current, plugin.data)
+fun readBuildModel(file: Path) = runCatching {
+    file.decodeYaml<StonecutterDataView>()
 }
 
-class StonecutterBuildModelBuilder : ToolingModelBuilder {
-    override fun canBuild(name: String): Boolean =
-        name == StonecutterBuildModel::class.qualifiedName!!
-
-    override fun buildAll(name: String, project: Project): StonecutterBuildModel =
-        StonecutterBuildModelImpl(project.extensions.getByType<StonecutterBuild>())
+internal fun writeControllerModel(plugin: StonecutterController) = runIgnoring {
+    plugin.root.stonecutterCacheDir.resolve("model.yml").toPath().encodeYaml(plugin.setup)
 }
 
-interface StonecutterControllerModel : Model {
-    val versions: List<StonecutterProject>
-    val vcsVersion: StonecutterProject
-    var current: StonecutterProject
-}
-
-data class StonecutterControllerModelImpl(
-    override val versions: List<StonecutterProject>,
-    override val vcsVersion: StonecutterProject,
-    override var current: StonecutterProject
-) : StonecutterControllerModel, Serializable {
-    internal constructor(controller: StonecutterController) : this(controller.setup.versions, controller.setup.vcsVersion, controller.setup.current)
-}
-
-class StonecutterControllerModelBuilder : ToolingModelBuilder {
-    override fun canBuild(name: String): Boolean =
-        name == StonecutterControllerModel::class.qualifiedName!!
-
-    override fun buildAll(name: String, project: Project): StonecutterControllerModel =
-        StonecutterControllerModelImpl(project.extensions.getByType<StonecutterController>())
+fun readControllerModel(file: Path) = runCatching {
+    file.decodeYaml<StonecutterSetup>()
 }
