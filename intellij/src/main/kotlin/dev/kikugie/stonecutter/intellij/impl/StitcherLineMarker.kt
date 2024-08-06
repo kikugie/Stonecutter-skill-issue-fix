@@ -53,7 +53,7 @@ class StitcherLineMarkerProvider : RelatedItemLineMarkerProvider(), GutterIconNa
         val directory = element.getUserData(Constants.DIRECTORY) ?: return
         JBPopupFactory
             .getInstance()
-            .createListPopup(VersionSelectionList(directory, matching))
+            .createListPopup(VersionSelectionList(element.project, directory, matching))
             .show(RelativePoint(event))    }
 
     private object Constants {

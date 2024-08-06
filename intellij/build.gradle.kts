@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "dev.kikugie"
-version = "0.1.0-beta.1"
+version = "0.1.0-beta.2"
 
 repositories {
     mavenCentral()
@@ -15,9 +15,12 @@ repositories {
 dependencies {
     implementation(project(":stitcher"))
     implementation(project(":stonecutter"))
-    implementation("org.gradle:gradle-tooling-api:8.8")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.1")
+    implementation(libs.cbor)
     runtimeOnly("org.slf4j:slf4j-simple:1.7.10")
+}
+
+kotlin {
+    jvmToolchain(16)
 }
 
 // See https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
