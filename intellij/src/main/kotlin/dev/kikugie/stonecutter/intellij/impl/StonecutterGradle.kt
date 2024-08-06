@@ -28,6 +28,8 @@ val PsiElement.stonecutterService get() =
 
 val PsiElement.module get() = ModuleUtil.findModuleForPsiElement(this)
 
+val Path.doubleParent get() = parent.parent
+
 class ReloadListener : AbstractProjectResolverExtension() {
     @Suppress("UnstableApiUsage")
     override fun resolveFinished(node: DataNode<ProjectData>) = ProjectManager.getInstance().openProjects.forEach {
@@ -47,7 +49,7 @@ class StonecutterService {
         readBuildModel(it.resolve(CACHE_PATH))
     }
     private val collectedBuildModels = memoize<Module, _> {
-        val parentPath = modulePaths(it).getOrNull()?.parent?.parent ?: return@memoize emptyMap()
+        val parentPath = modulePaths(it).getOrNull()?.doubleParent ?: return@memoize emptyMap()
         val controllerModel = controllerModels(parentPath).getOrNull() ?: return@memoize emptyMap()
         controllerModel.versions.mapNotNull { proj ->
             val subDir = parentPath.resolve("versions/${proj.project}")
@@ -56,6 +58,7 @@ class StonecutterService {
         }.toMap()
     }
 
+    fun getModulePath(module: Module) = modulePaths(module)
     fun getModuleModel(module: Module) = modulePaths(module).getOrNull()?.let(buildModels)
     fun getProjectModels(module: Module): Map<StonecutterProject, StonecutterDataView> = collectedBuildModels(module)
 

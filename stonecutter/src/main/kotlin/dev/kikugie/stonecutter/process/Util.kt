@@ -3,6 +3,7 @@
 package dev.kikugie.stonecutter.process
 
 import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.YamlConfiguration
 import com.charleskorn.kaml.decodeFromStream
 import com.charleskorn.kaml.encodeToStream
 import dev.kikugie.semver.VersionParser
@@ -16,6 +17,13 @@ import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import kotlin.io.path.*
 
+val YAML = Yaml(
+    configuration = YamlConfiguration(
+        strictMode = false
+    )
+)
+
+
 inline fun <reified T> Path.decode(): T = Cbor.Default.decodeFromByteArray(readBytes())
 inline fun <reified T> Path.encode(value: T) {
     parent.createDirectories()
@@ -26,11 +34,11 @@ inline fun <reified T> Path.encode(value: T) {
     )
 }
 
-inline fun <reified T> Path.decodeYaml(): T = inputStream().use { Yaml.default.decodeFromStream(it) }
+inline fun <reified T> Path.decodeYaml(): T = inputStream().use { YAML.decodeFromStream(it) }
 inline fun <reified T> Path.encodeYaml(value: T) {
     parent.createDirectories()
     outputStream(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING).use {
-        Yaml.default.encodeToStream(value, it)
+        YAML.encodeToStream(value, it)
     }
 }
 
