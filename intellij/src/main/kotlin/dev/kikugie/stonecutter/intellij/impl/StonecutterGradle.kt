@@ -24,7 +24,7 @@ import kotlin.jvm.optionals.getOrNull
 private const val CACHE_PATH = "build/stonecutter-cache/model.yml"
 
 val PsiElement.stonecutterService get() =
-    project.service<StonecutterService>()
+    project.getService(StonecutterService::class.java)
 
 val PsiElement.module get() = ModuleUtil.findModuleForPsiElement(this)
 
