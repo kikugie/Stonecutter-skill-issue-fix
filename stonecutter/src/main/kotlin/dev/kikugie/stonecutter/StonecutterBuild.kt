@@ -1,18 +1,20 @@
 package dev.kikugie.stonecutter
 
+import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.encodeToStream
 import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.SemanticVersionParser
 import dev.kikugie.semver.VersionParsingException
 import dev.kikugie.stitcher.lexer.IdentifierRecognizer.Companion.allowed
+import dev.kikugie.stonecutter.data.StonecutterData
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.SourceSetContainer
 import java.io.File
 import java.nio.file.Path
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.deleteRecursively
-import kotlin.io.path.exists
+import java.nio.file.StandardOpenOption
+import kotlin.io.path.*
 
 /**
  * Stonecutter plugin applied to the versioned build file.
@@ -106,6 +108,7 @@ open class StonecutterBuild internal constructor(val project: Project) : Stonecu
 
         project.afterEvaluate {
             configureSources(this)
+            saveModel()
         }
     }
 
@@ -150,6 +153,24 @@ open class StonecutterBuild internal constructor(val project: Project) : Stonecu
                 applyChiseled(it.resources)
             }
         } catch (_: MissingPropertyException) {
+        }
+    }
+
+    private fun saveModel() {
+        val model = StonecutterData(
+            debug,
+            constants,
+            swaps,
+            dependencies,
+            excludedExtensions,
+            excludedPaths
+        )
+        val path = project.buildDirectory.resolve("stonecutter-cache/model.yml").toPath()
+        runCatching {
+            path.parent.createDirectories()
+            path.outputStream(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING).use {
+                Yaml.default.encodeToStream(model, it)
+            }
         }
     }
 }

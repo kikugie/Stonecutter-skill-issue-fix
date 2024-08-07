@@ -2,6 +2,9 @@
 
 package dev.kikugie.stonecutter
 
+import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.encodeToStream
+import dev.kikugie.stonecutter.data.StonecutterData
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -9,12 +12,15 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import java.nio.file.Path
+import java.nio.file.StandardOpenOption
+import kotlin.io.path.createDirectories
+import kotlin.io.path.outputStream
 
 /**
  * Runs for `stonecutter.gradle` file, applying project configurations to versions and generating versioned tasks.
  */
 @Suppress("MemberVisibilityCanBePrivate")
-open class StonecutterController internal constructor(root: Project) : StonecutterConfiguration {
+open class StonecutterController internal constructor(private val root: Project) : StonecutterConfiguration {
     private val controller: ControllerManager = root.controller()
         ?: throw StonecutterGradleException("Project ${root.path} is not a Stonecutter controller. What did you even do to get this error?")
     private val setup: StonecutterSetup =
@@ -136,6 +142,16 @@ open class StonecutterController internal constructor(root: Project) : Stonecutt
 
             doLast {
                 controller.updateHeader(this.project.buildFile.toPath(), version.project)
+            }
+        }
+    }
+
+    private fun saveModel() {
+        val path = root.buildDirectory.resolve("stonecutter-cache/model.yml").toPath()
+        runCatching {
+            path.parent.createDirectories()
+            path.outputStream(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING).use {
+                Yaml.default.encodeToStream(setup, it)
             }
         }
     }
