@@ -13,11 +13,11 @@ internal val Project.stonecutterCacheDir
     get() = buildDirectory.resolve("stonecutter-cache")
 
 internal fun writeBuildModel(plugin: StonecutterBuild) = runIgnoring {
-    plugin.project.stonecutterCacheDir.resolve("model.yml").toPath().encodeYaml(plugin.data as StonecutterDataView)
+    plugin.project.stonecutterCacheDir.resolve("model.yml").toPath().encodeYaml(plugin.data)
 }
 
 fun readBuildModel(file: Path) = runCatching {
-    file.decodeYaml<StonecutterDataView>()
+    file.decodeYaml<StonecutterData>()
 }
 
 internal fun writeControllerModel(plugin: StonecutterController) = runIgnoring {

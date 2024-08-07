@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "dev.kikugie"
-version = "0.1.0-beta.2"
+version = "0.1.0-beta.3"
 
 repositories {
     mavenCentral()
@@ -34,4 +34,5 @@ intellij {
 tasks.patchPluginXml {
     sinceBuild = "223"
     untilBuild = "242.*"
+    version = project.version.toString()
 }

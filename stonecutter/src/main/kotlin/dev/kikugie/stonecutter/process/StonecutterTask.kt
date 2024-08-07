@@ -4,7 +4,7 @@ import dev.kikugie.stitcher.exception.SyntaxException
 import dev.kikugie.stitcher.scanner.StandardMultiLine
 import dev.kikugie.stitcher.scanner.StandardSingleLine
 import dev.kikugie.stonecutter.StonecutterProject
-import dev.kikugie.stonecutter.configuration.StonecutterDataView
+import dev.kikugie.stonecutter.configuration.StonecutterData
 import dev.kikugie.stonecutter.configuration.stonecutterCacheDir
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -42,7 +42,7 @@ internal abstract class StonecutterTask : DefaultTask() {
     abstract val toVersion: Property<StonecutterProject>
 
     @get:Input
-    abstract val data: Property<StonecutterDataView>
+    abstract val data: Property<StonecutterData>
 
     private lateinit var manager: FileManager
     private val statistics = Statistics()

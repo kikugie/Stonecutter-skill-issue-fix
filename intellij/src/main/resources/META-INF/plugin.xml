@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <idea-plugin>
     <id>dev.kikugie.stonecutter</id>
-    <version>0.1.0-beta.2</version>
+    <version>0.1.0-beta.3</version>
     <name>Stonecutter Dev</name>
     <vendor email="git.kikugie@protonmail.com" url="https://github.com/kikugie/stonecutter">KikuGie</vendor>
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
@@ -22,7 +22,7 @@
     ]]></description>
     <change-notes><![CDATA[
         <ul>
-            <li>Version switcher line marker<li>
+            <li>Fixed the data model serialization for backwards compatibility<li>
         </ul>
     ]]></change-notes>
 

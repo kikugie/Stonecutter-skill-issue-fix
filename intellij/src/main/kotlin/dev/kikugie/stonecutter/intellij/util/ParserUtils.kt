@@ -7,7 +7,7 @@ import dev.kikugie.stitcher.exception.StoringErrorHandler
 import dev.kikugie.stitcher.lexer.Lexer
 import dev.kikugie.stitcher.parser.CommentParser
 import dev.kikugie.stonecutter.StonecutterProject
-import dev.kikugie.stonecutter.configuration.StonecutterDataView
+import dev.kikugie.stonecutter.configuration.StonecutterData
 import dev.kikugie.stonecutter.process.toParams
 
 fun String.parse(): Definition? {
@@ -16,7 +16,7 @@ fun String.parse(): Definition? {
     return parser.parse()
 }
 
-fun String.findMatching(models: Map<StonecutterProject, StonecutterDataView>): Collection<StonecutterProject> {
+fun String.findMatching(models: Map<StonecutterProject, StonecutterData>): Collection<StonecutterProject> {
     val def = parse()?.takeIf(Definition::isNotEmpty) ?: return emptyList()
     return when {
         def.swap != null -> models.keys

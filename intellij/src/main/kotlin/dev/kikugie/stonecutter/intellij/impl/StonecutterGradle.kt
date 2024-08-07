@@ -11,7 +11,7 @@ import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.psi.PsiElement
 import dev.kikugie.stonecutter.StonecutterProject
-import dev.kikugie.stonecutter.configuration.StonecutterDataView
+import dev.kikugie.stonecutter.configuration.StonecutterData
 import dev.kikugie.stonecutter.configuration.readBuildModel
 import dev.kikugie.stonecutter.configuration.readControllerModel
 import dev.kikugie.stonecutter.intellij.util.memoize
@@ -60,7 +60,7 @@ class StonecutterService {
 
     fun getModulePath(module: Module) = modulePaths(module)
     fun getModuleModel(module: Module) = modulePaths(module).getOrNull()?.let(buildModels)
-    fun getProjectModels(module: Module): Map<StonecutterProject, StonecutterDataView> = collectedBuildModels(module)
+    fun getProjectModels(module: Module): Map<StonecutterProject, StonecutterData> = collectedBuildModels(module)
 
     internal fun reset() {
         modulePaths.clear()

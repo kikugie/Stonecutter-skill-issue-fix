@@ -52,7 +52,7 @@ open class StonecutterController internal constructor(internal val root: Project
     override var automaticPlatformConstants: Boolean = false
 
     init {
-        println("Running Stonecutter 0.5-alpha.3")
+        println("Running Stonecutter 0.5-alpha.4")
         versions.forEach { root.project(it.project).pluginManager.apply(StonecutterPlugin::class.java) }
         root.tasks.create("chiseledStonecutter") {
             setup.versions.forEach { dependsOn("${it.project}:setupChiseledBuild") }
