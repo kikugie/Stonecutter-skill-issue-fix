@@ -9,12 +9,12 @@ import dev.kikugie.stonecutter.StonecutterSettings
 
 pluginManagement {
     repositories {
-        maven("https://maven.kikugie.dev/releases")
+        gradlePluginPortal()
     }
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.4.2"
+    id("dev.kikugie.stonecutter") version "0.4.3"
 }
 
 extensions.configure<StonecutterSettings> {
@@ -34,14 +34,12 @@ extensions.configure<StonecutterSettings> {
 ```groovy [settings.gradle]
 pluginManagement {
     repositories {
-        maven{
-            url = "https://maven.kikugie.dev/releases"
-        }
+        gradlePluginPortal()
     }
 }
 
 plugins {
-    id "dev.kikugie.stonecutter" version "0.4.2"
+    id "dev.kikugie.stonecutter" version "0.4.3"
 }
 
 stonecutter {
@@ -116,7 +114,7 @@ For example, you can add plugins like this:
 ```kts
 plugins {
     id("dev.kikugie.stonecutter")
-    id("fabric-loom") version "1.6-SNAPSHOT" apply false
+    id("fabric-loom") version "1.7-SNAPSHOT" apply false
 }
 ```
 This way it prevents Gradle from reconfiguring the plugin for every subproject.
