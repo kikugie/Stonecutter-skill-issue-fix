@@ -1,30 +1,44 @@
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.apache.commons.text.similarity.LevenshteinDistance
+import kotlin.math.roundToInt
 
 object ProjectFinder {
     val client = HttpUtils { IllegalStateException(it.message) }
-    val accuracy = 0.9
+    val accuracy = 0.8
 
     fun find(vararg mods: String): List<ProjectInfo> = mods
             .map(::find)
             .mapNotNull(Result<ProjectInfo>::getOrNull)
             .toList()
 
-    fun find(mrSlug: String, cfSlug: String = mrSlug): Result<ProjectInfo> {
-        println("Retrieving info for '$mrSlug'")
+    fun find(slug: String): Result<ProjectInfo> {
         val builder = ProjectInfo.Builder()
-        findCurseforge(cfSlug, builder)
-        findModrinth(mrSlug, builder)
+        val cf = findCurseforge(slug, builder)
+        val mr = findModrinth(slug, builder)
+        val str = buildString {
+            append("Searching for '$slug': ")
+            append("Modrinth: ")
+            if (mr != null) append("${mr.slug}|${(mr.similarity * 100).toInt()}%")
+            else append("X")
+            append(' ')
+            append("Curseforge: ")
+            if (cf != null) append("${cf.slug}|${(cf.similarity * 100).toInt()}%")
+            else append("X")
+        }
+        println(str)
+
         return builder.tryBuild()
     }
 
-    private fun findCurseforge(mod: String, builder: ProjectInfo.Builder) {
+    private fun findCurseforge(mod: String, builder: ProjectInfo.Builder): StatResult? {
         val key = "$2a$10\$wuAJuNZuted3NORVmpgUC.m8sI.pv1tOPKZyBgLFGjxFp/br0lZCC" // Whatcha lookin' at, it's public anyway
+        var similarity: Double = .0
         val search = "https://api.curseforge.com/v1/mods/search?gameId=432&slug=$mod"
         val info = client.get<CfSearchResult>(search, mapOf("x-api-key" to key)).data.firstOrNull {
-            mod.similarity(it.slug) >= accuracy
-        } ?: return
+            similarity = mod.similarity(it.slug)
+            similarity >= accuracy
+        } ?: return null
         builder {
             title = info.name
             description = info.summary
@@ -34,13 +48,16 @@ object ProjectFinder {
             info.links["sourceUrl"]?.let { github = it }
             info.logo?.let { icon = it.url }
         }
+        return StatResult(similarity, info.slug)
     }
 
-    private fun findModrinth(mod: String, builder: ProjectInfo.Builder) {
+    private fun findModrinth(mod: String, builder: ProjectInfo.Builder): StatResult? {
         val search = "https://api.modrinth.com/v2/search?query=$mod&facets=[[\"project_type:mod\"]]"
+        var similarity: Double = .0
         val result = client.get<MrSearchResult>(search).hits.firstOrNull{
-            mod.similarity(it.slug) >= accuracy
-        } ?: return
+            similarity = mod.similarity(it.slug)
+            similarity >= accuracy
+        } ?: return null
         val project = "https://api.modrinth.com/v2/project/${result.slug}"
         val info = client.get<MrProjectInfo>(project)
         builder {
@@ -52,6 +69,7 @@ object ProjectFinder {
             modrinth = "https://modrinth.com/mod/${info.slug}"
             info.sourceUrl?.let { github = it }
         }
+        return StatResult(similarity, info.slug)
     }
 
     private fun String.raw() = lowercase()
@@ -106,5 +124,10 @@ object ProjectFinder {
     @Serializable
     private data class CfLogoInfo(
         val url: String
+    )
+
+    private data class StatResult(
+        val similarity: Double,
+        val slug: String
     )
 }

@@ -1,4 +1,4 @@
-allthetrims
+all the trims
 automodpack
 autodrop
 autowhitelist
@@ -30,7 +30,6 @@ my totem doll
 neruina
 new creative inventory
 playerstatistics
-position display
 random fishing
 scribble
 shared resources
@@ -43,3 +42,5 @@ telekinesis
 tt20
 yacl
 zoomify
+openboatutils
+hudenhancer
