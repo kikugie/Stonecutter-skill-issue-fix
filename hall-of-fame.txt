@@ -13,6 +13,7 @@ ctmselector
 cyan
 cyansethome
 elytra trims
+eventutils
 enchantmentdisabler
 fabricbettergrass
 fast recipe
@@ -36,6 +37,7 @@ shared resources
 skin overrides
 skinshuffle
 skylper
+sounds
 snow under trees remastered
 sushi bar
 telekinesis

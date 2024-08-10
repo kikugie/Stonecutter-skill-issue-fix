@@ -50,8 +50,7 @@ const members = [
     title: 'Customizable elytra mod with trims, banner patterns and more!',
     links: [
       { icon: 'github', link: 'https://github.com/Kikugie/elytra-trims' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/elytra-trims' },
-      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/elytra-trims' }
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/elytra-trims' }
     ]
   },
   {
@@ -112,6 +111,15 @@ const members = [
       { icon: 'github', link: 'https://github.com/enjarai/cicada-lib' },
       { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/cicada' },
       { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/cicada' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/ZouiUX7t/d20aa8a40008b3f027144e21c916c4a7229a0c78.png',
+    name: 'Sounds',
+    title: 'Upgrade your experience with this customizable sound mod! It introduces new sound effects and enhances the original ones. Enjoy a richer audio experience with new sounds for blocks, items, inventory, and the UI!',
+    links: [
+      { icon: 'github', link: 'https://github.com/IMB11/Sounds' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/sound' }
     ]
   },
   {
@@ -316,6 +324,15 @@ const members = [
     ]
   },
   {
+    avatar: 'https://cdn.modrinth.com/data/ygYU16dG/cd7e06456a341a345a6d2be1e2a057745d293969.png',
+    name: 'My Totem Doll',
+    title: 'Simple Fabric mod which replaces all totems with player dolls. Rename your totem to player\'s nickname to use it\'s skin.',
+    links: [
+      { icon: 'github', link: 'https://github.com/LopyMine/My-Totem-Doll' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/my_totem_doll' }
+    ]
+  },
+  {
     avatar: 'https://cdn.modrinth.com/data/lg17V3i3/d88de184e364d8dd1da21933c7c82ce298b0fb98.png',
     name: 'autodrop',
     title: 'Simply drops specific items after pickup',
@@ -325,12 +342,12 @@ const members = [
     ]
   },
   {
-    avatar: 'https://cdn.modrinth.com/data/ygYU16dG/cd7e06456a341a345a6d2be1e2a057745d293969.png',
-    name: 'My Totem Doll',
-    title: 'Simple Fabric mod which replaces all totems with player dolls. Rename your totem to player\'s nickname to use it\'s skin.',
+    avatar: 'https://cdn.modrinth.com/data/YS3ZignI/f8056e4ce6ac00a50c431eac915509d14a0e90b4.png',
+    name: 'TT20 (TPS Fixer)',
+    title: 'TT20 helps reduce lag by optimizing how ticks work when the server\'s TPS is low.',
     links: [
-      { icon: 'github', link: 'https://github.com/LopyMine/My-Totem-Doll' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/my_totem_doll' }
+      { icon: 'github', link: 'https://github.com/snackbag/tt20' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/tt20' }
     ]
   },
   {
@@ -349,15 +366,6 @@ const members = [
     links: [
       { icon: 'github', link: 'https://github.com/Aeldit/CTMSelector' },
       { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/ctm-selector' }
-    ]
-  },
-  {
-    avatar: 'https://cdn.modrinth.com/data/YS3ZignI/f8056e4ce6ac00a50c431eac915509d14a0e90b4.png',
-    name: 'TT20 (TPS Fixer)',
-    title: 'TT20 helps reduce lag by optimizing how ticks work when the server\'s TPS is low.',
-    links: [
-      { icon: 'github', link: 'https://github.com/snackbag/tt20' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/tt20' }
     ]
   },
   {
@@ -423,6 +431,15 @@ const members = [
     links: [
       { icon: 'github', link: 'https://github.com/btwonion/skylper' },
       { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/skylper' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/ZcRRACSs/cca4a6415d48d8d18535f6ea5bb316ebeaf9117b.png',
+    name: 'EventUtils',
+    title: 'Alerting for Event Alerts Minecraft events',
+    links: [
+      { icon: 'github', link: 'https://github.com/Event-Alerts/EventUtils' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/alerts' }
     ]
   },
   {
