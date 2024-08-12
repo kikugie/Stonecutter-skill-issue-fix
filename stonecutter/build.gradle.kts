@@ -1,9 +1,9 @@
 @file:Suppress("UnstableApiUsage")
 
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    java
     `kotlin-dsl`
     alias(libs.plugins.shadow)
     alias(libs.plugins.gradle.publishing)
@@ -39,13 +39,18 @@ tasks.withType<DokkaTask>().configureEach {
     }
 }
 
-kotlin {
-    jvmToolchain(16)
-}
-
 java {
     withSourcesJar()
     withJavadocJar()
+
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+}
+
+tasks.compileKotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_16)
+    }
 }
 
 tasks.shadowJar {
@@ -56,6 +61,11 @@ tasks.shadowJar {
 
 tasks.named<Jar>("javadocJar") {
     from(tasks.named("dokkaJavadoc"))
+}
+
+tasks.register("publishAll") {
+    group = "publishing"
+    dependsOn(tasks.publish, tasks.publishPlugins)
 }
 
 publishing {
