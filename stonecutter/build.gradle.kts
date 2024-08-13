@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     `kotlin-dsl`
+    alias(libs.plugins.mpp)
     alias(libs.plugins.shadow)
     alias(libs.plugins.gradle.publishing)
     alias(libs.plugins.kotlin.jvm)
@@ -12,7 +13,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-val stonecutter: String by project
+val stonecutter: String = "0.4" // by project
 
 group = "dev.kikugie"
 version = stonecutter
@@ -87,6 +88,40 @@ publishing {
             version = project.version.toString()
             from(components["java"])
         }
+    }
+}
+
+publishMods {
+    version = stonecutter
+    displayName = "Stonecutter [$stonecutter]"
+    type = when {
+        "alpha" in stonecutter -> ALPHA
+        "beta" in stonecutter -> BETA
+        else -> STABLE
+    }
+    changelog = """
+        ## Installation
+        ```kts
+        pluginManagement {
+            repositories {
+                maven("https://maven.kikugie.dev/releases")
+            }
+        }
+
+        plugins {
+            id("dev.kikugie.stonecutter") version "$stonecutter"
+        }
+        ```
+        
+        ## Changelog
+        ${rootProject.file("CHANGELOG.md").readText()}
+    """.trimIndent()
+    github {
+        repository = "kikugie/stonecutter"
+        accessToken = property("githubToken").toString()
+        commitish = "0.4"
+        tagName = "v$stonecutter"
+        allowEmptyFiles = true
     }
 }
 
