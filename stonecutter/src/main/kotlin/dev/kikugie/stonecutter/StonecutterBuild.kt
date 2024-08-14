@@ -1,11 +1,14 @@
 package dev.kikugie.stonecutter
 
+import dev.kikugie.experimentalstonecutter.StonecutterProject
+import dev.kikugie.experimentalstonecutter.StonecutterUtility
+import dev.kikugie.experimentalstonecutter.build.BuildConfiguration
+import dev.kikugie.experimentalstonecutter.build.StonecutterData
 import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.VersionParser
 import dev.kikugie.semver.VersionParsingException
 import dev.kikugie.stitcher.lexer.IdentifierRecognizer.Companion.allowed
 import dev.kikugie.stonecutter.configuration.*
-import dev.kikugie.stonecutter.process.StonecutterTask
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
@@ -24,7 +27,7 @@ import kotlin.io.path.exists
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 @OptIn(ExperimentalPathApi::class)
-open class StonecutterBuild internal constructor(val project: Project) : StonecutterConfiguration, StonecutterUtility {
+open class StonecutterBuild internal constructor(val project: Project) : BuildConfiguration, StonecutterUtility {
     internal val setup = project.parent?.let {
         project.gradle.extensions.getByType(StonecutterSetup.Container::class.java)[it]
     } ?: throw StonecutterGradleException(

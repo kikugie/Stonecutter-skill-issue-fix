@@ -1,6 +1,6 @@
-package dev.kikugie.stonecutter.configuration
+package dev.kikugie.experimentalstonecutter.controller
 
-interface StonecutterGlobalParameters {
+interface ControllerParameters {
     /**
      * Sets up platform constants (like `fabric`, `forge`, etc.)
      * from project properties.

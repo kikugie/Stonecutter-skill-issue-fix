@@ -6,8 +6,8 @@ import dev.kikugie.stitcher.eval.isNotEmpty
 import dev.kikugie.stitcher.exception.StoringErrorHandler
 import dev.kikugie.stitcher.lexer.Lexer
 import dev.kikugie.stitcher.parser.CommentParser
-import dev.kikugie.stonecutter.StonecutterProject
-import dev.kikugie.stonecutter.configuration.StonecutterData
+import dev.kikugie.experimentalstonecutter.StonecutterProject
+import dev.kikugie.experimentalstonecutter.build.StonecutterData
 import dev.kikugie.stonecutter.process.toParams
 
 fun String.parse(): Definition? {

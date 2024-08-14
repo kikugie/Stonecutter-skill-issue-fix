@@ -1,4 +1,4 @@
-package dev.kikugie.stonecutter.configuration
+package dev.kikugie.experimentalstonecutter
 
 import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.StringVersion

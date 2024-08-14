@@ -1,6 +1,6 @@
 package dev.kikugie.stonecutter
 
-import dev.kikugie.stonecutter.configuration.StonecutterSetup
+import dev.kikugie.experimentalstonecutter.StonecutterProject
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
 import org.gradle.api.provider.ListProperty

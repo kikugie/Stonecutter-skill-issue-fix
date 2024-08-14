@@ -1,4 +1,4 @@
-package dev.kikugie.stonecutter
+package dev.kikugie.experimentalstonecutter
 
 import dev.kikugie.semver.SemanticVersion
 import kotlinx.serialization.Serializable

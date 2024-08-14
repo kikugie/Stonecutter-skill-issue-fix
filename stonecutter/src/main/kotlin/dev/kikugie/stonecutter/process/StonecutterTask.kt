@@ -1,40 +1,26 @@
 package dev.kikugie.stonecutter.process
 
-import dev.kikugie.stitcher.exception.SyntaxException
 import dev.kikugie.stitcher.scanner.StandardMultiLine
 import dev.kikugie.stitcher.scanner.StandardSingleLine
-import dev.kikugie.stonecutter.StonecutterProject
-import dev.kikugie.stonecutter.configuration.StonecutterData
-import dev.kikugie.stonecutter.configuration.stonecutterCacheDir
+import dev.kikugie.experimentalstonecutter.ProjectName
+import dev.kikugie.experimentalstonecutter.StonecutterProject
+import dev.kikugie.experimentalstonecutter.build.StonecutterData
+import groovy.lang.Reference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import java.nio.charset.StandardCharsets
-import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.copyTo
-import kotlin.io.path.walk
-import kotlin.io.path.writeText
+import kotlin.io.path.*
 import kotlin.system.measureTimeMillis
 
-@Suppress("LeakingThis")
-@OptIn(ExperimentalPathApi::class)
 internal abstract class StonecutterTask : DefaultTask() {
-    @get:Input
-    abstract val chiseled: Property<Boolean>
-
-    @get:Input
-    abstract val input: Property<Path>
-
-    @get:Input
-    abstract val output: Property<Path>
-
     @get:Input
     abstract val fromVersion: Property<StonecutterProject>
 
@@ -42,106 +28,103 @@ internal abstract class StonecutterTask : DefaultTask() {
     abstract val toVersion: Property<StonecutterProject>
 
     @get:Input
-    abstract val data: Property<StonecutterData>
+    abstract val input: Property<String>
 
-    private lateinit var manager: FileManager
+    @get:Input
+    abstract val output: Property<String>
+
+    @get:Input
+    abstract val dests: MapProperty<String, Path>
+
+    @get:Input
+    abstract val data: MapProperty<String, StonecutterData>
+
+    @get:Input
+    abstract val cacheDir: Property<(ProjectName, StonecutterProject) -> Path>
+
     private val statistics = Statistics()
-
-    init {
-        chiseled.convention(false)
-    }
 
     @TaskAction
     fun run() {
-        require(input.isPresent && output.isPresent && toVersion.isPresent) {
-            "[Stonecutter] StonecutterTask is not fully initialized"
-        }
-        manager = createManager()
         statistics.duration = measureTimeMillis {
-            transform(input.get(), output.get())
+            transform(dests.get())
         }
-        println("""
+        println(
+            """
             [Stonecutter] Switched to ${toVersion.get().project} in ${statistics.duration}ms 
-            (${statistics.total - statistics.skipped} processed | ${statistics.parsed} parsed ${statistics.total} total)
-            """.trimIndent())
-    }
-
-    private fun createManager(): FileManager {
-        val dataView = data.get()
-        val dest = if (chiseled.get()) project.parent!! else project
-        fun cacheDir(pr: StonecutterProject) = dest.project(pr.project).stonecutterCacheDir.toPath()
-
-        val params = dataView.toParams(toVersion.get().version)
-        return FileManager(
-            inputCache = cacheDir(fromVersion.get()),
-            outputCache = cacheDir(toVersion.get()),
-            filter = FileFilter(dataView.excludedExtensions, dataView.excludedPaths),
-            recognizers = listOf(StandardMultiLine, StandardSingleLine),
-            params = params,
-            debug = dataView.debug,
-            statistics = statistics
+            (${statistics.total - statistics.skipped} processed | ${statistics.parsed} parsed | ${statistics.total} total)
+            """.trimIndent()
         )
     }
 
-    private fun transform(input: Path, output: Path): Unit = runBlocking {
-        val inPlace = input == output
-        val skipped = mutableListOf<Path>()
-        val processed = mutableListOf<Pair<Path, String>>()
-        val exceptions = mutableListOf<Throwable>()
-        input.walk().map {
-            statistics.total += 1
-            it to process(input, input.relativize(it))
-        }.asFlow().flowOn(Dispatchers.Default).catch {
-            exceptions += it
-        }.transform<Pair<Path, String?>, Unit> { (file, result) ->
-            if (result != null) processed.add(file to result)
-            else {
-                statistics.skipped += 1
-                skipped.add(file)
+    private fun transform(dests: Map<String, Path>) = runBlocking {
+        val errored = Reference(false)
+        val merged = dests.map { (project, path) ->
+            transform(project, path.resolve(input.get()), path.resolve(output.get()), errored)
+        }.merge().flowOn(Dispatchers.IO).toList()
+        statistics.total = merged.size
+
+        val error = errored.get()
+        for ((result, output) in merged) when (result) {
+            is TransformResult.Processed -> {
+                statistics.parsed++
+                if (output == null || error) continue
+                output.parent.createDirectories()
+                output.writeText(
+                    result.str,
+                    StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING
+                )
             }
-        }.collect()
-        if (exceptions.isNotEmpty())
-            throw exceptions.composeCauses()
-        if (!inPlace) skipped.forEach {
-            val out = output.resolve(input.relativize(it))
-            Files.createDirectories(out.parent)
-            it.copyTo(out)
+            is TransformResult.Skipped -> {
+                statistics.skipped++
+                if (output == null || error) continue
+                output.parent.createDirectories()
+                result.file.copyTo(output, true)
+            }
+
+            is TransformResult.Failed -> {
+                System.err.println(result.error.message)
+            }
         }
-        processed.forEach { (it, content) ->
-            val out = output.resolve(input.relativize(it))
-            Files.createDirectories(out.parent)
-            out.writeText(
-                content,
-                StandardCharsets.UTF_8,
-                StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING
-            )
+        if (error) throw Exception("Failed to switch to ${toVersion.get().project}")
+    }
+
+    @OptIn(ExperimentalPathApi::class)
+    private fun transform(project: String, input: Path, output: Path, marker: Reference<Boolean>): Flow<Pair<TransformResult, Path?>> {
+        val out = if (input == output) null else output
+        val manager = FileManager(project)
+        return input
+            .walk()
+            .map {
+                val result = process(manager, input, it)
+                if (result is TransformResult.Failed) marker.set(true)
+                result to out?.resolve(input.relativize(it))
+            }
+            .asFlow()
+    }
+
+    private fun process(manager: FileManager, root: Path, file: Path): TransformResult = runCatching {
+        manager.process(root, root.relativize(file))
+    }.run {
+        when {
+            isFailure -> TransformResult.Failed(file, exceptionOrNull()!!)
+            getOrNull() == null -> TransformResult.Skipped(file)
+            else -> TransformResult.Processed(file, getOrNull()!!)
         }
     }
 
-    private fun List<Throwable>.composeCauses(): Throwable {
-        val cause = buildString {
-            for (err in this@composeCauses) {
-                val primary = err.message ?: "An error occurred"
-                val cause = err.cause
-                val message = StringBuilder()
-                message.append("    > $primary:\n")
-                for (line in (cause?.message ?: "").lines())
-                    message.append("        $line\n")
-                if (data.get().debug && err !is SyntaxException) cause?.stackTrace?.forEach {
-                    message.append("            $it\n")
-                }
-                append(message)
-            }
-        }
-        return RuntimeException("Failed to switch to ${toVersion.get().project}:\n$cause")
-    }
-
-    private fun process(root: Path, file: Path): String? = try {
-        manager.process(root, file)
-    } catch (e: Exception) {
-        throw RuntimeException("Failed to process $file").apply {
-            initCause(e)
-        }
+    private fun FileManager(project: String): FileManager {
+        val data = checkNotNull(data.get()[project])
+        return FileManager(
+            inputCache = cacheDir.get()(project, fromVersion.get()),
+            outputCache = cacheDir.get()(project, toVersion.get()),
+            filter = FileFilter(data.excludedExtensions, data.excludedPaths),
+            recognizers = listOf(StandardMultiLine, StandardSingleLine),
+            params = data.toParams(toVersion.get().version),
+            debug = data.debug,
+            statistics = statistics
+        )
     }
 }

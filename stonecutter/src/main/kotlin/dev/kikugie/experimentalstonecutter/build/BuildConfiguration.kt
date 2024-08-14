@@ -1,4 +1,4 @@
-package dev.kikugie.stonecutter.configuration
+package dev.kikugie.experimentalstonecutter.build
 
 import dev.kikugie.stonecutter.StonecutterBuild
 import dev.kikugie.stonecutter.StonecutterController
@@ -10,7 +10,7 @@ import java.nio.file.Path
  * Shared by [StonecutterBuild] and [StonecutterController]
  */
 @Suppress("unused")
-interface StonecutterConfiguration {
+interface BuildConfiguration {
     /**
      * Creates a swap id.
      *
@@ -176,24 +176,4 @@ interface StonecutterConfiguration {
      * or a file extension qualifier (i.e. `*.json`).
      */
     fun exclude(path: String)
-
-    /**
-     * Enables Stonecutter debugging utilities.
-     *
-     * Currently, it creates human-readable ASTs in the cache folder
-     * and adds stack traces to reported exceptions.
-     */
-    var debug: Boolean
-
-    /**
-     * Enables Stonecutter debugging utilities.
-     *
-     * Currently, it creates human-readable ASTs in the cache folder
-     * and adds stack traces to reported exceptions.
-     *
-     * @param state Whenever the debug mode is enabled. Defaults to `false`
-     */
-    fun debug(state: Boolean) {
-        debug = state
-    }
 }

@@ -2,14 +2,19 @@
 
 package dev.kikugie.stonecutter
 
+import dev.kikugie.experimentalstonecutter.StonecutterPlugin
+import dev.kikugie.experimentalstonecutter.StonecutterProject
+import dev.kikugie.experimentalstonecutter.StonecutterUtility
 import dev.kikugie.stonecutter.configuration.*
 import dev.kikugie.stonecutter.configuration.writeControllerModel
-import dev.kikugie.stonecutter.process.StonecutterTask
+import dev.kikugie.experimentalstonecutter.controller.ControllerParameters
+import dev.kikugie.experimentalstonecutter.build.BuildConfiguration
+import dev.kikugie.experimentalstonecutter.controller.ControllerManager
+import dev.kikugie.experimentalstonecutter.controller.controller
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.annotations.ApiStatus
 import java.nio.file.Path
@@ -18,7 +23,9 @@ import java.nio.file.Path
  * Runs for `stonecutter.gradle` file, applying project configurations to versions and generating versioned tasks.
  */
 @Suppress("MemberVisibilityCanBePrivate")
-open class StonecutterController internal constructor(internal val root: Project) : StonecutterConfiguration, StonecutterUtility, StonecutterGlobalParameters {
+open class StonecutterController internal constructor(internal val root: Project) : BuildConfiguration,
+    StonecutterUtility,
+    ControllerParameters {
     private val manager: ControllerManager = root.controller()
         ?: throw StonecutterGradleException("Project ${root.path} is not a Stonecutter controller. What did you even do to get this error?")
     internal val setup: StonecutterSetup =

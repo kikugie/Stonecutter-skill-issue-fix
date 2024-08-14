@@ -1,5 +1,9 @@
-package dev.kikugie.stonecutter
+package dev.kikugie.experimentalstonecutter
 
+import dev.kikugie.experimentalstonecutter.build.StonecutterBuild
+import dev.kikugie.experimentalstonecutter.controller.StonecutterController
+import dev.kikugie.experimentalstonecutter.controller.controller
+import dev.kikugie.experimentalstonecutter.settings.StonecutterSettings
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.initialization.Settings
@@ -12,7 +16,7 @@ internal open class StonecutterPlugin : Plugin<ExtensionAware> {
         else if (target is Project)
             if (target.controller() == null) StonecutterBuild::class
             else StonecutterController::class
-        else throw StonecutterGradleException("The plugin may only be applied to settings and projects")
+        else error("The plugin may only be applied to settings and projects")
         target.extensions.create("stonecutter", type.java, target)
     }
 }
