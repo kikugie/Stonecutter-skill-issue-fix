@@ -33,7 +33,7 @@ object CommentRemover : Block.Visitor<String> {
     override fun visitContent(it: ContentBlock) = it.removeComments()
     override fun visitComment(it: CommentBlock): String = buildString {
         append(it.content.value.replaceAll(onRemoveComment))
-        if (it.end.isBlank()) append(it.end)
+        if (it.end.isBlank()) append(it.end.value)
     }
     override fun visitCode(it: CodeBlock): String = it.removeComments()
 
