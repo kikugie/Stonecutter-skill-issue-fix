@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     java
     kotlin("jvm")
@@ -19,8 +21,15 @@ dependencies {
     runtimeOnly("org.slf4j:slf4j-simple:1.7.10")
 }
 
-kotlin {
-    jvmToolchain(16)
+java {
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+}
+
+tasks.compileKotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_16)
+    }
 }
 
 // See https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
