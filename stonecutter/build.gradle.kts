@@ -92,6 +92,7 @@ publishing {
 }
 
 publishMods {
+    if (!hasProperty("githubToken")) return@publishMods
     version = stonecutter
     displayName = "Stonecutter [$stonecutter]"
     type = when {
