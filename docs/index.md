@@ -29,11 +29,6 @@ features:
     details: Explore the rich feature set provided by the custom in-comment language used by Stonecutter - Stitcher.
     link: /stonecutter/comments
     linkText: Documentation
-  - title: Code documentation
-    icon: 🛠
-    details: Do you want to know how the file parsing and transformation is accomplished? Then you're in luck - the code is very organized and documented.
-    link: /dokka/
-    linkText: KDoc
   - title: Intellij IDEA plugin
     icon: 🧩
     details: The Intellij plugin is still in early development, but already has a couple useful features.
