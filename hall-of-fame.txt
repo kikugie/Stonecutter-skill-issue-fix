@@ -15,7 +15,7 @@ cyansethome
 elytra trims
 eventutils
 enchantmentdisabler
-fabricbettergrass
+bettergrassify
 fast recipe
 flow
 fog
@@ -46,3 +46,8 @@ yacl
 zoomify
 openboatutils
 hudenhancer
+view bobbing options
+easy rename
+namefabric
+customdurability
+saturative
