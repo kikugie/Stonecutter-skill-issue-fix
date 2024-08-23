@@ -65,8 +65,8 @@ tasks.register("updateVersion") {
 
 tasks.register("updateHallOfFame") {
     doLast {
-        val dest = project.file("docs/index.md").toPath()
-        val mods = project.file("hall-of-fame.txt").toPath()
+        val dest = project.file("docs/index.md")
+        val mods = project.file("hall-of-fame.yml")
         fun cleanLines(): List<String> {
             var yeet = false
             return dest.readLines().filterNot {
@@ -78,10 +78,7 @@ tasks.register("updateHallOfFame") {
                 yeet
             }
         }
-        val projects = ProjectFinder
-            .find(*mods.readLines().toTypedArray())
-            .sortedBy { -it.downloads }
-            .joinToString(",\n") { it.toJS() }
+        val projects = ProjectFinder.find(mods)
         val text = cleanLines().joinToString("\n").replaceFirst(
             "let start = \"here\";",
             """
