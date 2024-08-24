@@ -39,8 +39,8 @@ features:
 <!--suppress ES6UnusedImports, HtmlUnknownAttribute -->
 <script setup>
 import { VPTeamMembers } from 'vitepress/theme';
-import modrinth from '/docs/public/assets/modrinth.svg?raw';
-import curseforge from '/docs/public/assets/curseforge.svg?raw';
+import modrinth from '/public/assets/modrinth.svg?raw';
+import curseforge from '/public/assets/curseforge.svg?raw';
 
 const members = [
 %s
