@@ -26,8 +26,6 @@ entries:
   - name: flow
   - name: fog
   - name: forgotten graves
-    cf_link: https://www.curseforge.com/minecraft/mc-mods/forgotten-graves
-    adjust: 240000
   - name: fsit
   - name: florum sporum
   - name: load my chunks
