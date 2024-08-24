@@ -92,7 +92,8 @@ publishing {
 }
 
 publishMods {
-    if (!hasProperty("githubToken")) return@publishMods
+    val token = findProperty("githubToken")?.toString() ?: return@publishMods
+
     version = stonecutter
     displayName = "Stonecutter [$stonecutter]"
     type = when {
@@ -119,7 +120,7 @@ publishMods {
     """.trimIndent()
     github {
         repository = "kikugie/stonecutter"
-        accessToken = property("githubToken").toString()
+        accessToken = token
         commitish = "0.4"
         tagName = "v$stonecutter"
         allowEmptyFiles = true
