@@ -15,17 +15,13 @@ object ProjectFinder {
         val longest = entries.maxOf { it.name.length }
         val template = "| %s | %s | %s | %s |"
         val header = "| ${"Name".padEnd(longest)} | MR | CF | GH |"
-        val divider = "+${"-".repeat(longest + 2)}+----+----+----|"
+        val divider = "+${"-".repeat(longest + 2)}+----+----+----+"
         println(divider)
         println(header)
         println(divider)
 
         val flow = entries.asFlow().flowOn(Dispatchers.Default).transform {
             emit(ProjectInfo.Builder().apply {
-                modrinth = it.modrinth
-                curseforge = it.curseforge
-                github = it.github
-
                 CurseforgeAPI.get(it)?.invoke(this)
                 ModrinthAPI.get(it)?.invoke(this)
 
@@ -34,19 +30,24 @@ object ProjectFinder {
                 it.description?.let { description = it }
                 downloads = (downloads + it.adjust).coerceAtMost(Int.MAX_VALUE)
 
-                fun Any?.status(replaced: Boolean) = when {
-                    this == null -> TextColors.red("NO")
-                    replaced -> TextColors.cyan("OT")
+                fun Any?.status(replaced: Any?) = when {
+                    this != null && replaced != null -> TextColors.brightYellow("FX")
+                    this == null && replaced == null -> TextColors.red("NO")
+                    this == null && replaced != null -> TextColors.cyan("OT")
                     else -> TextColors.green("OK")
                 }
                 println(
                     template.format(
                         it.name.padEnd(longest),
-                        modrinth.status(it.modrinth != null),
-                        curseforge.status(it.curseforge != null),
-                        github.status(it.github != null),
+                        modrinth.status(it.modrinth),
+                        curseforge.status(it.curseforge),
+                        github.status(it.github),
                     )
                 )
+
+                it.modrinth?.let { modrinth = it }
+                it.curseforge?.let { curseforge = it }
+                it.github?.let { github = it }
             }.tryBuild().getOrNull())
         }.onCompletion {
             println(divider)
@@ -56,5 +57,10 @@ object ProjectFinder {
             .sortedBy { -it.downloads }
             .joinToString(",\n") { it.toJS() }
         projects
+    }
+
+    private infix inline fun Boolean.then(action: () -> Unit): Boolean {
+        if (this) action()
+        return this
     }
 }

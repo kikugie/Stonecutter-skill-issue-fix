@@ -14,8 +14,6 @@ entries:
   - name: camerapture
   - name: chais inventory sorter
   - name: cicada
-    cf_link: https://www.curseforge.com/minecraft/mc-mods/cicada
-    adjust: 650000
   - name: controlify
   - name: ctmselector
   - name: cyan
@@ -25,7 +23,6 @@ entries:
   - name: enchantmentdisabler
   - name: bettergrassify
   - name: fast recipe
-    cf_link: https://www.curseforge.com/minecraft/mc-mods/fast-recipe
   - name: flow
   - name: fog
   - name: forgotten graves
@@ -59,9 +56,6 @@ entries:
   - name: skinshuffle
   - name: skylper
   - name: sound
-    cf_link: https://www.curseforge.com/minecraft/mc-mods/sound
-    adjust: 195000
-    title: Sounds
   - name: snow under trees remastered
     cf_link: https://www.curseforge.com/minecraft/mc-mods/snow-under-trees-remastered
     adjust: 4720000
@@ -76,16 +70,4 @@ entries:
   - name: namefabric
   - name: customdurability
   - name: sodium leaf culling
-    gh_link: https://github.com/txnimc/SodiumLeafCulling
-    cf_link: https://www.curseforge.com/minecraft/mc-mods/sodium-leaf-culling
-    adjust: 100
-    title: Sodium Leaf Culling
-    icon: https://media.forgecdn.net/avatars/thumbnails/1066/342/256/256/638600282351479262.jpg
-    description: This Sodium addon optimizes the performance of leaves, which are typically more costly to render due to their transparency.
-  - name: magnesium extras
-    gh_link: https://github.com/txnimc/SodiumExtras
-    cf_link: https://www.curseforge.com/minecraft/mc-mods/magnesium-extras
-    adjust: 21370000
-    title: Sodium/Embeddium Extras
-    icon: https://media.forgecdn.net/avatars/thumbnails/1066/735/256/256/638600914286319886.png
-    description: Sodium Extras adds a lot of features to Sodium (and Embeddium on older versions) to improve the experience and performance.
+  - name: magnesium-extras

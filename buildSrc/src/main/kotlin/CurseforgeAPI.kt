@@ -19,11 +19,14 @@ object CurseforgeAPI {
     }
 
     private fun find(mod: String): CfProjectInfo? {
-        val search = "https://api.curseforge.com/v1/mods/search?gameId=432&slug=$mod"
-        return client.get<CfSearchResult>(search, mapOf("x-api-key" to KEY))?.data?.firstOrNull {
+        val template = "https://api.curseforge.com/v1/mods/search?gameId=432&%s=$mod"
+        return info(template.format("slug"), mod) ?: info(template.format("searchFilter"), mod)
+    }
+
+    private fun info(link: String, mod: String) = client.get<CfSearchResult>(link, mapOf("x-api-key" to KEY))
+        ?.data?.firstOrNull {
             mod.similarity(it.slug) >= accuracy
         }
-    }
 
     @Serializable
     private data class CfSearchResult(

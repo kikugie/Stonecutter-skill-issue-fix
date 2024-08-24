@@ -24,3 +24,4 @@ run
 /node_modules/
 /docs/.vitepress/dist/
 /.env
+docs/index.md
