@@ -1,6 +1,10 @@
 entries:
+  - name: elytra trims
+    cf_link: https://www.curseforge.com/minecraft/mc-mods/elytra-trims
+    adjust: 2000000000
   - name: all the trims
     cf_link: https://www.curseforge.com/minecraft/mc-mods/all-the-trims
+    adjust: 4300000
   - name: automodpack
   - name: autodrop
   - name: autowhitelist
@@ -10,38 +14,57 @@ entries:
   - name: camerapture
   - name: chais inventory sorter
   - name: cicada
+    cf_link: https://www.curseforge.com/minecraft/mc-mods/cicada
+    adjust: 650000
   - name: controlify
   - name: ctmselector
   - name: cyan
   - name: cyansethome
-  - name: elytra trims
-    cf_link: https://www.curseforge.com/minecraft/mc-mods/elytra-trims
-  - name: eventutils
+  - name: event utils
+    mr_link: https://modrinth.com/mod/alerts
   - name: enchantmentdisabler
-  - name: fabricbettergrass
+  - name: bettergrassify
   - name: fast recipe
+    cf_link: https://www.curseforge.com/minecraft/mc-mods/fast-recipe
   - name: flow
   - name: fog
   - name: forgotten graves
+    cf_link: https://www.curseforge.com/minecraft/mc-mods/forgotten-graves
+    adjust: 240000
   - name: fsit
   - name: florum sporum
-  - name: loadmychunks
+  - name: load my chunks
+    cf_link: https://www.curseforge.com/minecraft/mc-mods/load-my-chunks
+    adjust: 16000
   - name: mcc island nametag mod
   - name: mob armor trims
+    cf_link: https://www.curseforge.com/minecraft/mc-mods/mob-armor-trims
+    adjust: 8600
   - name: moderate loading screen
+    cf_link: https://www.curseforge.com/minecraft/mc-mods/mod-erate-loading-screen
+    adjust: 97000
   - name: mru
   - name: my totem doll
+    cf_link: https://www.curseforge.com/minecraft/mc-mods/my-totem-doll
+    adjust: 20000
   - name: neruina
   - name: new creative inventory
   - name: playerstatistics
   - name: random fishing
   - name: scribble
   - name: shared resources
+    cf_link: https://www.curseforge.com/minecraft/mc-mods/shared-resources
+    adjust: 2400
   - name: skin overrides
   - name: skinshuffle
   - name: skylper
-  - name: sounds
+  - name: sound
+    cf_link: https://www.curseforge.com/minecraft/mc-mods/sound
+    adjust: 195000
+    title: Sounds
   - name: snow under trees remastered
+    cf_link: https://www.curseforge.com/minecraft/mc-mods/snow-under-trees-remastered
+    adjust: 4720000
   - name: sushi bar
   - name: telekinesis
   - name: tt20
@@ -49,3 +72,20 @@ entries:
   - name: zoomify
   - name: openboatutils
   - name: hudenhancer
+  - name: structurify
+  - name: namefabric
+  - name: customdurability
+  - name: sodium leaf culling
+    gh_link: https://github.com/txnimc/SodiumLeafCulling
+    cf_link: https://www.curseforge.com/minecraft/mc-mods/sodium-leaf-culling
+    adjust: 100
+    title: Sodium Leaf Culling
+    icon: https://media.forgecdn.net/avatars/thumbnails/1066/342/256/256/638600282351479262.jpg
+    description: This Sodium addon optimizes the performance of leaves, which are typically more costly to render due to their transparency.
+  - name: magnesium extras
+    gh_link: https://github.com/txnimc/SodiumExtras
+    cf_link: https://www.curseforge.com/minecraft/mc-mods/magnesium-extras
+    adjust: 21370000
+    title: Sodium/Embeddium Extras
+    icon: https://media.forgecdn.net/avatars/thumbnails/1066/735/256/256/638600914286319886.png
+    description: Sodium Extras adds a lot of features to Sodium (and Embeddium on older versions) to improve the experience and performance.

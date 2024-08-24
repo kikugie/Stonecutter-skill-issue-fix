@@ -2,6 +2,7 @@ import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.versioning.VersioningConfiguration
 import org.jetbrains.dokka.versioning.VersioningPlugin
+import java.nio.file.StandardOpenOption
 import kotlin.io.path.readLines
 import kotlin.io.path.writeText
 
@@ -65,28 +66,12 @@ tasks.register("updateVersion") {
 
 tasks.register("updateHallOfFame") {
     doLast {
+        val template = project.file("util/index.md")
         val dest = project.file("docs/index.md")
         val mods = project.file("hall-of-fame.yml")
-        fun cleanLines(): List<String> {
-            var yeet = false
-            return dest.readLines().filterNot {
-                if (it.trimStart().startsWith("let start")) {
-                    yeet = true
-                    return@filterNot false
-                } else if (it.trimStart().startsWith("let end"))
-                    yeet = false
-                yeet
-            }
-        }
+
         val projects = ProjectFinder.find(mods)
-        val text = cleanLines().joinToString("\n").replaceFirst(
-            "let start = \"here\";",
-            """
-                let start = "here";
-                const members = [
-                %s
-                ];
-            """.trimIndent().format(projects))
-        dest.writeText(text)
+        val text = template.readText().format(projects)
+        dest.toPath().writeText(text, Charsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
     }
 }

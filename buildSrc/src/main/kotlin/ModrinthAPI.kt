@@ -2,7 +2,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 object ModrinthAPI {
-    suspend fun get(entry: SearchEntry): BuilderConsumer? {
+    fun get(entry: SearchEntry): BuilderConsumer? {
         val slug = entry.modrinth?.run { substringAfterLast('/') } ?: find(entry.name) ?: return null
         val link = "https://api.modrinth.com/v2/project/$slug"
         val info = client.get<MrProjectInfo>(link) ?: return null

@@ -19,7 +19,7 @@ features:
     details: Do you already have a project or want to start from scratch? Take a look on the detailed setup guide.
     link: /stonecutter/migration
     linkText: Get Started
-  - title: Quick Start
+  - title: Quick start
     icon: ⏳
     details: Check out the Fabric mod template repository to start a new mod with multi-version support.
     link: https://github.com/kikugie/stonecutter-template-fabric
@@ -29,20 +29,19 @@ features:
     details: Explore the rich feature set provided by the custom in-comment language used by Stonecutter - Stitcher.
     link: /stonecutter/comments
     linkText: Documentation
-  - title: Code documentation
-    icon: 🛠
-    details: Do you want to know how the file parsing and transformation is accomplished? Then you're in luck - the code is very organized and documented.
-    link: /dokka/
-    linkText: KDoc
+  - title: Intellij IDEA plugin
+    icon: 🧩
+    details: The Intellij plugin is still in early development, but already has a couple useful features.
+    link: https://plugins.jetbrains.com/plugin/25044-stonecutter-dev
+    linkText: Plugin page
 ---
 
 <!--suppress ES6UnusedImports, HtmlUnknownAttribute -->
 <script setup>
 import { VPTeamMembers } from 'vitepress/theme';
-import modrinth from '/assets/modrinth.svg?raw';
-import curseforge from '/assets/curseforge.svg?raw';
+import modrinth from '/docs/assets/modrinth.svg?raw';
+import curseforge from '/docs/assets/curseforge.svg?raw';
 
-let start = "here";
 const members = [
   {
     avatar: 'https://cdn.modrinth.com/data/XpzGz7KD/8ff6751948e096f540e320681742d0b3b918931e.png',
@@ -50,7 +49,8 @@ const members = [
     title: 'Customizable elytra mod with trims, banner patterns and more!',
     links: [
       { icon: 'github', link: 'https://github.com/Kikugie/elytra-trims' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/elytra-trims' }
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/elytra-trims' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/elytra-trims' }
     ]
   },
   {
@@ -61,6 +61,15 @@ const members = [
       { icon: 'github', link: 'https://github.com/isXander/YetAnotherConfigLib' },
       { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/yacl' },
       { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/yacl' }
+    ]
+  },
+  {
+    avatar: 'https://media.forgecdn.net/avatars/thumbnails/1066/735/256/256/638600914286319886.png',
+    name: 'Sodium/Embeddium Extras',
+    title: 'Sodium Extras adds a lot of features to Sodium (and Embeddium on older versions) to improve the experience and performance.',
+    links: [
+      { icon: 'github', link: 'https://github.com/txnimc/SodiumExtras' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/magnesium-extras' }
     ]
   },
   {
@@ -94,6 +103,26 @@ const members = [
     ]
   },
   {
+    avatar: 'https://cdn.modrinth.com/data/XVnUIUAQ/8165a80ccd1c58a9a0fd7505b4d27235a759bf28.png',
+    name: 'Snow Under Trees (Fabric)',
+    title: 'Adds snow under trees in snowy biomes, making the biomes more immersive.',
+    links: [
+      { icon: 'github', link: 'https://github.com/mineblock11/SnowUnderTrees' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/snow-under-trees-remastered' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/snow-under-trees-remastered' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/pnsUKrap/7bb6b50b2f8be66ea13e0cfd290a7c2e348d6074.png',
+    name: 'All The Trims',
+    title: 'Allows any item to be an armour trim material and makes all armour trimmable.',
+    links: [
+      { icon: 'github', link: 'https://github.com/Benjamin-Norton/AllTheTrims/' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/allthetrims' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/all-the-trims' }
+    ]
+  },
+  {
     avatar: 'https://cdn.modrinth.com/data/DOUdJVEm/4f8cdb3933f9efa0c5dfd5574d3ad6b101c7f3ef.png',
     name: 'Controlify',
     title: 'Adds the best controller support to Minecraft Java edition!',
@@ -119,17 +148,8 @@ const members = [
     title: 'Upgrade your experience with this customizable sound mod! It introduces new sound effects and enhances the original ones. Enjoy a richer audio experience with new sounds for blocks, items, inventory, and the UI!',
     links: [
       { icon: 'github', link: 'https://github.com/IMB11/Sounds' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/sound' }
-    ]
-  },
-  {
-    avatar: 'https://cdn.modrinth.com/data/XVnUIUAQ/8165a80ccd1c58a9a0fd7505b4d27235a759bf28.png',
-    name: 'Snow Under Trees (Fabric)',
-    title: 'Adds snow under trees in snowy biomes, making the biomes more immersive.',
-    links: [
-      { icon: 'github', link: 'https://github.com/mineblock11/SnowUnderTrees' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/snow-under-trees-remastered' },
-      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/snow-under-trees-remastered' }
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/sound' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/sound' }
     ]
   },
   {
@@ -142,6 +162,16 @@ const members = [
     ]
   },
   {
+    avatar: 'https://cdn.modrinth.com/data/FrZIkosK/914fbe1f142a3fbe7488d0064e252f08f10c4a93.png',
+    name: 'Forgotten Graves',
+    title: 'Minecraft (Fabric) mod that stores items and XP in a decaying grave upon death',
+    links: [
+      { icon: 'github', link: 'https://github.com/ginsm/forgotten-graves' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/forgotten-graves' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/forgotten-graves' }
+    ]
+  },
+  {
     avatar: 'https://cdn.modrinth.com/data/WuGVWUF2/3475344bb37e1e27c2a54b574284cf0240b1ab70.png',
     name: 'Fog',
     title: 'A total overhaul of Minecraft\'s fog, offering options to customize fog color, start, and end points. Enjoy a more immersive experience with enhanced depth and visuals, all while keeping the same view distance.',
@@ -149,16 +179,6 @@ const members = [
       { icon: 'github', link: 'https://github.com/IMB11/Fog' },
       { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/fog' },
       { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/fog' }
-    ]
-  },
-  {
-    avatar: 'https://cdn.modrinth.com/data/pnsUKrap/7bb6b50b2f8be66ea13e0cfd290a7c2e348d6074.png',
-    name: 'All The Trims',
-    title: 'Allows any item to be an armour trim material and makes all armour trimmable.',
-    links: [
-      { icon: 'github', link: 'https://github.com/Benjamin-Norton/AllTheTrims/' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/allthetrims' },
-      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/all-the-trims' }
     ]
   },
   {
@@ -182,12 +202,13 @@ const members = [
     ]
   },
   {
-    avatar: 'https://cdn.modrinth.com/data/FrZIkosK/914fbe1f142a3fbe7488d0064e252f08f10c4a93.png',
-    name: 'Forgotten Graves',
-    title: 'Minecraft (Fabric) mod that stores items and XP in a decaying grave upon death',
+    avatar: 'https://cdn.modrinth.com/data/RCjGlCDj/icon.png',
+    name: 'Mod-erate Loading Screen',
+    title: 'An "alternative" to Mod Menu that\'s a lot less usable.',
     links: [
-      { icon: 'github', link: 'https://github.com/ginsm/forgotten-graves' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/forgotten-graves' }
+      { icon: 'github', link: 'https://github.com/enjarai/moderate-loading-screen' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/moderate-loading-screen' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/mod-erate-loading-screen' }
     ]
   },
   {
@@ -198,6 +219,16 @@ const members = [
       { icon: 'github', link: 'https://github.com/Skidamek/AutoModpack' },
       { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/automodpack' },
       { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/automodpack' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/m5T5xmUy/c67c1f900e8344e462bb5c21fb512579f3b0be46.png',
+    name: 'BetterGrassify',
+    title: 'Gamers can finally touch grass!?  OptiFine\'s Fancy and Fast better grass implemented on Fabric and NeoForge!',
+    links: [
+      { icon: 'github', link: 'https://github.com/UltimatChamp/BetterGrassify' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/bettergrassify' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/bettergrassify' }
     ]
   },
   {
@@ -220,16 +251,6 @@ const members = [
     ]
   },
   {
-    avatar: 'https://cdn.modrinth.com/data/m5T5xmUy/c67c1f900e8344e462bb5c21fb512579f3b0be46.png',
-    name: 'FabricBetterGrass',
-    title: 'Gamers can finally touch grass!?  OptiFine\'s Fancy and Fast better grass implemented on Fabric!',
-    links: [
-      { icon: 'github', link: 'https://github.com/UltimatChamp/FabricBetterGrass' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/fabricbettergrass' },
-      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/fabricbettergrass' }
-    ]
-  },
-  {
     avatar: 'https://cdn.modrinth.com/data/tr2Mv6ke/a98512fe0df192749fa001268dcf8dd96f99e587.png',
     name: 'Sushi Bar',
     title: 'A library mod for Chai\'s mods',
@@ -239,23 +260,13 @@ const members = [
     ]
   },
   {
-    avatar: 'https://cdn.modrinth.com/data/RCjGlCDj/icon.png',
-    name: 'Mod-erate Loading Screen',
-    title: 'An "alternative" to Mod Menu that\'s a lot less usable.',
+    avatar: 'https://cdn.modrinth.com/data/ygYU16dG/cd7e06456a341a345a6d2be1e2a057745d293969.png',
+    name: 'My Totem Doll',
+    title: 'Simple Fabric mod which replaces all totems with player dolls. Rename your totem to player\'s nickname to use it\'s skin.',
     links: [
-      { icon: 'github', link: 'https://github.com/enjarai/moderate-loading-screen' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/moderate-loading-screen' },
-      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/mod-erate-loading-screen' }
-    ]
-  },
-  {
-    avatar: 'https://cdn.modrinth.com/data/Kd03i2oU/5bfab0390b4655470b95b80824df9ffe6e280514.png',
-    name: 'Enchantment Disabler',
-    title: 'Disable enchantments you don\'t like, and nerf enchanting in multiple ways with an extensive configuration. Supports modded enchantments.',
-    links: [
-      { icon: 'github', link: 'https://github.com/pajicadvance/enchantmentdisabler' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/enchantment-disabler' },
-      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/enchantmentdisabler' }
+      { icon: 'github', link: 'https://github.com/LopyMine/My-Totem-Doll' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/my_totem_doll' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/my-totem-doll' }
     ]
   },
   {
@@ -269,12 +280,43 @@ const members = [
     ]
   },
   {
+    avatar: 'https://cdn.modrinth.com/data/Kd03i2oU/5bfab0390b4655470b95b80824df9ffe6e280514.png',
+    name: 'Enchantment Disabler',
+    title: 'Disable enchantments you don\'t like, and nerf enchanting in multiple ways with an extensive configuration. Supports modded enchantments.',
+    links: [
+      { icon: 'github', link: 'https://github.com/pajicadvance/enchantmentdisabler' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/enchantment-disabler' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/enchantmentdisabler' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/OtbeKtn3/84b00a5052788dc9be3fc477648319d7374672c1.png',
+    name: 'Load My Chunks',
+    title: 'A Server Friendly Chunk Loader Mod',
+    links: [
+      { icon: 'github', link: 'https://github.com/Drathonix/LoadMyChunks' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/load-my-chunks' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/load-my-chunks' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/hHVaPgFK/723c55a27d7d633024fdfe14464a44c84bf05d48.png',
+    name: 'Mob Armor Trims',
+    title: 'Makes mobs be able to spawn with naturally trimmed armor',
+    links: [
+      { icon: 'github', link: 'https://github.com/Imajo24I/Mob-Armor-Trims-1.20.1/' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/mob-armor-trims' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/mob-armor-trims' }
+    ]
+  },
+  {
     avatar: 'https://cdn.modrinth.com/data/8CsGxc95/f1d33853af9a7c9a05f2562fc72750187b3ed988.png',
     name: 'Shared Resources',
     title: 'A mod for sharing game files like resource packs, shaders, saves and more between separate Minecraft instances.',
     links: [
       { icon: 'github', link: 'https://github.com/enjarai/shared-resources' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/shared-resources' }
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/shared-resources' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/shared-resources' }
     ]
   },
   {
@@ -297,15 +339,6 @@ const members = [
     ]
   },
   {
-    avatar: 'https://cdn.modrinth.com/data/9auOqb3o/a0abec247c17a55fb4826f9b641fefdebd794339.png',
-    name: 'CyanSetHome',
-    title: 'Adds the /sethome command and a system of trust between player to allow them to teleport to their respective homes',
-    links: [
-      { icon: 'github', link: 'https://github.com/Aeldit/CyanSetHome' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/cyansethome' }
-    ]
-  },
-  {
     avatar: 'https://cdn.modrinth.com/data/s9XXQTOb/b2ad6897ae0ae1277dc3fefe4d99ed6e7e3f9024.png',
     name: 'Chai\'s Inventory Sorter',
     title: 'An inventory sorter that complements the vanilla UI with fully configurable sorting',
@@ -324,21 +357,22 @@ const members = [
     ]
   },
   {
-    avatar: 'https://cdn.modrinth.com/data/ygYU16dG/cd7e06456a341a345a6d2be1e2a057745d293969.png',
-    name: 'My Totem Doll',
-    title: 'Simple Fabric mod which replaces all totems with player dolls. Rename your totem to player\'s nickname to use it\'s skin.',
+    avatar: 'https://cdn.modrinth.com/data/9auOqb3o/a0abec247c17a55fb4826f9b641fefdebd794339.png',
+    name: 'CyanSetHome',
+    title: 'Adds the /sethome command and a system of trust between player to allow them to teleport to their respective homes',
     links: [
-      { icon: 'github', link: 'https://github.com/LopyMine/My-Totem-Doll' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/my_totem_doll' }
+      { icon: 'github', link: 'https://github.com/Aeldit/CyanSetHome' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/cyansethome' }
     ]
   },
   {
-    avatar: 'https://cdn.modrinth.com/data/lg17V3i3/d88de184e364d8dd1da21933c7c82ce298b0fb98.png',
-    name: 'autodrop',
-    title: 'Simply drops specific items after pickup',
+    avatar: 'https://cdn.modrinth.com/data/Kt9bUp9L/9f4bfe0ec9fa7b4d55b9b6c926420aff7b542e36.png',
+    name: 'NameFabric',
+    title: 'Shows you public player data like past usernames, current skin, and more using LabyNet\'s and Mojang\'s API.',
     links: [
-      { icon: 'github', link: 'https://github.com/btwonion/autodrop' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/autodrop' }
+      { icon: 'github', link: 'https://github.com/not-coded/NameFabric' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/namefabric' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/namefabric' }
     ]
   },
   {
@@ -351,12 +385,12 @@ const members = [
     ]
   },
   {
-    avatar: 'https://cdn.modrinth.com/data/hHVaPgFK/723c55a27d7d633024fdfe14464a44c84bf05d48.png',
-    name: 'Mob Armor Trims',
-    title: 'Makes mobs be able to spawn with naturally trimmed armor',
+    avatar: 'https://cdn.modrinth.com/data/lg17V3i3/d88de184e364d8dd1da21933c7c82ce298b0fb98.png',
+    name: 'autodrop',
+    title: 'Simply drops specific items after pickup',
     links: [
-      { icon: 'github', link: 'https://github.com/Imajo24I/Mob-Armor-Trims-1.20.1/' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/mob-armor-trims' }
+      { icon: 'github', link: 'https://github.com/btwonion/autodrop' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/autodrop' }
     ]
   },
   {
@@ -378,6 +412,16 @@ const members = [
     ]
   },
   {
+    avatar: 'https://cdn.modrinth.com/data/yXAvIk0x/a8e206afee8b866700008f18b57212f0d6ce17c6.png',
+    name: 'Scribble',
+    title: 'Expertly edit your books with rich formatting options, page utilities and more! And it\'s all client-side!',
+    links: [
+      { icon: 'github', link: 'https://github.com/chrrs/scribble' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/scribble' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/scribble' }
+    ]
+  },
+  {
     avatar: 'https://cdn.modrinth.com/data/zGxxQr33/94087d290a929535845be488cde26de54c6826f0.png',
     name: 'Cyan',
     title: 'Adds a few commands for survival Minecraft server and client !',
@@ -387,13 +431,12 @@ const members = [
     ]
   },
   {
-    avatar: 'https://cdn.modrinth.com/data/yXAvIk0x/a8e206afee8b866700008f18b57212f0d6ce17c6.png',
-    name: 'Scribble',
-    title: 'Expertly edit your books with rich formatting options, page utilities and more! And it\'s all client-side!',
+    avatar: 'https://cdn.modrinth.com/data/GON0Fdk5/047b7bfec30d245cd7d5972affe208e6b0f8da98.png',
+    name: 'skin overrides',
+    title: 'a simple mod for locally changing skins and capes.',
     links: [
-      { icon: 'github', link: 'https://github.com/chrrs/scribble' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/scribble' },
-      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/scribble' }
+      { icon: 'github', link: 'https://lumity.dev/orifu/skin-overrides' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/skin-overrides' }
     ]
   },
   {
@@ -416,15 +459,6 @@ const members = [
     ]
   },
   {
-    avatar: 'https://cdn.modrinth.com/data/GON0Fdk5/047b7bfec30d245cd7d5972affe208e6b0f8da98.png',
-    name: 'skin overrides',
-    title: 'a simple mod for locally changing skins and capes.',
-    links: [
-      { icon: 'github', link: 'https://lumity.dev/orifu/skin-overrides' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/skin-overrides' }
-    ]
-  },
-  {
     avatar: 'https://cdn.modrinth.com/data/MXwU9ODv/f984c9f3ddcc0d1bf9bd227406a540778b4932ff.png',
     name: 'skylper',
     title: 'Utility mod for Hypixel Skyblock focusing on mining',
@@ -443,6 +477,16 @@ const members = [
     ]
   },
   {
+    avatar: 'https://cdn.modrinth.com/data/yItp8TXg/c0a28bc0b0027385ec15f694e341d683f3a24eb7.png',
+    name: 'Fast Recipe',
+    title: 'Ctrl + LMB on recipe for instantly crafting, according to it. Fabric.',
+    links: [
+      { icon: 'github', link: 'https://github.com/LopyMine/fast-recipe' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/fast-recipe' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/fast-recipe' }
+    ]
+  },
+  {
     avatar: 'https://cdn.modrinth.com/data/vEyyiUWA/4c3f1393e4885be462eaa0e984d9c2f08562d8cf.png',
     name: 'Random Fishing',
     title: 'A simple mod that adds an enchantment for fishing rods that makes fishing produce random items.',
@@ -452,12 +496,13 @@ const members = [
     ]
   },
   {
-    avatar: 'https://cdn.modrinth.com/data/yItp8TXg/c0a28bc0b0027385ec15f694e341d683f3a24eb7.png',
-    name: 'Fast Recipe',
-    title: 'Ctrl + LMB on recipe for instantly crafting, according to it. Fabric.',
+    avatar: 'https://cdn.modrinth.com/data/OKRes5Es/16c8870d72779019359fdf3780398b2925433b02.gif',
+    name: 'CustomDurability',
+    title: 'A Fabric Mod that allows for changing the durabilities of all items!',
     links: [
-      { icon: 'github', link: 'https://github.com/LopyMine/fast-recipe' },
-      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/fast-recipe' }
+      { icon: 'github', link: 'https://github.com/GravityCY/CustomDurability' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/customdurability' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/customdurability' }
     ]
   },
   {
@@ -472,10 +517,20 @@ const members = [
   {
     avatar: 'https://cdn.modrinth.com/data/joSM3OBw/d678ad694601af535d957b535bce1510b2690dee.png',
     name: 'New Creative Inventory',
-    title: 'A recreation of the creative inventory from version 1.19.3',
+    title: 'This mod allows the ver1.19.3 creative inventory layout to be used with versions lower than ver1.19.3.',
     links: [
       { icon: 'github', link: 'https://github.com/Plastoid501/NewCreativeInventory' },
       { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/new-creative-inventory' }
+    ]
+  },
+  {
+    avatar: 'https://cdn.modrinth.com/data/yz7AM2zx/1e8c9087ff0c3378becc98c8798fb928d3072812.png',
+    name: 'Structurify',
+    title: 'A lightweight configuration mod that makes it easy and accessible to customize everything related to structures, eliminating the hassle of creating multiple datapacks.',
+    links: [
+      { icon: 'github', link: 'https://github.com/Faboslav/structurify' },
+      { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/structurify' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/structurify' }
     ]
   },
   {
@@ -486,9 +541,17 @@ const members = [
       { icon: 'github', link: 'https://github.com/sailex428/HudEnhancer' },
       { icon: { svg: modrinth }, link: 'https://modrinth.com/mod/hudenhancer' }
     ]
+  },
+  {
+    avatar: 'https://media.forgecdn.net/avatars/thumbnails/1066/342/256/256/638600282351479262.jpg',
+    name: 'Sodium Leaf Culling',
+    title: 'This Sodium addon optimizes the performance of leaves, which are typically more costly to render due to their transparency.',
+    links: [
+      { icon: 'github', link: 'https://github.com/txnimc/SodiumLeafCulling' },
+      { icon: { svg: curseforge }, link: 'https://www.curseforge.com/minecraft/mc-mods/sodium-leaf-culling' }
+    ]
   }
 ];
-let end = "here";
 </script>
 
 ## Projects using Stonecutter
