@@ -1,10 +1,15 @@
-# Migrating to Stonecutter
+# Setting up Stonecutter
 You decided to use Stonecutter. My pleasure! Let me take you on a ride!
+
+> [!NOTE]
+> This guide uses examples for Fabric, to have some kind of examples,
+> but Stonecutter works independently of the platform and can be used
+> with Forge mods, Paper plugins and even non-minecraft projects.
 
 ## Project settings
 ### Settings template
 ::: code-group
-```kts [settings.gradle.kts]
+```kotlin [settings.gradle.kts]
 import dev.kikugie.stonecutter.StonecutterSettings
 
 pluginManagement {
@@ -14,7 +19,7 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.4.3"
+    id("dev.kikugie.stonecutter") version "0.4.5"
 }
 
 extensions.configure<StonecutterSettings> {
@@ -39,7 +44,7 @@ pluginManagement {
 }
 
 plugins {
-    id "dev.kikugie.stonecutter" version "0.4.3"
+    id "dev.kikugie.stonecutter" version "0.4.5"
 }
 
 stonecutter {
@@ -60,14 +65,14 @@ Stonecutter settings block is the first entrypoint for the project. It informs t
 ::: tabs
 == Kotlin DSL
 In the Kotlin example, these parameters are used if you want the rest of your project to use Kotlin DSL:  
-```kts
+```kotlin
 kotlinController = true
 centralScript = "build.gradle.kts"
 ```
 
 == Shared block
 `shared` block controls the version setup in a Stonecutter project:  
-```kts
+```kotlin
 shared {
     versions("1.20.1", "1.20.6")
     vers("1.21-snapshot", "1.21-alpha.24.20.a")
@@ -148,16 +153,6 @@ stonecutter.registerChiseled tasks.register("chiseledBuild", stonecutter.chisele
 :::
 Chiseled tasks process the active version for all existing subprojects and then runs the specified task for them.
 
-### Configure each
-Configuring `build.gradle[.kts]` is a later topic as well, although not as far away, but for consistency you can use the following method:
-```kts
-// Same for Groovy
-stonecutter.configureEach {
-    
-}
-```
-There you get an implicit receiver (AKA called with `this.`) of the `build.gradle[.kts]` plugin, where you can call all its methods.
-
 ## Versioned properties
 Before we configure the build file, we need to set up versioned properties.
 For example, the basic setup for a Fabric mod would look like this:
@@ -205,7 +200,7 @@ This finally covers the contents of `build.gradle[.kts]` :tada:
 The very first change you'll need to make is to apply versioned dependencies:
 ::: tabs
 == build.gradle.kts
-```kts
+```kotlin
 dependencies {
     minecraft("com.mojang:minecraft:${property("deps.minecraft")}")
     mappings("net.fabricmc:yarn:${property("deps.yarn_mappings")}:v2")

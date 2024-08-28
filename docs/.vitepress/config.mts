@@ -17,7 +17,7 @@ export default defineVersionedConfig(__dirname, {
   title: 'Stonecutter',
   description: 'Modern Gradle plugin for multi-version management',
   versioning: {
-    latestVersion: '0.4.3',
+    latestVersion: '0.4.5',
   },
   cleanUrls: true,
   appearance: 'dark',
@@ -53,7 +53,7 @@ export default defineVersionedConfig(__dirname, {
           text: 'Stonecutter',
           items: [
             { text: 'Introduction', link: '/stonecutter/introduction' },
-            { text: 'Migrating to Stonecutter', link: '/stonecutter/migration' },
+            { text: 'Setting up Stonecutter', link: '/stonecutter/setup' },
             { text: 'Developing your mod', link: '/stonecutter/launch' },
             { text: 'Versioned comments', link: '/stonecutter/comments' },
             { text: 'Stonecutter configuration', link: '/stonecutter/configuration' },

@@ -55,7 +55,7 @@ tasks.register("updateVersion") {
 
         val version = project.property("stonecutter")
         replaceAndWrite("docs/.vitepress/config.mts", "latestVersion: '.+'", "latestVersion: '$version'")
-        replaceAndWrite("docs/stonecutter/migration.md", "version \".+\"$", "version \"$version\"")
+        replaceAndWrite("docs/stonecutter/setup.md", "version \".+\"$", "version \"$version\"")
         replaceAndWrite(
             "stonecutter/src/main/kotlin/dev/kikugie/stonecutter/StonecutterController.kt",
             "\"Running Stonecutter .+\"",

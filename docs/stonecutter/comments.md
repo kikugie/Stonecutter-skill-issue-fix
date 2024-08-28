@@ -10,9 +10,9 @@ Stonecutter comments are prefixed with special symbols, which mark them as code 
 
 ### Condition
 Condition comments support all the functions of boolean algebra, such as:
-```kotlin
+```java
 //? if bl1 || (bl2 && !bl3)
-func()
+method();
 ```
 The comment above will technically fail, since we haven't told Stonecutter what `bl1`, `bl2` and `bl3` are, 
 but it shows the principle. If the condition fails, the function below will be commented, or otherwise the comment will be removed.
@@ -21,21 +21,21 @@ By default, the only available values are Minecraft version predicates, such as 
 
 ### Swap
 Swaps replace the value with a predefined parameter.
-```kotlin
+```java
 // 1.20.1
 //$ swap_token
-func1()
+method1();
 
 // 1.20.6
 //$ swap_token
-func2()
+method2();
 ```
 They’re replacements to doing the same with an if-else boilerplate:
-```kotlin
+```java
 //? if <1.20.6 {
-func1()
+method1();
 //?} else
-/*func2()*/
+/*method2();*/
 ```
 
 The way to configure swaps is described in the next chapter.
@@ -50,11 +50,11 @@ There are three types:
 
 > [!IMPORTANT]
 > If you are chaining conditions, only the last one is allowed to be non-closed.
-> ```kotlin
+> ```java
 > //? if bl1 {
-> /*func1()
+> /*method1();
 > *///?} else
-> func2()
+> method2();
 > ```
 
 ### Closed
