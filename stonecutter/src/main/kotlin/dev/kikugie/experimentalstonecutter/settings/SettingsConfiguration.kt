@@ -1,6 +1,6 @@
 package dev.kikugie.experimentalstonecutter.settings
 
-import dev.kikugie.stonecutter.BNAN
+import dev.kikugie.experimentalstonecutter.BNAN
 import org.gradle.api.Action
 import org.gradle.api.initialization.ProjectDescriptor
 

@@ -4,7 +4,7 @@ import dev.kikugie.stitcher.scanner.StandardMultiLine
 import dev.kikugie.stitcher.scanner.StandardSingleLine
 import dev.kikugie.experimentalstonecutter.ProjectName
 import dev.kikugie.experimentalstonecutter.StonecutterProject
-import dev.kikugie.experimentalstonecutter.build.StonecutterData
+import dev.kikugie.experimentalstonecutter.data.BuildData
 import groovy.lang.Reference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -37,7 +37,7 @@ internal abstract class StonecutterTask : DefaultTask() {
     abstract val dests: MapProperty<String, Path>
 
     @get:Input
-    abstract val data: MapProperty<String, StonecutterData>
+    abstract val data: MapProperty<String, BuildData>
 
     @get:Input
     abstract val cacheDir: Property<(ProjectName, StonecutterProject) -> Path>

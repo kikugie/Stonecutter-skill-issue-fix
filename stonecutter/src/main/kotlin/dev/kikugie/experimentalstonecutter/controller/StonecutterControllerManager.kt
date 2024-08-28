@@ -1,7 +1,6 @@
 package dev.kikugie.experimentalstonecutter.controller
 
 import dev.kikugie.experimentalstonecutter.ProjectName
-import dev.kikugie.stonecutter.StonecutterGradleException
 import org.gradle.api.Project
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
@@ -76,23 +75,17 @@ private fun updateFileWithKey(file: Path, filename: String, key: String) {
             } else line
         }.toList()
     }
-    if (newLines.isEmpty()) throw emptyFile(filename)
-    if (corrupted) throw invalidScript(filename, key)
+    check(newLines.isNotEmpty()) { emptyFile(filename) }
+    check(!corrupted) { invalidScript(filename, key) }
     file.writeLines(newLines, Charsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
 }
 
-private fun emptyFile(name: String): Throwable =
-    StonecutterGradleException(
-        """
-        $name is empty. This might have been caused by a user error.
-        If this is intentional, delete the file to make Stonecutter regenerate it.
-        """.trimIndent()
-    )
+private fun emptyFile(name: String) = """
+    $name is empty. This might have been caused by a user error.
+    If this is intentional, delete the file to make Stonecutter regenerate it.
+    """.trimIndent()
 
-private fun invalidScript(name: String, missing: String): Throwable =
-    StonecutterGradleException(
-        """
-        Couldn't find active version specification in $name.
-        Add `$missing` or delete the file to make Stonecutter regenerate it
-        """.trimIndent()
-    )
+private fun invalidScript(name: String, missing: String) = """
+    Couldn't find active version specification in $name.
+    Add `$missing` or delete the file to make Stonecutter regenerate it
+    """.trimIndent()

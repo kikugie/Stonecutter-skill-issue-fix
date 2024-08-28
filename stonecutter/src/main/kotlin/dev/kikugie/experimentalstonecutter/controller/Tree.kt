@@ -21,6 +21,7 @@ data class ProjectTree(
     val vcs: StonecutterProject,
     val branches: Map<ProjectName, ProjectBranch>,
 ) {
+    val path by lazy { project.projectDir.toPath() }
     /**
      * The active version for this tree.
      */
@@ -51,6 +52,7 @@ data class ProjectBranch(
     val name: ProjectName,
     val entries: Map<ProjectName, ProjectNode>,
 ) {
+    val path by lazy { project.projectDir.toPath() }
     operator fun get(project: ProjectName) = entries[project]
 }
 
@@ -65,6 +67,8 @@ data class ProjectNode(
     val project: Project,
     val parent: ProjectName,
     val metadata: StonecutterProject
-)
+) {
+    val path by lazy { project.projectDir.toPath() }
+}
 
 

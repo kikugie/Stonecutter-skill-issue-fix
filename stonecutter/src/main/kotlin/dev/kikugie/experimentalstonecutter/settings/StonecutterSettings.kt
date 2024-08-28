@@ -2,11 +2,11 @@ package dev.kikugie.experimentalstonecutter.settings
 
 import dev.kikugie.experimentalstonecutter.ProjectName
 import dev.kikugie.experimentalstonecutter.StonecutterProject
-import dev.kikugie.stonecutter.*
 import dev.kikugie.experimentalstonecutter.controller.GroovyController
 import dev.kikugie.experimentalstonecutter.controller.KotlinController
-import dev.kikugie.stonecutter.StonecutterGradleException
 import dev.kikugie.experimentalstonecutter.StonecutterUtility
+import dev.kikugie.experimentalstonecutter.data.TreeContainer
+import dev.kikugie.experimentalstonecutter.data.TreeModelContainer
 import org.gradle.api.Action
 import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings
@@ -32,8 +32,7 @@ open class StonecutterSettings(private val settings: Settings) : SettingsConfigu
      */
     var centralScript = "build.gradle"
         set(value) {
-            if (value.startsWith("stonecutter.gradle"))
-                throw StonecutterGradleException("Invalid buildscript name")
+            require(!value.startsWith("stonecutter.gradle")) { "Build script must not override the controller" }
             field = value
         }
 
@@ -50,6 +49,7 @@ open class StonecutterSettings(private val settings: Settings) : SettingsConfigu
     }
 
     override fun create(project: ProjectDescriptor) {
+        settings.include(project.path)
         create(project, shared)
     }
 

@@ -2,12 +2,13 @@ package dev.kikugie.experimentalstonecutter.controller
 
 import dev.kikugie.experimentalstonecutter.ProjectName
 import dev.kikugie.experimentalstonecutter.StonecutterProject
-import dev.kikugie.experimentalstonecutter.settings.TreeContainer
 import dev.kikugie.stonecutter.configuration.stonecutterCachePath
-import dev.kikugie.experimentalstonecutter.settings.TreeModelContainer
-import dev.kikugie.experimentalstonecutter.settings.TreeModel
 import dev.kikugie.stonecutter.*
 import dev.kikugie.experimentalstonecutter.StonecutterUtility
+import dev.kikugie.experimentalstonecutter.build.StonecutterBuild
+import dev.kikugie.experimentalstonecutter.data.TreeContainer
+import dev.kikugie.experimentalstonecutter.data.TreeModel
+import dev.kikugie.experimentalstonecutter.data.TreeModelContainer
 import dev.kikugie.stonecutter.process.StonecutterTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
@@ -15,7 +16,7 @@ import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 
 @Suppress("MemberVisibilityCanBePrivate")
-open class StonecutterController(internal val root: Project) : StonecutterUtility {
+open class StonecutterController(internal val root: Project) : StonecutterUtility, ControllerParameters {
     private val manager: ControllerManager = checkNotNull(root.controller()) {
         "Project ${root.path} is not a Stonecutter controller. What did you even do to get this error?"
     }
@@ -27,7 +28,10 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     val current: StonecutterProject get() = tree.current
     val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
 
+    override var automaticPlatformConstants: Boolean = false
+
     init {
+        println("Running Stonecutter 0.5-alpha.4")
         val data: TreeModel = checkNotNull(root.gradle.extensions.getByType<TreeModelContainer>()[root]) {
             "Project ${root.path} is not registered. This might've been caused by removing a project while its active"
         }
@@ -41,7 +45,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
             }
             branches[name] = ProjectBranch(branchProject, name, versions)
         }
-        tree = ProjectTree(root, data.vcs, branches)
+        tree = ProjectTree(root, data.vcsVersion, branches)
         tree.versions = data.versions.toList()
         container.register(root.path, tree)
         tree.branches.values.forEach {
@@ -63,6 +67,18 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
 
     operator fun get(project: ProjectName) = tree[project]
 
+    private fun configurePlatforms(projects: Iterable<Project>) {
+        val key = "loom.platform"
+        val platforms = mutableSetOf<String>()
+        for (it in projects) it.findProperty(key)?.run {
+            platforms += this.toString()
+        }
+        if (platforms.isEmpty()) return
+        for (it in projects) it.findProperty(key)?.run {
+            it.extensions.getByType<StonecutterBuild>().consts(this.toString(), platforms)
+        }
+    }
+
     private fun setupProject() {
         createStonecutterTask("Reset active project", tree.vcs) {
             "Sets active version to ${tree.vcs.project}. Run this before making a commit."
@@ -73,6 +89,9 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         for (it in versions) createStonecutterTask("Set active project to ${it.project}", it) {
             "Sets the active project to ${it.project}, processing all versioned comments."
         }
+        if (automaticPlatformConstants) configurePlatforms(
+            tree.branches.values.flatMap { it.entries.values.map(ProjectNode::project) }
+        )
     }
 
     private inline fun createStonecutterTask(name: String, version: StonecutterProject, desc: () -> String) =
@@ -94,9 +113,8 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
             output.set("src")
 
             dests.set(tree.branches.mapValues { (_, v) -> v.project.projectDir.toPath() })
-            cacheDir.set { branch, version ->
-                tree[branch][version.project]?.project?.stonecutterCachePath
-                    ?: tree[branch]!!.project.stonecutterCachePath.resolve("out-of-bounds/$version")
+            cacheDir.set { branch, version -> tree[branch][version.project]?.project?.stonecutterCachePath
+                ?: tree[branch]!!.project.stonecutterCachePath.resolve("out-of-bounds/$version")
             }
 
             doLast {

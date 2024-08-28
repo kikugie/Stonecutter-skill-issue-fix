@@ -1,12 +1,17 @@
 package dev.kikugie.experimentalstonecutter.build
 
-import dev.kikugie.experimentalstonecutter.settings.TreeContainer
 import dev.kikugie.semver.VersionParser
 import dev.kikugie.semver.VersionParsingException
 import dev.kikugie.stitcher.lexer.IdentifierRecognizer.Companion.allowed
 import dev.kikugie.experimentalstonecutter.StonecutterProject
 import dev.kikugie.experimentalstonecutter.StonecutterUtility
+import dev.kikugie.experimentalstonecutter.controller.get
+import dev.kikugie.experimentalstonecutter.data.BuildData
+import dev.kikugie.experimentalstonecutter.data.TreeContainer
+import dev.kikugie.experimentalstonecutter.data.buildDirectoryPath
 import dev.kikugie.stonecutter.configuration.buildDirectory
+import dev.kikugie.stonecutter.configuration.stonecutterCachePath
+import dev.kikugie.stonecutter.process.StonecutterTask
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
@@ -14,12 +19,18 @@ import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import java.nio.file.Path
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.deleteRecursively
+import kotlin.io.path.exists
+import kotlin.io.path.invariantSeparatorsPathString
 
+@OptIn(ExperimentalPathApi::class)
 @Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterBuild(val project: Project) : BuildConfiguration, StonecutterUtility {
-    internal val data = StonecutterData()
-    internal val tree = requireNotNull(project.parent) { "Project ${project.path} must be a versioned project." }
+    internal val data = BuildData()
+    internal val tree = requireNotNull(project.rootProject) { "Project ${project.path} must be a versioned project." }
         .run { gradle.extensions.getByType<TreeContainer>()[this]!! }
+    internal val branch = requireNotNull(tree[project.parent!!.name])
 
     /**
      * All available versions.
@@ -39,7 +50,7 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration, Stonecut
     }
 
     init {
-        // TODO
+        project.configure()
     }
 
     override fun swap(identifier: String, replacement: String) {
@@ -76,17 +87,41 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration, Stonecut
         }
     }
 
-    private fun configureSources() {
+    private fun Project.configure() {
+        tasks.register("setupChiseledBuild", StonecutterTask::class.java) {
+            val parent = requireNotNull(project.parent) {
+                "Chiseled task can't be registered for the root project. How did you manage to do it though?"
+            }
+
+            toVersion.set(current)
+            fromVersion.set(active)
+
+            input.set("src")
+            project.buildDirectoryPath.resolve("chiseledSrc").let {
+                if (it.exists()) it.deleteRecursively()
+                output.set(branch.path.relativize(it).invariantSeparatorsPathString)
+            }
+
+            dests.set(parent.let { mapOf(it.path to it.projectDir.toPath()) })
+            cacheDir.set { _, version -> branch[version.project]?.project?.stonecutterCachePath
+                ?: branch.project.stonecutterCachePath.resolve("out-of-bounds/$version")
+            }
+        }
+
+        afterEvaluate { configureSources() }
+    }
+
+    private fun Project.configureSources() {
         try {
-            val useChiseledSrc = tree.hasChiseled(project.gradle.startParameter.taskNames)
+            val useChiseledSrc = tree.hasChiseled(gradle.startParameter.taskNames)
             val formatter: (Path) -> Any = when {
-                useChiseledSrc   -> { src -> File(project.buildDirectory, "chiseledSrc/$src") }
+                useChiseledSrc   -> { src -> File(buildDirectory, "chiseledSrc/$src") }
                 current.isActive -> { src -> "../../src/$src" }
                 else             -> return
             }
 
-            val parentDir = project.parent!!.projectDir.resolve("src").toPath()
-            val thisDir = project.projectDir.resolve("src").toPath()
+            val parentDir = parent!!.projectDir.resolve("src").toPath()
+            val thisDir = projectDir.resolve("src").toPath()
 
             fun applyChiseled(from: SourceDirectorySet, to: SourceDirectorySet = from) {
                 from.sourceDirectories.mapNotNull {
@@ -100,7 +135,7 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration, Stonecut
                 }
             }
 
-            for (it in project.property("sourceSets") as SourceSetContainer) {
+            for (it in property("sourceSets") as SourceSetContainer) {
                 applyChiseled(it.allJava, it.java)
                 applyChiseled(it.resources)
             }
