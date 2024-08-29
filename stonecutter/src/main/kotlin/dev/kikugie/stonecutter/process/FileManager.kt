@@ -2,15 +2,16 @@ package dev.kikugie.stonecutter.process
 
 import com.charleskorn.kaml.Yaml
 import dev.kikugie.stitcher.data.scope.Scope
-import dev.kikugie.stitcher.exception.SyntaxException
 import dev.kikugie.stitcher.eval.Assembler
+import dev.kikugie.stitcher.exception.SyntaxException
 import dev.kikugie.stitcher.exception.join
 import dev.kikugie.stitcher.parser.FileParser
-import dev.kikugie.stitcher.transformer.TransformParameters
-import dev.kikugie.stitcher.transformer.Transformer
 import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.scanner.Scanner
-import kotlinx.serialization.*
+import dev.kikugie.stitcher.transformer.TransformParameters
+import dev.kikugie.stitcher.transformer.Transformer
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import org.slf4j.LoggerFactory
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
@@ -92,9 +93,11 @@ internal class FileManager(
     private fun Path.writeConfigured(string: String) {
         writeText(string, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
     }
+
     private fun Path.cleanMatching(start: String) = parent.listDirectoryEntries().forEach {
         if (it.fileName.name.startsWith(start)) it.deleteExisting()
     }
+
     private fun Path.hashName(hash: String, ext: String) = parent.resolve("${fileName.name}_$hash.$ext")
 
     private fun getCachedOutput(source: Path): String? = runIgnoring {

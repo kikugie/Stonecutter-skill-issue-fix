@@ -10,7 +10,7 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.psi.PsiElement
-import dev.kikugie.experimentalstonecutter.StonecutterProject
+import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.experimentalstonecutter.build.StonecutterData
 import dev.kikugie.stonecutter.configuration.readBuildModel
 import dev.kikugie.stonecutter.configuration.readControllerModel

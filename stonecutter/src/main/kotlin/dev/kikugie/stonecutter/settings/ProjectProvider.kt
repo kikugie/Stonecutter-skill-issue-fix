@@ -1,10 +1,10 @@
-package dev.kikugie.experimentalstonecutter.settings
+package dev.kikugie.stonecutter.settings
 
-import dev.kikugie.experimentalstonecutter.BNAN
-import dev.kikugie.experimentalstonecutter.ProjectName
-import dev.kikugie.experimentalstonecutter.TargetVersion
-import dev.kikugie.experimentalstonecutter.StonecutterProject
 import dev.kikugie.semver.SemanticVersion
+import dev.kikugie.stonecutter.BNAN
+import dev.kikugie.stonecutter.ProjectName
+import dev.kikugie.stonecutter.StonecutterProject
+import dev.kikugie.stonecutter.TargetVersion
 
 /**
  * Methods available in [SettingsConfiguration.shared], [SettingsConfiguration.create] and [TreeBuilder.branch].

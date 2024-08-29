@@ -1,11 +1,10 @@
-package dev.kikugie.experimentalstonecutter.settings
+package dev.kikugie.stonecutter.settings
 
-import dev.kikugie.experimentalstonecutter.*
-import dev.kikugie.experimentalstonecutter.controller.GroovyController
-import dev.kikugie.experimentalstonecutter.controller.KotlinController
-import dev.kikugie.experimentalstonecutter.data.TreeContainer
-import dev.kikugie.experimentalstonecutter.data.TreeBuilderContainer
-import dev.kikugie.experimentalstonecutter.sanitize
+import dev.kikugie.stonecutter.*
+import dev.kikugie.stonecutter.controller.GroovyController
+import dev.kikugie.stonecutter.controller.KotlinController
+import dev.kikugie.stonecutter.data.TreeBuilderContainer
+import dev.kikugie.stonecutter.data.TreeContainer
 import org.gradle.api.Action
 import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings
@@ -15,7 +14,8 @@ import kotlin.io.path.notExists
 
 @Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterSettings(private val settings: Settings) : SettingsConfiguration, StonecutterUtility {
-    private val container: TreeBuilderContainer = settings.gradle.extensions.create<TreeBuilderContainer>("stonecutterTreeBuilders")
+    private val container: TreeBuilderContainer =
+        settings.gradle.extensions.create<TreeBuilderContainer>("stonecutterTreeBuilders")
     private lateinit var shared: TreeBuilder
 
     private val controller get() = if (kotlinController) KotlinController else GroovyController
@@ -25,6 +25,7 @@ open class StonecutterSettings(private val settings: Settings) : SettingsConfigu
      * - `stonecutter.gradle` -> `stonecutter.gradle.kts`
      */
     var kotlinController = false
+
     /**
      * Buildscript used by all subprojects.
      * Defaults to `build.gradle`.
@@ -101,11 +102,12 @@ open class StonecutterSettings(private val settings: Settings) : SettingsConfigu
         project.buildFileName = "../../$build"
     }
 
-    private fun get(path: ProjectPath): ProjectDescriptor = with(path.sanitize()) {
-        if (isEmpty()) settings.rootProject
-        else {
-            settings.include(this)
-            settings.project(":$this")
+    private fun get(path: ProjectPath): ProjectDescriptor =
+        with(path.sanitize()) {
+            if (isEmpty()) settings.rootProject
+            else {
+                settings.include(this)
+                settings.project(":$this")
+            }
         }
-    }
 }

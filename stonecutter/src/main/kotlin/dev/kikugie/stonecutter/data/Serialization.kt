@@ -1,10 +1,10 @@
-package dev.kikugie.experimentalstonecutter.data
+package dev.kikugie.stonecutter.data
 
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import dev.kikugie.semver.VersionParser
 import dev.kikugie.stitcher.transformer.TransformParameters
-import dev.kikugie.experimentalstonecutter.buildDirectory
+import dev.kikugie.stonecutter.buildDirectory
 import org.gradle.api.Project
 
 internal val Project.buildDirectoryFile
@@ -32,7 +32,7 @@ inline fun <T : Any> runIgnoring(action: () -> T): T? = runCatching(action).getO
 
 fun StitcherParameters.toParams(version: String, key: String = "minecraft"): TransformParameters {
     val deps = dependencies.toMutableMap()
-    deps.getOrElse(key) { VersionParser.parseLenient(version)}.let {
+    deps.getOrElse(key) { VersionParser.parseLenient(version) }.let {
         deps[key] = it
         deps[""] = it
     }

@@ -2,9 +2,9 @@ package dev.kikugie.stonecutter.process
 
 import dev.kikugie.stitcher.scanner.StandardMultiLine
 import dev.kikugie.stitcher.scanner.StandardSingleLine
-import dev.kikugie.experimentalstonecutter.ProjectName
-import dev.kikugie.experimentalstonecutter.StonecutterProject
-import dev.kikugie.experimentalstonecutter.data.StitcherParameters
+import dev.kikugie.stonecutter.ProjectName
+import dev.kikugie.stonecutter.StonecutterProject
+import dev.kikugie.stonecutter.data.StitcherParameters
 import groovy.lang.Reference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -80,6 +80,7 @@ internal abstract class StonecutterTask : DefaultTask() {
                     StandardOpenOption.TRUNCATE_EXISTING
                 )
             }
+
             is TransformResult.Skipped -> {
                 statistics.skipped++
                 if (output == null || error) continue
@@ -95,7 +96,12 @@ internal abstract class StonecutterTask : DefaultTask() {
     }
 
     @OptIn(ExperimentalPathApi::class)
-    private fun transform(project: String, input: Path, output: Path, marker: Reference<Boolean>): Flow<Pair<TransformResult, Path?>> {
+    private fun transform(
+        project: String,
+        input: Path,
+        output: Path,
+        marker: Reference<Boolean>
+    ): Flow<Pair<TransformResult, Path?>> {
         val out = if (input == output) null else output
         val manager = FileManager(project)
         return input

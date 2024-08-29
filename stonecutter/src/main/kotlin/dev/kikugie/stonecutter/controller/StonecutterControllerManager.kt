@@ -1,6 +1,6 @@
-package dev.kikugie.experimentalstonecutter.controller
+package dev.kikugie.stonecutter.controller
 
-import dev.kikugie.experimentalstonecutter.ProjectName
+import dev.kikugie.stonecutter.ProjectName
 import org.gradle.api.Project
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption

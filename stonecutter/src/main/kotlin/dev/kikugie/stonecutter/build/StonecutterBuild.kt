@@ -1,16 +1,12 @@
-package dev.kikugie.experimentalstonecutter.build
+package dev.kikugie.stonecutter.build
 
 import dev.kikugie.semver.VersionParser
 import dev.kikugie.semver.VersionParsingException
 import dev.kikugie.stitcher.lexer.IdentifierRecognizer.Companion.allowed
-import dev.kikugie.experimentalstonecutter.StonecutterProject
-import dev.kikugie.experimentalstonecutter.StonecutterUtility
-import dev.kikugie.experimentalstonecutter.data.StitcherParameters
-import dev.kikugie.experimentalstonecutter.data.TreeContainer
-import dev.kikugie.experimentalstonecutter.data.buildDirectoryPath
-import dev.kikugie.experimentalstonecutter.sanitize
-import dev.kikugie.experimentalstonecutter.buildDirectory
-import dev.kikugie.experimentalstonecutter.stonecutterCachePath
+import dev.kikugie.stonecutter.*
+import dev.kikugie.stonecutter.data.StitcherParameters
+import dev.kikugie.stonecutter.data.TreeContainer
+import dev.kikugie.stonecutter.data.buildDirectoryPath
 import dev.kikugie.stonecutter.process.StonecutterTask
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
@@ -34,24 +30,27 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration, Stonecut
     internal val tree = requireNotNull(project.rootProject) { "Project $project must be a versioned project" }
         .run { gradle.extensions.getByType<TreeContainer>()[this]!! }
     internal val branch = requireNotNull(tree[parent]) {
-        "Branch '${parent.path.sanitize()}' not found in [${tree.branches.keys.joinToString {"'$it'"}}]"
+        "Branch '${parent.path.sanitize()}' not found in [${tree.branches.keys.joinToString { "'$it'" }}]"
     }
 
     /**
      * All available versions.
      */
     val versions: List<StonecutterProject> get() = tree.versions
+
     /**
      * The currently active version. Global for all instances of the build file.
      *
      * **May not exist in this branch!**
      */
     val active: StonecutterProject get() = tree.current
+
     /**
      * Metadata of the currently processed version.
      */
-    val current: StonecutterProject by lazy { tree.versions.find { it.project == project.name }
-        ?: error("No matching version found for project ${project.name}")
+    val current: StonecutterProject by lazy {
+        tree.versions.find { it.project == project.name }
+            ?: error("No matching version found for project ${project.name}")
     }
 
     init {
@@ -104,8 +103,9 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration, Stonecut
             }
 
             dests.set(this@StonecutterBuild.parent.let { mapOf(it.path to it.projectDir.toPath()) })
-            cacheDir.set { _, version -> branch[version.project]?.project?.stonecutterCachePath
-                ?: branch.project.stonecutterCachePath.resolve("out-of-bounds/$version")
+            cacheDir.set { _, version ->
+                branch[version.project]?.project?.stonecutterCachePath
+                    ?: branch.project.stonecutterCachePath.resolve("out-of-bounds/$version")
             }
         }
 
@@ -116,9 +116,9 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration, Stonecut
         try {
             val useChiseledSrc = tree.hasChiseled(gradle.startParameter.taskNames)
             val formatter: (Path) -> Any = when {
-                useChiseledSrc   -> { src -> File(buildDirectory, "chiseledSrc/$src") }
+                useChiseledSrc -> { src -> File(buildDirectory, "chiseledSrc/$src") }
                 current.isActive -> { src -> "../../src/$src" }
-                else             -> return
+                else -> return
             }
 
             val parentDir = parent!!.projectDir.resolve("src").toPath()

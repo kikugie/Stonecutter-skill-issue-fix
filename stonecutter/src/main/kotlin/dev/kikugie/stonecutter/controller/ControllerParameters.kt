@@ -1,4 +1,4 @@
-package dev.kikugie.experimentalstonecutter.controller
+package dev.kikugie.stonecutter.controller
 
 interface ControllerParameters {
     /**

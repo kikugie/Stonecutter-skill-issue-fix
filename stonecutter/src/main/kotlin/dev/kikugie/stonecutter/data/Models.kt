@@ -1,8 +1,8 @@
-package dev.kikugie.experimentalstonecutter.data
+package dev.kikugie.stonecutter.data
 
-import dev.kikugie.experimentalstonecutter.ProjectName
 import dev.kikugie.semver.Version
-import dev.kikugie.experimentalstonecutter.StonecutterProject
+import dev.kikugie.stonecutter.ProjectName
+import dev.kikugie.stonecutter.StonecutterProject
 import kotlinx.serialization.Serializable
 import java.nio.file.Path
 

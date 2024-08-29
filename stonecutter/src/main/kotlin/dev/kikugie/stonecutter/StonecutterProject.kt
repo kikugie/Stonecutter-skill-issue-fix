@@ -1,4 +1,4 @@
-package dev.kikugie.experimentalstonecutter
+package dev.kikugie.stonecutter
 
 import dev.kikugie.semver.SemanticVersion
 import kotlinx.serialization.Serializable
@@ -23,8 +23,6 @@ class StonecutterProject internal constructor(
      */
     var isActive: Boolean = false
         internal set
-
-    internal fun asActive() = this.also { isActive = true }
 
     override fun equals(other: Any?): Boolean =
         if (other !is StonecutterProject) false

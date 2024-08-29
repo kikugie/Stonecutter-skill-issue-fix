@@ -6,9 +6,9 @@ import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import com.charleskorn.kaml.decodeFromStream
 import com.charleskorn.kaml.encodeToStream
-import dev.kikugie.experimentalstonecutter.data.StitcherParameters
 import dev.kikugie.semver.VersionParser
 import dev.kikugie.stitcher.transformer.TransformParameters
+import dev.kikugie.stonecutter.data.StitcherParameters
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray

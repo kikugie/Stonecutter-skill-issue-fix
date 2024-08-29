@@ -1,7 +1,6 @@
 package dev.kikugie.stonecutter
 
-import dev.kikugie.experimentalstonecutter.StonecutterProject
-import dev.kikugie.experimentalstonecutter.data.TreeContainer
+import dev.kikugie.stonecutter.data.TreeContainer
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
 import org.gradle.api.provider.ListProperty

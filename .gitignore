@@ -14,7 +14,7 @@ out
 .idea
 
 # gradle
-build
+build/
 .gradle
 .kotlin
 

@@ -1,15 +1,11 @@
-package dev.kikugie.experimentalstonecutter.controller
+package dev.kikugie.stonecutter.controller
 
-import dev.kikugie.experimentalstonecutter.ProjectName
-import dev.kikugie.experimentalstonecutter.StonecutterProject
-import dev.kikugie.experimentalstonecutter.stonecutterCachePath
 import dev.kikugie.stonecutter.*
-import dev.kikugie.experimentalstonecutter.StonecutterUtility
-import dev.kikugie.experimentalstonecutter.build.StonecutterBuild
-import dev.kikugie.experimentalstonecutter.data.TreeContainer
-import dev.kikugie.experimentalstonecutter.data.TreeBuilderContainer
-import dev.kikugie.experimentalstonecutter.settings.TreeBuilder
+import dev.kikugie.stonecutter.build.StonecutterBuild
+import dev.kikugie.stonecutter.data.TreeBuilderContainer
+import dev.kikugie.stonecutter.data.TreeContainer
 import dev.kikugie.stonecutter.process.StonecutterTask
+import dev.kikugie.stonecutter.settings.TreeBuilder
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.apply

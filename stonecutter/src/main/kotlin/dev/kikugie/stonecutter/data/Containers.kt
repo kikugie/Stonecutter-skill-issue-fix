@@ -1,10 +1,10 @@
-package dev.kikugie.experimentalstonecutter.data
+package dev.kikugie.stonecutter.data
 
-import dev.kikugie.experimentalstonecutter.controller.ProjectTree
-import dev.kikugie.experimentalstonecutter.settings.TreeBuilder
-import dev.kikugie.experimentalstonecutter.settings.StonecutterSettings
-import dev.kikugie.experimentalstonecutter.controller.StonecutterController
-import dev.kikugie.experimentalstonecutter.ProjectPath
+import dev.kikugie.stonecutter.ProjectPath
+import dev.kikugie.stonecutter.controller.ProjectTree
+import dev.kikugie.stonecutter.controller.StonecutterController
+import dev.kikugie.stonecutter.settings.StonecutterSettings
+import dev.kikugie.stonecutter.settings.TreeBuilder
 import org.gradle.api.Project
 
 /**

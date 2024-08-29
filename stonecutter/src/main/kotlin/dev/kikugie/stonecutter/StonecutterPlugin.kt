@@ -1,9 +1,9 @@
 package dev.kikugie.stonecutter
 
-import dev.kikugie.experimentalstonecutter.build.StonecutterBuild
-import dev.kikugie.experimentalstonecutter.controller.StonecutterController
-import dev.kikugie.experimentalstonecutter.controller.controller
-import dev.kikugie.experimentalstonecutter.settings.StonecutterSettings
+import dev.kikugie.stonecutter.build.StonecutterBuild
+import dev.kikugie.stonecutter.controller.StonecutterController
+import dev.kikugie.stonecutter.controller.controller
+import dev.kikugie.stonecutter.settings.StonecutterSettings
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.initialization.Settings

@@ -1,10 +1,10 @@
-package dev.kikugie.experimentalstonecutter.controller
+package dev.kikugie.stonecutter.controller
 
-import dev.kikugie.experimentalstonecutter.ProjectName
-import dev.kikugie.experimentalstonecutter.StonecutterProject
-import dev.kikugie.experimentalstonecutter.settings.TreeBuilder
-import dev.kikugie.experimentalstonecutter.TaskName
-import dev.kikugie.experimentalstonecutter.sanitize
+import dev.kikugie.stonecutter.ProjectName
+import dev.kikugie.stonecutter.StonecutterProject
+import dev.kikugie.stonecutter.TaskName
+import dev.kikugie.stonecutter.sanitize
+import dev.kikugie.stonecutter.settings.TreeBuilder
 import org.gradle.api.Project
 import java.nio.file.Path
 
@@ -32,6 +32,7 @@ data class ProjectTree(
      * All registered nodes.
      */
     val nodes: Sequence<ProjectNode> get() = branches.values.asSequence().flatMap { it.entries.values }
+
     /**
      * The active version for this tree.
      */
@@ -82,6 +83,7 @@ data class ProjectBranch(
      * Location of this branch on the disk.
      */
     val path by lazy { project.projectDir.toPath() }
+
     /**
      * Finds an entry for the given name.
      *

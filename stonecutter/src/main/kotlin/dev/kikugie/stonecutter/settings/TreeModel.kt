@@ -1,9 +1,9 @@
-package dev.kikugie.experimentalstonecutter.settings
+package dev.kikugie.stonecutter.settings
 
-import dev.kikugie.experimentalstonecutter.ProjectName
-import dev.kikugie.experimentalstonecutter.StonecutterProject
-import dev.kikugie.experimentalstonecutter.TargetVersion
-import dev.kikugie.experimentalstonecutter.data.NodeMap
+import dev.kikugie.stonecutter.ProjectName
+import dev.kikugie.stonecutter.StonecutterProject
+import dev.kikugie.stonecutter.TargetVersion
+import dev.kikugie.stonecutter.data.NodeMap
 import org.gradle.api.Action
 
 /**
@@ -15,6 +15,7 @@ class TreeBuilder : ProjectProvider {
     internal val nodes: NodeMap = mutableMapOf()
     internal val branches: MutableMap<ProjectName, BranchBuilder> = mutableMapOf()
     internal val versions: Collection<StonecutterProject> get() = _versions.values
+
     /**
      * Version used by the `Reset active project` task. Defaults to the first registered version.
      */
@@ -67,14 +68,18 @@ class TreeBuilder : ProjectProvider {
      *
      * @param id Subproject's name for this branch
      */
-    inner class BranchBuilder(private val id: ProjectName) : ProjectProvider {
+    inner class BranchBuilder(private val id: ProjectName) :
+        ProjectProvider {
         /**
          * Buildscript filename override for this branch.
          * Defaults to the one set in the [StonecutterSettings] configuration scope.
          */
         lateinit var buildscript: String
 
-        override fun vers(name: ProjectName, version: TargetVersion) =
+        override fun vers(
+            name: ProjectName,
+            version: TargetVersion
+        ) =
             this@TreeBuilder.add(id, find(StonecutterProject(name, version)))
 
         /**

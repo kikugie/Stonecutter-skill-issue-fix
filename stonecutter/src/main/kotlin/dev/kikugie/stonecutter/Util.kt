@@ -1,4 +1,4 @@
-package dev.kikugie.experimentalstonecutter
+package dev.kikugie.stonecutter
 
 import org.gradle.api.Project
 
