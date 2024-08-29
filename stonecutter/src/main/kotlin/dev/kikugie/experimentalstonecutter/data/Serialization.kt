@@ -4,7 +4,7 @@ import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import dev.kikugie.semver.VersionParser
 import dev.kikugie.stitcher.transformer.TransformParameters
-import dev.kikugie.stonecutter.configuration.buildDirectory
+import dev.kikugie.experimentalstonecutter.buildDirectory
 import org.gradle.api.Project
 
 internal val Project.buildDirectoryFile
@@ -30,7 +30,7 @@ val YAML = Yaml(
 
 inline fun <T : Any> runIgnoring(action: () -> T): T? = runCatching(action).getOrNull()
 
-fun BuildData.toParams(version: String, key: String = "minecraft"): TransformParameters {
+fun StitcherParameters.toParams(version: String, key: String = "minecraft"): TransformParameters {
     val deps = dependencies.toMutableMap()
     deps.getOrElse(key) { VersionParser.parseLenient(version)}.let {
         deps[key] = it

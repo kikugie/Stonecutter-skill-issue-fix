@@ -26,7 +26,8 @@ interface ProjectProvider {
      * @param versions Version and project identifiers.
      * Recommended to use a [SemanticVersion], but plain string values are accepted too.
      */
-    fun versions(versions: Iterable<TargetVersion>) = versions.forEach { vers(it, it) }
+    fun versions(versions: Iterable<TargetVersion>) =
+        versions.forEach { vers(it, it) }
 
     /**
      * Registers multiple [StonecutterProject]s with the same directory and target versions.
@@ -34,7 +35,8 @@ interface ProjectProvider {
      * @param versions Version and project identifiers.
      * Recommended to use a [SemanticVersion], but plain string values are accepted too.
      */
-    fun versions(vararg versions: TargetVersion) = versions.forEach { vers(it, it) }
+    fun versions(vararg versions: TargetVersion) =
+        versions.forEach { vers(it, it) }
 
     /**
      * Registers multiple [StonecutterProject]s with separate directory and target versions.
@@ -50,7 +52,8 @@ interface ProjectProvider {
      *
      * @param versions
      */
-    fun versions(versions: Iterable<Pair<ProjectName, TargetVersion>>) = versions.forEach { vers(it.first, it.second) }.let { BNAN }
+    fun versions(versions: Iterable<Pair<ProjectName, TargetVersion>>) =
+        versions.forEach { vers(it.first, it.second) }.let { BNAN }
 
     /**
      * Registers multiple [StonecutterProject]s with separate directory and target versions.

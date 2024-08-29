@@ -3,6 +3,9 @@ package dev.kikugie.experimentalstonecutter
 import dev.kikugie.semver.SemanticVersion
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents a project entry in a Stonecutter branch.
+ */
 @Serializable
 class StonecutterProject internal constructor(
     /**

@@ -3,20 +3,18 @@ package dev.kikugie.experimentalstonecutter.settings
 import dev.kikugie.experimentalstonecutter.ProjectName
 import dev.kikugie.experimentalstonecutter.StonecutterProject
 import dev.kikugie.experimentalstonecutter.TargetVersion
+import dev.kikugie.experimentalstonecutter.data.NodeMap
 import org.gradle.api.Action
-
-typealias Nodes = MutableSet<StonecutterProject>
-typealias NodeMap = MutableMap<ProjectName, Nodes>
 
 /**
  * Represents a project tree structure in the `settings.gradle[.kts]` file.
  * This tree only supports 3 layers of depth: `root -> branch -> node`.
  */
 class TreeBuilder : ProjectProvider {
+    private val _versions: MutableMap<StonecutterProject, StonecutterProject> = mutableMapOf()
     internal val nodes: NodeMap = mutableMapOf()
     internal val branches: MutableMap<ProjectName, BranchBuilder> = mutableMapOf()
-    internal val versions: MutableSet<StonecutterProject> = mutableSetOf()
-
+    internal val versions: Collection<StonecutterProject> get() = _versions.values
     /**
      * Version used by the `Reset active project` task. Defaults to the first registered version.
      */
@@ -31,11 +29,14 @@ class TreeBuilder : ProjectProvider {
         get() = versions.find { it.project == vcsVersion }
             ?: error("No versions registered")
 
+    // Required to have object identity
+    private fun find(project: StonecutterProject) = _versions.getOrDefault(project, project)
+
     private fun add(name: ProjectName, project: StonecutterProject) =
-        nodes.getOrPut(name, ::mutableSetOf).let { versions += project; it += project }
+        nodes.getOrPut(name, ::mutableSetOf).let { _versions[project] = project; it += project }
 
     override fun vers(name: ProjectName, version: TargetVersion) =
-        add("", StonecutterProject(name, version))
+        add("", find(StonecutterProject(name, version)))
 
     /**
      * Creates an inherited branch, which copies all the versions specified in this block.
@@ -74,14 +75,14 @@ class TreeBuilder : ProjectProvider {
         lateinit var buildscript: String
 
         override fun vers(name: ProjectName, version: TargetVersion) =
-            add(id, StonecutterProject(name, version))
+            this@TreeBuilder.add(id, find(StonecutterProject(name, version)))
 
         /**
          * Copies nodes registered in [TreeBuilder] to this branch
          */
-        fun inherit() = checkNotNull(nodes[""]) {
-            "Tried inheriting root nodes before they were registered"
-        }.forEach { add(id, it) }
+        fun inherit() = checkNotNull(this@TreeBuilder.nodes[""]) {
+            "No root node to inherit from"
+        }.forEach { this@TreeBuilder.add(id, it) }
     }
 }
 

@@ -4,7 +4,7 @@ import dev.kikugie.experimentalstonecutter.*
 import dev.kikugie.experimentalstonecutter.controller.GroovyController
 import dev.kikugie.experimentalstonecutter.controller.KotlinController
 import dev.kikugie.experimentalstonecutter.data.TreeContainer
-import dev.kikugie.experimentalstonecutter.data.TreeModelContainer
+import dev.kikugie.experimentalstonecutter.data.TreeBuilderContainer
 import dev.kikugie.experimentalstonecutter.sanitize
 import org.gradle.api.Action
 import org.gradle.api.initialization.ProjectDescriptor
@@ -15,7 +15,7 @@ import kotlin.io.path.notExists
 
 @Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterSettings(private val settings: Settings) : SettingsConfiguration, StonecutterUtility {
-    private val container: TreeModelContainer = settings.gradle.extensions.create<TreeModelContainer>("stonecutterTreeModel")
+    private val container: TreeBuilderContainer = settings.gradle.extensions.create<TreeBuilderContainer>("stonecutterTreeBuilders")
     private lateinit var shared: TreeBuilder
 
     private val controller get() = if (kotlinController) KotlinController else GroovyController
@@ -36,7 +36,7 @@ open class StonecutterSettings(private val settings: Settings) : SettingsConfigu
         }
 
     init {
-        settings.gradle.extensions.create<TreeContainer>("stonecutterProjectTree")
+        settings.gradle.extensions.create<TreeContainer>("stonecutterProjectTrees")
     }
 
     override fun shared(action: Action<TreeBuilder>) {

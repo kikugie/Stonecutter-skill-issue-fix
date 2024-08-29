@@ -57,7 +57,6 @@ interface SettingsConfiguration {
      * Configures the specified projects to be versioned with setup provided by [shared].
      *
      * @param projects Project references
-     * @return 🍌 to prevent JVM signature crash. Do whatever you want with it
      */
     fun create(projects: Iterable<ProjectDescriptor>) =
         projects.forEach(::create).let { BNAN }
@@ -110,7 +109,6 @@ interface SettingsConfiguration {
      *
      * @param projects Project references
      * @param action Configuration scope
-     * @return 🍌 to prevent JVM signature crash due to type erasure. Do whatever you want with it
      */
     fun create(projects: Iterable<ProjectDescriptor>, action: Action<TreeBuilder>) =
         projects.forEach { create(it, action) }.let { BNAN }

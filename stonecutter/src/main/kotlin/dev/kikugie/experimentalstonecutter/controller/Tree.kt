@@ -6,6 +6,7 @@ import dev.kikugie.experimentalstonecutter.settings.TreeBuilder
 import dev.kikugie.experimentalstonecutter.TaskName
 import dev.kikugie.experimentalstonecutter.sanitize
 import org.gradle.api.Project
+import java.nio.file.Path
 
 internal operator fun ProjectBranch?.get(project: ProjectName) = this?.entries?.get(project)
 
@@ -22,20 +23,41 @@ data class ProjectTree(
     val vcs: StonecutterProject,
     val branches: Map<ProjectName, ProjectBranch>,
 ) {
-    val path by lazy { project.projectDir.toPath() }
-    val nodes get() = branches.values.asSequence().flatMap { it.entries.values }
+    /**
+     * Location of this tree on the disk.
+     */
+    val path: Path by lazy { project.projectDir.toPath() }
+
+    /**
+     * All registered nodes.
+     */
+    val nodes: Sequence<ProjectNode> get() = branches.values.asSequence().flatMap { it.entries.values }
     /**
      * The active version for this tree.
      */
     var current: StonecutterProject = vcs
         internal set
 
+    /**
+     * All registered versions.
+     */
     var versions: List<StonecutterProject> = emptyList()
         internal set
 
     private val tasks: MutableSet<TaskName> = mutableSetOf()
 
+    /**
+     * Finds a branch for the given name.
+     *
+     * @param project Name of the project
+     */
     operator fun get(project: ProjectName) = branches[project]
+
+    /**
+     * Finds a branch for the given project.
+     *
+     * @param project Project reference
+     */
     operator fun get(project: Project) = branches[project.path.sanitize()]
 
     internal fun addTask(task: TaskName) = tasks.add(task)
@@ -56,8 +78,22 @@ data class ProjectBranch(
     val name: ProjectName,
     val entries: Map<ProjectName, ProjectNode>,
 ) {
+    /**
+     * Location of this branch on the disk.
+     */
     val path by lazy { project.projectDir.toPath() }
+    /**
+     * Finds an entry for the given name.
+     *
+     * @param project Name of the project
+     */
     operator fun get(project: ProjectName) = entries[project]
+
+    /**
+     * Finds an entry for the given project.
+     *
+     * @param project Project reference
+     */
     operator fun get(project: Project) = entries[project.path.sanitize()]
 }
 
@@ -73,6 +109,9 @@ data class ProjectNode(
     val parent: ProjectName,
     val metadata: StonecutterProject
 ) {
+    /**
+     * Location of this node on the disk.
+     */
     val path by lazy { project.projectDir.toPath() }
 }
 

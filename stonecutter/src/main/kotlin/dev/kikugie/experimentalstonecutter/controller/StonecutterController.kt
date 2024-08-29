@@ -2,13 +2,13 @@ package dev.kikugie.experimentalstonecutter.controller
 
 import dev.kikugie.experimentalstonecutter.ProjectName
 import dev.kikugie.experimentalstonecutter.StonecutterProject
-import dev.kikugie.stonecutter.configuration.stonecutterCachePath
+import dev.kikugie.experimentalstonecutter.stonecutterCachePath
 import dev.kikugie.stonecutter.*
 import dev.kikugie.experimentalstonecutter.StonecutterUtility
 import dev.kikugie.experimentalstonecutter.build.StonecutterBuild
 import dev.kikugie.experimentalstonecutter.data.TreeContainer
-import dev.kikugie.experimentalstonecutter.data.TreeModel
-import dev.kikugie.experimentalstonecutter.data.TreeModelContainer
+import dev.kikugie.experimentalstonecutter.data.TreeBuilderContainer
+import dev.kikugie.experimentalstonecutter.settings.TreeBuilder
 import dev.kikugie.stonecutter.process.StonecutterTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
@@ -33,7 +33,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
 
     init {
         println("Running Stonecutter 0.5-alpha.4")
-        val data: TreeModel = checkNotNull(root.gradle.extensions.getByType<TreeModelContainer>()[root]) {
+        val data: TreeBuilder = checkNotNull(root.gradle.extensions.getByType<TreeBuilderContainer>()[root]) {
             "Project ${root.path} is not registered. This might've been caused by removing a project while its active"
         }
         tree = constructTree(data).also(::configureTree)
@@ -46,20 +46,25 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         current.isActive = true
     }
 
+    /**
+     * Registers the task as chiseled. This is required for all tasks that need to build all versions.
+     *
+     * @param provider Task configuration
+     */
     infix fun registerChiseled(provider: TaskProvider<*>) {
         tree.addTask(provider.name)
     }
 
     operator fun get(project: ProjectName) = tree[project]
 
-    private fun constructTree(model: TreeModel): ProjectTree = model.nodes.mapValues { (name, nodes) ->
+    private fun constructTree(model: TreeBuilder): ProjectTree = model.nodes.mapValues { (name, nodes) ->
         val branch = if (name.isEmpty()) root else root.project(name)
         val versions = nodes.associate {
             it.project to ProjectNode(branch.project(it.project), name, it)
         }
         ProjectBranch(branch, name, versions)
     }.let {
-        ProjectTree(root, model.vcsVersion, it)
+        ProjectTree(root, model.vcsProject, it)
     }.apply {
         versions = model.versions.toList()
     }

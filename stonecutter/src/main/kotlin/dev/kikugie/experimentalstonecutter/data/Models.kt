@@ -1,10 +1,13 @@
 package dev.kikugie.experimentalstonecutter.data
 
-import dev.kikugie.experimentalstonecutter.settings.NodeMap
+import dev.kikugie.experimentalstonecutter.ProjectName
 import dev.kikugie.semver.Version
 import dev.kikugie.experimentalstonecutter.StonecutterProject
 import kotlinx.serialization.Serializable
 import java.nio.file.Path
+
+typealias Nodes = MutableSet<StonecutterProject>
+typealias NodeMap = MutableMap<ProjectName, Nodes>
 
 @Serializable
 data class TreeModel(
@@ -20,8 +23,11 @@ data class BranchModel(
     val current: StonecutterProject,
 )
 
+/**
+ * Parameters passed to the file processor and the Intellij plugin.
+ */
 @Serializable
-data class BuildData(
+data class StitcherParameters(
     val constants: MutableMap<String, Boolean> = mutableMapOf(),
     val swaps: MutableMap<String, String> = mutableMapOf(),
     val dependencies: MutableMap<String, Version> = mutableMapOf(),

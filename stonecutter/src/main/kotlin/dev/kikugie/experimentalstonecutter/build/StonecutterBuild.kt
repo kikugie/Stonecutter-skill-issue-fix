@@ -5,13 +5,12 @@ import dev.kikugie.semver.VersionParsingException
 import dev.kikugie.stitcher.lexer.IdentifierRecognizer.Companion.allowed
 import dev.kikugie.experimentalstonecutter.StonecutterProject
 import dev.kikugie.experimentalstonecutter.StonecutterUtility
-import dev.kikugie.experimentalstonecutter.controller.get
-import dev.kikugie.experimentalstonecutter.data.BuildData
+import dev.kikugie.experimentalstonecutter.data.StitcherParameters
 import dev.kikugie.experimentalstonecutter.data.TreeContainer
 import dev.kikugie.experimentalstonecutter.data.buildDirectoryPath
 import dev.kikugie.experimentalstonecutter.sanitize
-import dev.kikugie.stonecutter.configuration.buildDirectory
-import dev.kikugie.stonecutter.configuration.stonecutterCachePath
+import dev.kikugie.experimentalstonecutter.buildDirectory
+import dev.kikugie.experimentalstonecutter.stonecutterCachePath
 import dev.kikugie.stonecutter.process.StonecutterTask
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
@@ -31,7 +30,7 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration, Stonecut
     private val parent = checkNotNull(project.parent) {
         "StonecutterBuild applied to the non-versioned buildscript"
     }
-    internal val data = BuildData()
+    internal val data = StitcherParameters()
     internal val tree = requireNotNull(project.rootProject) { "Project $project must be a versioned project" }
         .run { gradle.extensions.getByType<TreeContainer>()[this]!! }
     internal val branch = requireNotNull(tree[parent]) {

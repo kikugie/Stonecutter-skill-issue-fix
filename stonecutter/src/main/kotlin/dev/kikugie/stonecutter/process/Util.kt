@@ -6,7 +6,7 @@ import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import com.charleskorn.kaml.decodeFromStream
 import com.charleskorn.kaml.encodeToStream
-import dev.kikugie.experimentalstonecutter.data.BuildData
+import dev.kikugie.experimentalstonecutter.data.StitcherParameters
 import dev.kikugie.semver.VersionParser
 import dev.kikugie.stitcher.transformer.TransformParameters
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -48,7 +48,7 @@ inline fun <T> runIgnoring(action: () -> T): T? = try {
     null
 }
 
-fun BuildData.toParams(version: String, key: String = "minecraft"): TransformParameters {
+fun StitcherParameters.toParams(version: String, key: String = "minecraft"): TransformParameters {
     val deps = dependencies.toMutableMap()
     val dest = deps[key] ?: VersionParser.parseLenient(version)
     deps[key] = dest
