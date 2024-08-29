@@ -42,6 +42,9 @@ internal abstract class StonecutterTask : DefaultTask() {
     @get:Input
     abstract val cacheDir: Property<(ProjectName, StonecutterProject) -> Path>
 
+    @get:Input
+    abstract val debug: Property<Boolean>
+
     private val statistics = Statistics()
 
     @TaskAction
@@ -123,7 +126,7 @@ internal abstract class StonecutterTask : DefaultTask() {
             filter = FileFilter(data.excludedExtensions, data.excludedPaths),
             recognizers = listOf(StandardMultiLine, StandardSingleLine),
             params = data.toParams(toVersion.get().version),
-            debug = data.debug,
+            debug = false,
             statistics = statistics
         )
     }

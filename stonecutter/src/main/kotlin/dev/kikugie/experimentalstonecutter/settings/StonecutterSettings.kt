@@ -1,12 +1,11 @@
 package dev.kikugie.experimentalstonecutter.settings
 
-import dev.kikugie.experimentalstonecutter.ProjectName
-import dev.kikugie.experimentalstonecutter.StonecutterProject
+import dev.kikugie.experimentalstonecutter.*
 import dev.kikugie.experimentalstonecutter.controller.GroovyController
 import dev.kikugie.experimentalstonecutter.controller.KotlinController
-import dev.kikugie.experimentalstonecutter.StonecutterUtility
 import dev.kikugie.experimentalstonecutter.data.TreeContainer
 import dev.kikugie.experimentalstonecutter.data.TreeModelContainer
+import dev.kikugie.experimentalstonecutter.sanitize
 import org.gradle.api.Action
 import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings
@@ -62,9 +61,10 @@ open class StonecutterSettings(private val settings: Settings) : SettingsConfigu
     }
 
     private fun create(project: ProjectDescriptor, setup: TreeBuilder) {
-        require(!container.register(project.path, setup)) {
+        require(container.register(project.path, setup)) {
             "Project ${project.path} is already registered"
         }
+        println("Created tree:\n$setup")
 
         project.buildFileName = controller.filename
         with(project.projectDir.resolve(controller.filename).toPath()) {
@@ -72,7 +72,7 @@ open class StonecutterSettings(private val settings: Settings) : SettingsConfigu
         }
 
         setup.nodes.forEach { (name, branch) ->
-            createBranch(name, project, setup, branch)
+            createBranch(name.sanitize(), project, setup, branch)
         }
     }
 
@@ -82,11 +82,7 @@ open class StonecutterSettings(private val settings: Settings) : SettingsConfigu
         setup: TreeBuilder,
         branch: Iterable<StonecutterProject>
     ) {
-        val scope = if (name.isEmpty()) project else with(settings) {
-            val path = "${project.path}:$name"
-            include(path)
-            project(path)
-        }
+        val scope = if (name.isEmpty()) project else get("${project.path.sanitize()}:$name")
         val file = runCatching { setup.branches[name]!!.buildscript }.getOrNull() ?: centralScript
         branch.forEach { createProject(scope, it, file) }
     }
@@ -96,12 +92,7 @@ open class StonecutterSettings(private val settings: Settings) : SettingsConfigu
         version: StonecutterProject,
         build: String
     ) {
-        val project = with(settings) {
-            val path = "${root.path}:${version.project}"
-            include(path)
-            project(path)
-        }
-
+        val project = get("${root.path.sanitize()}:${version.project}")
         val versionDir = File("${root.projectDir}/versions/${version.project}")
         versionDir.mkdirs()
 
@@ -110,7 +101,7 @@ open class StonecutterSettings(private val settings: Settings) : SettingsConfigu
         project.buildFileName = "../../$build"
     }
 
-    private fun get(name: String) = with(name.removePrefix(":")) {
+    private fun get(path: ProjectPath): ProjectDescriptor = with(path.sanitize()) {
         if (isEmpty()) settings.rootProject
         else {
             settings.include(this)

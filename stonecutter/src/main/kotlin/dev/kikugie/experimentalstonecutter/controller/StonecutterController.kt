@@ -12,6 +12,7 @@ import dev.kikugie.experimentalstonecutter.data.TreeModelContainer
 import dev.kikugie.stonecutter.process.StonecutterTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 
@@ -35,23 +36,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         val data: TreeModel = checkNotNull(root.gradle.extensions.getByType<TreeModelContainer>()[root]) {
             "Project ${root.path} is not registered. This might've been caused by removing a project while its active"
         }
-        val branches = mutableMapOf<ProjectName, ProjectBranch>()
-        for ((name, branch) in data.nodes) {
-            val branchProject = if (name.isEmpty()) root else root.project(name)
-            val versions = mutableMapOf<ProjectName, ProjectNode>()
-            for (ver in branch) {
-                val nodeProject = branchProject.project(ver.project)
-                versions[ver.project] = ProjectNode(nodeProject, name, ver)
-            }
-            branches[name] = ProjectBranch(branchProject, name, versions)
-        }
-        tree = ProjectTree(root, data.vcsVersion, branches)
-        tree.versions = data.versions.toList()
-        container.register(root.path, tree)
-        tree.branches.values.forEach {
-            container.register(it.project.path, tree)
-        }
-
+        tree = constructTree(data).also(::configureTree)
         root.afterEvaluate { setupProject() }
     }
 
@@ -66,6 +51,27 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     }
 
     operator fun get(project: ProjectName) = tree[project]
+
+    private fun constructTree(model: TreeModel): ProjectTree = model.nodes.mapValues { (name, nodes) ->
+        val branch = if (name.isEmpty()) root else root.project(name)
+        val versions = nodes.associate {
+            it.project to ProjectNode(branch.project(it.project), name, it)
+        }
+        ProjectBranch(branch, name, versions)
+    }.let {
+        ProjectTree(root, model.vcsVersion, it)
+    }.apply {
+        versions = model.versions.toList()
+    }
+
+    private fun configureTree(tree: ProjectTree) {
+        for (it in tree.branches.values) container.register(it.project.path, tree)
+        val task = root.tasks.create("chiseledStonecutter")
+        for (it in tree.nodes) {
+            it.project.pluginManager.apply(StonecutterPlugin::class)
+            task.dependsOn("${it.project.path}:setupChiseledBuild")
+        }
+    }
 
     private fun configurePlatforms(projects: Iterable<Project>) {
         val key = "loom.platform"
@@ -113,8 +119,9 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
             output.set("src")
 
             dests.set(tree.branches.mapValues { (_, v) -> v.project.projectDir.toPath() })
-            cacheDir.set { branch, version -> tree[branch][version.project]?.project?.stonecutterCachePath
-                ?: tree[branch]!!.project.stonecutterCachePath.resolve("out-of-bounds/$version")
+            cacheDir.set { branch, version ->
+                tree[branch][version.project]?.project?.stonecutterCachePath
+                    ?: tree[branch]!!.project.stonecutterCachePath.resolve("out-of-bounds/$version")
             }
 
             doLast {

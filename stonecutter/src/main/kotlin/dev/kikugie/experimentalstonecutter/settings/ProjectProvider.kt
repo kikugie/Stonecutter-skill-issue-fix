@@ -1,6 +1,6 @@
 package dev.kikugie.experimentalstonecutter.settings
 
-import dev.kikugie.stonecutter.BNAN
+import dev.kikugie.experimentalstonecutter.BNAN
 import dev.kikugie.experimentalstonecutter.ProjectName
 import dev.kikugie.experimentalstonecutter.TargetVersion
 import dev.kikugie.experimentalstonecutter.StonecutterProject
@@ -50,7 +50,7 @@ interface ProjectProvider {
      *
      * @param versions
      */
-    fun versions(versions: Iterable<Pair<ProjectName, TargetVersion>>) = versions.forEach { vers(it.first, it.second) }
+    fun versions(versions: Iterable<Pair<ProjectName, TargetVersion>>) = versions.forEach { vers(it.first, it.second) }.let { BNAN }
 
     /**
      * Registers multiple [StonecutterProject]s with separate directory and target versions.

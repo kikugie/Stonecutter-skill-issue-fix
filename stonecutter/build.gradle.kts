@@ -57,7 +57,7 @@ tasks.shadowJar {
 }
 
 tasks.named<Jar>("javadocJar") {
-    from(tasks.named("dokkaJavadoc"))
+//    from(tasks.named("dokkaJavadoc"))
 }
 
 publishing {

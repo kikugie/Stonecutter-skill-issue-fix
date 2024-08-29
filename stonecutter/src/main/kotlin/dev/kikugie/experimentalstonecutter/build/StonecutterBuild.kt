@@ -9,6 +9,7 @@ import dev.kikugie.experimentalstonecutter.controller.get
 import dev.kikugie.experimentalstonecutter.data.BuildData
 import dev.kikugie.experimentalstonecutter.data.TreeContainer
 import dev.kikugie.experimentalstonecutter.data.buildDirectoryPath
+import dev.kikugie.experimentalstonecutter.sanitize
 import dev.kikugie.stonecutter.configuration.buildDirectory
 import dev.kikugie.stonecutter.configuration.stonecutterCachePath
 import dev.kikugie.stonecutter.process.StonecutterTask
@@ -27,10 +28,15 @@ import kotlin.io.path.invariantSeparatorsPathString
 @OptIn(ExperimentalPathApi::class)
 @Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterBuild(val project: Project) : BuildConfiguration, StonecutterUtility {
+    private val parent = checkNotNull(project.parent) {
+        "StonecutterBuild applied to the non-versioned buildscript"
+    }
     internal val data = BuildData()
-    internal val tree = requireNotNull(project.rootProject) { "Project ${project.path} must be a versioned project." }
+    internal val tree = requireNotNull(project.rootProject) { "Project $project must be a versioned project" }
         .run { gradle.extensions.getByType<TreeContainer>()[this]!! }
-    internal val branch = requireNotNull(tree[project.parent!!.name])
+    internal val branch = requireNotNull(tree[parent]) {
+        "Branch '${parent.path.sanitize()}' not found in [${tree.branches.keys.joinToString {"'$it'"}}]"
+    }
 
     /**
      * All available versions.
@@ -89,10 +95,6 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration, Stonecut
 
     private fun Project.configure() {
         tasks.register("setupChiseledBuild", StonecutterTask::class.java) {
-            val parent = requireNotNull(project.parent) {
-                "Chiseled task can't be registered for the root project. How did you manage to do it though?"
-            }
-
             toVersion.set(current)
             fromVersion.set(active)
 
@@ -102,7 +104,7 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration, Stonecut
                 output.set(branch.path.relativize(it).invariantSeparatorsPathString)
             }
 
-            dests.set(parent.let { mapOf(it.path to it.projectDir.toPath()) })
+            dests.set(this@StonecutterBuild.parent.let { mapOf(it.path to it.projectDir.toPath()) })
             cacheDir.set { _, version -> branch[version.project]?.project?.stonecutterCachePath
                 ?: branch.project.stonecutterCachePath.resolve("out-of-bounds/$version")
             }

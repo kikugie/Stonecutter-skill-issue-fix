@@ -1,4 +1,4 @@
-package dev.kikugie.experimentalstonecutter
+package dev.kikugie.stonecutter
 
 import dev.kikugie.experimentalstonecutter.build.StonecutterBuild
 import dev.kikugie.experimentalstonecutter.controller.StonecutterController

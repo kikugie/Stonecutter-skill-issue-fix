@@ -1,7 +1,6 @@
 package dev.kikugie.experimentalstonecutter.build
 
-import dev.kikugie.stonecutter.StonecutterBuild
-import dev.kikugie.stonecutter.StonecutterController
+import dev.kikugie.experimentalstonecutter.controller.StonecutterController
 import java.io.File
 import java.nio.file.Path
 

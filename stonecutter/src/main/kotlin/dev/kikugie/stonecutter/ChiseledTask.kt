@@ -1,6 +1,7 @@
 package dev.kikugie.stonecutter
 
 import dev.kikugie.experimentalstonecutter.StonecutterProject
+import dev.kikugie.experimentalstonecutter.data.TreeContainer
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
 import org.gradle.api.provider.ListProperty
@@ -11,7 +12,7 @@ import org.gradle.api.tasks.Input
  */
 @Suppress("LeakingThis", "unused")
 abstract class ChiseledTask : DefaultTask() {
-    private val setup = project.gradle.extensions.getByType(StonecutterSetup.Container::class.java)[project]!!
+    private val setup = project.gradle.extensions.getByType(TreeContainer::class.java)[project]!!
     private val setupTask: Task = project.tasks.getByName("chiseledStonecutter")
 
     /**

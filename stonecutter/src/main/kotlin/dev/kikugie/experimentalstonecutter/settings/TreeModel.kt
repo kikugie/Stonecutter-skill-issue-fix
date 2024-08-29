@@ -53,6 +53,14 @@ class TreeBuilder : ProjectProvider {
     fun branch(name: ProjectName, action: Action<BranchBuilder>) =
         BranchBuilder(name).also { branches[name] = it }.let(action::execute)
 
+    override fun toString() = buildString {
+        appendLine("|- vcs: $vcsVersion")
+        appendLine("|- versions:")
+        appendLine(versions.treeView().prepend("| "))
+        appendLine("\\- branches:")
+        append(nodes.treeView().prepend("  "))
+    }
+
     /**
      * Proxy class for adding nodes to the given branch in the tree.
      *
@@ -76,3 +84,25 @@ class TreeBuilder : ProjectProvider {
         }.forEach { add(id, it) }
     }
 }
+
+private fun String.prepend(str: String) = lines().joinToString("\n") { str + it }
+
+private fun StonecutterProject.treeView() = "- $project: v$version"
+
+private fun Collection<StonecutterProject>.treeView() =
+    map { it.treeView() }.mapIndexed { j, line ->
+        val lastLine = j == size - 1
+        if (!lastLine) line.prepend("|")
+        else line.prepend(" ").replaceFirst(' ', '\\')
+    }.joinToString("\n")
+
+private fun NodeMap.treeView() = entries.mapIndexed { i, entry ->
+    val (name, nodes) = entry
+    val joined = nodes.treeView()
+    val lastElem = i == this@treeView.size - 1
+    val elem = if (lastElem) joined.prepend("  ")
+    else joined.prepend("| ")
+    val header = if (lastElem) "\\- $name:\n"
+    else "|- $name:\n"
+    header + elem
+}.joinToString("\n")

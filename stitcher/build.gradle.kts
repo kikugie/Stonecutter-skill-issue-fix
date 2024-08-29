@@ -29,7 +29,6 @@ tasks.withType<DokkaTask>().configureEach {
     moduleName.set("Stitcher")
     dokkaSourceSets {
         configureEach {
-            reportUndocumented = true
             skipEmptyPackages = true
         }
     }

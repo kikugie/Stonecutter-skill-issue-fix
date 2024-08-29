@@ -4,6 +4,7 @@ import dev.kikugie.experimentalstonecutter.ProjectName
 import dev.kikugie.experimentalstonecutter.StonecutterProject
 import dev.kikugie.experimentalstonecutter.settings.TreeBuilder
 import dev.kikugie.experimentalstonecutter.TaskName
+import dev.kikugie.experimentalstonecutter.sanitize
 import org.gradle.api.Project
 
 internal operator fun ProjectBranch?.get(project: ProjectName) = this?.entries?.get(project)
@@ -22,6 +23,7 @@ data class ProjectTree(
     val branches: Map<ProjectName, ProjectBranch>,
 ) {
     val path by lazy { project.projectDir.toPath() }
+    val nodes get() = branches.values.asSequence().flatMap { it.entries.values }
     /**
      * The active version for this tree.
      */
@@ -34,6 +36,8 @@ data class ProjectTree(
     private val tasks: MutableSet<TaskName> = mutableSetOf()
 
     operator fun get(project: ProjectName) = branches[project]
+    operator fun get(project: Project) = branches[project.path.sanitize()]
+
     internal fun addTask(task: TaskName) = tasks.add(task)
     internal fun hasChiseled(stack: Iterable<TaskName>) = stack.any { it in tasks }
 }
@@ -54,6 +58,7 @@ data class ProjectBranch(
 ) {
     val path by lazy { project.projectDir.toPath() }
     operator fun get(project: ProjectName) = entries[project]
+    operator fun get(project: Project) = entries[project.path.sanitize()]
 }
 
 /**
