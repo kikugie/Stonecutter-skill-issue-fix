@@ -1,5 +1,8 @@
 package dev.kikugie.stonecutter.controller
 
+/**
+ * Parameters applied globally in [StonecutterController].
+ */
 interface ControllerParameters {
     /**
      * Sets up platform constants (like `fabric`, `forge`, etc.)

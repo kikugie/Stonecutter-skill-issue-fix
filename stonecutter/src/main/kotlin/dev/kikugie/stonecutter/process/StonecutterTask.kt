@@ -5,7 +5,7 @@ import dev.kikugie.stitcher.scanner.StandardSingleLine
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.controller.ProjectBranch
 import dev.kikugie.stonecutter.data.StitcherParameters
-import groovy.lang.Reference
+import dev.kikugie.stonecutter.process.ProcessResult.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
@@ -14,9 +14,11 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import org.slf4j.LoggerFactory
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.io.path.*
 import kotlin.system.measureTimeMillis
 
@@ -42,6 +44,7 @@ internal abstract class StonecutterTask : DefaultTask() {
     @get:Input
     abstract val cacheDir: Property<(ProjectBranch, StonecutterProject) -> Path>
 
+    private val logger = LoggerFactory.getLogger(this::class.java)
     private val statistics = Statistics()
 
     @TaskAction
@@ -56,9 +59,20 @@ internal abstract class StonecutterTask : DefaultTask() {
     }
 
     private fun transform(dests: Map<ProjectBranch, Path>) = runBlocking {
-        val errored = Reference(false)
-        val merged = dests.map { (project, path) ->
-            transform(project, path.resolve(input.get()), path.resolve(output.get()), errored)
+        val errored = AtomicReference(false)
+        val merged = dests.map { (branch, path) ->
+            val input = path.resolve(input.get())
+            val output = path.resolve(output.get())
+            logger.debug(
+                "Transforming '{}': {} ({}) -> {} ({}) with {}",
+                branch.id,
+                input,
+                fromVersion.get(),
+                output,
+                toVersion.get(),
+                data.get()[branch]?.toParams(toVersion.get().version)
+            )
+            transform(branch, input, output, errored)
         }.merge().flowOn(Dispatchers.IO).toList()
         statistics.total = merged.size
 
@@ -95,27 +109,36 @@ internal abstract class StonecutterTask : DefaultTask() {
         project: ProjectBranch,
         input: Path,
         output: Path,
-        marker: Reference<Boolean>
+        marker: AtomicReference<Boolean>
     ): Flow<Pair<TransformResult, Path?>> {
-        val out = if (input == output) null else output
         val manager = FileManager(project)
         return input
             .walk()
             .map {
                 val result = process(manager, input, it)
                 if (result is TransformResult.Failed) marker.set(true)
-                result to out?.resolve(input.relativize(it))
+                result to output.resolve(input.relativize(it))
             }
             .asFlow()
     }
 
+    @Suppress("LoggingSimilarMessage")
     private fun process(manager: FileManager, root: Path, file: Path): TransformResult = runCatching {
         manager.process(root, root.relativize(file))
     }.run {
-        when {
-            isFailure -> TransformResult.Failed(file, exceptionOrNull()!!)
-            getOrNull() == null -> TransformResult.Skipped(file)
-            else -> TransformResult.Processed(file, getOrNull()!!)
+        if (isFailure) TransformResult.Failed(file, exceptionOrNull()!!).also {
+            println(it)
+        }
+        else when(val result = getOrThrow()) {
+            CacheMatches, FilterExcluded, NewMatches -> TransformResult.Skipped(file).also {
+                logger.debug("{} - {}", it, result::class.simpleName)
+            }
+            is NewProcessed -> TransformResult.Processed(file, result.content).also {
+                logger.debug("Processed({}) - {}", it.file, result::class.simpleName)
+            }
+            is ResultCached -> TransformResult.Processed(file, result.content).also {
+                logger.debug("Processed({}) - {}", it.file, result::class.simpleName)
+            }
         }
     }
 

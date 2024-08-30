@@ -23,13 +23,19 @@ import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.invariantSeparatorsPathString
 
+/**
+ * Stonecutter plugin applied to the versioned buildscript.
+ *
+ * @property project This plugin's project
+ * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration">Wiki</a>
+ */
 @OptIn(ExperimentalPathApi::class)
 @Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterBuild(val project: Project) : BuildConfiguration, StonecutterUtility {
     private val parent = checkNotNull(project.parent) {
         "StonecutterBuild applied to a non-versioned buildscript"
     }
-    internal val data = StitcherParameters()
+    internal lateinit var data: StitcherParameters
 
     /**
      * The full tree this project belongs to. Without subprojects it will only have the root branch.

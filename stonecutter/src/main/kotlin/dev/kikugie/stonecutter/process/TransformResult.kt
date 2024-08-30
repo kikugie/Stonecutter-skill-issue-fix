@@ -2,7 +2,7 @@ package dev.kikugie.stonecutter.process
 
 import java.nio.file.Path
 
-sealed interface TransformResult {
+internal sealed interface TransformResult {
     val file: Path
 
     data class Processed(override val file: Path, val str: String) : TransformResult

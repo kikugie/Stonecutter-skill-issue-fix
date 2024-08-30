@@ -10,6 +10,7 @@ import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.scanner.Scanner
 import dev.kikugie.stitcher.transformer.TransformParameters
 import dev.kikugie.stitcher.transformer.Transformer
+import dev.kikugie.stonecutter.process.ProcessResult.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import org.slf4j.LoggerFactory
@@ -32,16 +33,16 @@ internal class FileManager(
 ) {
     private val parametersMatch = updateParameters() && !debug
 
-    fun process(root: Path, source: Path): String? {
-        if (!filter.shouldProcess(source)) return null
+    fun process(root: Path, source: Path): ProcessResult {
+        if (!filter.shouldProcess(source)) return FilterExcluded
         val text = root.resolve(source).readText()
         val hash = text.hash("MD5")
 
         val cachePath = source.hashName(hash, source.extension)
         val cachedOutput = if (parametersMatch) getCachedOutput(cachePath) else null
         if (cachedOutput != null)
-            return if (cachedOutput == text) null
-            else cachedOutput
+            return if (cachedOutput == text) CacheMatches
+            else ResultCached(cachedOutput)
 
         val astPath = source.hashName(hash, "ast")
         var ast = if (parametersMatch) getCachedAst(astPath) else null
@@ -65,7 +66,7 @@ internal class FileManager(
         cleanUpAndWrite(source, outputCache.resolve("result").resolve(cachePath)) {
             writeConfigured(result)
         }
-        return if (result == text) null else result
+        return if (result == text) NewMatches else NewProcessed(result)
     }
 
     private inline fun cleanUpAndWrite(source: Path, dest: Path, action: Path.() -> Unit) = runIgnoring {

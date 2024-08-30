@@ -7,18 +7,27 @@ import dev.kikugie.stonecutter.data.TreeContainer
 import dev.kikugie.stonecutter.data.stonecutterCachePath
 import dev.kikugie.stonecutter.process.StonecutterTask
 import dev.kikugie.stonecutter.settings.TreeBuilder
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 
+internal typealias BranchEntry = Pair<ProjectBranch, StonecutterProject>
+
+/**
+ * Stonecutter plugin applied to `stonecutter.gradle[.kts]`.
+ *
+ * @see <a href="https://stonecutter.kikugie.dev/stonecutter/setup#project-controller">Wiki</a>
+ */
 @Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterController(internal val root: Project) : StonecutterUtility, ControllerParameters {
     private val manager: ControllerManager = checkNotNull(root.controller()) {
         "Project ${root.path} is not a Stonecutter controller. What did you even do to get this error?"
     }
     private val container: TreeContainer = root.gradle.extensions.getByType<TreeContainer>()
+    private val configurations: MutableMap<BranchEntry, ParameterHolder> = mutableMapOf()
 
     /**
      * The full project tree this controller operates on. The default branch is `""`.
@@ -76,6 +85,19 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         tree.addTask(provider.name)
     }
 
+    /**
+     * Specifies configurations for all combinations of versions and branches.
+     * This provides parameters for non-existing versions to be used by the processor.
+     * If the given version exists, it will be applied to the [StonecutterBuild].
+     *
+     * @param configuration Configuration scope
+     */
+    infix fun configureAll(configuration: Action<ParameterHolder>) = tree.asSequence().flatMap { br ->
+        versions.map { br to it }
+    }.forEach {
+        configurations.getOrPut(it) { ParameterHolder(it.first, it.second) }.let(configuration::execute)
+    }
+
     private fun constructTree(model: TreeBuilder): ProjectTree = model.nodes.mapValues { (name, nodes) ->
         val branch = if (name.isEmpty()) root else root.project(name)
         val versions = nodes.associate {
@@ -117,7 +139,12 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         for (it in versions) createStonecutterTask("Set active project to ${it.project}", it) {
             "Sets the active project to ${it.project}, processing all versioned comments."
         }
+        // FIXME doesn't yet whoops
         if (automaticPlatformConstants) configurePlatforms(tree.nodes)
+        // Apply configurations
+        for (it in tree.nodes) {
+            it.stonecutter.data = configurations[it.branch to it.metadata]?.data ?: continue
+        }
     }
 
     private inline fun createStonecutterTask(name: String, version: StonecutterProject, desc: () -> String) =
@@ -129,8 +156,16 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         desc: String,
     ) {
         root.tasks.create<StonecutterTask>(name) {
-            // FIXME: Can't configure missing build data - should be compensated by the global configuration
-            val builds = tree.associateWith { it[name]?.extensions?.getByType<StonecutterBuild>()?.data }
+            val builds = tree.associateWith {
+                requireNotNull(
+                    it[name]?.extensions?.getByType<StonecutterBuild>()?.data ?: configurations[it to version]?.data
+                ) {
+                    """
+                        No configuration found for '${version.project}' in branch '${it.id}'.
+                        Use `configureAll` to specify missing properties.
+                    """.trimIndent()
+                }
+            }
             val paths = tree.associateWith { it.path }
 
             group = "stonecutter"
@@ -144,8 +179,8 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
 
             data.set(builds)
             sources.set(paths)
-            cacheDir.set { branch, version -> branch[version.project]?.stonecutterCachePath ?:
-                branch.stonecutterCachePath.resolve("out-of-bounds/$version")
+            cacheDir.set { branch, version -> branch[version.project]?.stonecutterCachePath
+                ?: branch.stonecutterCachePath.resolve("out-of-bounds/$version")
             }
 
             doLast {

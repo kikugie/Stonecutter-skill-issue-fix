@@ -4,8 +4,15 @@ import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.StringVersion
 import dev.kikugie.semver.VersionParser
 import dev.kikugie.semver.VersionPredicate
+import dev.kikugie.stonecutter.build.StonecutterBuild
+import dev.kikugie.stonecutter.controller.StonecutterController
 import org.jetbrains.annotations.ApiStatus
+import org.jetbrains.annotations.Contract
 
+/**
+ * Provides a set of pure functions to ease Stonecutter configurations.
+ * Available in [StonecutterBuild] and [StonecutterController].
+ */
 interface StonecutterUtility {
     /**
      * Parses both parameters as [SemanticVersion] and compares them.
@@ -15,6 +22,7 @@ interface StonecutterUtility {
      * @return 1 if the first version is greater, -1 if the second is greater, 0 if they are equal
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
+    @Contract(pure = true)
     fun compare(left: String, right: String) =
         VersionParser.parse(left).compareTo(VersionParser.parse(right))
 
@@ -26,6 +34,7 @@ interface StonecutterUtility {
      * @return 1 if the first version is greater, -1 if the second is greater, 0 if they are equal
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
+    @Contract(pure = true)
     @ApiStatus.Experimental
     fun compareLenient(left: String, right: String) =
         VersionParser.parse(left).compareTo(VersionParser.parse(right))
@@ -40,6 +49,7 @@ interface StonecutterUtility {
      * @return 1 if the first version is greater, -1 if the second is greater, 0 if they are equal
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
+    @Contract(pure = true)
     @Deprecated("Use the non-infix variant", ReplaceWith("compare(this, other)"))
     infix fun String.comp(other: String) = compare(this, other)
 
@@ -51,6 +61,7 @@ interface StonecutterUtility {
      * @return `true` if all predicates succeed
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
+    @Contract(pure = true)
     fun eval(version: String, predicate: String): Boolean {
         val target = VersionParser.parse(version)
         return predicate.split(' ').all {
@@ -66,6 +77,7 @@ interface StonecutterUtility {
      * @return `true` if all predicates succeed
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
+    @Contract(pure = true)
     @ApiStatus.Experimental
     fun evalLenient(version: String, predicate: String): Boolean {
         val target = VersionParser.parseLenient(version)

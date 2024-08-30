@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
  * Represents a project entry in a Stonecutter branch.
  */
 @Serializable
-class StonecutterProject internal constructor(
+data class StonecutterProject internal constructor(
     /**
      * The name of this project's directory, as in `versions/${project}`.
      */
@@ -24,10 +24,21 @@ class StonecutterProject internal constructor(
     var isActive: Boolean = false
         internal set
 
+    /**
+     * Checks if the versions are equal, excluding the [isActive] parameter.
+     *
+     * @param other Object to check against
+     * @return Whenever [project] and [version] are the same
+     */
     override fun equals(other: Any?): Boolean =
         if (other !is StonecutterProject) false
         else project == other.project && version == other.version
 
+    /**
+     * Calculates the hash code, excluding the [isActive] parameter.
+     *
+     * @return Hash value
+     */
     override fun hashCode(): Int {
         var result = project.hashCode()
         result = 31 * result + version.hashCode()

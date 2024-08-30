@@ -3,9 +3,12 @@ package dev.kikugie.stonecutter.controller
 import dev.kikugie.stonecutter.ProjectName
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.TaskName
+import dev.kikugie.stonecutter.build.StonecutterBuild
 import dev.kikugie.stonecutter.sanitize
 import dev.kikugie.stonecutter.settings.TreeBuilder
 import org.gradle.api.Project
+import org.gradle.api.UnknownDomainObjectException
+import org.gradle.kotlin.dsl.getByType
 import java.nio.file.Path
 
 internal operator fun ProjectBranch?.get(project: ProjectName) = this?.nodes?.get(project)
@@ -67,6 +70,10 @@ data class ProjectTree(
 
     internal fun addTask(task: TaskName) = tasks.add(task)
     internal fun hasChiseled(stack: Iterable<TaskName>) = stack.any { it in tasks }
+
+    /**
+     * Iterator for the [branches] values.
+     */
     override fun iterator(): Iterator<ProjectBranch> = branches.values.iterator()
 }
 
@@ -118,6 +125,9 @@ data class ProjectBranch(
      */
     operator fun get(project: Project) = nodes[project.path.substringAfterLast(':')]
 
+    /**
+     * Iterator for the [nodes] values.
+     */
     override fun iterator(): Iterator<ProjectNode> = nodes.values.iterator()
 }
 
@@ -135,6 +145,12 @@ data class ProjectNode(
      * Location of this node on the disk.
      */
     val path: Path = projectDir.toPath()
+
+    /**
+     * Stonecutter plugin for this node.
+     * @throws [UnknownDomainObjectException] if the plugin is not applied
+     */
+    val stonecutter: StonecutterBuild get() = extensions.getByType<StonecutterBuild>()
 
     /**
      * Reference to the branch containing this node.
