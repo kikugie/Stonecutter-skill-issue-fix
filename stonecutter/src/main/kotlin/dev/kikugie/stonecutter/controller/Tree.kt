@@ -20,14 +20,14 @@ internal operator fun ProjectBranch?.get(project: ProjectName) = this?.nodes?.ge
  * Each branch may have the same [versions] or a subset of it. The default branch is `""`
  */
 data class ProjectTree(
-    val project: Project,
+    private val project: Project,
     val vcs: StonecutterProject,
     val branches: Map<ProjectName, ProjectBranch>,
-) : Iterable<ProjectBranch> {
+) : Iterable<ProjectBranch>, Project by project {
     /**
      * Location of this tree on the disk.
      */
-    val path: Path = project.projectDir.toPath()
+    val path: Path = projectDir.toPath()
 
     /**
      * All registered project nodes.
@@ -75,19 +75,19 @@ data class ProjectTree(
  *
  * @property project Gradle project of this branch.
  * **May be the same as [ProjectTree.project] if this is the root branch**
- * @property name Name of this branch. Same as the key in [ProjectTree.branches].
+ * @property id Name of this branch. Same as the key in [ProjectTree.branches].
  * **Empty string for the root branch**
  * @property nodes Nodes accessible by their project names
  */
 data class ProjectBranch(
-    val project: Project,
-    val name: ProjectName,
+    private val project: Project,
+    val id: ProjectName,
     val nodes: Map<ProjectName, ProjectNode>,
-): Iterable<ProjectNode> {
+): Iterable<ProjectNode>, Project by project {
     /**
      * Location of this branch on the disk.
      */
-    val path: Path = project.projectDir.toPath()
+    val path: Path = projectDir.toPath()
 
     /**
      * [StonecutterProject] instances of all [nodes].
@@ -128,13 +128,13 @@ data class ProjectBranch(
  * @property metadata Project metadata used for configuring tasks
  */
 data class ProjectNode(
-    val project: Project,
+    private val project: Project,
     val metadata: StonecutterProject
-) {
+) : Project by project {
     /**
      * Location of this node on the disk.
      */
-    val path: Path = project.projectDir.toPath()
+    val path: Path = projectDir.toPath()
 
     /**
      * Reference to the branch containing this node.

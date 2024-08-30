@@ -116,9 +116,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         for (it in versions) createStonecutterTask("Set active project to ${it.project}", it) {
             "Sets the active project to ${it.project}, processing all versioned comments."
         }
-        if (automaticPlatformConstants) configurePlatforms(
-            tree.branches.values.flatMap { it.nodes.values.map(ProjectNode::project) }
-        )
+        if (automaticPlatformConstants) configurePlatforms(tree.nodes)
     }
 
     private inline fun createStonecutterTask(name: String, version: StonecutterProject, desc: () -> String) =
