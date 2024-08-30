@@ -1,11 +1,13 @@
 package dev.kikugie.stonecutter.settings
 
-import dev.kikugie.stonecutter.*
+import dev.kikugie.stonecutter.ProjectName
+import dev.kikugie.stonecutter.StonecutterProject
+import dev.kikugie.stonecutter.StonecutterUtility
 import dev.kikugie.stonecutter.controller.GroovyController
 import dev.kikugie.stonecutter.controller.KotlinController
 import dev.kikugie.stonecutter.data.TreeBuilderContainer
 import dev.kikugie.stonecutter.data.TreeContainer
-import org.gradle.api.Action
+import dev.kikugie.stonecutter.sanitize
 import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings
 import org.gradle.kotlin.dsl.create
@@ -16,10 +18,9 @@ import kotlin.io.path.notExists
 import kotlin.io.path.writeText
 
 @Suppress("MemberVisibilityCanBePrivate")
-open class StonecutterSettings(private val settings: Settings) : SettingsConfiguration, StonecutterUtility {
+open class StonecutterSettings(settings: Settings) : SettingsConfiguration(settings), StonecutterUtility {
     private val container: TreeBuilderContainer =
         settings.gradle.extensions.create<TreeBuilderContainer>("stonecutterTreeBuilders")
-    private lateinit var shared: TreeBuilder
 
     private val controller get() = if (kotlinController) KotlinController else GroovyController
 
@@ -43,28 +44,7 @@ open class StonecutterSettings(private val settings: Settings) : SettingsConfigu
         settings.gradle.extensions.create<TreeContainer>("stonecutterProjectTrees")
     }
 
-    override fun shared(action: Action<TreeBuilder>) {
-        shared = TreeBuilder().also(action::execute)
-    }
-
-    override fun create(project: String) {
-        create(get(project), shared)
-    }
-
-    override fun create(project: ProjectDescriptor) {
-        settings.include(project.path)
-        create(project, shared)
-    }
-
-    override fun create(project: String, action: Action<TreeBuilder>) {
-        create(get(project), action)
-    }
-
-    override fun create(project: ProjectDescriptor, action: Action<TreeBuilder>) {
-        create(project, TreeBuilder().also(action::execute))
-    }
-
-    private fun create(project: ProjectDescriptor, setup: TreeBuilder) {
+    override fun create(project: ProjectDescriptor, setup: TreeBuilder) {
         require(container.register(project.path, setup)) {
             "Project ${project.path} is already registered"
         }
@@ -106,13 +86,5 @@ open class StonecutterSettings(private val settings: Settings) : SettingsConfigu
         project.projectDir = versionDir
         project.name = version.project
         project.buildFileName = "../../$build"
-    }
-
-    private fun get(path: ProjectPath): ProjectDescriptor = with(path.sanitize()) {
-        if (isEmpty()) settings.rootProject
-        else {
-            settings.include(this)
-            settings.project(":$this")
-        }
     }
 }

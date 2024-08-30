@@ -1,6 +1,12 @@
 package dev.kikugie.stonecutter.build
 
+import dev.kikugie.semver.VersionParser
+import dev.kikugie.semver.VersionParsingException
+import dev.kikugie.stitcher.lexer.IdentifierRecognizer
+import dev.kikugie.stonecutter.MapSetter
 import dev.kikugie.stonecutter.controller.StonecutterController
+import dev.kikugie.stonecutter.data.StitcherParameters
+import org.gradle.api.Project
 import java.io.File
 import java.nio.file.Path
 
@@ -9,7 +15,39 @@ import java.nio.file.Path
  * Shared by [StonecutterBuild] and [StonecutterController]
  */
 @Suppress("unused")
-interface BuildConfiguration {
+abstract class BuildConfiguration(private val project: Project) {
+    internal lateinit var data: StitcherParameters
+
+    /**
+     * Creates a swap with the given value. Meant to be used with Kotlin DSL:
+     * ```kotlin
+     * swaps["..."] = "..."
+     * ```
+     */
+    val swaps = object : MapSetter<String, String> {
+        override fun set(key: String, value: String) = swap(key, value)
+    }
+
+    /**
+     * Creates a constant with the given value. Meant to be used with Kotlin DSL:
+     * ```kotlin
+     * consts["..."] = true
+     * ```
+     */
+    val consts = object : MapSetter<String, Boolean> {
+        override fun set(key: String, value: Boolean) = const(key, value)
+    }
+
+    /**
+     * Creates a dependency with the given value. Meant to be used with Kotlin DSL:
+     * ```kotlin
+     * dependencies["..."] = "..."
+     * ```
+     */
+    val dependencies = object : MapSetter<String, String> {
+        override fun set(key: String, value: String) = dependency(key, value)
+    }
+
     /**
      * Creates a swap id.
      *
@@ -17,7 +55,61 @@ interface BuildConfiguration {
      * @param replacement Replacement string
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#swaps">Wiki</a>
      */
-    fun swap(identifier: String, replacement: String)
+    fun swap(identifier: String, replacement: String) {
+        data.swaps[validateId(identifier)] = replacement
+    }
+
+    /**
+     * Creates a constant accessible in stonecutter conditions.
+     *
+     * @param identifier Constant name
+     * @param value Boolean value
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
+     */
+    fun const(identifier: String, value: Boolean) {
+        data.constants[validateId(identifier)] = value
+    }
+
+    /**
+     * Adds a dependency to the semver checks.
+     *
+     * @param identifier Dependency name
+     * @param version Dependency version to check against in semantic version format
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#dependencies">Wiki</a>
+     */
+    fun dependency(identifier: String, version: String) {
+        data.dependencies[validateId(identifier)] = validateSemver(version)
+    }
+
+    /**
+     * Excludes a file or directory from being processed.
+     *
+     * @param path Absolute path to the file.
+     */
+    fun exclude(path: File) {
+        exclude(path.toPath())
+    }
+
+    /**
+     * Excludes a file or directory from being processed.
+     *
+     * @param path Absolute path to the file.
+     */
+    fun exclude(path: Path) {
+        data.excludedPaths.add(path)
+    }
+
+    /**
+     * Excludes a file or directory from being processed.
+     *
+     * @param path Path to the file relative to the parent project directory (where `stonecutter.gradle[.kts]` is located)
+     * or a file extension qualifier (i.e. `*.json`).
+     */
+    fun exclude(path: String) {
+        require(path.isNotBlank()) { "Path must not be empty" }
+        if (path.startsWith("*.")) data.excludedExtensions.add(path.substring(2))
+        else data.excludedPaths.add(project.file(path).toPath())
+    }
 
     /**
      * Creates a swap id.
@@ -49,15 +141,6 @@ interface BuildConfiguration {
     fun swaps(values: Iterable<Pair<String, String>>) {
         values.forEach { (id, str) -> swap(id, str) }
     }
-
-    /**
-     * Creates a constant accessible in stonecutter conditions.
-     *
-     * @param identifier Constant name
-     * @param value Boolean value
-     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
-     */
-    fun const(identifier: String, value: Boolean)
 
     /**
      * Creates a constant accessible in stonecutter conditions.
@@ -119,15 +202,6 @@ interface BuildConfiguration {
      * @param version Dependency version to check against in semantic version format
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#dependencies">Wiki</a>
      */
-    fun dependency(identifier: String, version: String)
-
-    /**
-     * Adds a dependency to the semver checks.
-     *
-     * @param identifier Dependency name
-     * @param version Dependency version to check against in semantic version format
-     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#dependencies">Wiki</a>
-     */
     fun dependency(identifier: String, version: () -> String) {
         dependency(identifier, version())
     }
@@ -152,27 +226,15 @@ interface BuildConfiguration {
         values.forEach { (id, ver) -> dependency(id, ver) }
     }
 
-    /**
-     * Excludes a file or directory from being processed.
-     *
-     * @param path Absolute path to the file.
-     */
-    fun exclude(path: File) {
-        exclude(path.toPath())
+    private fun validateId(id: String) = id.apply {
+        require(all(IdentifierRecognizer.Companion::allowed)) { "Invalid identifier: $this" }
     }
 
-    /**
-     * Excludes a file or directory from being processed.
-     *
-     * @param path Absolute path to the file.
-     */
-    fun exclude(path: Path)
-
-    /**
-     * Excludes a file or directory from being processed.
-     *
-     * @param path Path to the file relative to the parent project directory (where `stonecutter.gradle[.kts]` is located)
-     * or a file extension qualifier (i.e. `*.json`).
-     */
-    fun exclude(path: String)
+    private fun validateSemver(version: String) = try {
+        VersionParser.parse(version)
+    } catch (e: VersionParsingException) {
+        throw IllegalArgumentException("Invalid semantic version: $version").apply {
+            initCause(e)
+        }
+    }
 }

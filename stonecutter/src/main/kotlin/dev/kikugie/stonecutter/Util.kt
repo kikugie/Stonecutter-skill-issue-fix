@@ -39,3 +39,13 @@ internal val Project.stonecutterCacheDir
 
 internal val Project.stonecutterCachePath
     get() = stonecutterCacheDir.toPath()
+
+/**
+ * Delegates set operation. Meant to be used with Kotlin DSL.
+ *
+ * @param K Key type
+ * @param V Value type
+ */
+interface MapSetter<K, V> {
+    operator fun set(key: K, value: V)
+}

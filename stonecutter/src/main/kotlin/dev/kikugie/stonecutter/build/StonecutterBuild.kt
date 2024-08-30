@@ -1,16 +1,15 @@
 package dev.kikugie.stonecutter.build
 
-import dev.kikugie.semver.VersionParser
-import dev.kikugie.semver.VersionParsingException
-import dev.kikugie.stitcher.lexer.IdentifierRecognizer.Companion.allowed
-import dev.kikugie.stonecutter.*
+import dev.kikugie.stonecutter.StonecutterProject
+import dev.kikugie.stonecutter.StonecutterUtility
+import dev.kikugie.stonecutter.buildDirectory
 import dev.kikugie.stonecutter.controller.ProjectBranch
 import dev.kikugie.stonecutter.controller.ProjectNode
 import dev.kikugie.stonecutter.controller.ProjectTree
-import dev.kikugie.stonecutter.data.StitcherParameters
 import dev.kikugie.stonecutter.data.TreeContainer
 import dev.kikugie.stonecutter.data.buildDirectoryPath
 import dev.kikugie.stonecutter.process.StonecutterTask
+import dev.kikugie.stonecutter.stonecutterCachePath
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
@@ -31,11 +30,10 @@ import kotlin.io.path.invariantSeparatorsPathString
  */
 @OptIn(ExperimentalPathApi::class)
 @Suppress("MemberVisibilityCanBePrivate")
-open class StonecutterBuild(val project: Project) : BuildConfiguration, StonecutterUtility {
+open class StonecutterBuild(val project: Project) : BuildConfiguration(project.parent!!), StonecutterUtility {
     private val parent = checkNotNull(project.parent) {
         "StonecutterBuild applied to a non-versioned buildscript"
     }
-    internal lateinit var data: StitcherParameters
 
     /**
      * The full tree this project belongs to. Without subprojects it will only have the root branch.
@@ -78,40 +76,6 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration, Stonecut
 
     init {
         project.configure()
-    }
-
-    override fun swap(identifier: String, replacement: String) {
-        data.swaps[validateId(identifier)] = replacement
-    }
-
-    override fun const(identifier: String, value: Boolean) {
-        data.constants[validateId(identifier)] = value
-    }
-
-    override fun dependency(identifier: String, version: String) {
-        data.dependencies[validateId(identifier)] = validateSemver(version)
-    }
-
-    override fun exclude(path: Path) {
-        data.excludedPaths.add(path)
-    }
-
-    override fun exclude(path: String) {
-        require(path.isNotBlank()) { "Path must not be empty" }
-        if (path.startsWith("*.")) data.excludedExtensions.add(path.substring(2))
-        else data.excludedPaths.add(project.parent!!.file(path).toPath())
-    }
-
-    private fun validateId(id: String) = id.apply {
-        require(all(::allowed)) { "Invalid identifier: $this" }
-    }
-
-    private fun validateSemver(version: String) = try {
-        VersionParser.parse(version)
-    } catch (e: VersionParsingException) {
-        throw IllegalArgumentException("Invalid semantic version: $version").apply {
-            initCause(e)
-        }
     }
 
     private fun Project.configure() {
