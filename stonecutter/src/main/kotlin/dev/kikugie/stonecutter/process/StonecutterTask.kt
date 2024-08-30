@@ -42,9 +42,6 @@ internal abstract class StonecutterTask : DefaultTask() {
     @get:Input
     abstract val cacheDir: Property<(ProjectName, StonecutterProject) -> Path>
 
-    @get:Input
-    abstract val debug: Property<Boolean>
-
     private val statistics = Statistics()
 
     @TaskAction
