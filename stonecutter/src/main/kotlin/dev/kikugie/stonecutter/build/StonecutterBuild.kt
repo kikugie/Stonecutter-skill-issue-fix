@@ -119,7 +119,8 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration, Stonecut
                 output.set(branch.path.relativize(it).invariantSeparatorsPathString)
             }
 
-            dests.set(this@StonecutterBuild.parent.let { mapOf(it.path to it.projectDir.toPath()) })
+            data.set(mapOf(branch to this@StonecutterBuild.data))
+            sources.set(mapOf(branch to node.path))
             cacheDir.set { _, version ->
                 branch[version.project]?.project?.stonecutterCachePath
                     ?: branch.project.stonecutterCachePath.resolve("out-of-bounds/$version")

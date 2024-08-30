@@ -2,8 +2,8 @@ package dev.kikugie.stonecutter.process
 
 import dev.kikugie.stitcher.scanner.StandardMultiLine
 import dev.kikugie.stitcher.scanner.StandardSingleLine
-import dev.kikugie.stonecutter.ProjectName
 import dev.kikugie.stonecutter.StonecutterProject
+import dev.kikugie.stonecutter.controller.ProjectBranch
 import dev.kikugie.stonecutter.data.StitcherParameters
 import groovy.lang.Reference
 import kotlinx.coroutines.Dispatchers
@@ -34,21 +34,19 @@ internal abstract class StonecutterTask : DefaultTask() {
     abstract val output: Property<String>
 
     @get:Input
-    abstract val dests: MapProperty<String, Path>
+    abstract val sources: MapProperty<ProjectBranch, Path>
 
     @get:Input
-    abstract val data: MapProperty<String, StitcherParameters>
+    abstract val data: MapProperty<ProjectBranch, StitcherParameters>
 
     @get:Input
-    abstract val cacheDir: Property<(ProjectName, StonecutterProject) -> Path>
+    abstract val cacheDir: Property<(ProjectBranch, StonecutterProject) -> Path>
 
     private val statistics = Statistics()
 
     @TaskAction
     fun run() {
-        statistics.duration = measureTimeMillis {
-            transform(dests.get())
-        }
+        statistics.duration = measureTimeMillis { transform(sources.get()) }
         println(
             """
             [Stonecutter] Switched to ${toVersion.get().project} in ${statistics.duration}ms 
@@ -57,7 +55,7 @@ internal abstract class StonecutterTask : DefaultTask() {
         )
     }
 
-    private fun transform(dests: Map<String, Path>) = runBlocking {
+    private fun transform(dests: Map<ProjectBranch, Path>) = runBlocking {
         val errored = Reference(false)
         val merged = dests.map { (project, path) ->
             transform(project, path.resolve(input.get()), path.resolve(output.get()), errored)
@@ -94,7 +92,7 @@ internal abstract class StonecutterTask : DefaultTask() {
 
     @OptIn(ExperimentalPathApi::class)
     private fun transform(
-        project: String,
+        project: ProjectBranch,
         input: Path,
         output: Path,
         marker: Reference<Boolean>
@@ -121,11 +119,13 @@ internal abstract class StonecutterTask : DefaultTask() {
         }
     }
 
-    private fun FileManager(project: String): FileManager {
-        val data = checkNotNull(data.get()[project])
+    private fun FileManager(branch: ProjectBranch): FileManager {
+        val data = checkNotNull(data.get()[branch]) {
+            "Project '$project' not found in [${data.get().keys.joinToString { "'$it'" }}]"
+        }
         return FileManager(
-            inputCache = cacheDir.get()(project, fromVersion.get()),
-            outputCache = cacheDir.get()(project, toVersion.get()),
+            inputCache = cacheDir.get()(branch, fromVersion.get()),
+            outputCache = cacheDir.get()(branch, toVersion.get()),
             filter = FileFilter(data.excludedExtensions, data.excludedPaths),
             recognizers = listOf(StandardMultiLine, StandardSingleLine),
             params = data.toParams(toVersion.get().version),

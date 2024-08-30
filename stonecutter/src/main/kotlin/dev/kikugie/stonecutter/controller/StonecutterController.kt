@@ -4,6 +4,7 @@ import dev.kikugie.stonecutter.*
 import dev.kikugie.stonecutter.build.StonecutterBuild
 import dev.kikugie.stonecutter.data.TreeBuilderContainer
 import dev.kikugie.stonecutter.data.TreeContainer
+import dev.kikugie.stonecutter.data.stonecutterCachePath
 import dev.kikugie.stonecutter.process.StonecutterTask
 import dev.kikugie.stonecutter.settings.TreeBuilder
 import org.gradle.api.Project
@@ -123,11 +124,15 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         createStonecutterTask(name, version, desc())
 
     private fun createStonecutterTask(
-        name: String,
+        name: ProjectName,
         version: StonecutterProject,
         desc: String,
     ) {
         root.tasks.create<StonecutterTask>(name) {
+            // FIXME: Can't configure missing build data - should be compensated by the global configuration
+            val builds = tree.associateWith { it[name]?.extensions?.getByType<StonecutterBuild>()?.data }
+            val paths = tree.associateWith { it.path }
+
             group = "stonecutter"
             description = desc
 
@@ -137,10 +142,10 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
             input.set("src")
             output.set("src")
 
-            dests.set(tree.branches.mapValues { (_, v) -> v.project.projectDir.toPath() })
-            cacheDir.set { branch, version ->
-                tree[branch][version.project]?.project?.stonecutterCachePath
-                    ?: tree[branch]!!.project.stonecutterCachePath.resolve("out-of-bounds/$version")
+            data.set(builds)
+            sources.set(paths)
+            cacheDir.set { branch, version -> branch[version.project]?.stonecutterCachePath ?:
+                branch.stonecutterCachePath.resolve("out-of-bounds/$version")
             }
 
             doLast {
