@@ -17,18 +17,37 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     private val manager: ControllerManager = checkNotNull(root.controller()) {
         "Project ${root.path} is not a Stonecutter controller. What did you even do to get this error?"
     }
-    private val container = root.gradle.extensions.getByType<TreeContainer>()
-    private val tree: ProjectTree
+    private val container: TreeContainer = root.gradle.extensions.getByType<TreeContainer>()
 
-    val vcsVersion get() = tree.vcs
-    val versions: List<StonecutterProject> get() = tree.versions
+    /**
+     * The full project tree this controller operates on. The default branch is `""`.
+     */
+    val tree: ProjectTree
+
+    /**
+     * Version control project used by `Reset active project` task.
+     */
+    val vcsVersion: StonecutterProject get() = tree.vcs
+
+    /**
+     * All versions registered in the tree. Branches may have the same or a subset of these.
+     */
+    val versions: Collection<StonecutterProject> get() = tree.versions
+
+    /**
+     * The active version selected by `stonecutter.active "..."` call.
+     */
     val current: StonecutterProject get() = tree.current
+
+    /**
+     * Type of the chiseled task. Use in [registerChiseled].
+     */
     val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
 
     override var automaticPlatformConstants: Boolean = false
 
     init {
-        println("Running Stonecutter 0.5-alpha.4")
+        println("Running Stonecutter 0.5-project-trees.2")
         val data: TreeBuilder = checkNotNull(root.gradle.extensions.getByType<TreeBuilderContainer>()[root]) {
             "Project ${root.path} is not registered. This might've been caused by removing a project while its active"
         }
@@ -36,6 +55,11 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         root.afterEvaluate { setupProject() }
     }
 
+    /**
+     * Sets the active project. **DO NOT call on your own**
+     *
+     * @param name Name of the active project
+     */
     infix fun active(name: ProjectName) = with(tree) {
         current.isActive = false
         current = versions.find { it.project == name } ?: error("Project $name is not registered in ${root.path}")
@@ -51,18 +75,14 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         tree.addTask(provider.name)
     }
 
-    operator fun get(project: ProjectName) = tree[project]
-
     private fun constructTree(model: TreeBuilder): ProjectTree = model.nodes.mapValues { (name, nodes) ->
         val branch = if (name.isEmpty()) root else root.project(name)
         val versions = nodes.associate {
-            it.project to ProjectNode(branch.project(it.project), name, it)
+            it.project to ProjectNode(branch.project(it.project), it)
         }
         ProjectBranch(branch, name, versions)
     }.let {
         ProjectTree(root, model.vcsProject, it)
-    }.apply {
-        versions = model.versions.toList()
     }
 
     private fun configureTree(tree: ProjectTree) {
@@ -97,7 +117,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
             "Sets the active project to ${it.project}, processing all versioned comments."
         }
         if (automaticPlatformConstants) configurePlatforms(
-            tree.branches.values.flatMap { it.entries.values.map(ProjectNode::project) }
+            tree.branches.values.flatMap { it.nodes.values.map(ProjectNode::project) }
         )
     }
 

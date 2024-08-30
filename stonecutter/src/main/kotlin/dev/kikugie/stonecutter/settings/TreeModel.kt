@@ -4,6 +4,7 @@ import dev.kikugie.stonecutter.ProjectName
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.TargetVersion
 import dev.kikugie.stonecutter.data.NodeMap
+import dev.kikugie.stonecutter.sanitize
 import org.gradle.api.Action
 
 /**
@@ -11,30 +12,29 @@ import org.gradle.api.Action
  * This tree only supports 3 layers of depth: `root -> branch -> node`.
  */
 class TreeBuilder : ProjectProvider {
-    private val _versions: MutableMap<StonecutterProject, StonecutterProject> = mutableMapOf()
+    private val versions: MutableMap<StonecutterProject, StonecutterProject> = mutableMapOf()
     internal val nodes: NodeMap = mutableMapOf()
     internal val branches: MutableMap<ProjectName, BranchBuilder> = mutableMapOf()
-    internal val versions: Collection<StonecutterProject> get() = _versions.values
 
     /**
      * Version used by the `Reset active project` task. Defaults to the first registered version.
      */
     var vcsVersion: ProjectName? = null
-        get() = if (field == null) versions.firstOrNull()?.project else field
+        get() = if (field == null) versions.values.firstOrNull()?.project else field
         set(value) {
             requireNotNull(value) { "`vcsVersion` must be set to a non-null value." }
-            require(value in versions.map { it.project }) { "Version $value is not present in the tree." }
+            require(value in versions.values.map { it.project }) { "Version $value is not present in the tree." }
             field = value
         }
     internal val vcsProject
-        get() = versions.find { it.project == vcsVersion }
+        get() = versions.values.find { it.project == vcsVersion }
             ?: error("No versions registered")
 
     // Required to have object identity
-    private fun find(project: StonecutterProject) = _versions.getOrDefault(project, project)
+    private fun find(project: StonecutterProject) = versions.getOrDefault(project, project)
 
     private fun add(name: ProjectName, project: StonecutterProject) =
-        nodes.getOrPut(name, ::mutableSetOf).let { _versions[project] = project; it += project }
+        nodes.getOrPut(name, ::mutableSetOf).let { versions[project] = project; it += project }
 
     override fun vers(name: ProjectName, version: TargetVersion) =
         add("", find(StonecutterProject(name, version)))
@@ -44,7 +44,7 @@ class TreeBuilder : ProjectProvider {
      *
      * @param name Subproject's name for this branch
      */
-    fun branch(name: ProjectName) = branch(name) { inherit() }
+    fun branch(name: ProjectName) = branch(name.sanitize()) { inherit() }
 
     /**
      * Creates a new branch in this tree with provided configuration.
@@ -53,12 +53,12 @@ class TreeBuilder : ProjectProvider {
      * @param action Branch configuration
      */
     fun branch(name: ProjectName, action: Action<BranchBuilder>) =
-        BranchBuilder(name).also { branches[name] = it }.let(action::execute)
+        BranchBuilder(name.sanitize()).also { branches[name.sanitize()] = it }.let(action::execute)
 
     override fun toString() = buildString {
         appendLine("|- vcs: $vcsVersion")
         appendLine("|- versions:")
-        appendLine(versions.treeView().prepend("| "))
+        appendLine(versions.values.treeView().prepend("| "))
         appendLine("\\- branches:")
         append(nodes.treeView().prepend("  "))
     }

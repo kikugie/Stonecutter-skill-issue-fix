@@ -10,7 +10,10 @@ import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings
 import org.gradle.kotlin.dsl.create
 import java.io.File
+import java.nio.file.StandardOpenOption
+import kotlin.io.path.exists
 import kotlin.io.path.notExists
+import kotlin.io.path.writeText
 
 @Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterSettings(private val settings: Settings) : SettingsConfiguration, StonecutterUtility {
@@ -85,6 +88,9 @@ open class StonecutterSettings(private val settings: Settings) : SettingsConfigu
     ) {
         val scope = if (name.isEmpty()) project else get("${project.path.sanitize()}:$name")
         val file = runCatching { setup.branches[name]!!.buildscript }.getOrNull() ?: centralScript
+        with(scope.projectDir.resolve(file).toPath()) {
+            if (!exists()) writeText("", Charsets.UTF_8, StandardOpenOption.CREATE_NEW)
+        }
         branch.forEach { createProject(scope, it, file) }
     }
 
@@ -102,12 +108,11 @@ open class StonecutterSettings(private val settings: Settings) : SettingsConfigu
         project.buildFileName = "../../$build"
     }
 
-    private fun get(path: ProjectPath): ProjectDescriptor =
-        with(path.sanitize()) {
-            if (isEmpty()) settings.rootProject
-            else {
-                settings.include(this)
-                settings.project(":$this")
-            }
+    private fun get(path: ProjectPath): ProjectDescriptor = with(path.sanitize()) {
+        if (isEmpty()) settings.rootProject
+        else {
+            settings.include(this)
+            settings.project(":$this")
         }
+    }
 }

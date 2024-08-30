@@ -4,6 +4,9 @@ import dev.kikugie.semver.VersionParser
 import dev.kikugie.semver.VersionParsingException
 import dev.kikugie.stitcher.lexer.IdentifierRecognizer.Companion.allowed
 import dev.kikugie.stonecutter.*
+import dev.kikugie.stonecutter.controller.ProjectBranch
+import dev.kikugie.stonecutter.controller.ProjectNode
+import dev.kikugie.stonecutter.controller.ProjectTree
 import dev.kikugie.stonecutter.data.StitcherParameters
 import dev.kikugie.stonecutter.data.TreeContainer
 import dev.kikugie.stonecutter.data.buildDirectoryPath
@@ -24,19 +27,36 @@ import kotlin.io.path.invariantSeparatorsPathString
 @Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterBuild(val project: Project) : BuildConfiguration, StonecutterUtility {
     private val parent = checkNotNull(project.parent) {
-        "StonecutterBuild applied to the non-versioned buildscript"
+        "StonecutterBuild applied to a non-versioned buildscript"
     }
     internal val data = StitcherParameters()
-    internal val tree = requireNotNull(project.rootProject) { "Project $project must be a versioned project" }
-        .run { gradle.extensions.getByType<TreeContainer>()[this]!! }
-    internal val branch = requireNotNull(tree[parent]) {
-        "Branch '${parent.path.sanitize()}' not found in [${tree.branches.keys.joinToString { "'$it'" }}]"
+
+    /**
+     * The full tree this project belongs to. Without subprojects it will only have the root branch.
+     * Allows traversing all branches if needed. For project access use [node] methods.
+     */
+    val tree: ProjectTree = requireNotNull(project.rootProject.run { gradle.extensions.getByType<TreeContainer>()[this] }) {
+        "Project '$project' is not versioned"
+    }
+    /**
+     * The branch this project belongs to. Allows accessing other versions.
+     * For most cases use [node] methods.
+     */
+    val branch: ProjectBranch = requireNotNull(tree[parent]) {
+        "Branch '$parent' not found in [${tree.branches.keys.joinToString { "'$it'" }}]"
     }
 
     /**
-     * All available versions.
+     * This project's node. Contains this project's metadata and provides API for traversing the tree.
      */
-    val versions: List<StonecutterProject> get() = tree.versions
+    val node: ProjectNode = requireNotNull(branch[project]) {
+        "Project '$project' is not found in the branch {${branch.nodes.keys.joinToString { "'$it'" }}]"
+    }
+
+    /**
+     * All version in this project's branch.
+     */
+    val versions: Collection<StonecutterProject> get() = branch.versions
 
     /**
      * The currently active version. Global for all instances of the build file.
@@ -48,10 +68,7 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration, Stonecut
     /**
      * Metadata of the currently processed version.
      */
-    val current: StonecutterProject by lazy {
-        tree.versions.find { it.project == project.name }
-            ?: error("No matching version found for project ${project.name}")
-    }
+    val current: StonecutterProject = node.metadata
 
     init {
         project.configure()
