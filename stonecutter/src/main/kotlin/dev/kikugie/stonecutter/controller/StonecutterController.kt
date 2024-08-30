@@ -2,6 +2,7 @@ package dev.kikugie.stonecutter.controller
 
 import dev.kikugie.stonecutter.*
 import dev.kikugie.stonecutter.build.StonecutterBuild
+import dev.kikugie.stonecutter.data.StitcherParameters
 import dev.kikugie.stonecutter.data.TreeBuilderContainer
 import dev.kikugie.stonecutter.data.TreeContainer
 import dev.kikugie.stonecutter.data.stonecutterCachePath
@@ -57,7 +58,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     override var automaticPlatformConstants: Boolean = false
 
     init {
-        println("Running Stonecutter 0.5-project-trees.2")
+        println("Running Stonecutter 0.5-project-trees.4")
         val data: TreeBuilder = checkNotNull(root.gradle.extensions.getByType<TreeBuilderContainer>()[root]) {
             "Project ${root.path} is not registered. This might've been caused by removing a project while its active"
         }
@@ -92,7 +93,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
      *
      * @param configuration Configuration scope
      */
-    infix fun configureAll(configuration: Action<ParameterHolder>) = tree.asSequence().flatMap { br ->
+    infix fun parameters(configuration: Action<ParameterHolder>) = tree.asSequence().flatMap { br ->
         versions.map { br to it }
     }.forEach {
         configurations.getOrPut(it) { ParameterHolder(it.first, it.second) }.let(configuration::execute)
@@ -157,14 +158,9 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     ) {
         root.tasks.create<StonecutterTask>(name) {
             val builds = tree.associateWith {
-                requireNotNull(
-                    it[name]?.extensions?.getByType<StonecutterBuild>()?.data ?: configurations[it to version]?.data
-                ) {
-                    """
-                        No configuration found for '${version.project}' in branch '${it.id}'.
-                        Use `configureAll` to specify missing properties.
-                    """.trimIndent()
-                }
+                it[name]?.extensions?.getByType<StonecutterBuild>()?.data
+                    ?: configurations[it to version]?.data
+                    ?: StitcherParameters()
             }
             val paths = tree.associateWith { it.path }
 

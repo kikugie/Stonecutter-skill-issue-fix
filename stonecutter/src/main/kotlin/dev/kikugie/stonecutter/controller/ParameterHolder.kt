@@ -2,10 +2,9 @@ package dev.kikugie.stonecutter.controller
 
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.build.BuildConfiguration
-import dev.kikugie.stonecutter.data.StitcherParameters
 
 /**
- * Stores parameters configured in [StonecutterController.configureAll].
+ * Stores parameters configured in [StonecutterController.parameters].
  *
  * @property branch Currently processed branch
  * @property version Currently processed version.
@@ -15,8 +14,4 @@ import dev.kikugie.stonecutter.data.StitcherParameters
 class ParameterHolder(
     val branch: ProjectBranch,
     val version: StonecutterProject
-) : BuildConfiguration(branch) {
-    init {
-        data = StitcherParameters()
-    }
-}
+) : BuildConfiguration(branch)

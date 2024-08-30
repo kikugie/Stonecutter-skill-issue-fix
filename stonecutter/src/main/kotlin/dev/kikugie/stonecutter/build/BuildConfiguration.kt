@@ -16,7 +16,7 @@ import java.nio.file.Path
  */
 @Suppress("unused")
 abstract class BuildConfiguration(private val project: Project) {
-    internal lateinit var data: StitcherParameters
+    internal var data: StitcherParameters = StitcherParameters()
 
     /**
      * Creates a swap with the given value. Meant to be used with Kotlin DSL:
