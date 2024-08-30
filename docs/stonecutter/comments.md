@@ -1,5 +1,5 @@
 # Versioned comments
-To modify the source code to match your dependencies at compile time, 
+To modify the source code to match your dependencies at compile time,
 Stonecutter uses its own code, written in comments.
 
 Comment processing is managed by the Stitcher project (like tearing a file apart and *stitching* it together) - a transpiler for the comment syntax.
@@ -14,7 +14,7 @@ Condition comments support all the functions of boolean algebra, such as:
 //? if bl1 || (bl2 && !bl3)
 func()
 ```
-The comment above will technically fail, since we haven't told Stonecutter what `bl1`, `bl2` and `bl3` are, 
+The comment above will technically fail, since we haven't told Stonecutter what `bl1`, `bl2` and `bl3` are,
 but it shows the principle. If the condition fails, the function below will be commented, or otherwise the comment will be removed.
 
 By default, the only available values are Minecraft version predicates, such as `>=1.20.1`, `<1.21`, `=1.20.6`, etc.
@@ -100,13 +100,13 @@ Handling nested comments is surprisingly challenging, with a big difference betw
 /* /* comment */ */
 //      ends here ^
 ```
-The comment scanner takes the Java approach, since it's simpler, 
+The comment scanner takes the Java approach, since it's simpler,
 but when processed comments are applied, Stonecutter takes neither side - there shall be no nested multi-line comments.
-After being processed by Stonecutter the example above will look like this:
+After being processed by stonecutter the example above will look like this:
 ```
 /* /^ comment ^/ */
 ```
-Inner comments are replaced with `/^ ^/`. If Stonecutter needs to remove the outer comment, 
+Inner comments are replaced with `/^ ^/`. If Stonecutter needs to remove the outer comment,
 those placeholders will be converted to standard `/* */` comments.
 
 ## Syntax reference

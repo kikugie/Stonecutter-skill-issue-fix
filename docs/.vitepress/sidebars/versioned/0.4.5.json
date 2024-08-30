@@ -1,0 +1,28 @@
+{
+  "/": [
+    {
+      "text": "Introduction",
+      "link": "/stonecutter/introduction"
+    },
+    {
+      "text": "Setting up Stonecutter",
+      "link": "/stonecutter/setup"
+    },
+    {
+      "text": "Developing your mod",
+      "link": "/stonecutter/launch"
+    },
+    {
+      "text": "Versioned comments",
+      "link": "/stonecutter/comments"
+    },
+    {
+      "text": "Stonecutter configuration",
+      "link": "/stonecutter/configuration"
+    },
+    {
+      "text": "Tips and tricks",
+      "link": "/stonecutter/tips"
+    }
+  ]
+}

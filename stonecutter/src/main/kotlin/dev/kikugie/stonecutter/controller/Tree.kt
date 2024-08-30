@@ -132,7 +132,7 @@ data class ProjectBranch(
 }
 
 /**
- * Endpoint of the tree that represent a single version.
+ * Endpoint of the tree that represents a single version.
  *
  * @property project Project of this node, located in `version/$it`
  * @property metadata Project metadata used for configuring tasks

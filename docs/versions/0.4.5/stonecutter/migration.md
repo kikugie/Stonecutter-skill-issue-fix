@@ -14,7 +14,7 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.5-alpha.1"
+    id("dev.kikugie.stonecutter") version "0.4.5"
 }
 
 extensions.configure<StonecutterSettings> {
@@ -41,7 +41,7 @@ pluginManagement {
 }
 
 plugins {
-    id "dev.kikugie.stonecutter" version "0.5-alpha.1"
+    id "dev.kikugie.stonecutter" version "0.4.5"
 }
 
 stonecutter {

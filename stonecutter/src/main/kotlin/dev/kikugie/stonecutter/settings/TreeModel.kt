@@ -44,10 +44,10 @@ class TreeBuilder : ProjectProvider {
      *
      * @param name Subproject's name for this branch
      */
-    fun branch(name: ProjectName) = branch(name.sanitize()) { inherit() }
+    fun branch(name: ProjectName) = branch(name) { inherit() }
 
     /**
-     * Creates a new branch in this tree with provided configuration.
+     * Creates a new branch in this tree with the provided configuration.
      *
      * @param name Subproject's name for this branch
      * @param action Branch configuration
@@ -79,8 +79,7 @@ class TreeBuilder : ProjectProvider {
         override fun vers(
             name: ProjectName,
             version: TargetVersion
-        ) =
-            this@TreeBuilder.add(id, find(StonecutterProject(name, version)))
+        ) = this@TreeBuilder.add(id, find(StonecutterProject(name, version)))
 
         /**
          * Copies nodes registered in [TreeBuilder] to this branch
