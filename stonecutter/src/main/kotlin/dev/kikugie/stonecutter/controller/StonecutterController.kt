@@ -29,6 +29,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     }
     private val container: TreeContainer = root.gradle.extensions.getByType<TreeContainer>()
     private val configurations: MutableMap<BranchEntry, ParameterHolder> = mutableMapOf()
+    private val builds: MutableList<Action<StonecutterBuild>> = mutableListOf()
 
     /**
      * The full project tree this controller operates on. The default branch is `""`.
@@ -99,6 +100,11 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         configurations.getOrPut(it) { ParameterHolder(it.first, it.second) }.let(configuration::execute)
     }
 
+    @Deprecated(message = "Use `parameters {}` for global configuration.")
+    infix fun configureEach(configuration: Action<StonecutterBuild>) {
+        builds += configuration
+    }
+
     private fun constructTree(model: TreeBuilder): ProjectTree = model.nodes.mapValues { (name, nodes) ->
         val branch = if (name.isEmpty()) root else root.project(name)
         val versions = nodes.associate {
@@ -143,8 +149,9 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         // FIXME doesn't yet whoops
         if (automaticPlatformConstants) configurePlatforms(tree.nodes)
         // Apply configurations
-        for (it in tree.nodes) {
-            it.stonecutter.data = configurations[it.branch to it.metadata]?.data ?: continue
+        tree.nodes.forEach {
+            it.stonecutter.data = configurations[it.branch to it.metadata]?.data ?: StitcherParameters()
+            for (build in builds) build.execute(it.stonecutter)
         }
     }
 
