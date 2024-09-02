@@ -2,7 +2,7 @@ import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.versioning.VersioningConfiguration
 import org.jetbrains.dokka.versioning.VersioningPlugin
-import kotlin.io.path.readLines
+import java.nio.file.StandardOpenOption
 import kotlin.io.path.writeText
 
 plugins {
@@ -67,30 +67,20 @@ tasks.register("updateVersion") {
 
 tasks.register("updateHallOfFame") {
     doLast {
-        val dest = project.file("docs/index.md").toPath()
-        val mods = project.file("hall-of-fame.txt").toPath()
-        fun cleanLines(): List<String> {
-            var yeet = false
-            return dest.readLines().filterNot {
-                if (it.trimStart().startsWith("let start")) {
-                    yeet = true
-                    return@filterNot false
-                } else if (it.trimStart().startsWith("let end"))
-                    yeet = false
-                yeet
-            }
-        }
-        val projects = ProjectFinder
-            .find(*mods.readLines().toTypedArray())
-            .sortedBy { -it.downloads }
-            .joinToString(",\n") { it.toJS() }
-        val text = cleanLines().joinToString("\n").replaceFirst(
-            "let start = \"here\";",
-            """let start = "here";
-const members = [
-$projects
-];
-""")
-        dest.writeText(text)
+        val template = project.file("util/index.md")
+        val mods = project.file("hall-of-fame.yml")
+
+        val projects = ProjectFinder.find(mods)
+        val text = template.readText().format(projects)
+        val paths = mapOf(
+            "" to project.file("docs/index.md"),
+            "/0.4.4" to project.file("docs/versions/0.4.4/index.md")
+        )
+        for ((version, file) in paths) file.toPath().writeText(
+            text.replace(": /stonecutter", ": $version/stonecutter"),
+            Charsets.UTF_8,
+            StandardOpenOption.CREATE,
+            StandardOpenOption.TRUNCATE_EXISTING
+        )
     }
 }

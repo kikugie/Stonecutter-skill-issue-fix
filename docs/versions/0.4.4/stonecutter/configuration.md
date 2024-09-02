@@ -29,23 +29,14 @@ Constants add variables that can be checked in the code.
 stonecutter.const("fabric", isFabric)
 stonecutter.const("forge", isForge)
 ```
-```java [code.java]
+```java [example.java]
 //? if fabric
-System.out.println("good");
+LOGGER.info("faaaaaaaaaaaaaaaaaaabric");
+
+//? if forge
+/*LOGGER.info("froge")
 ```
 :::
-
-Platform-specific setup can also be simplified to:
-```kotlin [build.gradle[.kts]]
-val platform = property("loom.platform").toString()
-stonecutter.consts(platform, "fabric", "forge")
-```
-
-To ease the setup, enable automatic platform constants:
-```kotlin [stonecutter.gradle[.kts]]
-stonecutter.automaticPlatformConstants = true
-```
-This finds all enabled platform and assigns corresponding constants.
 
 ### Dependencies
 Stonecutter dependencies allow specifying additional targets for the version checker.
@@ -53,15 +44,15 @@ Stonecutter dependencies allow specifying additional targets for the version che
 ```kotlin [build.gradle[.kts]]
 stonecutter.dependency("sodium", "0.5.3")
 ```
-```kotlin [code.kt]
+```kotlin [example.java]
 //? if sodium: >0.6
-/*withSodium6()*/
+/*withSodium6();*/
 ```
 :::
 Implicit version checks default to `minecraft`, which means you can write:
-```kotlin [code.kt]
+```java [example.java]
 //? if minecraft: >1.20.1
-func()
+method();
 ```
 You can also overwrite the checked minecraft dependency this way:
 ```kotlin [build.gradle[.kts]]
@@ -95,13 +86,13 @@ Stonecutter excludes common image and audio formats to avoid occasional byte seq
 ### Comparisons
 Sometimes it can be handy to compare semantic versions in the buildscript (in a `swap` or `const` definition).
 For this purpose `stonecutter.compare` exists:
-```kotlin
+```kotlin [build.gradle[.kts] / stonecutter.gradle[.kts]]
 val mcVersion = stonecutter.current.version // = 1.19.4
 val isOneTwentyPlus = stonecutter.compare("1.20", mcVersion) >= 0 // false
 ```
 
 Alternatively, you can use the `eval` function:
-```kotlin
+```kotlin [build.gradle[.kts] / stonecutter.gradle[.kts]]
 val mcVersion = stonecutter.current.version // = 1.19.4
 val isOneTwentyPlus = stonecutter.eval(mcVersion, ">=1.20")
 ```

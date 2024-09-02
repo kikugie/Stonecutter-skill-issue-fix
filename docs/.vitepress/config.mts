@@ -17,7 +17,7 @@ export default defineVersionedConfig(__dirname, {
   title: 'Stonecutter',
   description: 'Modern Gradle plugin for multi-version management',
   versioning: {
-    latestVersion: '0.5-alpha.1',
+    latestVersion: '0.5-project-trees.4',
   },
   cleanUrls: true,
   appearance: 'dark',

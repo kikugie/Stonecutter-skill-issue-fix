@@ -21,7 +21,7 @@ Provided you have IDE-generated configs, you can use them.
 Remember to launch the correct one.  
 If you’re forgetful, you can include something like this in your `build.gradle[.kts]`:
 ::: code-group
-```kts [build.gradle.kts]
+```kotlin [build.gradle[.kts]]
 if (stonecutter.current.isActive) {
     rootProject.tasks.register("buildActive") {
         group = "project"
@@ -35,7 +35,7 @@ if (stonecutter.current.isActive) {
 Running `build` on the root project will result in the same error as mentioned above.
 However, remember the chiseled task from the last chapter? Just in case:
 ::: code-group
-```kts [stonecutter.gradle.kts]
+```kotlin [stonecutter.gradle.kts]
 plugins {
     id("dev.kikugie.stonecutter")
 }
