@@ -8,8 +8,9 @@ class Lexer(
     private val matchers: Iterable<TokenRecognizer>,
     private val handler: ErrorHandler,
 ): LexerAccess {
+    override val errors get() = handler.errors
+    val tokens: List<LexSlice> by lazy(::readTokens)
     private var index: Int = -1
-    private val tokens: List<LexSlice> by lazy(::readTokens)
 
     override fun get(index: Int): LexSlice? = tokens.getOrNull(index)
     override fun peek(): LexSlice? = tokens.getOrNull(index)

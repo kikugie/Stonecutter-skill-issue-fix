@@ -1,5 +1,6 @@
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
@@ -19,9 +20,10 @@ dependencies {
     testImplementation(libs.kaml)
     testImplementation(libs.junit.api)
     testImplementation(libs.junit.engine)
+    testImplementation("com.github.ajalt.mordant:mordant:2.7.2")
 }
 
-tasks.test {
+tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
@@ -39,7 +41,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_16
 }
 
-tasks.compileKotlin {
+tasks.withType<KotlinCompile> {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_16)
     }

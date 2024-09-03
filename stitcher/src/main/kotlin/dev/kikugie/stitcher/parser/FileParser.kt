@@ -40,10 +40,10 @@ class FileParser(
 
     private val commentStart get() = iter.prev!!
     private val commentEnd get() = when (iter.peek?.type) {
-            ContentType.COMMENT_END -> iter.peek!!
-            null, NullType -> Token("", ContentType.COMMENT_END)
-            else -> throw AssertionError("Unexpected token: ${iter.peek}")
-        }
+        ContentType.COMMENT_END -> iter.peek!!
+        null, NullType -> Token("", ContentType.COMMENT_END)
+        else -> throw AssertionError("Unexpected token: ${iter.peek}")
+    }
 
     /**
      * Parses the input sequence, creating an AST of scopes and blocks.
