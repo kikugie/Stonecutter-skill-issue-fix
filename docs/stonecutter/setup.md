@@ -10,7 +10,7 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "..."
+    id("dev.kikugie.stonecutter") version "0.5-project-trees.5"
 }
 
 stonecutter {
@@ -33,7 +33,7 @@ pluginManagement {
 }
 
 plugins {
-    id "dev.kikugie.stonecutter" version "..."
+    id "dev.kikugie.stonecutter" version "0.5-project-trees.5"
 }
 
 stonecutter {
@@ -141,7 +141,7 @@ Lastly, you need to adjust your buildscript to use versioned properties:
 == build.gradle.kts
 ```kts
 plugins {
-    id("fabric-loom") version "1.7-SNAPSHOT"
+    id("fabric-loom") version "0.5-project-trees.5"
 }
 
 dependencies {
@@ -163,7 +163,7 @@ Alternatively, assigning variables with `val fabricApi: String by project` is al
 == build.gradle
 ```groovy 
 plugins {
-    id "fabric-loom" version "1.7-SNAPSHOT"
+    id "fabric-loom" version "0.5-project-trees.5"
 }
 
 dependencies {

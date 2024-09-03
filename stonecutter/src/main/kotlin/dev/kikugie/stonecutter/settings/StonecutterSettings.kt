@@ -62,16 +62,14 @@ open class StonecutterSettings(settings: Settings) : SettingsConfiguration(setti
 
     private fun createBranch(
         name: ProjectName,
-        project: ProjectDescriptor,
+        root: ProjectDescriptor,
         setup: TreeBuilder,
         branch: Iterable<StonecutterProject>
     ) {
-        val scope = if (name.isEmpty()) project else get("${project.path.sanitize()}:$name")
+        val scope = if (name.isEmpty()) root else get("${root.path.sanitize()}:$name")
         val file = runCatching { setup.branches[name]!!.buildscript }.getOrNull() ?: centralScript
         scope.projectDir.toPath().createDirectories()
-        with(scope.projectDir.resolve(file).toPath()) {
-            if (notExists()) writeText("", Charsets.UTF_8, StandardOpenOption.CREATE_NEW)
-        }
+        scope.buildFileName = controller.filename
         branch.forEach { createProject(scope, it, file) }
     }
 

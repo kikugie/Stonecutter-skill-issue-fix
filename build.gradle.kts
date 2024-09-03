@@ -1,3 +1,4 @@
+import org.intellij.lang.annotations.Language
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.versioning.VersioningConfiguration
@@ -46,7 +47,7 @@ tasks.dokkaHtmlCollector {
 
 tasks.register("updateVersion") {
     doLast {
-        fun replaceAndWrite(path: String, pattern: String, replacement: String) {
+        fun replaceAndWrite(path: String, @Language("RegExp") pattern: String, replacement: String) {
             val location = project.file(path)
             require(location.exists() && location.isFile && location.canRead()) { "Path $path is invalid" }
             val text = location.readText()
@@ -54,11 +55,10 @@ tasks.register("updateVersion") {
             if (new != text) location.writeText(new)
         }
 
-        val version = project.property("stonecutter")
         replaceAndWrite("docs/.vitepress/config.mts", "latestVersion: '.+'", "latestVersion: '$version'")
-        replaceAndWrite("docs/stonecutter/migration.md", "version \".+\"$", "version \"$version\"")
+        replaceAndWrite("docs/stonecutter/setup.md", "version \".+\"$", "version \"$version\"")
         replaceAndWrite(
-            "stonecutter/src/main/kotlin/dev/kikugie/stonecutter/StonecutterController.kt",
+            "stonecutter/src/main/kotlin/dev/kikugie/stonecutter/controller/StonecutterController.kt",
             "\"Running Stonecutter .+\"",
             "\"Running Stonecutter $version\""
         )

@@ -44,6 +44,7 @@ tasks.compileKotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_16)
     }
+    dependsOn(rootProject.tasks.named("updateVersion"))
 }
 java {
     withSourcesJar()

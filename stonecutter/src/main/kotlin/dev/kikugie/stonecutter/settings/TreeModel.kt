@@ -68,8 +68,7 @@ class TreeBuilder : ProjectProvider {
      *
      * @param id Subproject's name for this branch
      */
-    inner class BranchBuilder(private val id: ProjectName) :
-        ProjectProvider {
+    inner class BranchBuilder(private val id: ProjectName) : ProjectProvider {
         /**
          * Buildscript filename override for this branch.
          * Defaults to the one set in the [StonecutterSettings] configuration scope.
