@@ -141,7 +141,7 @@ Lastly, you need to adjust your buildscript to use versioned properties:
 == build.gradle.kts
 ```kts
 plugins {
-    id("fabric-loom") version "0.5-project-trees.5"
+    id("fabric-loom") version "1.7-SNAPSHOT"
 }
 
 dependencies {
@@ -163,7 +163,7 @@ Alternatively, assigning variables with `val fabricApi: String by project` is al
 == build.gradle
 ```groovy 
 plugins {
-    id "fabric-loom" version "0.5-project-trees.5"
+    id "fabric-loom" version "1.7-SNAPSHOT"
 }
 
 dependencies {
