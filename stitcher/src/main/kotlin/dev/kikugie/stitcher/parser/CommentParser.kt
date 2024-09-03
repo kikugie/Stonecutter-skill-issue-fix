@@ -2,18 +2,16 @@ package dev.kikugie.stitcher.parser
 
 import dev.kikugie.stitcher.data.component.*
 import dev.kikugie.stitcher.data.scope.ScopeType
+import dev.kikugie.stitcher.data.token.*
 import dev.kikugie.stitcher.data.token.MarkerType.CONDITION
 import dev.kikugie.stitcher.data.token.MarkerType.SWAP
-import dev.kikugie.stitcher.data.token.NullType
 import dev.kikugie.stitcher.data.token.StitcherTokenType.*
-import dev.kikugie.stitcher.data.token.Token
-import dev.kikugie.stitcher.data.token.TokenType
-import dev.kikugie.stitcher.data.token.WhitespaceType
 import dev.kikugie.stitcher.eval.isBlank
 import dev.kikugie.stitcher.eval.isEmpty
 import dev.kikugie.stitcher.eval.isNotEmpty
 import dev.kikugie.stitcher.exception.ErrorHandler
 import dev.kikugie.stitcher.exception.StoringErrorHandler
+import dev.kikugie.stitcher.exception.accept
 import dev.kikugie.stitcher.lexer.LexSlice
 import dev.kikugie.stitcher.lexer.LexerAccess
 import dev.kikugie.stitcher.transformer.TransformParameters
@@ -21,63 +19,67 @@ import kotlin.math.min
 
 class CommentParser(
     private val lexer: LexerAccess,
-    private val handler: ErrorHandler = StoringErrorHandler(),
+    private val handler: ErrorHandler,
     private val params: TransformParameters? = null,
-) {
-    private val currentType get() = lexer.lookup()?.type
-    private val nextType get() = lexer.lookup(1)?.type
-    val errors get() = handler.errors
+) : LexerAccess by lexer {
+    private val nextType get() = lookup()?.type
 
     fun parse(): Definition? {
-        val mode = lexer.lookup()?.type ?: return null
-        val extension = nextType == SCOPE_CLOSE
-        if (extension) consume()
-        val component = when (mode) {
+        val marker = consume()?.type as? MarkerType ?: return null
+        val extension = (nextType == SCOPE_CLOSE).also {
+            if (it) consume()
+        }
+
+        val component = when (marker) {
             CONDITION -> parseCondition(extension)
             SWAP -> parseSwap(extension)
-            else -> return null
         }
+
         val closerToken = consume()
         val closer = when (closerToken?.type) {
             SCOPE_OPEN -> consume { ScopeType.CLOSED }
             EXPECT_WORD -> consume { ScopeType.WORD }
             null -> ScopeType.LINE
-            else -> consume { handler.accept(it, Messages.WRONG_CLOSER); ScopeType.LINE }
+            else -> consume {
+                it.report { "Invalid comment closer" }
+                ScopeType.LINE
+            }
         }
-        if (closerToken != null && component.isEmpty())
-            handler.accept(closerToken, Messages.EMPTY_BODY)
-        if (currentType == WhitespaceType)
-            consume()
-        if (lexer.lookup() != null)
-            handler.accept(lexer.lookup()!!.start(), Messages.NO_END)
+        if (closerToken != null && component.isEmpty()) closerToken.report {
+            "Scope specifiers are not allowed in closer blocks"
+        }
+        if (nextType != null) lookup()!!.report {
+            "Expected end of comment"
+        }
         return Definition(component, extension, closer)
     }
 
-    private fun parseSwap(isExtension: Boolean): Swap {
+    private fun parseSwap(extension: Boolean): Swap {
         var identifier = Token.EMPTY
         while (true) when (nextType) {
-            WhitespaceType -> consume()
             SCOPE_OPEN, EXPECT_WORD, null -> break
             IDENTIFIER -> consume {
-                if (isExtension) return@consume handler.accept(it, Messages.CLOSER_SWAP)
-                if (identifier == Token.EMPTY) identifier = it.token
-                else handler.accept(it, Messages.DUPLICATE_SWAP)
+                if (extension) return@consume it.report {
+                    "Identifiers are not allowed in swap closers"
+                }
+                if (identifier.isEmpty()) identifier = it.token
+                else it.report { "Duplicate swap identifier" }
+
                 if (params != null && it.value !in params.swaps)
-                    handler.accept(it, Messages.WRONG_SWAP)
+                    handler.accept(it, "Unresolved swap identifier")
             }
-            else -> consume { handler.accept(it, Messages.WRONG_TOKEN) }
+            else -> consume { it.report { "Unexpected token" } }
         }
         return Swap(identifier)
     }
 
-    private fun parseCondition(isExtension: Boolean): Condition {
+    private fun parseCondition(extension: Boolean): Condition {
         // Save to report after the sugar errors
         val errors = mutableListOf<LexSlice>()
         val sugar = mutableListOf<LexSlice>()
         var expression: Component = Empty
 
         while (true) when (nextType) {
-            WhitespaceType -> consume()
             SCOPE_OPEN, EXPECT_WORD, NullType, null -> break
             IF, ELSE, ELIF -> consume {
                 if (expression.isBlank()) sugar += it
@@ -88,38 +90,42 @@ class CommentParser(
                 else consume { errors += it }
             else -> consume { errors += it }
         }
-        validateCondition(isExtension, sugar, expression)
-        errors.forEach { handler.accept(it, Messages.WRONG_TOKEN) }
+        validateCondition(extension, sugar, expression)
+        errors.forEach { it.report { "Unexpected token" } }
         return Condition(sugar.map { it.token }, expression)
     }
 
     private fun matchExpression(): Component = when (nextType) {
-        WhitespaceType -> consume { matchExpression() }
         NEGATE -> consume { matchBoolean(Unary(it.token, matchExpression())) }
         PREDICATE -> matchBoolean(Assignment(Token.EMPTY, matchPredicates()))
         IDENTIFIER -> consume { id ->
             if (nextType == WhitespaceType) consume()
             if (nextType == ASSIGN) consume {
                 val predicates = matchPredicates()
-                if (params != null && id.value !in params.dependencies)
-                    handler.accept(id, Messages.WRONG_DEP)
-                if (predicates.isEmpty())
-                    handler.accept(it, Messages.NO_PREDICATES)
+                if (params != null && id.value !in params.dependencies) it.report {
+                    "Unresolved dependency"
+                }
+                if (predicates.isEmpty()) it.report {
+                    "Missing predicates"
+                }
                 matchBoolean(Assignment(id.token, predicates))
             } else {
-                if (params != null && id.value !in params.constants)
-                    handler.accept(id, Messages.WRONG_CONST)
+                if (params != null && id.value !in params.constants) id.report {
+                    "Unresolved constant"
+                }
                 matchBoolean(Literal(id.token))
             }
         }
         GROUP_OPEN -> consume {
             val group = Group(matchExpression())
             if (nextType == GROUP_CLOSE) consume()
-            else handler.accept(lexer.lookupOrDefault().end(GROUP_CLOSE), Messages.NO_GROUP_END)
+            else lexer.peek()!!.end().report {
+                "Expected ')' to close the group"
+            }
             matchBoolean(group)
         }
         else -> consume {
-            handler.accept(it, Messages.WRONG_TOKEN)
+            it.report { "Unexpected token" }
             Empty
         }
     }
@@ -139,30 +145,37 @@ class CommentParser(
     }
 
     private fun validateCondition(isExtension: Boolean, sugar: List<LexSlice>, component: Component) {
-        fun reportRest(n: Int) = sugar.drop(n).forEach { handler.accept(it, Messages.WRONG_SUGAR) }
-
+        fun reportRest(n: Int) = sugar.drop(n).forEach { it.report { "Invalid condition sugar" } }
         when (sugar.firstOrNull()?.type) {
             IF -> {
-                if (isExtension) handler.accept(sugar.first(), Messages.PLS_NO_EXTENSION)
-                if (component.isEmpty()) handler.accept(sugar.last().end(), Messages.NO_CONDITION)
+                if (isExtension) sugar.first().report {
+                    "Expected 'else' or 'elif' to follow the extension"
+                }
+                if (component.isEmpty()) sugar.last().end().report {
+                    "Must have a condition statement"
+                }
                 reportRest(1)
             }
             ELIF -> {
-                if (!isExtension) handler.accept(sugar.first(), Messages.NO_EXTENSION)
-                if (component.isEmpty()) handler.accept(sugar.last().end(), Messages.NO_CONDITION)
+                if (!isExtension) sugar.first().report {
+                    "Expected to follow '}' to extend the condition"
+                }
+                if (component.isEmpty()) sugar.last().end().report {
+                    "Must have a condition statement"
+                }
                 reportRest(1)
             }
             ELSE -> {
-                if (!isExtension) handler.accept(sugar.first(), Messages.NO_EXTENSION)
+                if (!isExtension) sugar.first().report {
+                    "Expected to follow '}' to extend the condition"
+                }
                 when (sugar.getOrNull(1)?.type) {
-                    IF -> {
-                        if (component.isEmpty()) handler.accept(sugar.last().end(), Messages.NO_CONDITION)
-                        reportRest(2)
-                    }
-                    null -> {
-                        if (component.isNotEmpty()) handler.accept(sugar.last().end(), Messages.PLS_NO_CONDITION)
-                        reportRest(1)
-                    }
+                    IF -> if (component.isEmpty()) sugar.last().end().report {
+                        "Must have a condition statement"
+                    }.also { reportRest(2) }
+                    null -> if (component.isNotEmpty()) sugar.last().end().report {
+                        "Must not have a condition statement"
+                    }.also { reportRest(1) }
                     else -> reportRest(1)
                 }
             }
@@ -174,14 +187,7 @@ class CommentParser(
     private fun LexSlice.end(new: TokenType = type): LexSlice =
         min(source.lastIndex, range.last + 1).let { LexSlice(new, it..it, source) }
 
-    private fun LexSlice.start(new: TokenType = type): LexSlice =
-        min(source.lastIndex, range.first).let { LexSlice(new, it..it, source) }
-
-    private fun consume(): LexSlice? {
-        return lexer.advance()
-    }
-
-    private inline fun <T> consume(action: (LexSlice) -> T): T {
-        return action(lexer.advance() ?: lexer.lookupOrDefault())
-    }
+    private fun consume(): LexSlice? = lexer.advance()
+    private inline fun <T> consume(action: (LexSlice) -> T): T = action(advance()!!)
+    private inline fun LexSlice.report(message: () -> String) = handler.accept(this, message())
 }

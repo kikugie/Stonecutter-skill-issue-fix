@@ -1,7 +1,12 @@
 package dev.kikugie.stitcher.lexer
 
 interface LexerAccess {
-    fun lookupOrDefault(offset: Int = 0): LexSlice
-    fun lookup(offset: Int = 0): LexSlice?
+    fun peek(): LexSlice?
+    fun lookup(): LexSlice?
     fun advance(): LexSlice?
+
+    fun rawLookup(offset: Int = 0): LexSlice?
+    fun rawAdvance(): LexSlice?
+
+    operator fun get(index: Int): LexSlice?
 }

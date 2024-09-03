@@ -6,6 +6,9 @@ import dev.kikugie.stitcher.data.scope.Scope
 import dev.kikugie.stitcher.data.token.Token
 import dev.kikugie.stitcher.transformer.TransformParameters
 
+fun Token.isEmpty() = this == Token.EMPTY
+fun Token.isNotEmpty() = !isEmpty()
+
 fun Token.isBlank() = value.isBlank()
 fun Token.isNotBlank() = !isBlank()
 

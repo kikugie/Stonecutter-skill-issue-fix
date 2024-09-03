@@ -8,6 +8,10 @@ fun Pair<LexSlice, String>.join() = """
     ${"~".repeat(first.value.length.coerceAtLeast(1)).prependIndent(" ".repeat((first.range.first).coerceAtLeast(0)))}
 """.trimIndent()
 
+inline fun ErrorHandler.accept(token: LexSlice, message: () -> String) {
+    accept(token, message())
+}
+
 interface ErrorHandler {
     val errors: Collection<Pair<LexSlice, String>>
     fun accept(token: LexSlice, message: String)

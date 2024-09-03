@@ -1,89 +1,52 @@
 package dev.kikugie.stitcher.lexer
 
 import dev.kikugie.stitcher.data.token.*
-import kotlin.math.min
+import dev.kikugie.stitcher.exception.ErrorHandler
 
 class Lexer(
     private val input: CharSequence,
-    private val matchers: Iterable<TokenRecognizer> = ALL,
-) : LexerAccess {
-    private val tokens = mutableListOf<LexSlice>()
-    private var index = 0
-    private var cursor = 0
+    private val matchers: Iterable<TokenRecognizer>,
+    private val handler: ErrorHandler,
+): LexerAccess {
+    private var index: Int = -1
+    private val tokens: List<LexSlice> by lazy(::readTokens)
 
-    override fun lookupOrDefault(offset: Int): LexSlice = lookup(offset) ?: LexSlice(NullType, input.lastIndex..<input.length, input)
-    override fun lookup(offset: Int) = when {
-        offset >= 0 -> tokens.getOrNull(index + offset) ?: run {
-            if (cursor == -1) return@run null
-            for (i in tokens.size..index + offset)
-                advanceInternal()
-            tokens.getOrNull(index + offset)
-        }
+    override fun get(index: Int): LexSlice? = tokens.getOrNull(index)
+    override fun peek(): LexSlice? = tokens.getOrNull(index)
+    override fun rawLookup(offset: Int): LexSlice? = tokens.getOrNull(index + offset)
+    override fun rawAdvance(): LexSlice? = tokens.getOrNull(++index)
 
-        else -> tokens.getOrNull(index + offset)
+    override fun lookup(): LexSlice? {
+        var cursor = index
+        do cursor++ while (tokens.getOrNull(cursor)?.type == WhitespaceType)
+        return tokens.getOrNull(cursor)
     }
 
-    override fun advance(): LexSlice? = (tokens.getOrNull(index + 1) ?: advanceInternal()).also {
-        if (it == null || cursor >= input.length) cursor = -1
-        index = min(index + 1, tokens.size)
+    override fun advance(): LexSlice? {
+        do index++ while (tokens.getOrNull(index)?.type == WhitespaceType)
+        return tokens.getOrNull(index)
     }
 
-    private fun advanceInternal(): LexSlice? = when (cursor) {
-        -1 -> null
-        0 -> when (input.firstOrNull()) {
-            '?' -> {
-                ++cursor
-                slice(MarkerType.CONDITION, 0..0)
-            }
+    private fun MutableList<LexSlice>.add(type: TokenType, range: IntRange) = add(slice(type, range))
+    private fun slice(type: TokenType, range: IntRange) = LexSlice(type, range, input)
 
-            '$' -> {
-                ++cursor
-                slice(MarkerType.SWAP, 0..0)
-            }
-
-            else -> {
-                cursor = -1
-                slice(ContentType.COMMENT, input.indices)
-            }
-        }.also {
-            tokens += it
+    private fun readTokens() = buildList {
+        when(input.firstOrNull()) {
+            '?' -> add(MarkerType.CONDITION, 0..0)
+            '$' -> add(MarkerType.SWAP, 0..0)
+            else -> add(ContentType.CONTENT, input.indices).also { return@buildList }
         }
 
-        else -> locateToken()
-    }
-
-    private fun locateToken(): LexSlice? {
-        if (cursor >= input.length) return null
-        fun find(): LexSlice? = matchers.firstNotNullOfOrNull {
-            val match = it.match(input, cursor) ?: return@firstNotNullOfOrNull null
-            val slice = slice(it.type, match)
-            cursor = slice.range.last + 1
-            slice
-        }
-
-        val start = cursor
-        var pos = cursor
-        val buffer = StringBuilder()
+        var cursor = 1
         while (cursor < input.length) {
-            val slice = find()
-            if (slice == null) buffer.append(input[cursor++])
-            else return if (buffer.isEmpty()) {
-                tokens += slice
-                slice
-            } else {
-                val unknown = slice(NullType, start until pos)
-                tokens += unknown
-                tokens += slice
-                unknown
+            val slice = matchers.firstNotNullOfOrNull { rec ->
+                rec.match(input, cursor)?.let { slice(rec.type, it) }
+            } ?: slice(NullType, cursor..<input.length).also {
+                handler.accept(it, "Unknown token")
             }
-            pos++
+            add(slice)
+            cursor = slice.range.last + 1
+            // TODO: When encountering a scope closer, wrap up processing
         }
-        if (buffer.isEmpty()) return null
-        val unknown = slice(NullType, start until cursor)
-        tokens += unknown
-        return unknown
     }
-
-    internal fun slice(type: TokenType, range: IntRange) = LexSlice(type, range, input)
-    internal fun tokens() = tokens
 }

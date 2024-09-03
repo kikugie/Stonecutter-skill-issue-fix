@@ -12,6 +12,7 @@ import dev.kikugie.stitcher.eval.isEmpty
 import dev.kikugie.stitcher.eval.isNotEmpty
 import dev.kikugie.stitcher.exception.ErrorHandler
 import dev.kikugie.stitcher.exception.StoringErrorHandler
+import dev.kikugie.stitcher.lexer.ALL
 import dev.kikugie.stitcher.lexer.LexSlice
 import dev.kikugie.stitcher.lexer.Lexer
 import dev.kikugie.stitcher.transformer.TransformParameters
@@ -62,7 +63,7 @@ class FileParser(
 
     private fun parseComment(token: Token) {
         val handler = handlerFactory()
-        val lexer = Lexer(token.value)
+        val lexer = Lexer(token.value, ALL, handler)
         val parser = CommentParser(lexer, handler, params)
         val def = parser.parse() ?: run {
             active.blocks.add(CommentBlock(commentStart, token, commentEnd))
@@ -71,10 +72,10 @@ class FileParser(
 
         if (def.extension)
             if (def.type == active.type) scopes.pop()
-            else handler.accept(lexer.tokens()[1], "${def.type} closes unmatched scope of ${active.type}")
+            else handler.accept(lexer[1]!!, "${def.type} closes unmatched scope of ${active.type}")
 
-        val scope = if (def.isEmpty() && def.extension && def.enclosure == ScopeType.LINE) null else Scope(def.type, def
-            .enclosure)
+        val scope = if (def.isEmpty() && def.extension && def.enclosure == ScopeType.LINE) null
+        else Scope(def.type, def.enclosure)
         active.blocks.add(CodeBlock(commentStart, def, commentEnd, scope))
         if (scope != null) scopes.push(scope)
     }
