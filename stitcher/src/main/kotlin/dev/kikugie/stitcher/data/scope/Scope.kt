@@ -65,11 +65,10 @@ enum class ScopeType(val id: String) {
 @Serializable
 data class Scope(
     // Not serialized because only used for parsing the tree
-    @Transient val type: MarkerType? = null,
-    @Transient val enclosure: ScopeType = CLOSED
-) {
+    @Transient var type: MarkerType? = null,
+    @Transient var enclosure: ScopeType = CLOSED,
     val blocks: MutableList<Block> = mutableListOf()
-
+) : MutableList<Block> by blocks {
     fun <T> accept(visitor: Visitor<T>): T = visitor.visitScope(this)
 
     interface Visitor<T> {

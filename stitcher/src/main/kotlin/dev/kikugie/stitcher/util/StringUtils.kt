@@ -1,20 +1,5 @@
 package dev.kikugie.stitcher.util
-import dev.kikugie.stitcher.data.scope.ScopeType
 import java.io.Reader
-
-internal fun CharSequence.leadingSpaces() = buildString {
-    for (c in this@leadingSpaces) if (c.isWhitespace()) append(c) else break
-}
-
-internal fun CharSequence.trailingSpaces() = buildString {
-    for (c in this@trailingSpaces.reversed()) if (c.isWhitespace()) append(c) else break
-}.reversed()
-
-internal fun String.affectedRange(type: ScopeType): IntRange = when (type) {
-    ScopeType.CLOSED -> indices
-    ScopeType.LINE   -> filterUntil { '\r' in it || '\n' in it }
-    ScopeType.WORD   -> filterUntil { it.isBlank() }
-}
 
 internal fun String.replaceKeepIndent(value: String): String {
     val tabIndents = firstOrNull() == '\t'
@@ -28,15 +13,6 @@ internal fun String.replaceKeepIndent(value: String): String {
         append(" ".repeat(minCommonIndent % 4))
     }
     return value.prependIndent(prepend)
-}
-
-internal inline fun String.filterUntil(predicate: (String) -> Boolean): IntRange {
-    val buffer = StringBuilder()
-    for (it in reader().ligatures()) {
-        if (buffer.isNotBlank() && predicate(it)) break
-        buffer.append(it)
-    }
-    return buffer.leadingSpaces().length..<buffer.length - buffer.trailingSpaces().length
 }
 
 internal fun CharSequence.indentWidth(): Int {

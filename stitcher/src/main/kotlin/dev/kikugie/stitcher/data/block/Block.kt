@@ -4,6 +4,7 @@ import dev.kikugie.stitcher.data.component.Definition
 import dev.kikugie.stitcher.data.scope.Scope
 import dev.kikugie.stitcher.data.token.Token
 import dev.kikugie.stitcher.data.block.Block.Visitor
+import dev.kikugie.stitcher.data.token.ContentType
 import kotlinx.serialization.Serializable
 
 /**
@@ -30,6 +31,8 @@ sealed interface Block {
 data class ContentBlock(
     val content: Token,
 ) : Block {
+    constructor(content: CharSequence) : this(Token(content.toString(), ContentType.CONTENT))
+
     override fun <T> accept(visitor: Visitor<T>) = visitor.visitContent(this)
 }
 

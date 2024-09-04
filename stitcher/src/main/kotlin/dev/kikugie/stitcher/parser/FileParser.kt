@@ -28,15 +28,13 @@ import java.util.*
 class FileParser(
     input: Sequence<Token>,
     private val params: TransformParameters? = null,
-    private val handlerFactory: () -> ErrorHandler = ::StoringErrorHandler,
+    private val handler: ErrorHandler = StoringErrorHandler(),
 ) {
+    val errors: Collection<Pair<LexSlice, String>> get() = handler.errors
     private val iter: LookaroundIterator<Token> = LookaroundIterator(input.iterator())
     private val scopes: Stack<Scope> = Stack<Scope>().apply { push(Scope()) }
     private val active: Scope get() = scopes.peek()
     private val root: Scope get() = scopes[0]
-    private val handlers: MutableList<ErrorHandler> = mutableListOf()
-    val hasErrors: Boolean get() = handlers.any { it.errors.isNotEmpty() }
-    val errors: Sequence<Pair<LexSlice, String>> get() = handlers.asSequence().flatMap { it.errors }
 
     private val commentStart get() = iter.prev!!
     private val commentEnd get() = when (iter.peek?.type) {
@@ -62,7 +60,6 @@ class FileParser(
     }.let { root }
 
     private fun parseComment(token: Token) {
-        val handler = handlerFactory()
         val lexer = Lexer(token.value, ALL, handler)
         val parser = CommentParser(lexer, handler, params)
         val def = parser.parse() ?: run {

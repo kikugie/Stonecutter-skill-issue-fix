@@ -4,95 +4,82 @@ import dev.kikugie.stitcher.data.block.Block
 import dev.kikugie.stitcher.data.block.CodeBlock
 import dev.kikugie.stitcher.data.block.CommentBlock
 import dev.kikugie.stitcher.data.block.ContentBlock
-import dev.kikugie.stitcher.data.component.Condition
 import dev.kikugie.stitcher.data.component.Definition
 import dev.kikugie.stitcher.data.scope.Scope
-import dev.kikugie.stitcher.data.token.ContentType
-import dev.kikugie.stitcher.data.token.MarkerType.CONDITION
-import dev.kikugie.stitcher.data.token.MarkerType.SWAP
-import dev.kikugie.stitcher.data.token.Token
-import dev.kikugie.stitcher.eval.Assembler
+import dev.kikugie.stitcher.data.token.MarkerType.*
 import dev.kikugie.stitcher.eval.ConditionChecker
 import dev.kikugie.stitcher.eval.join
+import dev.kikugie.stitcher.exception.ErrorHandler
+import dev.kikugie.stitcher.exception.StoringErrorHandler
+import dev.kikugie.stitcher.lexer.LexSlice
 import dev.kikugie.stitcher.parser.FileParser
 import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.scanner.Scanner
-import dev.kikugie.stitcher.util.affectedRange
 import dev.kikugie.stitcher.util.replaceKeepIndent
 
-/**
- * Evaluates [Definition]s and modifies the AST in-place.
- *
- * @property source Scope to modify
- * @property recognizers Comment recognizers used to reparse uncommented blocks
- * @property params Input parameters
- */
-// TODO: Handle different comment styles
 class Transformer(
     private val source: Scope,
     private val recognizers: Iterable<CommentRecognizer>,
     private val params: TransformParameters,
+    private val handler: ErrorHandler = StoringErrorHandler()
 ) : Block.Visitor<Unit> {
-    private val visitor = ConditionChecker(params)
-    private var previousResult: Boolean = false
+    private val checker = ConditionChecker(params)
+    private var previousResult = false
 
-    /**
-     * Runs the transformer on the given scope.
-     *
-     * @return input scope
-     */
-    fun process() = source.blocks.forEach { it.accept(this) }.let { source }
-    private fun withSource(source: Scope) = Transformer(source, recognizers, params)
+    fun process() = source.apply { onEach { it.accept(this@Transformer) } }
     override fun visitContent(it: ContentBlock) {}
     override fun visitComment(it: CommentBlock) {}
-    override fun visitCode(it: CodeBlock) = when (it.def.type) {
+    override fun visitCode(it: CodeBlock) = when (patch(it).scope?.type) {
         CONDITION -> processCondition(it)
         SWAP -> processSwap(it)
-        else -> {}
-    }
-
-    private fun processSwap(it: CodeBlock) {
-        val def = it.def
-        val contents = it.scope?.join()
-            ?: return
-        val replacement = params.swaps[def.swap!!.identifier.value]
-            ?: return // TODO
-        val range = contents.affectedRange(def.enclosure)
-        val target = contents.substring(range)
-        val new = contents.replaceRange(range, target.replaceKeepIndent(replacement))
-        if (contents != new) {
-            val parsed = new.parse()
-            withSource(parsed).process()
-            it.scope.assign(parsed.blocks)
-        }
+        null -> {}
     }
 
     private fun processCondition(it: CodeBlock) {
-        val def = it.def
-        val scope = it.scope ?: return
-        val condition = def.component as Condition
-        var bool = condition.accept(visitor)
-        if (!def.extension) previousResult = false
+        requireNotNull(it.scope) // Should be resolved by patch method
+        var bool = try {
+            it.def.condition!!.accept(checker)
+        } catch (e: UnsupportedOperationException) {
+            it.def.toSlice().report { "Failed to evaluate condition: ${e.message}" }
+            return
+        }
+
+        if (!it.def.extension) previousResult = false
         else bool = !previousResult && bool
         previousResult = bool || previousResult
 
-        val text = if (bool) CommentRemover.accept(def.enclosure, scope)
-        else CommentAdder.accept(def.enclosure, scope)
+        val text = if (bool) it.scope.accept(CommentRemover) else it.scope.accept(CommentAdder)
         when {
-            text == null -> withSource(scope).process()
-            !bool -> scope.assign(listOf(ContentBlock(Token(text, ContentType.CONTENT))))
-            else -> {
-                val parsed = text.parse()
-                withSource(parsed).process()
-                it.scope.assign(parsed.blocks)
-            }
+            text == null -> withSource(it.scope).process()
+            !bool -> listOf(ContentBlock(text)).assignTo(it.scope)
+            else -> withSource(text.parse()).process().assignTo(it.scope)
         }
     }
 
-    private fun String.parse() = FileParser(Scanner(reader(), recognizers).tokenize()).parse()
+    private fun processSwap(it: CodeBlock) {
+        requireNotNull(it.scope) // Should be resolved by patch method
+        val key = it.def.swap!!.identifier.value
+        val replacement = params.swaps[key] ?: return run {
+            it.def.toSlice().report { "Unable to find swap replacement" }
+        }
 
-    private fun Scope.assign(new: Iterable<Block>) {
-        blocks.clear()
-        blocks.addAll(new)
+        val contents = it.scope.join()
+        val range = contents.affectedRange(it.def.enclosure)
+        val target = contents.substring(range)
+        val new = contents.replaceRange(range, target.replaceKeepIndent(replacement))
+        if (contents != new) withSource(new.parse()).process().assignTo(it.scope)
+    }
+
+    private fun withSource(scope: Scope) = Transformer(scope, recognizers, params, handler)
+    private fun String.parse() = FileParser(Scanner(reader(), recognizers).tokenize(), params, handler).parse()
+    private fun Iterable<Block>.assignTo(scope: Scope) {
+        scope.clear()
+        scope.addAll(this)
+    }
+    private fun Definition.toSlice() = join().let { LexSlice(type!!, it.indices, it) }
+    private inline fun LexSlice.report(message: () -> String) = handler.accept(this, message())
+    private fun patch(it: CodeBlock): CodeBlock = it.apply {
+        scope?.type = def.type
+        scope?.enclosure = def.enclosure
     }
 }

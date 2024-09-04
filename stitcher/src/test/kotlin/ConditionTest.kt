@@ -1,6 +1,5 @@
 import com.github.ajalt.mordant.rendering.TextColors.cyan
 import com.github.ajalt.mordant.rendering.TextColors.red
-import dev.kikugie.semver.VersionParser
 import dev.kikugie.stitcher.eval.ConditionChecker
 import dev.kikugie.stitcher.parser.CommentParser
 import dev.kikugie.stitcher.transformer.TransformParameters
@@ -8,7 +7,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
 
-object EvalTest {
+object ConditionTest {
     val SAMPLES = buildList {
         add("const && >=1 <=3", true) {
             dependencies[""] = "2"
@@ -58,13 +57,5 @@ object EvalTest {
 
     private inline fun MutableList<Triple<String, Boolean, TransformParameters>>.add(expression: String, result: Boolean, parameters: TransformParametersBuilder.() -> Unit) {
         add(Triple("? $expression", result, TransformParametersBuilder().apply(parameters).build()))
-    }
-
-    private class TransformParametersBuilder {
-        val swaps: MutableMap<String, String> = mutableMapOf()
-        val constants: MutableMap<String, Boolean> = mutableMapOf()
-        val dependencies: MutableMap<String, String> = mutableMapOf()
-
-        fun build() = TransformParameters(swaps, constants, dependencies.mapValues { VersionParser.parse(it.value) })
     }
 }
