@@ -10,7 +10,7 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.5-project-trees.5"
+    id("dev.kikugie.version "0.5-alpha.5"
 }
 
 stonecutter {
@@ -33,7 +33,7 @@ pluginManagement {
 }
 
 plugins {
-    id "dev.kikugie.stonecutter" version "0.5-project-trees.5"
+    id "dev.kikugie.version "0.5-alpha.5"
 }
 
 stonecutter {
