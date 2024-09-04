@@ -63,3 +63,27 @@ private fun CharSequence.ligatures(): Iterator<String> = object : Iterator<Strin
         char = read()
     }
 }
+
+internal fun String.replaceKeepIndent(value: String): String {
+    val tabIndents = firstOrNull() == '\t'
+    val minCommonIndent = lines()
+        .filter(String::isNotBlank)
+        .minOfOrNull { it.indentWidth() }
+        ?: 0
+    val prepend = if (!tabIndents) " ".repeat(minCommonIndent)
+    else buildString {
+        append("\t".repeat(minCommonIndent / 4))
+        append(" ".repeat(minCommonIndent % 4))
+    }
+    return value.prependIndent(prepend)
+}
+
+internal fun CharSequence.indentWidth(): Int {
+    var count = 0
+    for (c in this) when (c) {
+        '\t' -> count += 4
+        ' ' -> count++
+        else -> break
+    }
+    return count
+}

@@ -25,7 +25,14 @@ object TransformerTest {
                 swaps["swap"] = "placeholder2"
             }
         }
-        add("swap indent") {
+        add("swap tab indent") {
+            input = "//\$ swap\n\tplaceholder1"
+            expected = "//\$ swap\n\tplaceholder2"
+            params {
+                swaps["swap"] = "placeholder2"
+            }
+        }
+        add("swap tab") {
             input = """
                 //$ swap
                     placeholder1

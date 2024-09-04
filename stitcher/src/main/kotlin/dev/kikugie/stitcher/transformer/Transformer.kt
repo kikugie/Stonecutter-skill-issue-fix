@@ -15,7 +15,6 @@ import dev.kikugie.stitcher.lexer.LexSlice
 import dev.kikugie.stitcher.parser.FileParser
 import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.scanner.Scanner
-import dev.kikugie.stitcher.util.replaceKeepIndent
 
 class Transformer(
     private val source: Scope,
