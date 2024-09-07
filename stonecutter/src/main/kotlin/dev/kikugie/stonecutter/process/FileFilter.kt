@@ -4,7 +4,7 @@ import java.nio.file.Path
 import kotlin.io.path.extension
 import kotlin.io.path.isDirectory
 
-internal data class FileFilter(
+data class FileFilter(
     private val excludedExtensions: Set<String>,
     private val excludedPaths: Set<Path>
 ) {

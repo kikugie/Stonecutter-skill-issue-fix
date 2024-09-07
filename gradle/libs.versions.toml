@@ -10,6 +10,7 @@ coroutines = "1.9.0-RC"
 kaml = "0.60.0"
 dokka = "1.9.20"
 junit = "5.9.2"
+lz4 = "1.8.0"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -28,3 +29,4 @@ kaml = { group = "com.charleskorn.kaml", name = "kaml", version.ref = "kaml" }
 cbor = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-cbor", version.ref = "serialization" }
 junit-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
 junit-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }
+lz4 = { group = "org.lz4", name = "lz4-java", version.ref = "lz4" }

@@ -15,13 +15,16 @@ import dev.kikugie.stitcher.exception.StoringErrorHandler
 import dev.kikugie.stitcher.lexer.ALL
 import dev.kikugie.stitcher.lexer.LexSlice
 import dev.kikugie.stitcher.lexer.Lexer
+import dev.kikugie.stitcher.scanner.CommentRecognizer
+import dev.kikugie.stitcher.scanner.Scanner
 import dev.kikugie.stitcher.transformer.TransformParameters
+import java.io.Reader
 import java.util.*
 
 /**
  * Parser for the entire file contents.
  *
- * @property handlerFactory Exception collector function for each comment
+ * @property handler Exception collector function for each comment
  *
  * @param input Sequence of tokens produced by the scanner or a reader to be scanned
  */
@@ -30,6 +33,18 @@ class FileParser(
     private val params: TransformParameters? = null,
     private val handler: ErrorHandler = StoringErrorHandler(),
 ) {
+    companion object {
+        fun create(
+            input: Reader,
+            handler: ErrorHandler,
+            recognizers: Iterable<CommentRecognizer>,
+            params: TransformParameters? = null,
+        ): FileParser {
+            val scanner = Scanner(input, recognizers)
+            return FileParser(scanner.tokenize(), params, handler)
+        }
+    }
+
     val errors: Collection<Pair<LexSlice, String>> get() = handler.errors
     private val iter: LookaroundIterator<Token> = LookaroundIterator(input.iterator())
     private val scopes: Stack<Scope> = Stack<Scope>().apply { push(Scope()) }

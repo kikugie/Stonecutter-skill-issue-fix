@@ -32,8 +32,9 @@ abstract class ChiseledTask : DefaultTask() {
      * @param name delegate task
      */
     fun ofTask(name: String) {
-        versions.get().forEach {
-            val task = project.project(it.project).tasks.getByName(name)
+        val versions = versions.get().toSet()
+        setup.nodes.filter { it.metadata in versions }.forEach {
+            val task = it.tasks.getByName(name)
             finalizedBy(task)
             task.mustRunAfter(setupTask)
         }

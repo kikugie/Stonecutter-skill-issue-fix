@@ -23,6 +23,7 @@ dependencies {
     implementation(libs.kotlin.coroutines)
     implementation(libs.kaml)
     implementation(libs.cbor)
+    implementation(libs.lz4)
 }
 
 tasks.withType<DokkaTask>().configureEach {

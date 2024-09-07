@@ -1,6 +1,13 @@
 package dev.kikugie.stonecutter
 
 import org.gradle.api.Project
+import java.io.Closeable
+import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.isReadable
+import kotlin.io.path.isRegularFile
+
+typealias StonecutterSettings = dev.kikugie.stonecutter.settings.StonecutterSettings
 
 /**
  * Represents an existing [StonecutterProject.project].
@@ -39,6 +46,11 @@ internal val Project.stonecutterCacheDir
 
 internal val Project.stonecutterCachePath
     get() = stonecutterCacheDir.toPath()
+
+internal inline fun <T : Closeable?, R> T.useCatching(block: (T) -> R): Result<R> =
+    runCatching { use(block) }
+
+internal fun Path.isAvailable() = exists() && isRegularFile() && isReadable()
 
 /**
  * Delegates set operation. Meant to be used with Kotlin DSL.
