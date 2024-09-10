@@ -1,8 +1,8 @@
 package dev.kikugie.stonecutter.process
 
 import dev.kikugie.semver.VersionParser
-import dev.kikugie.stitcher.scanner.StandardMultiLine
-import dev.kikugie.stitcher.scanner.StandardSingleLine
+import dev.kikugie.stitcher.scanner.DoubleSlashCommentRecognizer
+import dev.kikugie.stitcher.scanner.SlashStarCommentRecognizer
 import dev.kikugie.stitcher.transformer.TransformParameters
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.controller.ProjectBranch
@@ -72,7 +72,7 @@ internal abstract class StonecutterTask : DefaultTask() {
             dirs,
             FileFilter(params.excludedExtensions, params.excludedPaths),
             Charsets.UTF_8,
-            listOf(StandardMultiLine, StandardSingleLine),
+            listOf(SlashStarCommentRecognizer, DoubleSlashCommentRecognizer),
             params.toParams(toVersion.get().version),
             statistics, false
         )

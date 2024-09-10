@@ -70,7 +70,7 @@ class Transformer(
     }
 
     private fun withSource(scope: Scope) = Transformer(scope, recognizers, params, handler)
-    private fun String.parse() = FileParser(Scanner(reader(), recognizers).tokenize(), params, handler).parse()
+    private fun String.parse() = FileParser(Scanner(this, recognizers).asIterable(), params, handler).parse()
     private fun Iterable<Block>.assignTo(scope: Scope) {
         scope.clear()
         scope.addAll(this)

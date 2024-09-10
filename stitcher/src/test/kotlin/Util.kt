@@ -2,16 +2,16 @@ import com.charleskorn.kaml.Yaml
 import dev.kikugie.semver.VersionParser
 import dev.kikugie.stitcher.data.token.Token
 import dev.kikugie.stitcher.data.token.TokenType
-import dev.kikugie.stitcher.scanner.HashSingleLine
+import dev.kikugie.stitcher.scanner.DoubleSlashCommentRecognizer
+import dev.kikugie.stitcher.scanner.HashCommentRecognizer
 import dev.kikugie.stitcher.scanner.Scanner
-import dev.kikugie.stitcher.scanner.StandardMultiLine
-import dev.kikugie.stitcher.scanner.StandardSingleLine
+import dev.kikugie.stitcher.scanner.SlashStarCommentRecognizer
 import dev.kikugie.stitcher.transformer.TransformParameters
 import kotlinx.serialization.encodeToString
 
-val RECOGNIZERS = listOf(StandardSingleLine, HashSingleLine, StandardMultiLine)
+val RECOGNIZERS = listOf(SlashStarCommentRecognizer, HashCommentRecognizer, DoubleSlashCommentRecognizer)
 
-fun String.scan() = Scanner(reader(), RECOGNIZERS).tokenize()
+fun String.scan() = Scanner(this, RECOGNIZERS).asIterable()
 
 fun MutableList<Token>.token(value: String, type: TokenType) {
     add(Token(value, type))

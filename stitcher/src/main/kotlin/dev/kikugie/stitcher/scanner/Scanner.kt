@@ -1,121 +1,183 @@
 package dev.kikugie.stitcher.scanner
 
-import dev.kikugie.stitcher.data.token.Token
+import dev.kikugie.stitcher.data.token.ContentType
 import dev.kikugie.stitcher.data.token.ContentType.*
-import dev.kikugie.stitcher.data.token.TokenType
-import java.io.Reader
+import dev.kikugie.stitcher.data.token.Token
 
 /**
- * Separates comments and source contents to ease further lexical analysis.
+ * Determines which parts of the input string are considered to be comments.
+ * Comments inside string templates will not be detected
+ * due to language specific behaviour and should be avoided.
+ * ```kotlin
+ * "Template: ${/* not detected */variable}"
+ * ```
  *
- * @property input The reader object to read input from.
- * @property recognizers The collection of comment recognizers to use for tokenization.
+ * @property input String to scan
+ * @property recognizers The collection of comment recognizers to use for tokenization
  */
 class Scanner(
-    private val input: Reader,
+    private val input: CharSequence,
     private val recognizers: Iterable<CommentRecognizer>,
-) {
-    private val buffer = StringBuilder()
+) : Iterator<Token> {
+    companion object {
+        /**
+         * Scans the input [CharSequence] using the provided [CommentRecognizer]s and returns an [Iterable] of Tokens.
+         *
+         * @param input String to scan
+         * @param recognizers The collection of comment recognizers to use for tokenization
+         * @return an [Iterable] of [Token]s representing the scanned input
+         */
+        fun scan(input: CharSequence, recognizers: Iterable<CommentRecognizer>) = Scanner(input, recognizers).asIterable()
+    }
+
+    /**
+     * Length of the input.
+     *
+     * *Calling `input.length` every time makes it 9% slower, good job JVM constant evaluation!*
+     */
+    private val length = input.length
+
+    /**
+     * Current position in the input string.
+     */
     private var cursor = 0
-    private var current: CommentRecognizer? = null
+
+    /**
+     * Last appended position. Used to remember where to slice the string.
+     */
+    private var checkpoint = 0
+
+    /**
+     * The current quote enclosure type. Comments are not detected if it's not null.
+     * Updated by [quoteStatus].
+     */
     private var quote: Quote? = null
 
     /**
-     * Starts the scanner in lazy evaluation mode (there's no other mode).
-     *
-     * @return Lazily evaluated token sequence
+     * The current comment type. Must match [CommentRecognizer.end] to exit the comment.
      */
-    fun tokenize(): Sequence<Token> = sequence {
-        input.readLigatures { scan(it) }
-        if (buffer.isNotEmpty()) yield(buffer, if (current == null) CONTENT else COMMENT)
-        yield(Token.EMPTY)
+    private var comment: CommentRecognizer? = null
+
+    /**
+     * Stores the generated tokens, depleting before [advance] can be called.
+     */
+    private var buffer: ArrayDeque<Token> = ArrayDeque(4)
+
+    /**
+     * @return an [Iterable] for convenience
+     */
+    fun asIterable(): Iterable<Token> = Iterable { this }
+
+    override fun hasNext(): Boolean =
+        buffer.isNotEmpty() || advance()
+
+    override fun next(): Token {
+        if (!hasNext()) throw NoSuchElementException()
+        return buffer.removeFirst()
     }
 
-    private suspend fun SequenceScope<Token>.scan(str: String) {
-        cursor++
-        if (updateQuoteStatus().also { buffer.append(str) })
-            return
-        if (current == null) for (rec in recognizers) {
-            val match = rec.start(buffer) ?: continue
-            val start = cursor - buffer.length
-            match.range.shift(start)
-            buffer.delete(match.range)
-            if (buffer.isNotEmpty())
-                yield(buffer, CONTENT)
-            yield(match.value, COMMENT_START)
-            buffer.clear()
-            current = rec
-        } else {
-            val match = current?.end(buffer) ?: return
-            val start = cursor - buffer.length
-            match.range.shift(start)
-            buffer.delete(match.range)
-            yield(buffer, COMMENT)
-            yield(match.value, COMMENT_END)
-            buffer.clear()
-            current = null
+    private fun advance(): Boolean {
+        if (cursor >= length) return false
+        while (true) {
+            if (!advanceQuote())
+                return wrapRemaining()
+            val added = advanceRecognizers()
+            if (cursor >= length)
+                return wrapRemaining()
+            if (added) return true
+            cursor++
         }
     }
 
-    private fun updateQuoteStatus(): Boolean {
-        if (current != null) return false
-        val end = buffer.takeLast(3)
-        if (quote == null) quote = Quote.match(end)
-        else if (buffer.endsWith(quote!!.sequence) && !buffer.endsWith("\\${quote!!.sequence}"))
-            quote = null
+    private fun wrapRemaining(): Boolean {
+        if (cursor > checkpoint)
+            token(checkpoint, length, if (comment != null) COMMENT else CONTENT)
+        buffer.add(Token.EMPTY)
+        return true
+    }
+
+    private fun advanceQuote(): Boolean { // True when can process further
+        while (quoteStatus()) if (++cursor >= length) {
+            return false
+        }
+        return true
+    }
+
+    private fun advanceRecognizers(): Boolean { // True when have added to the list
+        if (cursor >= length) return false
+        if (comment == null) for (rec in recognizers) {
+            val match = rec.start(input, cursor)
+            if (match < 0) continue
+            if (checkpoint != cursor)
+                token(checkpoint, cursor, CONTENT)
+            token(cursor, cursor + match, COMMENT_START)
+            comment = rec
+            cursor += match
+            checkpoint = cursor
+            return true
+        } else {
+            val match = comment!!.end(input, cursor)
+            if (match < 0) return false
+            token(checkpoint, cursor, COMMENT)
+            token(cursor, cursor + match, COMMENT_END)
+            comment = null
+            cursor += match
+            checkpoint = cursor
+            return true
+        }
+        return false
+    }
+
+    /**
+     * Checks if the cursor is in quoted state or should exit it.
+     * Matches against non-escaped `'`, `"`, `'''`, `"""`. Quote must be closed by the same sequence that opened it
+     *
+     * If quote matches sets the cursor at the last character of the quote.
+     * @return `true` if the cursor is inside a quoted string
+     */
+    private fun quoteStatus(): Boolean {
+        if (comment != null || cursor >= length) return false
+        when (input[cursor]) {
+            '\'' -> if (getAt(cursor - 1) != '\\') when (quote) {
+                Quote.SINGLE -> quote = null
+                Quote.DOC_SINGLE -> if (next2Are('\'')) {
+                    cursor += 2; quote = null
+                }
+
+                null -> if (next2Are('\'')) {
+                    cursor += 2; quote = Quote.DOC_SINGLE
+                } else quote = Quote.SINGLE
+
+                else -> {}
+            }
+
+            '"' -> if (getAt(cursor - 1) != '\\') when (quote) {
+                Quote.DOUBLE -> quote = null
+                Quote.DOC_DOUBLE -> if (next2Are('"')) {
+                    cursor += 2; quote = null
+                }
+
+                null -> if (next2Are('"')) {
+                    cursor += 2; quote = Quote.DOC_DOUBLE
+                } else quote = Quote.DOUBLE
+
+                else -> {}
+            }
+        }
         return quote != null
     }
 
-    private fun StringBuilder.delete(range: IntRange) =
-        deleteRange(range.first, range.last + 1)
-
-    private enum class Quote(val sequence: String) {
-        SINGLE("'"),
-        DOUBLE("\""),
-        DOC_SINGLE("'''"),
-        DOC_DOUBLE("\"\"\"");
-
-        companion object {
-            fun match(chars: CharSequence) = when {
-                chars.lastOrNull() == '\'' -> SINGLE
-                chars.lastOrNull() == '"' -> DOUBLE
-                chars == DOC_SINGLE.sequence -> DOC_SINGLE
-                chars == DOC_DOUBLE.sequence -> DOC_DOUBLE
-                else -> null
-            }
-        }
+    private fun token(start: Int, end: Int, type: ContentType) {
+        buffer.add(Token(input.substring(start, end), type))
     }
 
-    private suspend inline fun SequenceScope<Token>.yield(
-        value: CharSequence,
-        type: TokenType,
-    ) = yield(Token(value.toString(), type))
+    private fun next2Are(char: Char): Boolean =
+        getAt(cursor + 1) == char && getAt(cursor + 2) == char
 
-    private inline fun Reader.readLigatures(action: (String) -> Unit) {
-        var char: Char
-        var captureCR = false
-        while (read().also { char = it.toChar() } != -1) when {
-            char == '\r' -> captureCR = true
-            captureCR ->
-                if (char == '\n')
-                    action("\r\n")
-                else {
-                    action("\r")
-                    action(char.toString())
-                }.also { captureCR = false }
+    private fun getAt(index: Int, default: Char = ' ') =
+        if (index >= 0 && index < length) input[index] else default
 
-            else -> action(char.toString())
-        }
-    }
-
-    private fun IntRange.shift(value: Int): IntRange =
-        first + value..last + value
-
-    //    private fun IntRange.shift(other: IntRange): IntRange {
-//        val shift = last - first
-//        return other.first + first..other.first + shift + first
-//    }
-    companion object {
-        fun Reader.scan(recognizers: Iterable<CommentRecognizer>) = Scanner(this, recognizers).tokenize()
+    private enum class Quote {
+        SINGLE, DOUBLE, DOC_SINGLE, DOC_DOUBLE
     }
 }

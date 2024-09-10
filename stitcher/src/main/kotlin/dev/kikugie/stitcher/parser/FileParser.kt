@@ -18,7 +18,6 @@ import dev.kikugie.stitcher.lexer.Lexer
 import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.scanner.Scanner
 import dev.kikugie.stitcher.transformer.TransformParameters
-import java.io.Reader
 import java.util.*
 
 /**
@@ -29,19 +28,19 @@ import java.util.*
  * @param input Sequence of tokens produced by the scanner or a reader to be scanned
  */
 class FileParser(
-    input: Sequence<Token>,
+    input: Iterable<Token>,
     private val params: TransformParameters? = null,
     private val handler: ErrorHandler = StoringErrorHandler(),
 ) {
     companion object {
         fun create(
-            input: Reader,
+            input: String,
             handler: ErrorHandler,
             recognizers: Iterable<CommentRecognizer>,
             params: TransformParameters? = null,
         ): FileParser {
             val scanner = Scanner(input, recognizers)
-            return FileParser(scanner.tokenize(), params, handler)
+            return FileParser(scanner.asIterable(), params, handler)
         }
     }
 

@@ -87,7 +87,7 @@ class FileProcessor(
             val handler = StoringErrorHandler()
             if (ast == null) {
                 statistics.parsed.getAndIncrement()
-                val parser = FileParser.create(text.reader(), handler, recognizers, params)
+                val parser = FileParser.create(text, handler, recognizers, params)
                 ast = parser.parse()
                 collector.push("Parsed AST, ${handler.errors.size} errors")
                 handler.throwIfHasErrors()

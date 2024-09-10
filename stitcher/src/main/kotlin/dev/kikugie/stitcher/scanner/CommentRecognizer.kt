@@ -1,62 +1,70 @@
 package dev.kikugie.stitcher.scanner
 
-import dev.kikugie.stitcher.data.token.Match
-
-enum class CommentType {
-    SINGLE_LINE, MULTI_LINE
-}
-
 /**
- * Interface for matching source comments in [Scanner]
+ * Matcher for comment start and end.
+ * Used instead of regex matching because regex is very slow.
  *
- * Matches the start and the end separately to improve scanner performance.
- * According to (very brief) tests, using regex matching makes it 1.6-2x slower.
+ * Comments must be closed by the same recognizer that opened it.
  */
 interface CommentRecognizer {
-    val type: CommentType
-    val start: String
-    val end: String
+    /**
+     * Detects if the comment starts at the cursor position.
+     *
+     * @param input Full input sequence
+     * @param offset Cursor position
+     * @return Length of the match or `-1` if it's not detected at the cursor
+     */
+    fun start(input: CharSequence, offset: Int): Int
 
-    fun start(str: CharSequence): Match? = str.match(start)
-    fun end(str: CharSequence): Match? = str.match(end)
-    fun CharSequence.match(match: CharSequence) = if (endsWith(match))
-        Match(match.toString(), length - match.length..<length) else null
+    /**
+     * Detects if the comment ends at the cursor position.
+     *
+     * @param input Full input sequence
+     * @param offset Cursor position
+     * @return Length of the match or `-1` if it's not detected at the cursor
+     */
+    fun end(input: CharSequence, offset: Int): Int
 }
 
 /**
- * Matches `/* ... */` comments
+ * Detects single-line comments starting with `#`.
+ * *Currently unused.*
  */
-data object StandardMultiLine : CommentRecognizer {
-    override val type = CommentType.MULTI_LINE
-    override val start = "/*"
-    override val end = "*/"
+data object HashCommentRecognizer : CommentRecognizer {
+    override fun start(input: CharSequence, offset: Int): Int =
+        if (input[offset] == '#') 1 else -1
+
+    override fun end(input: CharSequence, offset: Int): Int =
+        input.matchEOL(offset)
 }
 
 /**
- * Matches `// ...` comments
+ * Detects single-line comments starting with `//`.
  */
-data object StandardSingleLine : CommentRecognizer {
-    override val type = CommentType.SINGLE_LINE
-    override val start = "//"
-    override val end = "\n"
+data object DoubleSlashCommentRecognizer : CommentRecognizer {
+    override fun start(input: CharSequence, offset: Int): Int =
+        if (input[offset] == '/' && input.getAt(offset + 1) == '/') 2 else -1
 
-    override fun end(str: CharSequence) = str.matchEOL()
+    override fun end(input: CharSequence, offset: Int): Int =
+        input.matchEOL(offset)
 }
 
 /**
- * Matches `# ...` comments
+ * Detects `/* */` multi-line comments.
  */
-data object HashSingleLine : CommentRecognizer {
-    override val type = CommentType.SINGLE_LINE
-    override val start = "#"
-    override val end = "\n"
+data object SlashStarCommentRecognizer : CommentRecognizer {
+    override fun start(input: CharSequence, offset: Int): Int =
+        if (input[offset] == '/' && input.getAt(offset + 1) == '*') 2 else -1
 
-    override fun end(str: CharSequence) = str.matchEOL()
+    override fun end(input: CharSequence, offset: Int): Int =
+        if (input[offset] == '*' && input.getAt(offset + 1) == '/') 2 else -1
 }
 
-private fun CharSequence.matchEOL(): Match? = when {
-    endsWith("\r\n") -> Match("\r\n", length - 2..<length)
-    endsWith("\r") -> Match("\r", length - 1..<length)
-    endsWith("\n") -> Match("\n", length - 1..<length)
-    else -> null
+private fun CharSequence.matchEOL(offset: Int) = when (get(offset)) {
+    '\r' -> if (getAt(offset + 1) == '\n') 2 else 1
+    '\n' -> 1
+    else -> -1
 }
+
+private fun CharSequence.getAt(index: Int, default: Char = ' ') =
+    if (index >= 0 && index < length) get(index) else default

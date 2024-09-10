@@ -7,7 +7,6 @@ import dev.kikugie.stitcher.data.block.ContentBlock
 import dev.kikugie.stitcher.data.scope.Scope
 import dev.kikugie.stitcher.data.token.Token
 import dev.kikugie.stitcher.eval.join
-import dev.kikugie.stitcher.scanner.StandardMultiLine
 
 object CommentAdder : Block.Visitor<CharSequence>, Scope.Visitor<String?> {
     override fun visitCode(it: CodeBlock): CharSequence = map(it.join())
@@ -21,9 +20,9 @@ object CommentAdder : Block.Visitor<CharSequence>, Scope.Visitor<String?> {
 
     private fun StringBuilder.insertMultiline(scope: Scope) {
         val range = affectedRange(scope.enclosure)
-        if (range.last == lastIndex) append(StandardMultiLine.end)
-        else insert(range.last + 1, StandardMultiLine.end)
-        insert(range.first, StandardMultiLine.start)
+        if (range.last == lastIndex) append("*/")
+        else insert(range.last + 1, "*/")
+        insert(range.first, "/*")
     }
 
     private fun map(token: Token) = map(token.value)
