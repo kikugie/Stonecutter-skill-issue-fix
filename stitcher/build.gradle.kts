@@ -18,9 +18,7 @@ dependencies {
     implementation(libs.kotlin.serialization)
 
     testImplementation(libs.kaml)
-    testImplementation(libs.junit.api)
-    testImplementation(libs.junit.engine)
-    testImplementation("com.github.ajalt.mordant:mordant:2.7.2")
+    testImplementation(libs.bundles.test)
 }
 
 tasks.withType<Test>().configureEach {

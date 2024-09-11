@@ -24,6 +24,8 @@ dependencies {
     implementation(libs.kaml)
     implementation(libs.cbor)
     implementation(libs.lz4)
+
+    testImplementation(libs.bundles.test)
 }
 
 tasks.withType<DokkaTask>().configureEach {
