@@ -2,6 +2,7 @@ import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.Yaml.Companion
 import com.charleskorn.kaml.decodeFromStream
 import com.github.ajalt.mordant.rendering.TextColors
+import com.github.ajalt.mordant.rendering.TextColors.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.File
@@ -12,6 +13,7 @@ object ProjectFinder {
         find(file.inputStream().use { Yaml.default.decodeFromStream<SearchEntries>(it) }.entries)
 
     fun find(entries: List<SearchEntry>): String = runBlocking {
+        println(brightGreen("Searching ${entries.size} entries..."))
         val longest = entries.maxOf { it.name.length }
         val template = "| %s | %s | %s | %s |"
         val header = "| ${"Name".padEnd(longest)} | MR | CF | GH |"
@@ -31,10 +33,10 @@ object ProjectFinder {
                 downloads = (downloads + it.adjust).coerceAtMost(Int.MAX_VALUE)
 
                 fun Any?.status(replaced: Any?) = when {
-                    this != null && replaced != null -> TextColors.brightYellow("FX")
-                    this == null && replaced == null -> TextColors.red("NO")
-                    this == null && replaced != null -> TextColors.cyan("OT")
-                    else -> TextColors.green("OK")
+                    this != null && replaced != null -> brightYellow("FX")
+                    this == null && replaced == null -> red("NO")
+                    this == null && replaced != null -> cyan("OT")
+                    else -> green("OK")
                 }
                 println(
                     template.format(
@@ -53,7 +55,9 @@ object ProjectFinder {
             println(divider)
         }.filterNotNull()
 
+
         val projects = flow.toList()
+            .also { println(brightGreen("Sorting ${entries.size} entries...")) }
             .sortedBy { -it.downloads }
             .joinToString(",\n") { it.toJS() }
         projects
