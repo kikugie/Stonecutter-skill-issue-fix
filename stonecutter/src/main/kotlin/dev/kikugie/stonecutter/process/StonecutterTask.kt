@@ -42,7 +42,7 @@ internal abstract class StonecutterTask : DefaultTask() {
 
     @TaskAction
     fun run() {
-        val callbacks = mutableListOf<Callback>()
+        val callbacks = mutableListOf<() -> Unit>()
         val errors = mutableListOf<Throwable>()
         val time = measureTimeMillis {
             for ((branch, path) in sources.get()) processBranch(branch, path)
@@ -75,7 +75,7 @@ internal abstract class StonecutterTask : DefaultTask() {
         }
     }
 
-    private fun processBranch(branch: ProjectBranch, path: Path): Result<Callback>? {
+    private fun processBranch(branch: ProjectBranch, path: Path): Result<() -> Unit>? {
         val params = data.get()[branch] ?: return null
         val dirs = DirectoryData(
             path.resolve(input.get()),

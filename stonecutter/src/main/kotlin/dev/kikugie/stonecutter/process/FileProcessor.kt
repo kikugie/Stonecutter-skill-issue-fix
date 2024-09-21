@@ -14,9 +14,7 @@ import dev.kikugie.stitcher.transformer.Transformer
 import dev.kikugie.stonecutter.data.YAML
 import dev.kikugie.stonecutter.isAvailable
 import dev.kikugie.stonecutter.useCatching
-import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
@@ -35,9 +33,6 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.io.path.*
-import kotlin.reflect.KSuspendFunction0
-
-internal typealias Callback = KSuspendFunction0<Unit>
 
 @OptIn(ExperimentalSerializationApi::class, ExperimentalPathApi::class)
 internal class FileProcessor(
@@ -55,35 +50,25 @@ internal class FileProcessor(
     companion object {
         val LOGGER: Logger = LoggerFactory.getLogger(FileProcessor::class.java)
         val HASHER: XXHash64 = XXHashFactory.fastestInstance().hash64()
-        val FILE_LOCKS = ConcurrentHashMap<Path, Mutex>()
         const val CHUNK = 1024 * 16
         const val SEED: Long = -0x701074A728960DCB
 
-        private fun Path.mutex() = FILE_LOCKS.getOrPut(this, ::Mutex)
-
-        private fun Path.resolveChecked(subpath: Path) =
-            resolve(subpath).createParentDirectories()
+        private fun Path.resolveChecked(subpath: Path) = resolve(subpath).createParentDirectories()
 
         private fun Path.createParentDirectories() = also {
             parent.createDirectories()
         }
 
         private inline fun Path.writeConfigured(block: (OutputStream) -> Unit) = outputStream(
-            StandardOpenOption.CREATE,
-            StandardOpenOption.TRUNCATE_EXISTING
+            StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING
         ).useCatching { block(it) }
 
-        private fun Path.withExtension(ext: String) =
-            parent.resolve("${fileName.nameWithoutExtension}.$ext")
+        private fun Path.withExtension(ext: String) = parent.resolve("${fileName.nameWithoutExtension}.$ext")
 
         private fun Long.toByteList(dest: MutableList<Byte>) {
             (0 until 8).forEach { i ->
                 dest.add((this shr (i * 8) and 0xFF).toByte())
             }
-        }
-
-        private suspend inline fun <T> io(crossinline action: suspend CoroutineScope.() -> T) = withContext(Dispatchers.IO) {
-            action()
         }
     }
 
@@ -91,12 +76,11 @@ internal class FileProcessor(
     inner class EntryProcessor(private val source: Path) {
         internal val collector = LogCollector(LOGGER, dirs.root.resolve(source), debug)
 
-        internal suspend fun process(): String? {
+        internal fun process(): String? {
             statistics.total.getAndIncrement()
-            if (!filter.shouldProcess(source))
-                return null logging "Skipping, filtered"
+            if (!filter.shouldProcess(source)) return null logging "Skipping, filtered"
 
-            val text = io { dirs.root.resolve(source).readText(charset) }
+            val text = dirs.root.resolve(source).readText(charset)
             val checksum = createChecksum(text)
             val checksumsMatch = readAndCheckSums(checksum)
             if (parametersMatch && checksumsMatch && !debug) readCachedOutput()?.also {
@@ -126,57 +110,53 @@ internal class FileProcessor(
             else result logging "Successfully processed"
         }
 
-        private suspend fun writeDebugAst(ast: Scope) = io {
+        private fun writeDebugAst(ast: Scope) =
             dirs.debug.resolveChecked(source).runReporting("Failed to save debug AST") {
                 writeConfigured { YAML.encodeToStream(ast, it) }
             }
-        }
 
-        private suspend fun writeCachedAst(ast: Scope) = io {
+
+        private fun writeCachedAst(ast: Scope) =
             dirs.asts.resolveChecked(source).runReporting("Failed to save cached AST") {
                 writeConfigured { it.write(Cbor.Default.encodeToByteArray(ast)) }
-            }
-        }
 
-        private suspend fun writeCachedOutput(result: String) = io {
+            }
+
+        private fun writeCachedOutput(result: String) =
             dirs.results.resolveChecked(source).runReporting("Failed to save cached output") {
                 writeText(result, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
             }
-        }
 
-        private suspend fun writeChecksum(checksum: ByteArray) = io {
-            dirs.inputCache
-                .resolve("checksums")
-                .resolveChecked(source.withExtension("checksum"))
+
+        private fun writeChecksum(checksum: ByteArray) =
+            dirs.inputCache.resolve("checksums").resolveChecked(source.withExtension("checksum"))
                 .runReporting("Failed to save checksum") {
                     writeBytes(checksum, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
                 }
-        }
 
-        private suspend fun readCachedAst(): Scope? = io {
+
+        private fun readCachedAst(): Scope? {
             val file = dirs.asts.resolve(source)
-            if (!file.isAvailable()) null logging "AST cache not found"
+            return if (!file.isAvailable()) null logging "AST cache not found"
             else file.runReporting("Failed to read cached AST") {
-                mutex().withLock { Cbor.Default.decodeFromByteArray<Scope>(readBytes()) }
+                Cbor.Default.decodeFromByteArray<Scope>(file.readBytes())
             }
         }
 
-        private suspend fun readCachedOutput(): String? = io {
+        private fun readCachedOutput(): String? {
             val file = dirs.results.resolve(source)
-            if (!file.isAvailable()) null logging "Output cache not found"
+            return if (!file.isAvailable()) null logging "Output cache not found"
             else file.runReporting("Failed to read cached output") {
-                mutex().withLock { file.readText(charset) }
+                file.readText(charset)
             }
         }
 
-        private suspend fun readAndCheckSums(current: ByteArray): Boolean = io {
-            val file = dirs.inputCache
-                .resolve("checksums")
-                .resolve(source.withExtension("checksum"))
-            if (!file.isAvailable()) return@io false logging "Checksum file not found"
+        private fun readAndCheckSums(current: ByteArray): Boolean {
+            val file = dirs.inputCache.resolve("checksums").resolve(source.withExtension("checksum"))
+            if (!file.isAvailable()) return false logging "Checksum file not found"
 
             val checksum = file.runReporting("Failed to read checksum") {
-                mutex().withLock { file.readBytes() }
+                file.readBytes()
             }
 
             val match = current.contentEquals(checksum)
@@ -185,7 +165,7 @@ internal class FileProcessor(
                 appendLine("  Expected - ${Base64.encode(current)}")
                 append("  Received - ${checksum?.let(Base64::encode)}")
             }
-            match
+            return match
         }
 
         private fun createChecksum(input: String): ByteArray {
@@ -219,23 +199,19 @@ internal class FileProcessor(
         }
     }
 
-    fun process(): Callback = runBlocking {
-        if (dirs.temp.exists()) io {
-            dirs.temp.deleteRecursively()
-        }
+    fun process(): () -> Unit {
+        if (dirs.temp.exists()) dirs.temp.deleteRecursively()
 
         val errors = mutableMapOf<Path, Throwable>()
-        dirs.root
-            .walk()
-            .map { async { processEntry(it)?.also { e -> errors[it] = e }; Unit } }
-            .toList()
-            .awaitAll()
+        dirs.root.walk().forEach {
+            processEntry(it)?.also { e -> errors[it] = e }
+        }
 
         if (errors.isNotEmpty()) composeErrors(dirs.root, errors)
-        ::applyTemp
+        return ::applyTemp
     }
 
-    private suspend fun processEntry(file: Path): Throwable? {
+    private fun processEntry(file: Path): Throwable? {
         val relative = dirs.root.relativize(file)
         val processor = EntryProcessor(relative)
         val result = runCatching {
@@ -253,7 +229,7 @@ internal class FileProcessor(
         }.exceptionOrNull()
     }
 
-    private suspend fun saveToTemp(relative: Path, it: String?, file: Path) = io {
+    private fun saveToTemp(relative: Path, it: String?, file: Path) {
         val dest = dirs.temp.resolveChecked(relative)
         if (it != null) dest.writeText(it, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
         else if (!inPlace) file.copyTo(dest, true)
@@ -270,8 +246,8 @@ internal class FileProcessor(
         }
     }
 
-    private suspend fun applyTemp() = io {
-        if (dirs.temp.notExists()) return@io
+    private fun applyTemp() {
+        if (dirs.temp.notExists()) return
         dirs.dest.createDirectories()
         dirs.temp.copyToRecursively(dirs.dest, followLinks = false, overwrite = true, onError = { from, to, e ->
             throw IOException("Failed to copy $from to $to", e)
