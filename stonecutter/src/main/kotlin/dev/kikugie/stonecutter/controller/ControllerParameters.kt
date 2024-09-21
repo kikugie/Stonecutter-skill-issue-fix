@@ -27,8 +27,8 @@ interface ControllerParameters {
      * Currently, debug includes the following functionality:
      * - File processing caches are disabled in `build/stonecutter-cache/`:
      *      - `transform_parameters.yml` is generated every time.
+     *      - `checksums.cbor` is ignored.
      *      - `results/` is ignored.
-     *      - `asts/` is ignored.
      * - Debug ASTs in `.yml` format are written to `build/stonecutter-cache/debug`.
      * - All processing steps are written in the main log.
      */

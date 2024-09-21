@@ -1,5 +1,7 @@
 package dev.kikugie.stonecutter.process
 
+import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.YamlConfiguration
 import com.charleskorn.kaml.decodeFromStream
 import com.charleskorn.kaml.encodeToStream
 import dev.kikugie.stitcher.data.scope.Scope
@@ -11,19 +13,15 @@ import dev.kikugie.stitcher.parser.FileParser
 import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.transformer.TransformParameters
 import dev.kikugie.stitcher.transformer.Transformer
-import dev.kikugie.stonecutter.data.YAML
 import dev.kikugie.stonecutter.isAvailable
 import dev.kikugie.stonecutter.useCatching
-import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.*
 import kotlinx.serialization.cbor.Cbor
-import kotlinx.serialization.decodeFromByteArray
-import kotlinx.serialization.encodeToByteArray
 import net.jpountz.xxhash.XXHash64
 import net.jpountz.xxhash.XXHashFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.IOException
-import java.io.OutputStream
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
@@ -32,7 +30,9 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.io.path.*
 
-@OptIn(ExperimentalSerializationApi::class, ExperimentalPathApi::class)
+private typealias ChecksumMap = MutableMap<String, ByteArray>
+
+@OptIn(ExperimentalPathApi::class, ExperimentalEncodingApi::class, ExperimentalSerializationApi::class)
 internal class FileProcessor(
     private val dirs: DirectoryData,
     private val filter: FileFilter,
@@ -44,100 +44,63 @@ internal class FileProcessor(
 ) {
     private val inPlace = dirs.root == dirs.dest
     private val parametersMatch = updateParameters() && !debug
+    private val checksums = readChecksumMap()
 
     companion object {
+        val YAML = Yaml(
+            configuration = YamlConfiguration(
+                strictMode = false
+            )
+        )
         val LOGGER: Logger = LoggerFactory.getLogger(FileProcessor::class.java)
         val HASHER: XXHash64 = XXHashFactory.fastestInstance().hash64()
         const val CHUNK = 1024 * 16
         const val SEED: Long = -0x701074A728960DCB
+        private fun Path.withExtension(ext: String) =
+            parent.resolve("${fileName.nameWithoutExtension}.$ext")
 
-        private fun Path.resolveChecked(subpath: Path) = resolve(subpath).createParentDirectories()
-
-        private fun Path.createParentDirectories() = also {
+        private fun Path.resolveChecked(subpath: Path) = resolve(subpath).apply {
             parent.createDirectories()
         }
 
-        private inline fun Path.writeConfigured(block: (OutputStream) -> Unit) = outputStream(
-            StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING
-        ).useCatching { block(it) }
-
-        private fun Path.withExtension(ext: String) = parent.resolve("${fileName.nameWithoutExtension}.$ext")
-
-        private fun Long.toByteList(dest: MutableList<Byte>) {
-            (0 until 8).forEach { i ->
-                dest.add((this shr (i * 8) and 0xFF).toByte())
-            }
+        private operator fun ByteArray.set(index: Int, value: Long) {
+            for (i in 0 until 8) this[index + i] = (value shr (i * 8) and 0xFF).toByte()
         }
     }
 
-    @OptIn(ExperimentalEncodingApi::class)
-    inner class EntryProcessor(private val source: Path) {
-        internal val collector = LogCollector(LOGGER, dirs.root.resolve(source), debug)
+    private inner class EntryProcessor(private val source: Path) {
+        val collector = LogCollector(LOGGER, dirs.root.resolve(source), debug)
 
-        internal fun process(): String? {
-            statistics.total.getAndIncrement()
+        fun process(): String? {
+            statistics.total++
             if (!filter.shouldProcess(source)) return null logging "Skipping, filtered"
 
             val text = dirs.root.resolve(source).readText(charset)
             val checksum = createChecksum(text)
-            val checksumsMatch = readAndCheckSums(checksum)
-            if (parametersMatch && checksumsMatch && !debug) readCachedOutput()?.also {
+            val checksumsMatch = verifyChecksum(checksum)
+            checksums[source.invariantSeparatorsPathString] = checksum
+            if (parametersMatch && checksumsMatch && !debug) readCachedOutput()?.let {
                 return if (it == text) null logging "Skipping, matches cache"
                 else it logging "Found output cache"
             }
 
-            var ast: Scope? = null
-            if (checksumsMatch && !debug) ast = readCachedAst()
             val handler = StoringErrorHandler()
-            if (ast == null) {
-                statistics.parsed.getAndIncrement()
-                val parser = FileParser.create(text, handler, recognizers, params)
-                ast = parser.parse()
-                collector.push("Parsed AST, ${handler.errors.size} errors")
-                handler.throwIfHasErrors()
-                writeCachedAst(ast)
-                if (debug) writeDebugAst(ast)
+            statistics.processed++
+            val parser = FileParser.create(text, handler, recognizers, params)
+            val ast = parser.parse().also {
+                if (debug) writeDebugAst(it)
             }
+            collector.push("Parsed AST, ${handler.errors.size} errors")
+            handler.throwIfHasErrors()
+
             Transformer(ast, recognizers, params, handler).process()
             collector.push("Transformed AST, ${handler.errors.size} errors")
             handler.throwIfHasErrors()
+
             val result = ast.join()
             writeCachedOutput(result)
-            writeChecksum(checksum)
             return if (result == text) null logging "Skipping, matches input"
             else result logging "Successfully processed"
-        }
-
-        private fun writeDebugAst(ast: Scope) = dirs.debug
-            .resolveChecked(source.withExtension("yml"))
-            .runReporting("Failed to save debug AST") {
-                writeConfigured { YAML.encodeToStream(ast, it) }
-            }
-
-
-        private fun writeCachedAst(ast: Scope) = dirs.asts
-            .resolveChecked(source.withExtension("ast"))
-            .runReporting("Failed to save cached AST") {
-                writeConfigured { it.write(Cbor.Default.encodeToByteArray(ast)) }
-            }
-
-        private fun writeCachedOutput(result: String) = dirs.results.resolveChecked(source)
-            .runReporting("Failed to save cached output") {
-                writeText(result, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
-            }
-
-        private fun writeChecksum(checksum: ByteArray) = dirs.inputCache.resolve("checksums")
-            .resolveChecked(source.withExtension("checksum"))
-            .runReporting("Failed to save checksum") {
-                writeBytes(checksum, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
-            }
-
-        private fun readCachedAst(): Scope? {
-            val file = dirs.asts.resolve(source.withExtension("ast"))
-            return if (!file.isAvailable()) null logging "AST cache not found"
-            else file.runReporting("Failed to read cached AST") {
-                Cbor.Default.decodeFromByteArray<Scope>(file.readBytes())
-            }
         }
 
         private fun readCachedOutput(): String? {
@@ -148,33 +111,54 @@ internal class FileProcessor(
             }
         }
 
-        private fun readAndCheckSums(current: ByteArray): Boolean {
-            val file = dirs.inputCache.resolve("checksums").resolve(source.withExtension("checksum"))
-            if (!file.isAvailable()) return false logging "Checksum file not found"
-
-            val checksum = file.runReporting("Failed to read checksum") {
-                file.readBytes()
+        private fun writeCachedOutput(result: String) = dirs.results
+            .resolveChecked(source)
+            .runReporting("Failed to save cached output") {
+                writeText(result, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
             }
 
-            val match = current.contentEquals(checksum)
-            if (!match) null logging buildString {
+        private fun writeDebugAst(ast: Scope) = dirs.debug
+            .resolveChecked(source.withExtension("yml"))
+            .runReporting("Failed to save debug AST") {
+                outputStream(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING).use {
+                    YAML.encodeToStream(
+                        ast,
+                        it
+                    )
+                }
+            }
+
+        @OptIn(ExperimentalEncodingApi::class)
+        private fun verifyChecksum(current: ByteArray): Boolean {
+            val cached = checksums[source.invariantSeparatorsPathString] ?: return false
+            val match = current.contentEquals(cached)
+            null logging if (match) "Checksums match" else buildString {
                 appendLine("Checksum mismatch:")
                 appendLine("  Expected - ${Base64.encode(current)}")
-                append("  Received - ${checksum?.let(Base64::encode)}")
+                append("  Received - ${Base64.encode(cached)}")
             }
             return match
         }
 
         private fun createChecksum(input: String): ByteArray {
-            val list = mutableListOf<Byte>()
-            var offset = 0
-            while (offset < input.length) {
-                val bytes = input.substring(offset, (offset + CHUNK).coerceAtMost(input.length)).toByteArray(charset)
-                val data = HASHER.hash(bytes, 0, bytes.size, SEED)
-                data.toByteList(list)
-                offset += CHUNK
+            val bytes = input.toByteArray(charset)
+            val result = kotlin.run {
+                var chunks = input.length / CHUNK * 8
+                if (input.length % CHUNK != 0) chunks += 8
+                ByteArray(chunks)
             }
-            return list.toByteArray()
+
+            var index = 0
+            var cursor = 0
+            while (cursor < input.length) {
+                val end = (cursor + CHUNK).coerceAtMost(input.length)
+                val data = HASHER.hash(bytes, cursor, end - cursor, SEED)
+                result[index] = data
+
+                cursor += CHUNK
+                index += 8
+            }
+            return result
         }
 
         private inline fun <T, R> T.runReporting(message: String, action: T.() -> R): R? = kotlin.runCatching {
@@ -204,6 +188,7 @@ internal class FileProcessor(
             processEntry(it)?.also { e -> errors[it] = e }
         }
 
+        writeChecksumMap()
         if (errors.isNotEmpty()) composeErrors(dirs.root, errors)
         return ::applyTemp
     }
@@ -218,7 +203,6 @@ internal class FileProcessor(
             return it
         }.getOrThrow()
 
-        if (result != null) statistics.processed.getAndIncrement()
         return runCatching {
             saveToTemp(relative, result, file)
         }.also {
@@ -266,14 +250,46 @@ internal class FileProcessor(
         return if (saved != null && saved == params) true.also {
             collector.push("Cached parameters matched")
             collector.release()
-        }
-        else false.also {
-            collector.push("Saving parameter caches")
+        } else false.also {
             cache.parent.createDirectories()
-            cache.writeConfigured { YAML.encodeToStream(params, it) }.onFailure {
+            cache.outputStream(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING).useCatching {
+                YAML.encodeToStream(params, it)
+            }.onFailure {
                 collector.push("Failed to save transform parameters", it)
             }
             collector.release()
+        }
+    }
+
+    private fun readChecksumMap(): ChecksumMap {
+        val file = dirs.inputCache.resolve("checksums.cbor")
+        val collector = LogCollector(LOGGER, file)
+        val map: ChecksumMap = mutableMapOf()
+
+        return if (!file.isAvailable()) map.also {
+            collector.push("Checksums file not found")
+        } else file.runCatching {
+            val data: ChecksumMap = Cbor.Default.decodeFromByteArray(readBytes())
+            if (debug) map else data.toMutableMap()
+        }.onFailure {
+            collector.push("Failed to read checksums file", it)
+        }.getOrNull() ?: map
+    }
+
+    private fun writeChecksumMap() {
+        val file = dirs.inputCache.resolve("checksums.cbor").apply {
+            parent.createDirectories()
+        }
+        val collector = LogCollector(LOGGER, file)
+
+        file.runCatching {
+            writeBytes(
+                Cbor.Default.encodeToByteArray(checksums),
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING
+            )
+        }.onFailure {
+            collector.push("Failed to write checksums file", it)
         }
     }
 }

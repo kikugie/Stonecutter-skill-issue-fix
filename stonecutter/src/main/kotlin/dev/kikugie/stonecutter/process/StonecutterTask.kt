@@ -59,11 +59,11 @@ internal abstract class StonecutterTask : DefaultTask() {
         val message = buildString {
             append("Switched to ${toVersion.get().project} in ${time}ms.")
             append(" (")
-            append("${statistics.total.get()} total")
+            append("${statistics.total} total")
             append(" | ")
-            append("${statistics.parsed.get()} parsed")
+            append("${statistics.processed} processed")
             append(" | ")
-            append("${statistics.total.get() - statistics.processed.get()} skipped")
+            append("${statistics.total - statistics.processed} skipped")
             append(")")
         }
         println(message)

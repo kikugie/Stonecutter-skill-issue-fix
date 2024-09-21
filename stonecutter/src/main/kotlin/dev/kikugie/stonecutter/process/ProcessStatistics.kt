@@ -1,9 +1,6 @@
 package dev.kikugie.stonecutter.process
 
-import java.util.concurrent.atomic.AtomicInteger
-
 internal class ProcessStatistics {
-    val total = AtomicInteger()
-    val processed = AtomicInteger()
-    val parsed = AtomicInteger()
+    var total = 0
+    var processed = 0
 }
