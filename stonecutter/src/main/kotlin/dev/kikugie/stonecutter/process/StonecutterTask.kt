@@ -1,13 +1,8 @@
 package dev.kikugie.stonecutter.process
 
-import dev.kikugie.semver.VersionParser
 import dev.kikugie.stitcher.scanner.CommentRecognizers
-import dev.kikugie.stitcher.scanner.DoubleSlashCommentRecognizer
-import dev.kikugie.stitcher.scanner.SlashStarCommentRecognizer
-import dev.kikugie.stitcher.transformer.TransformParameters
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.controller.ProjectBranch
-import dev.kikugie.stonecutter.data.FileFilter
 import dev.kikugie.stonecutter.data.StitcherParameters
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
@@ -16,6 +11,8 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Path
+import kotlin.reflect.KFunction
+import kotlin.reflect.KFunction0
 import kotlin.system.measureTimeMillis
 
 internal abstract class StonecutterTask : DefaultTask() {
@@ -96,8 +93,8 @@ internal abstract class StonecutterTask : DefaultTask() {
             appendLine("  Cache out: ${dirs.outputCache}")
         }
         project.logger.debug(message)
-        return runCatching {
-            processor.process()
+        return processor.runCatching {
+            process()
         }
     }
 }

@@ -59,6 +59,29 @@ internal class FileProcessor(
         val FILE_LOCKS = ConcurrentHashMap<Path, Mutex>()
         const val CHUNK = 1024 * 16
         const val SEED: Long = -0x701074A728960DCB
+
+        private fun Path.mutex() = FILE_LOCKS.getOrPut(this, ::Mutex)
+
+        private fun Path.resolveChecked(subpath: Path) =
+            resolve(subpath).createParentDirectories()
+
+        private fun Path.createParentDirectories() = also {
+            parent.createDirectories()
+        }
+
+        private inline fun Path.writeConfigured(block: (OutputStream) -> Unit) = outputStream(
+            StandardOpenOption.CREATE,
+            StandardOpenOption.TRUNCATE_EXISTING
+        ).useCatching { block(it) }
+
+        private fun Path.withExtension(ext: String) =
+            parent.resolve("${fileName.nameWithoutExtension}.$ext")
+
+        private fun Long.toByteList(dest: MutableList<Byte>) {
+            (0 until 8).forEach { i ->
+                dest.add((this shr (i * 8) and 0xFF).toByte())
+            }
+        }
     }
 
     @OptIn(ExperimentalEncodingApi::class)
@@ -67,27 +90,19 @@ internal class FileProcessor(
 
         internal suspend fun process(): String? {
             statistics.total.getAndIncrement()
-            if (!filter.shouldProcess(source)) return null.also {
-                collector.push("Skipping, filtered")
-            }
+            if (!filter.shouldProcess(source))
+                return null logging "Skipping, filtered"
 
             val text = withContext(Dispatchers.IO) { dirs.root.resolve(source).readText(charset) }
             val checksum = createChecksum(text)
-            val checksumsMatch = checkChecksum(checksum)
+            val checksumsMatch = readAndCheckSums(checksum)
             if (parametersMatch && checksumsMatch && !debug) readCachedOutput()?.also {
-                return if (it == text) null.also {
-                    collector.push("Skipping, matches cache")
-                } else it.also {
-                    collector.push("Found output cache")
-                }
+                return if (it == text) null logging "Skipping, matches cache"
+                else it logging "Found output cache"
             }
 
             var ast: Scope? = null
-            if (checksumsMatch && !debug) ast = readCachedAst()?.also {
-                collector.push("Found AST cache")
-            } ?: null.also {
-                collector.push("AST cache not found")
-            }
+            if (checksumsMatch && !debug) ast = readCachedAst()
             val handler = StoringErrorHandler()
             if (ast == null) {
                 statistics.parsed.getAndIncrement()
@@ -104,93 +119,71 @@ internal class FileProcessor(
             val result = ast.join()
             writeCachedOutput(result)
             writeChecksum(checksum)
-            return if (result == text) null.also {
-                collector.push("Skipping, matches input")
-            } else result.also {
-                collector.push("Successfully processed")
-            }
+            return if (result == text) null logging "Skipping, matches input"
+            else result logging "Successfully processed"
         }
 
         private suspend fun writeDebugAst(ast: Scope) = withContext(Dispatchers.IO) {
-            val file = dirs.debug.resolve(source)
-            file.createParentDirectories().writeConfigured {
-                YAML.encodeToStream(ast, it)
-            }.onFailure {
-                collector.push("Failed to save debug AST", it)
+            dirs.debug.resolveChecked(source).runReporting("Failed to save debug AST") {
+                writeConfigured { YAML.encodeToStream(ast, it) }
             }
         }
 
         private suspend fun writeCachedAst(ast: Scope) = withContext(Dispatchers.IO) {
-            val file = dirs.asts.resolve(source)
-            file.createParentDirectories().writeConfigured {
-                it.write(Cbor.Default.encodeToByteArray(ast))
-            }.onFailure {
-                collector.push("Failed to save cached AST", it)
+            dirs.asts.resolveChecked(source).runReporting("Failed to save cached AST") {
+                writeConfigured { it.write(Cbor.Default.encodeToByteArray(ast)) }
             }
         }
 
         private suspend fun writeCachedOutput(result: String) = withContext(Dispatchers.IO) {
-            val file = dirs.results.resolve(source)
-            runCatching {
-                file.createParentDirectories().writeText(result, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
-            }.onFailure {
-                collector.push("Failed to save cached output", it)
+            dirs.results.resolveChecked(source).runReporting("Failed to save cached output") {
+                writeText(result, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
             }
+        }
+
+        private suspend fun writeChecksum(checksum: ByteArray) = withContext(Dispatchers.IO) {
+            dirs.inputCache
+                .resolve("checksums")
+                .resolveChecked(source.withExtension("checksum"))
+                .runReporting("Failed to save checksum") {
+                    writeBytes(checksum, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+                }
         }
 
         private suspend fun readCachedAst(): Scope? = withContext(Dispatchers.IO) {
             val file = dirs.asts.resolve(source)
-            if (!file.isAvailable()) null.also {
-                collector.push("AST cache not found")
-            } else file.inputStream().useCatching {
-                file.mutex().withLock { Cbor.Default.decodeFromByteArray<Scope>(it.readBytes()) }
-            }.onFailure {
-                collector.push("Failed to read cached AST", it)
-            }.getOrNull()
+            if (!file.isAvailable()) null logging "AST cache not found"
+            else file.runReporting("Failed to read cached AST") {
+                mutex().withLock { Cbor.Default.decodeFromByteArray<Scope>(readBytes()) }
+            }
         }
 
         private suspend fun readCachedOutput(): String? = withContext(Dispatchers.IO) {
             val file = dirs.results.resolve(source)
-            if (!file.isAvailable()) null.also {
-                collector.push("Output cache not found")
-            } else runCatching {
-                file.mutex().withLock { file.readText(charset) }
-            }.onFailure {
-                collector.push("Failed to read cached output", it)
-            }.getOrNull()
-        }
-
-        private suspend fun writeChecksum(checksum: ByteArray) = withContext(Dispatchers.IO) {
-            val root = dirs.inputCache.resolve("checksums")
-            val dest = root.resolve(source.withExtension("checksum"))
-            dest.createParentDirectories().runCatching {
-                writeBytes(checksum, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
-            }.onFailure {
-                collector.push("Failed to write checksum", it)
+            if (!file.isAvailable()) null logging "Output cache not found"
+            else file.runReporting("Failed to read cached output") {
+                mutex().withLock { file.readText(charset) }
             }
         }
 
-        private suspend fun checkChecksum(current: ByteArray): Boolean =
-            withContext(Dispatchers.IO) {
-                val root = dirs.inputCache.resolve("checksums")
-                val file = root.resolve(source.withExtension("checksum"))
-                if (!file.isAvailable()) return@withContext false.also {
-                    collector.push("Checksum file not found")
-                }
+        private suspend fun readAndCheckSums(current: ByteArray): Boolean = withContext(Dispatchers.IO) {
+            val file = dirs.inputCache
+                .resolve("checksums")
+                .resolve(source.withExtension("checksum"))
+            if (!file.isAvailable()) return@withContext false logging "Checksum file not found"
 
-                val checksum = runCatching {
-                    file.mutex().withLock { file.readBytes() }
-                }.onFailure {
-                    collector.push("Failed to read checksum", it)
-                }.getOrNull()
-                current.contentEquals(checksum).also {
-                    if (!it) buildString {
-                        appendLine("Checksum mismatch:")
-                        appendLine("  Expected - ${Base64.encode(current)}")
-                        append("  Received - ${checksum?.let(Base64::encode)}")
-                    }.let(collector::push)
-                }
+            val checksum = file.runReporting("Failed to read checksum") {
+                mutex().withLock { file.readBytes() }
             }
+
+            val match = current.contentEquals(checksum)
+            if (!match) null logging buildString {
+                appendLine("Checksum mismatch:")
+                appendLine("  Expected - ${Base64.encode(current)}")
+                append("  Received - ${checksum?.let(Base64::encode)}")
+            }
+            match
+        }
 
         private fun createChecksum(input: String): ByteArray {
             val list = mutableListOf<Byte>()
@@ -202,6 +195,16 @@ internal class FileProcessor(
                 offset += CHUNK
             }
             return list.toByteArray()
+        }
+
+        private inline fun <T, R> T.runReporting(message: String, action: T.() -> R): R? = kotlin.runCatching {
+            action()
+        }.onFailure {
+            collector.push(message, it)
+        }.getOrNull()
+
+        private infix fun <T> T.logging(message: String) = also {
+            collector.push(message)
         }
 
         private fun ErrorHandler.throwIfHasErrors(): Nothing? {
@@ -283,28 +286,4 @@ internal class FileProcessor(
             collector.release()
         }
     }
-
-    private inline fun Nothing?.also(block: () -> Unit): Nothing? {
-        block()
-        return this
-    }
-
-    private fun Path.createParentDirectories() = also {
-        parent.createDirectories()
-    }
-
-    private fun Path.mutex() = FILE_LOCKS.getOrPut(this, ::Mutex)
-
-    private fun Long.toByteList(dest: MutableList<Byte>) {
-        (0 until 8).forEach { i ->
-            dest.add((this shr (i * 8) and 0xFF).toByte())
-        }
-    }
-
-    private fun Path.withExtension(ext: String) = parent.resolve("${fileName.nameWithoutExtension}.$ext")
-
-    private inline fun Path.writeConfigured(block: (OutputStream) -> Unit) =
-        outputStream(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING).useCatching {
-            block(it)
-        }
 }
