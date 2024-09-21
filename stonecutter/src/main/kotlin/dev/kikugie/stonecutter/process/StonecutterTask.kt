@@ -53,8 +53,10 @@ internal abstract class StonecutterTask : DefaultTask() {
             for (it in callbacks) runCatching { it() }
                 .onFailure { errors.add(it) }
         }
-        if (errors.isNotEmpty())
-            composeErrors(errors)
+        if (errors.isNotEmpty()) {
+            printErrors(*errors.toTypedArray())
+            throw Exception("Failed to switch from ${fromVersion.get().project} to ${toVersion.get().project}")
+        }
 
         val message = buildString {
             append("Switched to ${toVersion.get().project} in ${time}ms.")
@@ -67,12 +69,6 @@ internal abstract class StonecutterTask : DefaultTask() {
             append(")")
         }
         println(message)
-    }
-
-    private fun composeErrors(errors: Iterable<Throwable>): Nothing {
-        throw Exception("Failed to switch from ${fromVersion.get().project} to ${toVersion.get().project}").apply {
-            errors.forEach(::addSuppressed)
-        }
     }
 
     private fun processBranch(branch: ProjectBranch, path: Path): Result<() -> Unit>? {

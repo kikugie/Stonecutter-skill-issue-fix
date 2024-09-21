@@ -107,7 +107,7 @@ internal class FileProcessor(
             val file = dirs.results.resolve(source)
             return if (!file.isAvailable()) null logging "Output cache not found"
             else file.runReporting("Failed to read cached output") {
-                file.readText(charset)
+                readText(charset)
             }
         }
 
@@ -121,10 +121,7 @@ internal class FileProcessor(
             .resolveChecked(source.withExtension("yml"))
             .runReporting("Failed to save debug AST") {
                 outputStream(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING).use {
-                    YAML.encodeToStream(
-                        ast,
-                        it
-                    )
+                    YAML.encodeToStream(ast, it)
                 }
             }
 
@@ -174,8 +171,8 @@ internal class FileProcessor(
         private fun ErrorHandler.throwIfHasErrors(): Nothing? {
             if (errors.isEmpty()) return null
             val path = dirs.root.resolve(source)
-            throw Exception("Failed to parse ${path.absolutePathString()}").apply {
-                errors.forEach { addSuppressed(Exception(it.join())) }
+            throw ProcessException("Failed to parse ${path.absolutePathString()}").apply {
+                errors.forEach { addSuppressed(ProcessException(it.join())) }
             }
         }
     }
@@ -216,16 +213,10 @@ internal class FileProcessor(
         else if (!inPlace) file.copyTo(dest, true)
     }
 
-    private fun composeErrors(root: Path, errors: Map<Path, Throwable>): Nothing {
-        throw Exception("Failed to process files in ${root.absolutePathString()}").apply {
-            errors.forEach { (file, err) ->
-                Exception("Failed to process ${file.absolutePathString()}").let {
-                    it.addSuppressed(err)
-                    addSuppressed(it)
-                }
-            }
+    private fun composeErrors(root: Path, errors: Map<Path, Throwable>): Nothing =
+        throw ProcessException("Failed to process files in ${root.absolutePathString()}").apply {
+            for ((_, err) in errors) addSuppressed(err)
         }
-    }
 
     private fun applyTemp() {
         if (dirs.temp.notExists()) return
