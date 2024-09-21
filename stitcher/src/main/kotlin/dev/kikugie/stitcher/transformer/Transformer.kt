@@ -7,7 +7,6 @@ import dev.kikugie.stitcher.data.block.ContentBlock
 import dev.kikugie.stitcher.data.component.Definition
 import dev.kikugie.stitcher.data.scope.Scope
 import dev.kikugie.stitcher.data.token.MarkerType.*
-import dev.kikugie.stitcher.eval.ConditionChecker
 import dev.kikugie.stitcher.eval.join
 import dev.kikugie.stitcher.exception.ErrorHandler
 import dev.kikugie.stitcher.exception.StoringErrorHandler
@@ -38,7 +37,7 @@ class Transformer(
         requireNotNull(it.scope) // Should be resolved by patch method
         var bool = try {
             it.def.condition!!.accept(checker)
-        } catch (e: UnsupportedOperationException) {
+        } catch (e: Exception) {
             it.def.toSlice().report { "Failed to evaluate condition: ${e.message}" }
             return
         }
@@ -47,7 +46,8 @@ class Transformer(
         else bool = !previousResult && bool
         previousResult = bool || previousResult
 
-        val text = if (bool) it.scope.accept(CommentRemover) else it.scope.accept(CommentAdder)
+        val text = if (bool) it.scope.accept(CommentRemover)
+        else it.scope.accept(CommentAdder)
         when {
             text == null -> withSource(it.scope).process()
             !bool -> listOf(ContentBlock(text)).assignTo(it.scope)

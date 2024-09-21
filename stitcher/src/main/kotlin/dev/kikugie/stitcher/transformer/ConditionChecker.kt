@@ -1,10 +1,9 @@
-package dev.kikugie.stitcher.eval
+package dev.kikugie.stitcher.transformer
 
 import dev.kikugie.semver.VersionPredicate
 import dev.kikugie.stitcher.data.component.*
 import dev.kikugie.stitcher.data.token.StitcherTokenType
 import dev.kikugie.stitcher.data.token.Token
-import dev.kikugie.stitcher.transformer.TransformParameters
 
 /**
  * Evaluates the passed [Component]'s boolean value.

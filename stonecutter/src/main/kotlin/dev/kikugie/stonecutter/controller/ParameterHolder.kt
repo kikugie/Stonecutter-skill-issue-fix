@@ -18,8 +18,9 @@ class ParameterHolder(
     val branch: ProjectBranch,
     val metadata: StonecutterProject
 ) : BuildConfiguration(branch), StonecutterUtility {
+    /**
+     * Project node matching [project] on [branch].
+     * May be `null` when branches have different sets of versions.
+     */
     val node: ProjectNode? = branch[metadata.project]
-    val project: ProjectName get() = metadata.project
-    val version: TargetVersion get() = metadata.version
-    val isActive: Boolean get() = metadata.isActive
 }

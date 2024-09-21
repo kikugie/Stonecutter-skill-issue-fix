@@ -1,6 +1,8 @@
 package dev.kikugie.stonecutter.data
 
 import dev.kikugie.semver.Version
+import dev.kikugie.semver.VersionParser
+import dev.kikugie.stitcher.transformer.TransformParameters
 import dev.kikugie.stonecutter.ProjectName
 import dev.kikugie.stonecutter.StonecutterProject
 import kotlinx.serialization.Serializable
@@ -37,4 +39,14 @@ data class StitcherParameters(
         "DS_Store", // Mac momentos
     ),
     val excludedPaths: MutableSet<Path> = mutableSetOf()
-)
+) {
+    fun toTransformParams(version: String, key: String = "minecraft"): TransformParameters = with(dependencies) {
+        getOrElse(key) { VersionParser.parseLenient(version) }.let {
+            put(key, it)
+            put("", it)
+        }
+        TransformParameters(swaps, constants, this)
+    }
+
+    fun toFileFilter() = FileFilter(excludedExtensions, excludedPaths)
+}

@@ -1,12 +1,15 @@
 package dev.kikugie.stonecutter.process
 
 import dev.kikugie.semver.VersionParser
+import dev.kikugie.stitcher.scanner.CommentRecognizers
 import dev.kikugie.stitcher.scanner.DoubleSlashCommentRecognizer
 import dev.kikugie.stitcher.scanner.SlashStarCommentRecognizer
 import dev.kikugie.stitcher.transformer.TransformParameters
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.controller.ProjectBranch
+import dev.kikugie.stonecutter.data.FileFilter
 import dev.kikugie.stonecutter.data.StitcherParameters
+import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
@@ -41,11 +44,20 @@ internal abstract class StonecutterTask : DefaultTask() {
 
     @TaskAction
     fun run() {
-        val errors: List<Throwable>
+        val callbacks = mutableListOf<Callback>()
+        val errors = mutableListOf<Throwable>()
         val time = measureTimeMillis {
-            errors = sources.get().mapNotNull { (branch, path) -> processBranch(branch, path) }
+            for ((branch, path) in sources.get()) processBranch(branch, path)
+                ?.onSuccess { callbacks.add(it) }
+                ?.onFailure { errors.add(it) }
         }
-        if (errors.isNotEmpty()) composeErrors(errors)
+        if (errors.isEmpty()) runBlocking {
+            for (it in callbacks) runCatching { it() }
+                .onFailure { errors.add(it) }
+        }
+        if (errors.isNotEmpty())
+            composeErrors(errors)
+
         val message = buildString {
             append("Switched to ${toVersion.get().project} in ${time}ms.")
             append(" ")
@@ -60,7 +72,7 @@ internal abstract class StonecutterTask : DefaultTask() {
         }
     }
 
-    private fun processBranch(branch: ProjectBranch, path: Path): Throwable? {
+    private fun processBranch(branch: ProjectBranch, path: Path): Result<Callback>? {
         val params = data.get()[branch] ?: return null
         val dirs = DirectoryData(
             path.resolve(input.get()),
@@ -70,10 +82,10 @@ internal abstract class StonecutterTask : DefaultTask() {
         )
         val processor = FileProcessor(
             dirs,
-            FileFilter(params.excludedExtensions, params.excludedPaths),
+            params.toFileFilter(),
             Charsets.UTF_8,
-            listOf(SlashStarCommentRecognizer, DoubleSlashCommentRecognizer),
-            params.toParams(toVersion.get().version),
+            CommentRecognizers.DEFAULT,
+            params.toTransformParams(toVersion.get().version),
             statistics, false
         )
         val message = buildString {
@@ -86,14 +98,6 @@ internal abstract class StonecutterTask : DefaultTask() {
         project.logger.debug(message)
         return runCatching {
             processor.process()
-        }.exceptionOrNull()
-    }
-
-    private fun StitcherParameters.toParams(version: String, key: String = "minecraft"): TransformParameters {
-        val deps = dependencies.toMutableMap()
-        val dest = deps[key] ?: VersionParser.parseLenient(version)
-        deps[key] = dest
-        deps[""] = dest
-        return TransformParameters(swaps, constants, deps)
+        }
     }
 }

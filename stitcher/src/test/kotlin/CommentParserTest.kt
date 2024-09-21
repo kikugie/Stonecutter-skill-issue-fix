@@ -3,6 +3,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
 import com.github.ajalt.mordant.rendering.TextColors.*
+import dev.kikugie.stitcher.exception.StoringErrorHandler
 
 object CommentParserTest {
     val SUGAR_TESTS = listOf(
@@ -14,7 +15,7 @@ object CommentParserTest {
         "? else" to false,
         "? else const" to false,
         "?} else" to true,
-        "?} else const" to false,
+        "?} else const" to true,
 
         "? elif" to false,
         "? elif const" to false,
@@ -84,6 +85,10 @@ object CommentParserTest {
         "? const { const again" to false,
     )
 
+    val SPACE_TESTS = listOf(
+        " ? const" to true,
+    )
+
     @TestFactory
     fun `test sugar`() = SUGAR_TESTS.tests()
     @TestFactory
@@ -92,6 +97,8 @@ object CommentParserTest {
     fun `test condition`() = CONDITION_TESTS.tests()
     @TestFactory
     fun `test scope`() = SCOPE_TESTS.tests()
+    @TestFactory
+    fun `test space`() = SPACE_TESTS.tests()
 
     private fun Iterable<Pair<String, Boolean>>.tests() = map {
         val str = if (it.second) '+' else '-'
@@ -99,17 +106,18 @@ object CommentParserTest {
     }
 
     private fun check(input: String, succeeds: Boolean) {
-        val parser = CommentParser.create(input)
+        val handler = StoringErrorHandler()
+        val parser = CommentParser.create(input, handler)
         val result = parser.parse()
         Assertions.assertNotNull(result) { "Failed to parse $input" }
 
-        val errors = parser.errors.joinToString {
+        val errors = handler.errors.joinToString("\n") {
             "- ${red(it.second)} - ${cyan(it.first.toString())}"
         }
         if (!succeeds) {
-            Assertions.assertFalse(parser.errors.isEmpty()) { "Expected to have errors" }
+            Assertions.assertFalse(handler.errors.isEmpty()) { "Expected to have errors" }
             println(green("'$input' received errors:\n$errors\n"))
-        } else Assertions.assertIterableEquals(emptyList<String>(), parser.errors) {
+        } else Assertions.assertIterableEquals(emptyList<String>(), handler.errors) {
             "Unexpected errors:\n$errors\n"
         }
     }

@@ -5,7 +5,6 @@ import dev.kikugie.stitcher.data.scope.ScopeType
 import dev.kikugie.stitcher.data.token.*
 import dev.kikugie.stitcher.data.token.MarkerType.CONDITION
 import dev.kikugie.stitcher.data.token.MarkerType.SWAP
-import dev.kikugie.stitcher.data.token.StitcherTokenType.*
 import dev.kikugie.stitcher.data.token.StitcherTokenType.AND
 import dev.kikugie.stitcher.data.token.StitcherTokenType.ASSIGN
 import dev.kikugie.stitcher.data.token.StitcherTokenType.ELIF
@@ -22,10 +21,7 @@ import dev.kikugie.stitcher.data.token.StitcherTokenType.SCOPE_CLOSE
 import dev.kikugie.stitcher.data.token.StitcherTokenType.SCOPE_OPEN
 import dev.kikugie.stitcher.eval.isBlank
 import dev.kikugie.stitcher.eval.isEmpty
-import dev.kikugie.stitcher.eval.isNotEmpty
 import dev.kikugie.stitcher.exception.ErrorHandler
-import dev.kikugie.stitcher.exception.StoringErrorHandler
-import dev.kikugie.stitcher.exception.accept
 import dev.kikugie.stitcher.lexer.*
 import dev.kikugie.stitcher.lexer.ALL
 import dev.kikugie.stitcher.transformer.TransformParameters
@@ -39,7 +35,7 @@ class CommentParser(
     companion object {
         fun create(
             input: CharSequence,
-            handler: ErrorHandler = StoringErrorHandler(),
+            handler: ErrorHandler,
             matchers: Iterable<TokenRecognizer> = ALL,
             params: TransformParameters? = null,
         ): CommentParser {
@@ -47,8 +43,6 @@ class CommentParser(
             return CommentParser(lexer, handler, params)
         }
     }
-
-    override val errors get() = handler.errors
     private val nextType get() = lookup()?.type
 
     fun parse(): Definition? {
@@ -231,10 +225,6 @@ class CommentParser(
                     IF -> if (component.isEmpty()) sugar.last().end().report {
                         "Must have a condition statement"
                     }.also { reportRest(2) }
-
-                    null -> if (component.isNotEmpty()) sugar.last().end().report {
-                        "Must not have a condition statement"
-                    }.also { reportRest(1) }
 
                     else -> reportRest(1)
                 }

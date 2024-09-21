@@ -60,6 +60,19 @@ data object SlashStarCommentRecognizer : CommentRecognizer {
         if (input[offset] == '*' && input.getAt(offset + 1) == '/') 2 else -1
 }
 
+object CommentRecognizers {
+    val ALL = listOf(
+        HashCommentRecognizer,
+        DoubleSlashCommentRecognizer,
+        SlashStarCommentRecognizer,
+    )
+
+    val DEFAULT = listOf(
+        DoubleSlashCommentRecognizer,
+        SlashStarCommentRecognizer,
+    )
+}
+
 private fun CharSequence.matchEOL(offset: Int) = when (get(offset)) {
     '\r' -> if (getAt(offset + 1) == '\n') 2 else 1
     '\n' -> 1

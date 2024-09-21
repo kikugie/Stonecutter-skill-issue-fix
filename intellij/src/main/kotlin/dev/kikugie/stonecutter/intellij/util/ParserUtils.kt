@@ -1,7 +1,7 @@
 package dev.kikugie.stonecutter.intellij.util
 
 import dev.kikugie.stitcher.data.component.Definition
-import dev.kikugie.stitcher.eval.ConditionChecker
+import dev.kikugie.stitcher.transformer.ConditionChecker
 import dev.kikugie.stitcher.eval.isNotEmpty
 import dev.kikugie.stitcher.exception.StoringErrorHandler
 import dev.kikugie.stitcher.lexer.Lexer

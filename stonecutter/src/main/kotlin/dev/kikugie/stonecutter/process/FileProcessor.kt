@@ -11,6 +11,7 @@ import dev.kikugie.stitcher.parser.FileParser
 import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.transformer.TransformParameters
 import dev.kikugie.stitcher.transformer.Transformer
+import dev.kikugie.stonecutter.data.FileFilter
 import dev.kikugie.stonecutter.data.YAML
 import dev.kikugie.stonecutter.isAvailable
 import dev.kikugie.stonecutter.useCatching
@@ -35,9 +36,12 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.io.path.*
+import kotlin.reflect.KSuspendFunction0
+
+internal typealias Callback = KSuspendFunction0<Unit>
 
 @OptIn(ExperimentalSerializationApi::class, ExperimentalPathApi::class)
-class FileProcessor(
+internal class FileProcessor(
     private val dirs: DirectoryData,
     private val filter: FileFilter,
     private val charset: Charset = StandardCharsets.UTF_8,
@@ -92,7 +96,7 @@ class FileProcessor(
                 collector.push("Parsed AST, ${handler.errors.size} errors")
                 handler.throwIfHasErrors()
                 writeCachedAst(ast)
-                writeDebugAst(ast)
+                if (debug) writeDebugAst(ast)
             }
             Transformer(ast, recognizers, params, handler).process()
             collector.push("Transformed AST, ${handler.errors.size} errors")
@@ -200,8 +204,8 @@ class FileProcessor(
             return list.toByteArray()
         }
 
-        private fun ErrorHandler.throwIfHasErrors() {
-            if (errors.isEmpty()) return
+        private fun ErrorHandler.throwIfHasErrors(): Nothing? {
+            if (errors.isEmpty()) return null
             val path = dirs.root.resolve(source)
             throw Exception("Failed to parse ${path.absolutePathString()}").apply {
                 errors.forEach { addSuppressed(Exception(it.join())) }
@@ -209,7 +213,7 @@ class FileProcessor(
         }
     }
 
-    fun process()  {
+    fun process(): Callback {
         dirs.temp.deleteRecursively()
         val errors: MutableMap<Path, MutableList<Throwable>> = mutableMapOf()
         for (file in dirs.root.walk()) runBlocking {
@@ -233,9 +237,7 @@ class FileProcessor(
         }
 
         if (errors.isNotEmpty()) composeErrors(dirs.root, errors)
-        runBlocking {
-            applyTemp()
-        }
+        return ::applyTemp
     }
 
     private fun composeErrors(root: Path, errors: Map<Path, List<Throwable>>): Nothing {

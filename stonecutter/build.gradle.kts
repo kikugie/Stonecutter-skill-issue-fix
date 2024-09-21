@@ -28,6 +28,10 @@ dependencies {
     testImplementation(libs.bundles.test)
 }
 
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
+
 tasks.withType<DokkaTask>().configureEach {
     moduleName.set("Stonecutter Plugin")
     dokkaSourceSets {

@@ -4,7 +4,7 @@ import org.slf4j.Logger
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 
-class LogCollector(private val logger: Logger, private val path: Path) {
+internal class LogCollector(private val logger: Logger, private val path: Path) {
     private val messages = mutableListOf<String>()
 
     fun push(message: String) {

@@ -3,7 +3,9 @@ import com.github.ajalt.mordant.rendering.TextColors.red
 import dev.kikugie.stitcher.eval.join
 import dev.kikugie.stitcher.exception.StoringErrorHandler
 import dev.kikugie.stitcher.parser.FileParser
+import dev.kikugie.stitcher.scanner.CommentRecognizers
 import dev.kikugie.stitcher.transformer.TransformParameters
+import dev.kikugie.stitcher.transformer.TransformParameters.Companion.TransformParameters
 import dev.kikugie.stitcher.transformer.Transformer
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -254,7 +256,7 @@ object TransformerTest {
         assertNotNull(scope)
         checkHandlerErrors()
 
-        val transformer = Transformer(scope, RECOGNIZERS, data.params, handler)
+        val transformer = Transformer(scope, CommentRecognizers.DEFAULT, data.params, handler)
         val modified = transformer.process()
         checkHandlerErrors()
 
@@ -269,8 +271,8 @@ object TransformerTest {
         lateinit var expected: String
         lateinit var input: String
         lateinit var params: TransformParameters
-        inline fun params(build: TransformParametersBuilder.() -> Unit) {
-            params = TransformParametersBuilder().apply(build).build()
+        inline fun params(build: TransformParameters.TransformParametersBuilder.() -> Unit) {
+            params = TransformParameters(build)
         }
     }
 }

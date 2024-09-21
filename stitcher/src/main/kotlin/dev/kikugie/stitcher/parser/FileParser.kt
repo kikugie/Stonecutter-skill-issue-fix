@@ -11,9 +11,7 @@ import dev.kikugie.stitcher.data.token.Token
 import dev.kikugie.stitcher.eval.isEmpty
 import dev.kikugie.stitcher.eval.isNotEmpty
 import dev.kikugie.stitcher.exception.ErrorHandler
-import dev.kikugie.stitcher.exception.StoringErrorHandler
 import dev.kikugie.stitcher.lexer.ALL
-import dev.kikugie.stitcher.lexer.LexSlice
 import dev.kikugie.stitcher.lexer.Lexer
 import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.scanner.Scanner
@@ -30,7 +28,7 @@ import java.util.*
 class FileParser(
     input: Iterable<Token>,
     private val params: TransformParameters? = null,
-    private val handler: ErrorHandler = StoringErrorHandler(),
+    private val handler: ErrorHandler,
 ) {
     companion object {
         fun create(
@@ -43,9 +41,7 @@ class FileParser(
             return FileParser(scanner.asIterable(), params, handler)
         }
     }
-
-    val errors: Collection<Pair<LexSlice, String>> get() = handler.errors
-    private val iter: LookaroundIterator<Token> = LookaroundIterator(input.iterator())
+    private val iter: LookaroundIterator<Token> = LookaroundIterator(input)
     private val scopes: Stack<Scope> = Stack<Scope>().apply { push(Scope()) }
     private val active: Scope get() = scopes.peek()
     private val root: Scope get() = scopes[0]

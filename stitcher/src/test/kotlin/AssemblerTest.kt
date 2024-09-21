@@ -1,4 +1,5 @@
 import dev.kikugie.stitcher.eval.join
+import dev.kikugie.stitcher.exception.StoringErrorHandler
 import dev.kikugie.stitcher.parser.CommentParser
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DynamicTest
@@ -18,7 +19,8 @@ object AssemblerTest {
     }.asIterable()
 
     private fun check(input: String) {
-        val parser = CommentParser.create(input)
+        val handler = StoringErrorHandler()
+        val parser = CommentParser.create(input, handler)
         val result = parser.parse()
         Assertions.assertNotNull(result) { "Failed to parse $input" }
         Assertions.assertEquals(input.trim(), result!!.join())

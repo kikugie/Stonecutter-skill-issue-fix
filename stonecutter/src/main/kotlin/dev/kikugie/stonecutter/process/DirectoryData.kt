@@ -2,7 +2,7 @@ package dev.kikugie.stonecutter.process
 
 import java.nio.file.Path
 
-data class DirectoryData(
+internal data class DirectoryData(
     val root: Path,
     val dest: Path,
     val inputCache: Path,
