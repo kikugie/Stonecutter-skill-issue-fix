@@ -14,7 +14,6 @@ import dev.kikugie.stitcher.transformer.Transformer
 import dev.kikugie.stonecutter.data.YAML
 import dev.kikugie.stonecutter.isAvailable
 import dev.kikugie.stonecutter.useCatching
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.decodeFromByteArray
@@ -29,7 +28,6 @@ import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.io.path.*
@@ -110,33 +108,32 @@ internal class FileProcessor(
             else result logging "Successfully processed"
         }
 
-        private fun writeDebugAst(ast: Scope) =
-            dirs.debug.resolveChecked(source).runReporting("Failed to save debug AST") {
+        private fun writeDebugAst(ast: Scope) = dirs.debug
+            .resolveChecked(source.withExtension("yml"))
+            .runReporting("Failed to save debug AST") {
                 writeConfigured { YAML.encodeToStream(ast, it) }
             }
 
 
-        private fun writeCachedAst(ast: Scope) =
-            dirs.asts.resolveChecked(source).runReporting("Failed to save cached AST") {
+        private fun writeCachedAst(ast: Scope) = dirs.asts
+            .resolveChecked(source.withExtension("ast"))
+            .runReporting("Failed to save cached AST") {
                 writeConfigured { it.write(Cbor.Default.encodeToByteArray(ast)) }
-
             }
 
-        private fun writeCachedOutput(result: String) =
-            dirs.results.resolveChecked(source).runReporting("Failed to save cached output") {
+        private fun writeCachedOutput(result: String) = dirs.results.resolveChecked(source)
+            .runReporting("Failed to save cached output") {
                 writeText(result, charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
             }
 
-
-        private fun writeChecksum(checksum: ByteArray) =
-            dirs.inputCache.resolve("checksums").resolveChecked(source.withExtension("checksum"))
-                .runReporting("Failed to save checksum") {
-                    writeBytes(checksum, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
-                }
-
+        private fun writeChecksum(checksum: ByteArray) = dirs.inputCache.resolve("checksums")
+            .resolveChecked(source.withExtension("checksum"))
+            .runReporting("Failed to save checksum") {
+                writeBytes(checksum, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+            }
 
         private fun readCachedAst(): Scope? {
-            val file = dirs.asts.resolve(source)
+            val file = dirs.asts.resolve(source.withExtension("ast"))
             return if (!file.isAvailable()) null logging "AST cache not found"
             else file.runReporting("Failed to read cached AST") {
                 Cbor.Default.decodeFromByteArray<Scope>(file.readBytes())
