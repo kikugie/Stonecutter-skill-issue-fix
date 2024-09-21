@@ -14,6 +14,7 @@ internal fun remap(str: CharSequence, from: Char, to: Char) = StringBuilder(str)
         if (index < 0) break
         if (getOrNull(index - 1) == '/' || getOrNull(index + 1) == '/')
             set(index, to)
+        index++
     }
 }
 
