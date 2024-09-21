@@ -1,13 +1,7 @@
 package dev.kikugie.stonecutter.build
 
-import dev.kikugie.stonecutter.StonecutterProject
-import dev.kikugie.stonecutter.StonecutterUtility
-import dev.kikugie.stonecutter.buildDirectory
-import dev.kikugie.stonecutter.controller.ProjectBranch
-import dev.kikugie.stonecutter.controller.ProjectNode
-import dev.kikugie.stonecutter.controller.ProjectTree
-import dev.kikugie.stonecutter.data.TreeContainer
-import dev.kikugie.stonecutter.data.buildDirectoryPath
+import dev.kikugie.stonecutter.*
+import dev.kikugie.stonecutter.controller.storage.*
 import dev.kikugie.stonecutter.process.StonecutterTask
 import dev.kikugie.stonecutter.stonecutterCachePath
 import groovy.lang.MissingPropertyException
@@ -31,15 +25,19 @@ import kotlin.io.path.invariantSeparatorsPathString
 @OptIn(ExperimentalPathApi::class)
 @Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterBuild(val project: Project) : BuildConfiguration(project.parent!!), StonecutterUtility {
-    private val parent = checkNotNull(project.parent) {
+    private val parent: Project = requireNotNull(project.parent) {
         "StonecutterBuild applied to a non-versioned buildscript"
+    }
+
+    private val params: GlobalParameters = requireNotNull(project.gradle.extensions.getByType<ProjectParameterContainer>()[project]) {
+        "Global parameters not found for project '$project'"
     }
 
     /**
      * The full tree this project belongs to. Without subprojects it will only have the root branch.
      * Allows traversing all branches if needed. For project access use [node] methods.
      */
-    val tree: ProjectTree = requireNotNull(project.rootProject.run { gradle.extensions.getByType<TreeContainer>()[this] }) {
+    val tree: ProjectTree = requireNotNull(project.gradle.extensions.getByType<ProjectTreeContainer>()[project]) {
         "Project '$project' is not versioned"
     }
     /**
@@ -80,6 +78,7 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
 
     private fun Project.configure() {
         tasks.register("setupChiseledBuild", StonecutterTask::class.java) {
+            debug.set(params.debug)
             toVersion.set(current)
             fromVersion.set(active)
 
@@ -91,9 +90,8 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
 
             data.set(mapOf(branch to this@StonecutterBuild.data))
             sources.set(mapOf(branch to branch.path))
-            cacheDir.set { _, version ->
-                branch[version.project]?.project?.stonecutterCachePath
-                    ?: branch.project.stonecutterCachePath.resolve("out-of-bounds/$version")
+            cacheDir.set { _, version -> branch[version.project]?.project?.stonecutterCachePath
+                ?: branch.project.stonecutterCachePath.resolve("out-of-bounds/$version")
             }
         }
 
@@ -102,9 +100,9 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
 
     private fun Project.configureSources() {
         try {
-            val useChiseledSrc = tree.hasChiseled(gradle.startParameter.taskNames)
+            val useChiseledSrc = params.hasChiseled(gradle.startParameter.taskNames)
             val formatter: (Path) -> Any = when {
-                useChiseledSrc -> { src -> File(buildDirectory, "chiseledSrc/$src") }
+                useChiseledSrc -> { src -> File(buildDirectoryFile, "chiseledSrc/$src") }
                 current.isActive -> { src -> "../../src/$src" }
                 else -> return
             }

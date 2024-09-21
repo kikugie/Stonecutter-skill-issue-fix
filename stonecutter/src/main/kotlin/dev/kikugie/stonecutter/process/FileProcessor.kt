@@ -11,7 +11,6 @@ import dev.kikugie.stitcher.parser.FileParser
 import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.transformer.TransformParameters
 import dev.kikugie.stitcher.transformer.Transformer
-import dev.kikugie.stonecutter.data.FileFilter
 import dev.kikugie.stonecutter.data.YAML
 import dev.kikugie.stonecutter.isAvailable
 import dev.kikugie.stonecutter.useCatching
@@ -86,7 +85,7 @@ internal class FileProcessor(
 
     @OptIn(ExperimentalEncodingApi::class)
     inner class EntryProcessor(private val source: Path) {
-        internal val collector = LogCollector(LOGGER, dirs.root.resolve(source))
+        internal val collector = LogCollector(LOGGER, dirs.root.resolve(source), debug)
 
         internal suspend fun process(): String? {
             statistics.total.getAndIncrement()

@@ -5,7 +5,6 @@ import dev.kikugie.semver.VersionParsingException
 import dev.kikugie.stitcher.lexer.IdentifierRecognizer
 import dev.kikugie.stonecutter.MapSetter
 import dev.kikugie.stonecutter.controller.StonecutterController
-import dev.kikugie.stonecutter.data.StitcherParameters
 import org.gradle.api.Project
 import java.io.File
 import java.nio.file.Path
@@ -16,7 +15,7 @@ import java.nio.file.Path
  */
 @Suppress("unused")
 abstract class BuildConfiguration(private val project: Project) {
-    internal var data: StitcherParameters = StitcherParameters()
+    internal var data: BuildParameters = BuildParameters()
 
     /**
      * Creates a swap with the given value. Meant to be used with Kotlin DSL:

@@ -1,6 +1,6 @@
 package dev.kikugie.stonecutter
 
-import dev.kikugie.stonecutter.data.TreeContainer
+import dev.kikugie.stonecutter.controller.storage.ProjectTreeContainer
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
 import org.gradle.api.provider.ListProperty
@@ -11,7 +11,9 @@ import org.gradle.api.tasks.Input
  */
 @Suppress("LeakingThis", "unused")
 abstract class ChiseledTask : DefaultTask() {
-    private val setup = project.gradle.extensions.getByType(TreeContainer::class.java)[project]!!
+    private val tree = requireNotNull(project.gradle.extensions.getByType(ProjectTreeContainer::class.java)[project]) {
+        "Chiseled task registered in a non-Stonecutter project"
+    }
     private val setupTask: Task = project.tasks.getByName("chiseledStonecutter")
 
     /**
@@ -23,7 +25,7 @@ abstract class ChiseledTask : DefaultTask() {
 
     init {
         dependsOn(setupTask)
-        versions.convention(setup.versions)
+        versions.convention(tree.versions)
     }
 
     /**
@@ -33,7 +35,7 @@ abstract class ChiseledTask : DefaultTask() {
      */
     fun ofTask(name: String) {
         val versions = versions.get().toSet()
-        setup.nodes.filter { it.metadata in versions }.forEach {
+        tree.nodes.filter { it.metadata in versions }.forEach {
             val task = it.tasks.getByName(name)
             finalizedBy(task)
             task.mustRunAfter(setupTask)

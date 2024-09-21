@@ -3,9 +3,11 @@ package dev.kikugie.stonecutter.process
 import org.slf4j.Logger
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
+import kotlin.time.Duration.Companion.nanoseconds
 
-internal class LogCollector(private val logger: Logger, private val path: Path) {
+internal class LogCollector(private val logger: Logger, private val path: Path, private val debug: Boolean = false) {
     private val messages = mutableListOf<String>()
+    private val start = System.nanoTime();
 
     fun push(message: String) {
         messages.add(message)
@@ -20,10 +22,13 @@ internal class LogCollector(private val logger: Logger, private val path: Path) 
     }
 
     fun release() {
+        val duration = (System.nanoTime() - start).nanoseconds
         val joined = buildString {
-            appendLine("File: ${path.absolutePathString()}")
+            append("File: ${path.absolutePathString()} ")
+            appendLine("($duration)")
             messages.joinToString("\n") { it.prependIndent("  ") }.also(::append)
         }
-        logger.debug(joined)
+        if (debug) println(joined)
+        else logger.debug(joined)
     }
 }

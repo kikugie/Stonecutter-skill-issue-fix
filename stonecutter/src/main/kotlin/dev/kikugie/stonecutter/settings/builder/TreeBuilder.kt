@@ -1,11 +1,14 @@
-package dev.kikugie.stonecutter.settings
+package dev.kikugie.stonecutter.settings.builder
 
 import dev.kikugie.stonecutter.ProjectName
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.TargetVersion
-import dev.kikugie.stonecutter.data.NodeMap
 import dev.kikugie.stonecutter.sanitize
+import dev.kikugie.stonecutter.settings.ProjectProvider
 import org.gradle.api.Action
+
+typealias Nodes = MutableSet<StonecutterProject>
+typealias NodeMap = MutableMap<ProjectName, Nodes>
 
 /**
  * Represents a project tree structure in the `settings.gradle[.kts]` file.
@@ -31,9 +34,9 @@ class TreeBuilder : ProjectProvider {
             ?: error("No versions registered")
 
     // Required to have object identity
-    private fun find(project: StonecutterProject) = versions.getOrDefault(project, project)
+    internal fun find(project: StonecutterProject) = versions.getOrDefault(project, project)
 
-    private fun add(name: ProjectName, project: StonecutterProject) =
+    internal fun add(name: ProjectName, project: StonecutterProject) =
         nodes.getOrPut(name, ::mutableSetOf).let { versions[project] = project; it += project }
 
     override fun vers(name: ProjectName, version: TargetVersion) =
@@ -53,7 +56,7 @@ class TreeBuilder : ProjectProvider {
      * @param action Branch configuration
      */
     fun branch(name: ProjectName, action: Action<BranchBuilder>) =
-        BranchBuilder(name.sanitize()).also { branches[name.sanitize()] = it }.let(action::execute)
+        BranchBuilder(this, name.sanitize()).also { branches[name.sanitize()] = it }.let(action::execute)
 
     override fun toString() = buildString {
         appendLine("|- vcs: $vcsVersion")
@@ -63,50 +66,4 @@ class TreeBuilder : ProjectProvider {
         append(nodes.treeView().prepend("  "))
     }
 
-    /**
-     * Proxy class for adding nodes to the given branch in the tree.
-     *
-     * @param id Subproject's name for this branch
-     */
-    inner class BranchBuilder(private val id: ProjectName) : ProjectProvider {
-        /**
-         * Buildscript filename override for this branch.
-         * Defaults to the one set in the [StonecutterSettings] configuration scope.
-         */
-        lateinit var buildscript: String
-
-        override fun vers(
-            name: ProjectName,
-            version: TargetVersion
-        ) = this@TreeBuilder.add(id, find(StonecutterProject(name, version)))
-
-        /**
-         * Copies nodes registered in [TreeBuilder] to this branch
-         */
-        fun inherit() = checkNotNull(this@TreeBuilder.nodes[""]) {
-            "No root node to inherit from"
-        }.forEach { this@TreeBuilder.add(id, it) }
-    }
 }
-
-private fun String.prepend(str: String) = lines().joinToString("\n") { str + it }
-
-private fun StonecutterProject.treeView() = "- $project: v$version"
-
-private fun Collection<StonecutterProject>.treeView() =
-    map { it.treeView() }.mapIndexed { j, line ->
-        val lastLine = j == size - 1
-        if (!lastLine) line.prepend("|")
-        else line.prepend(" ").replaceFirst(' ', '\\')
-    }.joinToString("\n")
-
-private fun NodeMap.treeView() = entries.mapIndexed { i, entry ->
-    val (name, nodes) = entry
-    val joined = nodes.treeView()
-    val lastElem = i == this@treeView.size - 1
-    val elem = if (lastElem) joined.prepend("  ")
-    else joined.prepend("| ")
-    val header = if (lastElem) "\\- $name:\n"
-    else "|- $name:\n"
-    header + elem
-}.joinToString("\n")

@@ -3,25 +3,24 @@ package dev.kikugie.stonecutter.settings
 import dev.kikugie.stonecutter.ProjectName
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.StonecutterUtility
-import dev.kikugie.stonecutter.controller.GroovyController
-import dev.kikugie.stonecutter.controller.KotlinController
-import dev.kikugie.stonecutter.data.TreeBuilderContainer
-import dev.kikugie.stonecutter.data.TreeContainer
+import dev.kikugie.stonecutter.controller.manager.GroovyController
+import dev.kikugie.stonecutter.controller.manager.KotlinController
+import dev.kikugie.stonecutter.controller.storage.ProjectParameterContainer
+import dev.kikugie.stonecutter.controller.storage.ProjectTreeContainer
 import dev.kikugie.stonecutter.sanitize
+import dev.kikugie.stonecutter.settings.builder.TreeBuilder
+import dev.kikugie.stonecutter.settings.builder.TreeBuilderContainer
 import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.getByType
 import java.io.File
-import java.nio.file.StandardOpenOption
 import kotlin.io.path.createDirectories
 import kotlin.io.path.notExists
-import kotlin.io.path.writeText
 
 @Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterSettings(settings: Settings) : SettingsConfiguration(settings), StonecutterUtility {
-    private val container: TreeBuilderContainer =
-        settings.gradle.extensions.create<TreeBuilderContainer>("stonecutterTreeBuilders")
-
+    private val container: TreeBuilderContainer
     private val controller get() = if (kotlinController) KotlinController else GroovyController
 
     /**
@@ -36,19 +35,26 @@ open class StonecutterSettings(settings: Settings) : SettingsConfiguration(setti
      */
     var centralScript = "build.gradle"
         set(value) {
-            require(!value.startsWith("stonecutter.gradle")) { "Build script must not override the controller" }
+            require(!value.startsWith("stonecutter.gradle")) {
+                "Build script must not override the controller"
+            }
             field = value
         }
 
     init {
-        settings.gradle.extensions.create<TreeContainer>("stonecutterProjectTrees")
+        with(settings.gradle.extensions) {
+            create<TreeBuilderContainer>("stonecutterTreeBuilders")
+            create<ProjectTreeContainer>("stonecutterProjectTrees")
+            create<ProjectParameterContainer>("stonecutterProjectParameters")
+        }
+        container = settings.extensions.getByType<TreeBuilderContainer>()
     }
 
     override fun create(project: ProjectDescriptor, setup: TreeBuilder) {
         require(container.register(project.path, setup)) {
             "Project ${project.path} is already registered"
         }
-        println("Created tree:\n$setup")
+        println("[Stonecutter] Created tree:\n$setup")
 
         project.buildFileName = controller.filename
         with(project.projectDir.resolve(controller.filename).toPath()) {

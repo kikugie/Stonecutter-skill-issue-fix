@@ -3,6 +3,7 @@ package dev.kikugie.stonecutter.settings
 import dev.kikugie.stonecutter.BNAN
 import dev.kikugie.stonecutter.ProjectPath
 import dev.kikugie.stonecutter.sanitize
+import dev.kikugie.stonecutter.settings.builder.TreeBuilder
 import org.gradle.api.Action
 import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings

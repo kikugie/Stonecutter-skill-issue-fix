@@ -2,8 +2,8 @@ package dev.kikugie.stonecutter.process
 
 import dev.kikugie.stitcher.scanner.CommentRecognizers
 import dev.kikugie.stonecutter.StonecutterProject
-import dev.kikugie.stonecutter.controller.ProjectBranch
-import dev.kikugie.stonecutter.data.StitcherParameters
+import dev.kikugie.stonecutter.controller.storage.ProjectBranch
+import dev.kikugie.stonecutter.build.BuildParameters
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.MapProperty
@@ -11,8 +11,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Path
-import kotlin.reflect.KFunction
-import kotlin.reflect.KFunction0
 import kotlin.system.measureTimeMillis
 
 internal abstract class StonecutterTask : DefaultTask() {
@@ -32,10 +30,13 @@ internal abstract class StonecutterTask : DefaultTask() {
     abstract val sources: MapProperty<ProjectBranch, Path>
 
     @get:Input
-    abstract val data: MapProperty<ProjectBranch, StitcherParameters>
+    abstract val data: MapProperty<ProjectBranch, BuildParameters>
 
     @get:Input
     abstract val cacheDir: Property<(ProjectBranch, StonecutterProject) -> Path>
+
+    @get:Input
+    abstract val debug: Property<Boolean>
 
     private val statistics: ProcessStatistics = ProcessStatistics()
 
@@ -57,8 +58,13 @@ internal abstract class StonecutterTask : DefaultTask() {
 
         val message = buildString {
             append("Switched to ${toVersion.get().project} in ${time}ms.")
-            append(" ")
-            append("(${statistics.total.get()} total | ${statistics.parsed.get()} parsed | ${statistics.total.get() - statistics.processed.get()} skipped)")
+            append(" (")
+            append("${statistics.total.get()} total")
+            append(" | ")
+            append("${statistics.parsed.get()} parsed")
+            append(" | ")
+            append("${statistics.total.get() - statistics.processed.get()} skipped")
+            append(")")
         }
         println(message)
     }
@@ -83,7 +89,8 @@ internal abstract class StonecutterTask : DefaultTask() {
             Charsets.UTF_8,
             CommentRecognizers.DEFAULT,
             params.toTransformParams(toVersion.get().version),
-            statistics, false
+            statistics,
+            debug.get()
         )
         val message = buildString {
             appendLine("Processing branch ${branch.path}...")

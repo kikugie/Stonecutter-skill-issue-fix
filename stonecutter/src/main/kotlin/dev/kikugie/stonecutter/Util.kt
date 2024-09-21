@@ -38,14 +38,17 @@ const val BNAN = "🍌"
 
 internal fun ProjectPath.sanitize() = removePrefix(":")
 
-internal val Project.buildDirectory
+internal val Project.buildDirectoryFile
     get() = layout.buildDirectory.asFile.get()
 
-internal val Project.stonecutterCacheDir
-    get() = buildDirectory.resolve("stonecutter-cache")
+internal val Project.buildDirectoryPath
+    get() = layout.buildDirectory.asFile.get().toPath()
+
+internal val Project.stonecutterCacheFile
+    get() = buildDirectoryFile.resolve("stonecutter-cache")
 
 internal val Project.stonecutterCachePath
-    get() = stonecutterCacheDir.toPath()
+    get() = stonecutterCacheFile.toPath()
 
 internal inline fun <T : Closeable?, R> T.useCatching(block: (T) -> R): Result<R> =
     runCatching { use(block) }

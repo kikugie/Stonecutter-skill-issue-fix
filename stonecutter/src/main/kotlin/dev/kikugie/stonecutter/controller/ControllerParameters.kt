@@ -20,4 +20,17 @@ interface ControllerParameters {
      * ```
      */
     val automaticPlatformConstants: Boolean
+
+    /**
+     * Debug mode toggle for all nodes in the tree.
+     *
+     * Currently, debug includes the following functionality:
+     * - File processing caches are disabled in `build/stonecutter-cache/`:
+     *      - `transform_parameters.yml` is generated every time.
+     *      - `results/` is ignored.
+     *      - `asts/` is ignored.
+     * - Debug ASTs in `.yml` format are written to `build/stonecutter-cache/debug`.
+     * - All processing steps are written in the main log.
+     */
+    val debug: Boolean
 }

@@ -2,12 +2,13 @@ package dev.kikugie.stonecutter.controller
 
 import dev.kikugie.stonecutter.*
 import dev.kikugie.stonecutter.build.StonecutterBuild
-import dev.kikugie.stonecutter.data.StitcherParameters
-import dev.kikugie.stonecutter.data.TreeBuilderContainer
-import dev.kikugie.stonecutter.data.TreeContainer
-import dev.kikugie.stonecutter.data.stonecutterCachePath
+import dev.kikugie.stonecutter.controller.manager.ControllerManager
+import dev.kikugie.stonecutter.controller.manager.controller
+import dev.kikugie.stonecutter.controller.storage.*
+import dev.kikugie.stonecutter.build.BuildParameters
 import dev.kikugie.stonecutter.process.StonecutterTask
-import dev.kikugie.stonecutter.settings.TreeBuilder
+import dev.kikugie.stonecutter.settings.builder.TreeBuilder
+import dev.kikugie.stonecutter.settings.builder.TreeBuilderContainer
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
@@ -27,9 +28,12 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     private val manager: ControllerManager = checkNotNull(root.controller()) {
         "Project ${root.path} is not a Stonecutter controller. What did you even do to get this error?"
     }
-    private val container: TreeContainer = root.gradle.extensions.getByType<TreeContainer>()
+    private val treeContainer: ProjectTreeContainer = root.gradle.extensions.getByType<ProjectTreeContainer>()
+    private val parameterContainer: ProjectParameterContainer =
+        root.gradle.extensions.getByType<ProjectParameterContainer>()
     private val configurations: MutableMap<BranchEntry, ParameterHolder> = mutableMapOf()
     private val builds: MutableList<Action<StonecutterBuild>> = mutableListOf()
+    private val parameters: GlobalParameters = GlobalParameters()
 
     /**
      * The full project tree this controller operates on. The default branch is `""`.
@@ -57,6 +61,11 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
 
     override var automaticPlatformConstants: Boolean = false
+    override var debug
+        get() = parameters.debug
+        set(value) {
+            parameters.debug = value
+        }
 
     init {
         println("Running Stonecutter 0.5-alpha.8")
@@ -84,7 +93,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
      * @param provider Task configuration
      */
     infix fun registerChiseled(provider: TaskProvider<*>) {
-        tree.addTask(provider.name)
+        parameters.addTask(provider.name)
     }
 
     /**
@@ -116,7 +125,10 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     }
 
     private fun configureTree(tree: ProjectTree) {
-        for (it in tree.branches.values) container.register(it.project.path, tree)
+        (tree.branches.values + tree.nodes).forEach {
+            treeContainer.register(it, tree)
+            parameterContainer.register(it, parameters)
+        }
         val task = root.tasks.create("chiseledStonecutter")
         for (it in tree.nodes) {
             it.project.pluginManager.apply(StonecutterPlugin::class)
@@ -150,7 +162,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         if (automaticPlatformConstants) configurePlatforms(tree.nodes)
         // Apply configurations
         tree.nodes.forEach {
-            it.stonecutter.data = configurations[it.branch to it.metadata]?.data ?: StitcherParameters()
+            it.stonecutter.data = configurations[it.branch to it.metadata]?.data ?: BuildParameters()
             for (build in builds) build.execute(it.stonecutter)
         }
     }
@@ -167,13 +179,14 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
             val builds = tree.associateWith {
                 it[name]?.extensions?.getByType<StonecutterBuild>()?.data
                     ?: configurations[it to version]?.data
-                    ?: StitcherParameters()
+                    ?: BuildParameters()
             }
             val paths = tree.associateWith { it.path }
 
             group = "stonecutter"
             description = desc
 
+            debug.set(parameters.debug)
             toVersion.set(version)
             fromVersion.set(tree.current)
 

@@ -2,7 +2,7 @@ package dev.kikugie.stonecutter
 
 import dev.kikugie.stonecutter.build.StonecutterBuild
 import dev.kikugie.stonecutter.controller.StonecutterController
-import dev.kikugie.stonecutter.controller.controller
+import dev.kikugie.stonecutter.controller.manager.controller
 import dev.kikugie.stonecutter.settings.StonecutterSettings
 import org.gradle.api.Plugin
 import org.gradle.api.Project

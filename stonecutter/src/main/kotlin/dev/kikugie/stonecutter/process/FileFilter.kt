@@ -1,4 +1,4 @@
-package dev.kikugie.stonecutter.data
+package dev.kikugie.stonecutter.process
 
 import java.nio.file.Path
 import kotlin.io.path.extension
