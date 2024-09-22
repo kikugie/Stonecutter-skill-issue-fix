@@ -20,7 +20,7 @@ data class ProjectTree(
     private val project: Project,
     val vcs: StonecutterProject,
     val branches: Map<ProjectName, ProjectBranch>,
-) : Iterable<ProjectBranch>, Project by project {
+) : Collection<ProjectBranch> by branches.values, Project by project {
     /**
      * Location of this tree on the disk.
      */
@@ -59,10 +59,4 @@ data class ProjectTree(
      * @param project Project reference
      */
     operator fun get(project: Project) = branches[project.path.sanitize()]
-
-
-    /**
-     * Iterator for the [branches] values.
-     */
-    override fun iterator(): Iterator<ProjectBranch> = branches.values.iterator()
 }

@@ -7,6 +7,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.isReadable
 import kotlin.io.path.isRegularFile
 
+@Deprecated("Use `stonecutter { }` instead")
 typealias StonecutterSettings = dev.kikugie.stonecutter.settings.StonecutterSettings
 
 /**
@@ -62,5 +63,11 @@ internal fun Path.isAvailable() = exists() && isRegularFile() && isReadable()
  * @param V Value type
  */
 interface MapSetter<K, V> {
+    /**
+     * Sets the value for the specified key in the underlying map.
+     *
+     * @param key the key to set the value for
+     * @param value the value to set for the key
+     */
     operator fun set(key: K, value: V)
 }

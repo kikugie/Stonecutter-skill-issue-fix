@@ -32,6 +32,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     private val parameterContainer: ProjectParameterContainer =
         root.gradle.extensions.getByType<ProjectParameterContainer>()
     private val configurations: MutableMap<BranchEntry, ParameterHolder> = mutableMapOf()
+    private val actions: MutableList<Action<ParameterHolder>> = mutableListOf()
     private val builds: MutableList<Action<StonecutterBuild>> = mutableListOf()
     private val parameters: GlobalParameters = GlobalParameters()
 
@@ -109,6 +110,14 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         configurations.getOrPut(it) { ParameterHolder(it.first, it.second) }.let(configuration::execute)
     }
 
+    /**
+     * Executes the provided action on each node after the nodes are configured.
+     *
+     * This may miss configurations required for a multi-branch setup
+     * and may have issues accessing versioned project properties.
+     *
+     * @param configuration Versioned plugin configuration
+     */
     @Deprecated(message = "Use `parameters {}` for global configuration.")
     infix fun configureEach(configuration: Action<StonecutterBuild>) {
         builds += configuration
@@ -160,9 +169,16 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         }
         // FIXME doesn't yet whoops
         if (automaticPlatformConstants) configurePlatforms(tree.nodes)
+
         // Apply configurations
+        tree.flatMap { br -> versions.map { br to it } }.forEach { (br, ver) ->
+            val holder = ParameterHolder(br, ver)
+            actions.forEach { it.execute(holder) }
+            configurations[br to ver] = holder
+        }
+        
         tree.nodes.forEach {
-            it.stonecutter.data = configurations[it.branch to it.metadata]?.data ?: BuildParameters()
+            configurations[it.branch to it.metadata]?.run { it.stonecutter.from(this) }
             for (build in builds) build.execute(it.stonecutter)
         }
     }

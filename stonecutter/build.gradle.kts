@@ -1,6 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
-import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.gradle.AbstractDokkaLeafTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -32,14 +32,8 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
-tasks.withType<DokkaTask>().configureEach {
-    moduleName.set("Stonecutter Plugin")
-    dokkaSourceSets {
-        configureEach {
-            reportUndocumented = true
-            skipEmptyPackages = true
-        }
-    }
+tasks.withType<AbstractDokkaLeafTask>().configureEach {
+    moduleName.set("Stonecutter Gradle")
 }
 
 java {
@@ -66,6 +60,10 @@ tasks.shadowJar {
 
 tasks.named<Jar>("javadocJar") {
     from(tasks.named("dokkaJavadoc"))
+}
+
+tasks.withType<AbstractDokkaLeafTask> {
+    moduleName = "Stonecutter Gradle"
 }
 
 publishing {

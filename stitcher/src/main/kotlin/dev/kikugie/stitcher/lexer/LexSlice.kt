@@ -9,6 +9,8 @@ data class LexSlice(
     val range: IntRange,
     val source: CharSequence
 ) {
+    constructor(type: TokenType, range: Int, source: CharSequence) : this(type, range..range, source)
+
     val value get() = if (range.first >= 0 && range.last < source.length) source.substring(range) else ""
     val token get() = Token(value, type)
 

@@ -7,15 +7,15 @@ import dev.kikugie.stonecutter.sanitize
 import dev.kikugie.stonecutter.settings.ProjectProvider
 import org.gradle.api.Action
 
-typealias Nodes = MutableSet<StonecutterProject>
-typealias NodeMap = MutableMap<ProjectName, Nodes>
+internal typealias Nodes = MutableSet<StonecutterProject>
+internal typealias NodeMap = MutableMap<ProjectName, Nodes>
 
 /**
  * Represents a project tree structure in the `settings.gradle[.kts]` file.
  * This tree only supports 3 layers of depth: `root -> branch -> node`.
  */
 class TreeBuilder : ProjectProvider {
-    private val versions: MutableMap<StonecutterProject, StonecutterProject> = mutableMapOf()
+    internal val versions: MutableMap<StonecutterProject, StonecutterProject> = mutableMapOf()
     internal val nodes: NodeMap = mutableMapOf()
     internal val branches: MutableMap<ProjectName, BranchBuilder> = mutableMapOf()
 
@@ -57,13 +57,4 @@ class TreeBuilder : ProjectProvider {
      */
     fun branch(name: ProjectName, action: Action<BranchBuilder>) =
         BranchBuilder(this, name.sanitize()).also { branches[name.sanitize()] = it }.let(action::execute)
-
-    override fun toString() = buildString {
-        appendLine("|- vcs: $vcsVersion")
-        appendLine("|- versions:")
-        appendLine(versions.values.treeView().prepend("| "))
-        appendLine("\\- branches:")
-        append(nodes.treeView().prepend("  "))
-    }
-
 }

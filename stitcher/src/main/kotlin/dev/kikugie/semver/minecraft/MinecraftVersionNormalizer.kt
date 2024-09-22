@@ -3,7 +3,7 @@ package dev.kikugie.semver.minecraft
 import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.VersionParser
 
-class MinecraftVersionNormalizer(private val supplier: MinecraftVersionInfo) {
+internal class MinecraftVersionNormalizer(private val supplier: MinecraftVersionInfo) {
     fun parse(input: CharSequence): SemanticVersion =
         VersionParser.parse(getValidVersion(input.toString()))
 

@@ -3,6 +3,7 @@ package dev.kikugie.stonecutter.process
 import dev.kikugie.stitcher.scanner.CommentRecognizers
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.controller.storage.ProjectBranch
+import dev.kikugie.stonecutter.controller.storage.GlobalParameters
 import dev.kikugie.stonecutter.build.BuildParameters
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
@@ -13,33 +14,66 @@ import org.gradle.api.tasks.TaskAction
 import java.nio.file.Path
 import kotlin.system.measureTimeMillis
 
-internal abstract class StonecutterTask : DefaultTask() {
+/**
+ * Task used by Stonecutter to transform files.
+ */
+abstract class StonecutterTask : DefaultTask() {
+    /**
+     * Stonecutter project to switch from.
+     */
     @get:Input
     abstract val fromVersion: Property<StonecutterProject>
 
+    /**
+     * Stonecutter project to switch to.
+     */
     @get:Input
     abstract val toVersion: Property<StonecutterProject>
 
+    /**
+     * Input directory relative to each [sources] entry.
+     */
     @get:Input
     abstract val input: Property<String>
 
+    /**
+     * Output directory relative to each [sources] entry.
+     */
     @get:Input
     abstract val output: Property<String>
 
+    /**
+     * Root directories for all processed branches.
+     */
     @get:Input
     abstract val sources: MapProperty<ProjectBranch, Path>
 
+    /**
+     * Build parameters for all processed branches.
+     */
     @get:Input
     abstract val data: MapProperty<ProjectBranch, BuildParameters>
 
+    /**
+     * Root directory provider for each version.
+     * This is usually node's `build/stonecutter-cache`, however if it's not available
+     * branche's `build/stonecutter-cache/out-of-bounds/$project` is used.
+     */
     @get:Input
     abstract val cacheDir: Property<(ProjectBranch, StonecutterProject) -> Path>
 
+    /**
+     * Enables the debug functionality from [GlobalParameters].
+     */
     @get:Input
     abstract val debug: Property<Boolean>
 
     private val statistics: ProcessStatistics = ProcessStatistics()
 
+    /**
+     * Transforms the given branches. If no errors were reported applies the changes,
+     * otherwise prints the errors and throws and exception.
+     */
     @TaskAction
     fun run() {
         val callbacks = mutableListOf<() -> Unit>()

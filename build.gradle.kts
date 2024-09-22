@@ -1,8 +1,12 @@
+import net.lingala.zip4j.ZipFile
 import org.intellij.lang.annotations.Language
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
+import org.jetbrains.dokka.gradle.AbstractDokkaLeafTask
+import org.jetbrains.dokka.gradle.AbstractDokkaParentTask
 import org.jetbrains.dokka.versioning.VersioningConfiguration
 import org.jetbrains.dokka.versioning.VersioningPlugin
+import java.net.URI
 import java.nio.file.StandardOpenOption
 import kotlin.io.path.writeText
 
@@ -15,6 +19,9 @@ plugins {
 group = property("group").toString()
 version = property("version").toString()
 
+val unzipTarget = rootProject.layout.buildDirectory.file("dokka/versions").get().asFile
+val String.URL get() = URI.create(this).toURL()
+
 buildscript {
     repositories {
         mavenCentral()
@@ -23,6 +30,7 @@ buildscript {
     dependencies {
         classpath(libs.dokka.base)
         classpath(libs.dokka.versioning)
+        classpath(libs.zip4j)
     }
 }
 
@@ -31,17 +39,21 @@ repositories {
 }
 
 dependencies {
-    dokkaHtmlPlugin(libs.dokka.versioning)
+    dokkaPlugin(libs.dokka.versioning)
 }
 
-tasks.dokkaHtmlCollector {
-    moduleName = "Stonecutter KDoc"
-    pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
-        homepageLink = "https://stonecutter.kikugie.dev/"
-        footerMessage = "(c) 2024 KikuGie"
+tasks.register("extractOldDocs") {
+    val source = projectDir.resolve("docs/kdoc")
+    fun unzip(file: File, to: File) = ZipFile(file).use { zip ->
+        to.mkdirs()
+        zip.extractAll(to.absolutePath)
     }
-    pluginConfiguration<VersioningPlugin, VersioningConfiguration> {
-        version = project.version.toString()
+
+    onlyIf { !unzipTarget.exists() && source.listFiles()?.isNotEmpty() == true }
+    doLast {
+        source.listFiles()!!.filter { it.extension == "zip" }.forEach {
+            unzip(it, unzipTarget.resolve(it.nameWithoutExtension))
+        }
     }
 }
 
@@ -82,5 +94,52 @@ tasks.register("updateHallOfFame") {
             StandardOpenOption.CREATE,
             StandardOpenOption.TRUNCATE_EXISTING
         )
+    }
+}
+
+tasks.withType<AbstractDokkaParentTask> {
+    moduleName = "Stonecutter KDoc"
+
+    pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+        homepageLink = "https://stonecutter.kikugie.dev/"
+        footerMessage = "(c) 2024 KikuGie"
+    }
+
+    pluginConfiguration<VersioningPlugin, VersioningConfiguration> {
+        version = project.version.toString()
+        olderVersionsDir = unzipTarget
+        renderVersionsNavigationOnAllPages = true
+    }
+
+    dependsOn(tasks.named("extractOldDocs"))
+}
+
+subprojects {
+    tasks.withType<AbstractDokkaLeafTask> {
+        dokkaSourceSets.configureEach {
+            reportUndocumented = true
+            skipEmptyPackages = true
+            suppressObviousFunctions = true
+            suppressInheritedMembers = true
+
+            sourceLink {
+                localDirectory.set(projectDir)
+                remoteUrl.set("https://github.com/kikugie/stonecutter/tree/0.5/${project.name}/".URL)
+                remoteLineSuffix.set("#L")
+            }
+
+            externalDocumentationLink {
+                url = "https://docs.gradle.org/current/kotlin-dsl/".URL
+                packageListUrl = "https://docs.gradle.org/current/kotlin-dsl/gradle/package-list".URL
+            }
+
+            externalDocumentationLink {
+                url = "https://kotlinlang.org/api/core/".URL
+            }
+
+            externalDocumentationLink {
+                url = "https://kotlinlang.org/api/kotlinx.serialization/".URL
+            }
+        }
     }
 }

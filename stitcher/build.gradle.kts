@@ -1,4 +1,4 @@
-import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.gradle.AbstractDokkaLeafTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -7,6 +7,7 @@ plugins {
     `maven-publish`
     kotlin("jvm")
     kotlin("plugin.serialization")
+    alias(libs.plugins.kotlin.dokka)
 }
 
 repositories {
@@ -25,13 +26,8 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
-tasks.withType<DokkaTask>().configureEach {
-    moduleName.set("Stitcher")
-    dokkaSourceSets {
-        configureEach {
-            skipEmptyPackages = true
-        }
-    }
+tasks.withType<AbstractDokkaLeafTask> {
+    moduleName = "Stitcher"
 }
 
 java {

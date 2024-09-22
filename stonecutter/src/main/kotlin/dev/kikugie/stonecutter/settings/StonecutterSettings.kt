@@ -10,6 +10,7 @@ import dev.kikugie.stonecutter.controller.storage.ProjectTreeContainer
 import dev.kikugie.stonecutter.sanitize
 import dev.kikugie.stonecutter.settings.builder.TreeBuilder
 import dev.kikugie.stonecutter.settings.builder.TreeBuilderContainer
+import dev.kikugie.stonecutter.settings.builder.treeView
 import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings
 import org.gradle.kotlin.dsl.create
@@ -18,6 +19,10 @@ import java.io.File
 import kotlin.io.path.createDirectories
 import kotlin.io.path.notExists
 
+/**
+ * Represents the Stonecutter configuration in `settings.gradle[.kts]`.
+ * @see TODO(wiki page)
+ */
 @Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterSettings(settings: Settings) : SettingsConfiguration(settings), StonecutterUtility {
     private val container: TreeBuilderContainer
@@ -43,18 +48,16 @@ open class StonecutterSettings(settings: Settings) : SettingsConfiguration(setti
 
     init {
         with(settings.gradle.extensions) {
-            create<TreeBuilderContainer>("stonecutterTreeBuilders")
+            container = create<TreeBuilderContainer>("stonecutterTreeBuilders")
             create<ProjectTreeContainer>("stonecutterProjectTrees")
             create<ProjectParameterContainer>("stonecutterProjectParameters")
         }
-        container = settings.extensions.getByType<TreeBuilderContainer>()
     }
 
     override fun create(project: ProjectDescriptor, setup: TreeBuilder) {
         require(container.register(project.path, setup)) {
             "Project ${project.path} is already registered"
         }
-        println("[Stonecutter] Created tree:\n$setup")
 
         project.buildFileName = controller.filename
         with(project.projectDir.resolve(controller.filename).toPath()) {

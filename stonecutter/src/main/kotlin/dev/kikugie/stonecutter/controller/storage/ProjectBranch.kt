@@ -18,7 +18,7 @@ data class ProjectBranch(
     private val project: Project,
     val id: ProjectName,
     val nodes: Map<ProjectName, ProjectNode>,
-): Iterable<ProjectNode>, Project by project {
+): Collection<ProjectNode> by nodes.values, Project by project {
     /**
      * Location of this branch on the disk.
      */
@@ -52,9 +52,4 @@ data class ProjectBranch(
      * @param project Project reference
      */
     operator fun get(project: Project) = nodes[project.path.substringAfterLast(':')]
-
-    /**
-     * Iterator for the [nodes] values.
-     */
-    override fun iterator(): Iterator<ProjectNode> = nodes.values.iterator()
 }

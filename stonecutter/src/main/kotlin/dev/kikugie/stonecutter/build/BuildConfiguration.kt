@@ -15,7 +15,7 @@ import java.nio.file.Path
  */
 @Suppress("unused")
 abstract class BuildConfiguration(private val project: Project) {
-    internal var data: BuildParameters = BuildParameters()
+    internal val data: BuildParameters = BuildParameters()
 
     /**
      * Creates a swap with the given value. Meant to be used with Kotlin DSL:
@@ -223,6 +223,14 @@ abstract class BuildConfiguration(private val project: Project) {
      */
     fun dependencies(values: Iterable<Pair<String, String>>) {
         values.forEach { (id, ver) -> dependency(id, ver) }
+    }
+
+    internal fun from(other: BuildConfiguration): Unit = with(data) {
+        swaps.putAll(other.data.swaps)
+        constants.putAll(other.data.constants)
+        dependencies.putAll(other.data.dependencies)
+        excludedPaths.addAll(other.data.excludedPaths)
+        excludedExtensions.addAll(other.data.excludedExtensions)
     }
 
     private fun validateId(id: String) = id.apply {
