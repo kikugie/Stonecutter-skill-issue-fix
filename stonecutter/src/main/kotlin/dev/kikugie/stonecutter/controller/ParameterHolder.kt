@@ -13,7 +13,6 @@ import dev.kikugie.stonecutter.controller.storage.ProjectNode
  * @property metadata Currently processed version.
  * **May not exist in the given branch**, but you should still provide the same set of parameters
  */
-@Suppress("MemberVisibilityCanBePrivate")
 class ParameterHolder(
     val branch: ProjectBranch,
     val metadata: StonecutterProject

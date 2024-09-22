@@ -3,7 +3,6 @@ package dev.kikugie.stonecutter
 import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.StringVersion
 import dev.kikugie.semver.VersionParser
-import dev.kikugie.semver.VersionPredicate
 import dev.kikugie.stonecutter.build.StonecutterBuild
 import dev.kikugie.stonecutter.controller.StonecutterController
 import org.jetbrains.annotations.ApiStatus
@@ -24,7 +23,7 @@ interface StonecutterUtility {
      */
     @Contract(pure = true)
     fun compare(left: String, right: String) =
-        VersionParser.parse(left).compareTo(VersionParser.parse(right))
+        VersionParser.parse(left).value.compareTo(VersionParser.parse(right).value)
 
     /**
      * Parses both parameters as [SemanticVersion] or [StringVersion] and compares them.
@@ -37,7 +36,7 @@ interface StonecutterUtility {
     @Contract(pure = true)
     @ApiStatus.Experimental
     fun compareLenient(left: String, right: String) =
-        VersionParser.parse(left).compareTo(VersionParser.parse(right))
+        VersionParser.parseLenient(left).value.compareTo(VersionParser.parse(right).value)
 
     /**
      * Parses both parameters as semantic versions and compares them.
@@ -57,15 +56,15 @@ interface StonecutterUtility {
      * Evaluates the passed version as [SemanticVersion] and compares to the given predicate(s).
      *
      * @param version Version to test against
-     * @param predicate One or multiple version predicates separated with spaces. Predicates may have an operator (=, >, <=, ~, etc; defaults to =), followed by a version
+     * @param predicate One or multiple version predicates separated with spaces. Predicates may have an operator (=, >, <=, ~, etc.; defaults to =), followed by a version
      * @return `true` if all predicates succeed
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
     @Contract(pure = true)
     fun eval(version: String, predicate: String): Boolean {
-        val target = VersionParser.parse(version)
+        val target = VersionParser.parse(version).value
         return predicate.split(' ').all {
-            VersionPredicate.parse(it).eval(target)
+            VersionParser.parsePredicateLenient(it).value.eval(target)
         }
     }
 
@@ -80,9 +79,9 @@ interface StonecutterUtility {
     @Contract(pure = true)
     @ApiStatus.Experimental
     fun evalLenient(version: String, predicate: String): Boolean {
-        val target = VersionParser.parseLenient(version)
+        val target = VersionParser.parseLenient(version).value
         return predicate.split(' ').all {
-            VersionPredicate.parseLenient(it).eval(target)
+            VersionParser.parsePredicateLenient(it).value.eval(target)
         }
     }
 }

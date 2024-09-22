@@ -24,7 +24,7 @@ data class TransformParameters(
         fun build() = TransformParameters(
             swaps.toMap(),
             constants.toMap(),
-            dependencies.mapValues { VersionParser.parse(it.value) }
+            dependencies.mapValues { VersionParser.parse(it.value).value }
         )
     }
 }

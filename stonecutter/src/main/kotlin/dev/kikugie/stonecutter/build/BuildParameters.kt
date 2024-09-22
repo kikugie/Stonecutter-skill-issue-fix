@@ -37,7 +37,7 @@ data class BuildParameters(
      * @return Parameters used by the parser and AST transformer
      */
     fun toTransformParams(version: String, key: String = "minecraft"): TransformParameters = with(dependencies) {
-        getOrElse(key) { VersionParser.parseLenient(version) }.let {
+        getOrElse(key) { VersionParser.parseLenient(version).value }.let {
             put(key, it)
             put("", it)
         }

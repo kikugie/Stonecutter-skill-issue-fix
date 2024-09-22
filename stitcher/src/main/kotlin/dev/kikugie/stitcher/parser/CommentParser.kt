@@ -23,7 +23,6 @@ import dev.kikugie.stitcher.eval.isBlank
 import dev.kikugie.stitcher.eval.isEmpty
 import dev.kikugie.stitcher.exception.ErrorHandler
 import dev.kikugie.stitcher.lexer.*
-import dev.kikugie.stitcher.lexer.ALL
 import dev.kikugie.stitcher.transformer.TransformParameters
 import kotlin.math.min
 
@@ -36,10 +35,9 @@ class CommentParser(
         fun create(
             input: CharSequence,
             handler: ErrorHandler,
-            matchers: Iterable<TokenRecognizer> = ALL,
             params: TransformParameters? = null,
         ): CommentParser {
-            val lexer = Lexer(input, matchers, handler)
+            val lexer = Lexer(input, handler)
             return CommentParser(lexer, handler, params)
         }
     }

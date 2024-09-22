@@ -10,11 +10,9 @@ import dev.kikugie.stonecutter.controller.storage.ProjectTreeContainer
 import dev.kikugie.stonecutter.sanitize
 import dev.kikugie.stonecutter.settings.builder.TreeBuilder
 import dev.kikugie.stonecutter.settings.builder.TreeBuilderContainer
-import dev.kikugie.stonecutter.settings.builder.treeView
 import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings
 import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import kotlin.io.path.createDirectories
 import kotlin.io.path.notExists

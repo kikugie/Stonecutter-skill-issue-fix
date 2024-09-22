@@ -11,7 +11,6 @@ import dev.kikugie.stitcher.data.token.Token
 import dev.kikugie.stitcher.eval.isEmpty
 import dev.kikugie.stitcher.eval.isNotEmpty
 import dev.kikugie.stitcher.exception.ErrorHandler
-import dev.kikugie.stitcher.lexer.ALL
 import dev.kikugie.stitcher.lexer.Lexer
 import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.scanner.Scanner
@@ -70,7 +69,7 @@ class FileParser(
     }.let { root }
 
     private fun parseComment(token: Token) {
-        val lexer = Lexer(token.value, ALL, handler)
+        val lexer = Lexer(token.value, handler)
         val parser = CommentParser(lexer, handler, params)
         val def = parser.parse() ?: run {
             active.blocks.add(CommentBlock(commentStart, token, commentEnd))

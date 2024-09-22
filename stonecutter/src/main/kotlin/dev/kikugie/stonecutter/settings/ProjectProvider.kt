@@ -5,6 +5,7 @@ import dev.kikugie.stonecutter.BNAN
 import dev.kikugie.stonecutter.ProjectName
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.TargetVersion
+import dev.kikugie.stonecutter.settings.builder.TreeBuilder
 
 /**
  * Methods available in [SettingsConfiguration.shared], [SettingsConfiguration.create] and [TreeBuilder.branch].

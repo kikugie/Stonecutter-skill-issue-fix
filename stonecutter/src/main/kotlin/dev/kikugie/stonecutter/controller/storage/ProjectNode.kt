@@ -4,6 +4,7 @@ import dev.kikugie.stonecutter.ProjectName
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.build.StonecutterBuild
 import org.gradle.api.Project
+import org.gradle.api.UnknownDomainObjectException
 import org.gradle.kotlin.dsl.getByType
 import java.nio.file.Path
 

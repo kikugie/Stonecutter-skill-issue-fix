@@ -2,7 +2,7 @@ package dev.kikugie.stonecutter.build
 
 import dev.kikugie.semver.VersionParser
 import dev.kikugie.semver.VersionParsingException
-import dev.kikugie.stitcher.lexer.IdentifierRecognizer
+import dev.kikugie.stitcher.lexer.TokenMatcher.Companion.isValidIdentifier
 import dev.kikugie.stonecutter.MapSetter
 import dev.kikugie.stonecutter.controller.StonecutterController
 import org.gradle.api.Project
@@ -234,11 +234,11 @@ abstract class BuildConfiguration(private val project: Project) {
     }
 
     private fun validateId(id: String) = id.apply {
-        require(all(IdentifierRecognizer.Companion::allowed)) { "Invalid identifier: $this" }
+        require(all { it.isValidIdentifier() }) { "Invalid identifier: $this" }
     }
 
     private fun validateSemver(version: String) = try {
-        VersionParser.parse(version)
+        VersionParser.parse(version, full = true).value
     } catch (e: VersionParsingException) {
         throw IllegalArgumentException("Invalid semantic version: $version").apply {
             initCause(e)

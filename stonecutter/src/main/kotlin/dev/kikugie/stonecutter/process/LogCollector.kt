@@ -20,7 +20,7 @@ class LogCollector(
     val debug: Boolean = false
 ) {
     private val messages = mutableListOf<String>()
-    private val start = System.nanoTime();
+    private val start = System.nanoTime()
 
     /**
      * Adds a message.

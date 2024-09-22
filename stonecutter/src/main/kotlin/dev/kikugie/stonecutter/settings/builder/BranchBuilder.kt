@@ -4,6 +4,7 @@ import dev.kikugie.stonecutter.ProjectName
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.TargetVersion
 import dev.kikugie.stonecutter.settings.ProjectProvider
+import dev.kikugie.stonecutter.settings.StonecutterSettings
 
 /**
  * Proxy class for adding nodes to the given branch in the tree.

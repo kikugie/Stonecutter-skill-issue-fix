@@ -1,63 +1,148 @@
 package dev.kikugie.semver
 
+import dev.kikugie.semver.VersionComparisonOperator.Companion.operatorLength
+import dev.kikugie.stitcher.util.StringUtil.countStart
 
-/**
- * Semantic version parser based on the Fabric Loader implementation, but doesn't allow `.x` wildcards.
- *
- * @see <a href="https://github.com/FabricMC/fabric-loader/blob/master/src/main/java/net/fabricmc/loader/impl/util/version/SemanticVersionImpl.java">SemanticVersionImpl</a>
- */
 object VersionParser {
-    fun parseLenient(input: CharSequence): Version =
-        runCatching { parse(input) }.getOrElse { StringVersion(input.toString()) }
+    private val INVALID_NUMBER = VersionParsingException("Invalid version number")
+    private val INVALID_PRE_RELEASE = VersionParsingException("Invalid pre-release")
+    private val INVALID_BUILD_METADATA = VersionParsingException("Invalid build metadata")
+    private val EMPTY_VERSION = VersionParsingException("Empty version")
+    private val EMPTY_PRE_RELEASE = VersionParsingException("Missing pre-release")
+    private val EMPTY_BUILD_METADATA = VersionParsingException("Missing build metadata")
+    private val NOT_FULL_MATCH = VersionParsingException("Not a full match")
 
-    fun parse(input: CharSequence): SemanticVersion {
-        var version = input.toString()
-        var preModifier = ""
-        var postModifier = ""
+    data class Result<T>(
+        val value: T,
+        val end: Int
+    )
 
-        val plusDelimeter = version.indexOf('+')
-        if (plusDelimeter >= 0) {
-            postModifier = version.substring(plusDelimeter + 1)
-            version = version.substring(0, plusDelimeter)
+    @Throws(VersionParsingException::class)
+    fun parse(input: CharSequence, start: Int = 0, full: Boolean = false): Result<SemanticVersion> =
+        parseSemanticVersion(input, start)
+            .also { if (full) it.requireFullMatch(input) }
+
+    @Throws(VersionParsingException::class)
+    fun parseLenient(input: CharSequence, start: Int = 0, full: Boolean = false): Result<out Version> = try {
+        parseSemanticVersion(input, start)
+    } catch (_: VersionParsingException) {
+        parseStringVersion(input, start)
+    }.also { if (full) it.requireFullMatch(input) }
+
+    @Throws(VersionParsingException::class)
+    fun parsePredicate(input: CharSequence, start: Int = 0, full: Boolean = false): Result<VersionPredicate> {
+        if (start >= input.length || input[start].isWhitespace()) throw EMPTY_VERSION
+        var len = input.operatorLength(start)
+        val operator = VersionComparisonOperator.match(input.substring(start, start + len))
+        len += input.countStart(start + len, ' ')
+        val (version, end) = parse(input, start + len, full)
+        return VersionPredicate(operator, version) end end
+    }
+
+    @Throws(VersionParsingException::class)
+    fun parsePredicateLenient(input: CharSequence, start: Int = 0, full: Boolean = false): Result<VersionPredicate> {
+        if (start >= input.length || input[start].isWhitespace()) throw EMPTY_VERSION
+        var len = input.operatorLength(start)
+        val operator = VersionComparisonOperator.match(input.substring(start, start + len))
+        len += input.countStart(start + len, ' ')
+        val (version, end) = parseLenient(input, start + len, full)
+        return VersionPredicate(operator, version) end end
+    }
+
+    private fun Result<*>.requireFullMatch(input: CharSequence) {
+        if (end != input.length) throw NOT_FULL_MATCH
+    }
+
+    private fun parseSemanticVersion(input: CharSequence, start: Int): Result<SemanticVersion> {
+        if (start >= input.length || input[start].isWhitespace()) throw EMPTY_VERSION
+        val (components, cursor) = parseComponents(input, start)
+        return when (input.getOrNull(cursor)) {
+            '-' -> parsePreRelease(input, cursor + 1, components)
+            '+' -> parsePostRelease(input, cursor + 1, components)
+            else -> SemanticVersion(components) end cursor
         }
+    }
 
-        val dashDelimeter = version.indexOf('-')
-        if (dashDelimeter >= 0) {
-            preModifier = version.substring(dashDelimeter + 1)
-            version = version.substring(0, dashDelimeter)
+    private fun parseComponents(input: CharSequence, start: Int): Result<IntArray> {
+        var cursor = start
+        var builder = -1
+        val components = mutableListOf<Int>()
+
+        while (cursor < input.length) when (val ch = input[cursor]) {
+            in '0'..'9' -> {
+                builder = if (builder < 0) ch - '0'
+                else (builder * 10) + (ch - '0')
+                cursor++
+            }
+
+            '.' -> {
+                if (builder < 0) throw INVALID_NUMBER
+                components.add(builder)
+                builder = -1
+                cursor++
+            }
+
+            else -> break
         }
+        if (builder < 0) throw INVALID_NUMBER
+        components.add(builder)
+        return components.toIntArray() end cursor
+    }
 
-        if (version.startsWith('.') || version.endsWith('.'))
-            throw VersionParsingException("Incomplete version number: $version in $input")
-        if (preModifier.isNotEmpty() && !preModifier.validate())
-            throw VersionParsingException("Invalid metadata: $preModifier in $input")
+    private fun parsePreRelease(input: CharSequence, start: Int, components: IntArray): Result<SemanticVersion> {
+        var cursor = start
+        val builder = StringBuilder()
+        while (cursor < input.length) when (val ch = input[cursor]) {
+            '+' -> return parsePostRelease(input, cursor + 1, components, builder)
+            in 'a'..'z', in 'A'..'Z', in '0'..'9' -> {
+                builder.append(ch); cursor++
+            }
 
-        val stringComponents = version.split('.')
-        if (stringComponents.isEmpty())
-            throw VersionParsingException("Empty version number: $version in $input")
-        val components = IntArray(stringComponents.size)
-
-        stringComponents.forEachIndexed { i, it ->
-            if (it.isEmpty())
-                throw VersionParsingException("Incomplete version number: $version in $input")
-            components[i] = try {
-                it.toUInt().toInt()
-            } catch (e: NumberFormatException) {
-                throw VersionParsingException("Invalid version number: $version in $input").apply {
-                    initCause(e)
+            '-', '_', '.' -> when (builder.lastOrNull()) {
+                null, '.' -> throw INVALID_PRE_RELEASE
+                else -> {
+                    builder.append(ch); cursor++
                 }
             }
+
+            else -> break
         }
-        return SemanticVersion(components, preModifier, postModifier)
+        if (builder.isEmpty()) throw EMPTY_PRE_RELEASE
+        return SemanticVersion(components, builder.toString()) end cursor
     }
 
-    private fun String.validate(): Boolean {
-        val segments = split('.')
-        if (segments.isEmpty()) return false
-        for (str in segments) {
-            if (str.isEmpty()) return false
-            for (char in str) if (!char.isLetterOrDigit() && char != '-') return false
+    private fun parsePostRelease(
+        input: CharSequence,
+        start: Int,
+        components: IntArray,
+        pre: CharSequence = ""
+    ): Result<SemanticVersion> {
+        var cursor = start
+        val builder = StringBuilder()
+        while (cursor < input.length) when (val ch = input[cursor]) {
+            in 'a'..'z', in 'A'..'Z', in '0'..'9' -> {
+                builder.append(ch); cursor++
+            }
+
+            '-', '_', '.' -> when (builder.lastOrNull()) {
+                null, '.' -> throw INVALID_BUILD_METADATA
+                else -> {
+                    builder.append(ch); cursor++
+                }
+            }
+
+            else -> break
         }
-        return true
+        if (builder.isEmpty()) throw EMPTY_BUILD_METADATA
+        return SemanticVersion(components, pre.toString(), builder.toString()) end cursor
     }
+
+    private fun parseStringVersion(input: CharSequence, start: Int): Result<StringVersion> {
+        if (start >= input.length || input[start].isWhitespace()) throw EMPTY_VERSION
+        var cursor = start
+        while (cursor < input.length) if (input[cursor++].isWhitespace()) break
+        return StringVersion(input.substring(start, cursor)) end cursor
+    }
+
+    private infix fun <T> T.end(end: Int) = Result(this, end)
 }

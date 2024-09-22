@@ -85,8 +85,10 @@ object CommentParserTest {
         "? const { const again" to false,
     )
 
-    val SPACE_TESTS = listOf(
+    val MISC_TESTS = listOf(
         " ? const" to true,
+        "? >= 1" to true,
+        "? hi my name is multiplier, no - market flyer, no - amplifier, no - marble fire" to false
     )
 
     @TestFactory
@@ -98,7 +100,7 @@ object CommentParserTest {
     @TestFactory
     fun `test scope`() = SCOPE_TESTS.tests()
     @TestFactory
-    fun `test space`() = SPACE_TESTS.tests()
+    fun `misc space`() = MISC_TESTS.tests()
 
     private fun Iterable<Pair<String, Boolean>>.tests() = map {
         val str = if (it.second) '+' else '-'

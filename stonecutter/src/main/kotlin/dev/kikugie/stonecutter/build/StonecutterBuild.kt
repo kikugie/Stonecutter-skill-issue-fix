@@ -34,7 +34,7 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
     }
 
     /**
-     * The full tree this project belongs to. Without subprojects it will only have the root branch.
+     * The full tree this project belongs to. Without subprojects, it will only have the root branch.
      * Allows traversing all branches if needed. For project access use [node] methods.
      */
     val tree: ProjectTree = requireNotNull(project.gradle.extensions.getByType<ProjectTreeContainer>()[project]) {
