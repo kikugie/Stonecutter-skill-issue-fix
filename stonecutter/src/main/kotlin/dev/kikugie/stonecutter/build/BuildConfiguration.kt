@@ -6,6 +6,7 @@ import dev.kikugie.stitcher.lexer.TokenMatcher.Companion.isValidIdentifier
 import dev.kikugie.stonecutter.MapSetter
 import dev.kikugie.stonecutter.controller.StonecutterController
 import org.gradle.api.Project
+import org.jetbrains.annotations.ApiStatus
 import java.io.File
 import java.nio.file.Path
 
@@ -85,6 +86,9 @@ abstract class BuildConfiguration(private val project: Project) {
      *
      * @param path Absolute path to the file.
      */
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated("To be reworked in 0.6 with inverted behaviour using `include()`")
+    @ApiStatus.ScheduledForRemoval(inVersion = "0.6")
     fun exclude(path: File) {
         exclude(path.toPath())
     }
@@ -94,6 +98,9 @@ abstract class BuildConfiguration(private val project: Project) {
      *
      * @param path Absolute path to the file.
      */
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated("To be reworked in 0.6 with inverted behaviour using `include()`")
+    @ApiStatus.ScheduledForRemoval(inVersion = "0.6")
     fun exclude(path: Path) {
         data.excludedPaths.add(path)
     }
@@ -104,6 +111,8 @@ abstract class BuildConfiguration(private val project: Project) {
      * @param path Path to the file relative to the parent project directory (where `stonecutter.gradle[.kts]` is located)
      * or a file extension qualifier (i.e. `*.json`).
      */
+    @Deprecated("To be reworked in 0.6 with inverted behaviour using `include()`")
+    @ApiStatus.ScheduledForRemoval(inVersion = "0.6")
     fun exclude(path: String) {
         require(path.isNotBlank()) { "Path must not be empty" }
         if (path.startsWith("*.")) data.excludedExtensions.add(path.substring(2))
