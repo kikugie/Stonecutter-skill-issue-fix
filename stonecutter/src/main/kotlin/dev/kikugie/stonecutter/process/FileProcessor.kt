@@ -56,7 +56,7 @@ class FileProcessor(
     private val parametersMatch = updateParameters() && !debug
     private val checksums = readChecksumMap()
 
-    private companion object {
+    internal companion object {
         val YAML = Yaml(
             configuration = YamlConfiguration(
                 strictMode = false
@@ -97,7 +97,7 @@ class FileProcessor(
             if (!filter(source)) return null logging "Skipping, filtered"
 
             val text = dirs.root.resolve(source).readText(charset)
-            val checksum = createChecksum(text)
+            val checksum = createChecksum(text, charset)
             val checksumsMatch = verifyChecksum(checksum)
             checksums[source.invariantSeparatorsPathString] = checksum
             if (parametersMatch && checksumsMatch && !debug) readCachedOutput()?.let {
@@ -156,27 +156,6 @@ class FileProcessor(
                 append("  Received - ${Base64.encode(cached)}")
             }
             return match
-        }
-
-        private fun createChecksum(input: String): ByteArray {
-            val bytes = input.toByteArray(charset)
-            val result = kotlin.run {
-                var chunks = input.length / CHUNK * 8
-                if (input.length % CHUNK != 0) chunks += 8
-                ByteArray(chunks)
-            }
-
-            var index = 0
-            var cursor = 0
-            while (cursor < input.length) {
-                val end = (cursor + CHUNK).coerceAtMost(input.length)
-                val data = HASHER.hash(bytes, cursor, end - cursor, SEED)
-                result[index] = data
-
-                cursor += CHUNK
-                index += 8
-            }
-            return result
         }
 
         private inline fun <T, R> T.runReporting(message: String, action: T.() -> R): R? = kotlin.runCatching {

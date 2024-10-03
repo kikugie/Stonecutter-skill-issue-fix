@@ -31,6 +31,9 @@ but if you're using a different platform, apply the described changes to your ne
 > The bundle implementation is highly dependent on the platform you use and the functionality of your mod,
 > so if you're dedicated to doing it - you're on your own adventure.
 
+### I ran `build`, but got an error, what's wrong?
+> You didn't use a chiseled build.
+
 ### How is it better than Preprocessor?
 > There are quite a lot of improvements. Some key points are:
 > - Optimization: Stonecutter provides faster version switching and building.
