@@ -1,14 +1,19 @@
 import com.charleskorn.kaml.Yaml
-import com.charleskorn.kaml.Yaml.Companion
 import com.charleskorn.kaml.decodeFromStream
-import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.rendering.TextColors.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
 import java.io.File
-import java.nio.file.Path
 
 object ProjectFinder {
+    private const val EXCLUDE = "EXCLUDE"
+    private val OK = green("OK")
+    private val FIX = brightYellow("FX")
+    private val CUSTOM = cyan("CT")
+    private val EXCLUDED = gray("EX")
+    private val ERROR = red("ER")
+
     fun find(file: File): String =
         find(file.inputStream().use { Yaml.default.decodeFromStream<SearchEntries>(it) }.entries)
 
@@ -24,8 +29,8 @@ object ProjectFinder {
 
         val flow = entries.asFlow().flowOn(Dispatchers.Default).transform {
             emit(ProjectInfo.Builder().apply {
-                CurseforgeAPI.get(it)?.invoke(this)
-                ModrinthAPI.get(it)?.invoke(this)
+                if (it.curseforge != EXCLUDE) CurseforgeAPI.get(it)?.invoke(this)
+                if (it.modrinth != EXCLUDE) ModrinthAPI.get(it)?.invoke(this)
 
                 it.title?.let { title = it }
                 it.icon?.let { icon = it }
@@ -33,10 +38,11 @@ object ProjectFinder {
                 downloads = (downloads + it.adjust).coerceAtMost(Int.MAX_VALUE)
 
                 fun Any?.status(replaced: Any?) = when {
-                    this != null && replaced != null -> brightYellow("FX")
-                    this == null && replaced == null -> red("NO")
-                    this == null && replaced != null -> cyan("OT")
-                    else -> green("OK")
+                    replaced == EXCLUDE -> EXCLUDED
+                    this != null && replaced != null -> FIX
+                    this == null && replaced == null -> ERROR
+                    this == null && replaced != null -> CUSTOM
+                    else -> OK
                 }
                 println(
                     template.format(
@@ -47,8 +53,8 @@ object ProjectFinder {
                     )
                 )
 
-                it.modrinth?.let { modrinth = it }
-                it.curseforge?.let { curseforge = it }
+                it.modrinth.takeUnless { it == EXCLUDE }?.let { modrinth = it }
+                it.curseforge.takeUnless { it == EXCLUDE }?.let { curseforge = it }
                 it.github?.let { github = it }
             }.tryBuild().getOrNull())
         }.onCompletion {
@@ -61,10 +67,5 @@ object ProjectFinder {
             .sortedBy { -it.downloads }
             .joinToString(",\n") { it.toJS() }
         projects
-    }
-
-    private infix inline fun Boolean.then(action: () -> Unit): Boolean {
-        if (this) action()
-        return this
     }
 }

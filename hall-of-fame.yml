@@ -59,6 +59,7 @@ entries:
     adjust: 4720000
   - name: sushi bar
   - name: telekinesis
+    cf_link: EXCLUDE
   - name: tt20
   - name: yacl
   - name: zoomify
