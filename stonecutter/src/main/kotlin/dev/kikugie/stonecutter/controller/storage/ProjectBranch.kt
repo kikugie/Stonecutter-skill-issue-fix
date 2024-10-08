@@ -19,6 +19,10 @@ data class ProjectBranch(
     val id: ProjectName,
     val nodes: Map<ProjectName, ProjectNode>,
 ): Collection<ProjectNode> by nodes.values, Project by project {
+    companion object {
+        internal operator fun ProjectBranch?.get(project: ProjectName) = this?.nodes?.get(project)
+    }
+
     /**
      * Location of this branch on the disk.
      */

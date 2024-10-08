@@ -3,6 +3,7 @@ package dev.kikugie.stonecutter.controller.storage
 import dev.kikugie.stonecutter.ProjectName
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.build.StonecutterBuild
+import dev.kikugie.stonecutter.controller.storage.ProjectBranch.Companion.get
 import org.gradle.api.Project
 import org.gradle.api.UnknownDomainObjectException
 import org.gradle.kotlin.dsl.getByType

@@ -1,8 +1,6 @@
 package dev.kikugie.stonecutter.settings.builder
 
 import dev.kikugie.stonecutter.StonecutterProject
-import dev.kikugie.stonecutter.controller.StonecutterController
-import dev.kikugie.stonecutter.data.ProjectContainer
 
 internal fun TreeBuilder.treeView() = buildString {
     appendLine("|- vcs: $vcsVersion")
@@ -33,8 +31,3 @@ internal fun NodeMap.treeView() = entries.mapIndexed { i, entry ->
     else "|- $name:\n"
     header + elem
 }.joinToString("\n")
-
-/**
- * Storage for the [TreeBuilder] to be passed to [StonecutterController].
- */
-open class TreeBuilderContainer : ProjectContainer<TreeBuilder>()

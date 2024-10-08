@@ -1,11 +1,10 @@
-package dev.kikugie.stonecutter.controller.storage
+package dev.kikugie.stonecutter.data
 
-import dev.kikugie.stonecutter.ProjectName
 import dev.kikugie.stonecutter.build.StonecutterBuild
+import dev.kikugie.stonecutter.controller.storage.GlobalParameters
+import dev.kikugie.stonecutter.controller.storage.ProjectTree
 import dev.kikugie.stonecutter.controller.StonecutterController
-import dev.kikugie.stonecutter.data.ProjectContainer
-
-internal operator fun ProjectBranch?.get(project: ProjectName) = this?.nodes?.get(project)
+import dev.kikugie.stonecutter.settings.builder.TreeBuilder
 
 /**
  * Saves the finished [ProjectTree] in [StonecutterController] to be available with
@@ -22,3 +21,8 @@ open class ProjectTreeContainer : ProjectContainer<ProjectTree>()
  * ```
  */
 open class ProjectParameterContainer : ProjectContainer<GlobalParameters>()
+
+/**
+ * Storage for the [TreeBuilder] to be passed to [StonecutterController].
+ */
+open class TreeBuilderContainer : ProjectContainer<TreeBuilder>()

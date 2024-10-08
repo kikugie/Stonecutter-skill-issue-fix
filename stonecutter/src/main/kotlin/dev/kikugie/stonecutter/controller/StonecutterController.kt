@@ -6,9 +6,11 @@ import dev.kikugie.stonecutter.controller.manager.ControllerManager
 import dev.kikugie.stonecutter.controller.manager.controller
 import dev.kikugie.stonecutter.controller.storage.*
 import dev.kikugie.stonecutter.build.BuildParameters
+import dev.kikugie.stonecutter.data.ProjectParameterContainer
+import dev.kikugie.stonecutter.data.ProjectTreeContainer
 import dev.kikugie.stonecutter.process.StonecutterTask
 import dev.kikugie.stonecutter.settings.builder.TreeBuilder
-import dev.kikugie.stonecutter.settings.builder.TreeBuilderContainer
+import dev.kikugie.stonecutter.data.TreeBuilderContainer
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider

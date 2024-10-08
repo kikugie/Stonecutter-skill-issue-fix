@@ -2,6 +2,8 @@ package dev.kikugie.stonecutter.build
 
 import dev.kikugie.stonecutter.*
 import dev.kikugie.stonecutter.controller.storage.*
+import dev.kikugie.stonecutter.data.ProjectParameterContainer
+import dev.kikugie.stonecutter.data.ProjectTreeContainer
 import dev.kikugie.stonecutter.process.StonecutterTask
 import dev.kikugie.stonecutter.stonecutterCachePath
 import groovy.lang.MissingPropertyException
