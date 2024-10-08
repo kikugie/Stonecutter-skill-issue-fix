@@ -1,5 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
+import org.jetbrains.dokka.gradle.AbstractDokkaLeafTask
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -13,10 +14,8 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-val stonecutter: String = "0.4" // by project
-
 group = "dev.kikugie"
-version = stonecutter
+version = property("version").toString()
 
 repositories {
     mavenCentral()
@@ -30,14 +29,8 @@ dependencies {
     implementation(libs.cbor)
 }
 
-tasks.withType<DokkaTask>().configureEach {
-    moduleName.set("Stonecutter Plugin")
-    dokkaSourceSets {
-        configureEach {
-            reportUndocumented = true
-            skipEmptyPackages = true
-        }
-    }
+tasks.withType<AbstractDokkaLeafTask>().configureEach {
+    moduleName.set("Stonecutter Gradle")
 }
 
 java {
@@ -88,42 +81,6 @@ publishing {
             version = project.version.toString()
             from(components["java"])
         }
-    }
-}
-
-publishMods {
-    val token = findProperty("githubToken")?.toString() ?: return@publishMods
-
-    version = stonecutter
-    displayName = "Stonecutter [$stonecutter]"
-    type = when {
-        "alpha" in stonecutter -> ALPHA
-        "beta" in stonecutter -> BETA
-        else -> STABLE
-    }
-    changelog = """
-        ## Installation
-        ```kts
-        pluginManagement {
-            repositories {
-                maven("https://maven.kikugie.dev/releases")
-            }
-        }
-
-        plugins {
-            id("dev.kikugie.stonecutter") version "$stonecutter"
-        }
-        ```
-        
-        ## Changelog
-        ${rootProject.file("CHANGELOG.md").readText()}
-    """.trimIndent()
-    github {
-        repository = "kikugie/stonecutter"
-        accessToken = token
-        commitish = "0.4"
-        tagName = "v$stonecutter"
-        allowEmptyFiles = true
     }
 }
 

@@ -1,3 +1,4 @@
+import org.jetbrains.dokka.gradle.AbstractDokkaLeafTask
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -6,12 +7,12 @@ plugins {
     `maven-publish`
     kotlin("jvm")
     kotlin("plugin.serialization")
+    alias(libs.plugins.kotlin.dokka)
 }
 
-val stitcher: String by project
+version = property("version").toString()
 
 group = "dev.kikugie"
-version = stitcher
 
 repositories {
     mavenCentral()
@@ -30,14 +31,8 @@ tasks.test {
     useJUnitPlatform()
 }
 
-tasks.withType<DokkaTask>().configureEach {
+tasks.withType<AbstractDokkaLeafTask>().configureEach {
     moduleName.set("Stitcher")
-    dokkaSourceSets {
-        configureEach {
-            reportUndocumented = true
-            skipEmptyPackages = true
-        }
-    }
 }
 
 java {

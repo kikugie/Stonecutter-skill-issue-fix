@@ -1,7 +1,9 @@
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
+import org.jetbrains.dokka.gradle.AbstractDokkaLeafTask
 import org.jetbrains.dokka.versioning.VersioningConfiguration
 import org.jetbrains.dokka.versioning.VersioningPlugin
+import java.net.URI
 import java.nio.file.StandardOpenOption
 import kotlin.io.path.readLines
 import kotlin.io.path.writeText
@@ -23,12 +25,16 @@ buildscript {
     }
 }
 
+group = property("group").toString()
+version = property("version").toString()
+val String.URL get() = URI.create(this).toURL()
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    dokkaHtmlPlugin(libs.dokka.versioning)
+    dokkaPlugin(libs.dokka.versioning)
 }
 
 tasks.dokkaHtmlCollector {
@@ -37,9 +43,36 @@ tasks.dokkaHtmlCollector {
         homepageLink = "https://stonecutter.kikugie.dev/"
         footerMessage = "(c) 2024 KikuGie"
     }
-    val stonecutter = rootProject.property("stonecutter").toString()
     pluginConfiguration<VersioningPlugin, VersioningConfiguration> {
-        version = stonecutter
+        version = project.version.toString()
+    }
+}
+
+subprojects {
+    tasks.withType<AbstractDokkaLeafTask> {
+        dokkaSourceSets.configureEach {
+            reportUndocumented = true
+            skipEmptyPackages = true
+
+            sourceLink {
+                localDirectory.set(projectDir)
+                remoteUrl.set("https://github.com/kikugie/stonecutter/tree/0.4/${project.name}/".URL)
+                remoteLineSuffix.set("#L")
+            }
+
+            externalDocumentationLink {
+                url = "https://docs.gradle.org/current/kotlin-dsl/".URL
+                packageListUrl = "https://docs.gradle.org/current/kotlin-dsl/gradle/package-list".URL
+            }
+
+            externalDocumentationLink {
+                url = "https://kotlinlang.org/api/core/".URL
+            }
+
+            externalDocumentationLink {
+                url = "https://kotlinlang.org/api/kotlinx.serialization/".URL
+            }
+        }
     }
 }
 
@@ -53,7 +86,7 @@ tasks.register("updateVersion") {
             if (new != text) location.writeText(new)
         }
 
-        val version = project.property("stonecutter")
+        val version = project.property("version")
         replaceAndWrite("docs/.vitepress/config.mts", "latestVersion: '.+'", "latestVersion: '$version'")
         replaceAndWrite("docs/stonecutter/setup.md", "version \".+\"$", "version \"$version\"")
         replaceAndWrite(
