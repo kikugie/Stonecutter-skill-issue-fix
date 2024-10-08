@@ -1,16 +1,19 @@
 package dev.kikugie.stonecutter.controller
 
 import dev.kikugie.stonecutter.*
+import dev.kikugie.stonecutter.build.BuildParameters
 import dev.kikugie.stonecutter.build.StonecutterBuild
 import dev.kikugie.stonecutter.controller.manager.ControllerManager
 import dev.kikugie.stonecutter.controller.manager.controller
-import dev.kikugie.stonecutter.controller.storage.*
-import dev.kikugie.stonecutter.build.BuildParameters
+import dev.kikugie.stonecutter.controller.storage.GlobalParameters
+import dev.kikugie.stonecutter.controller.storage.ProjectBranch
+import dev.kikugie.stonecutter.controller.storage.ProjectNode
+import dev.kikugie.stonecutter.controller.storage.ProjectTree
 import dev.kikugie.stonecutter.data.ProjectParameterContainer
 import dev.kikugie.stonecutter.data.ProjectTreeContainer
+import dev.kikugie.stonecutter.data.TreeBuilderContainer
 import dev.kikugie.stonecutter.process.StonecutterTask
 import dev.kikugie.stonecutter.settings.builder.TreeBuilder
-import dev.kikugie.stonecutter.data.TreeBuilderContainer
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
@@ -106,7 +109,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
      *
      * @param configuration Configuration scope
      */
-    infix fun parameters(configuration: Action<ParameterHolder>) = tree.asSequence().flatMap { br ->
+    infix fun parameters(configuration: Action<ParameterHolder>) = tree.branches.asSequence().flatMap { br ->
         versions.map { br to it }
     }.forEach {
         configurations.getOrPut(it) { ParameterHolder(it.first, it.second) }.let(configuration::execute)
@@ -136,7 +139,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     }
 
     private fun configureTree(tree: ProjectTree) {
-        (tree.branches.values + tree.nodes).forEach {
+        (tree.branches + tree.nodes).forEach {
             treeContainer.register(it, tree)
             parameterContainer.register(it, parameters)
         }
@@ -173,7 +176,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         if (automaticPlatformConstants) configurePlatforms(tree.nodes)
 
         // Apply configurations
-        tree.flatMap { br -> versions.map { br to it } }.forEach { (br, ver) ->
+        tree.branches.flatMap { br -> versions.map { br to it } }.forEach { (br, ver) ->
             val holder = ParameterHolder(br, ver)
             actions.forEach { it.execute(holder) }
             configurations[br to ver] = holder
@@ -194,12 +197,12 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         desc: String,
     ) {
         root.tasks.create<StonecutterTask>(name) {
-            val builds = tree.associateWith {
+            val builds = tree.branches.associateWith {
                 it[name]?.extensions?.getByType<StonecutterBuild>()?.data
                     ?: configurations[it to version]?.data
                     ?: BuildParameters()
             }
-            val paths = tree.associateWith { it.path }
+            val paths = tree.branches.associateWith { it.path }
 
             group = "stonecutter"
             description = desc

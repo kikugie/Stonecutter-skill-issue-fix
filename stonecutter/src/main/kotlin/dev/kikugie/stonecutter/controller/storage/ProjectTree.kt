@@ -20,8 +20,8 @@ import java.nio.file.Path
 data class ProjectTree(
     private val project: Project,
     val vcs: StonecutterProject,
-    val branches: Map<ProjectName, ProjectBranch>,
-) : Collection<ProjectBranch> by branches.values, Project by project {
+    private val _branches: Map<ProjectName, ProjectBranch>,
+) : Map<ProjectName, ProjectBranch> by _branches, Project by project {
     /**
      * Location of this tree on the disk.
      */
@@ -30,12 +30,17 @@ data class ProjectTree(
     /**
      * All registered project nodes.
      */
-    val nodes: List<ProjectNode> = flatMap { it.nodes.values }
+    val nodes: Collection<ProjectNode> = values.flatMap { it.values }
+
+    /**
+     * All registered branches
+     */
+    val branches: Collection<ProjectBranch> = values
 
     /**
      * All unique versions in this tree.
      */
-    val versions: Collection<StonecutterProject> = flatMap { it.versions }.toSet()
+    val versions: Collection<StonecutterProject> = values.flatMap { it.versions }.toSet()
 
     /**
      * The active version for this tree.
@@ -44,20 +49,13 @@ data class ProjectTree(
         internal set
 
     init {
-        branches.values.forEach { it.tree = this }
+        values.forEach { it.tree = this }
     }
-
-    /**
-     * Finds a branch for the given name.
-     *
-     * @param project Name of the project
-     */
-    operator fun get(project: ProjectName) = branches[project]
 
     /**
      * Finds a branch for the given project.
      *
      * @param project Project reference
      */
-    operator fun get(project: Project) = branches[project.path.sanitize()]
+    operator fun get(project: Project) = get(project.path.sanitize())
 }

@@ -17,10 +17,10 @@ import java.nio.file.Path
 data class ProjectBranch(
     private val project: Project,
     val id: ProjectName,
-    val nodes: Map<ProjectName, ProjectNode>,
-): Collection<ProjectNode> by nodes.values, Project by project {
+    private val _nodes: Map<ProjectName, ProjectNode>,
+): Map<ProjectName, ProjectNode> by _nodes, Project by project {
     companion object {
-        internal operator fun ProjectBranch?.get(project: ProjectName) = this?.nodes?.get(project)
+        internal operator fun ProjectBranch?.get(project: ProjectName) = this?.get(project)
     }
 
     /**
@@ -29,9 +29,14 @@ data class ProjectBranch(
     val path: Path = projectDir.toPath()
 
     /**
+     * All nodes in this branch.
+     */
+    val nodes: Collection<ProjectNode> = values
+
+    /**
      * [StonecutterProject] instances of all [nodes].
      */
-    val versions: Collection<StonecutterProject> = map { it.metadata }
+    val versions: Collection<StonecutterProject> = values.map { it.metadata }
 
     /**
      * Reference to the tree containing this branch.
@@ -40,20 +45,13 @@ data class ProjectBranch(
         internal set
 
     init {
-        nodes.values.forEach { it.branch = this }
+        values.forEach { it.branch = this }
     }
-
-    /**
-     * Finds an entry for the given name.
-     *
-     * @param project Name of the project
-     */
-    operator fun get(project: ProjectName) = nodes[project]
 
     /**
      * Finds an entry for the given project.
      *
      * @param project Project reference
      */
-    operator fun get(project: Project) = nodes[project.path.substringAfterLast(':')]
+    operator fun get(project: Project) = get(project.path.substringAfterLast(':'))
 }

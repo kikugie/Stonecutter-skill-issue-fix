@@ -47,14 +47,14 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
      * For most cases use [node] methods.
      */
     val branch: ProjectBranch = requireNotNull(tree[parent]) {
-        "Branch '$parent' not found in [${tree.branches.keys.joinToString { "'$it'" }}]"
+        "Branch '$parent' not found in [${tree.keys.joinToString { "'$it'" }}]"
     }
 
     /**
      * This project's node. Contains this project's metadata and provides API for traversing the tree.
      */
     val node: ProjectNode = requireNotNull(branch[project]) {
-        "Project '$project' is not found in the branch {${branch.nodes.keys.joinToString { "'$it'" }}]"
+        "Project '$project' is not found in the branch {${branch.keys.joinToString { "'$it'" }}]"
     }
 
     /**
