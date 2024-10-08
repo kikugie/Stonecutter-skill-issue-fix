@@ -19,8 +19,8 @@ data class ProjectBranch(
     val id: ProjectName,
     private val _nodes: Map<ProjectName, ProjectNode>,
 ): Map<ProjectName, ProjectNode> by _nodes, Project by project {
-    companion object {
-        internal operator fun ProjectBranch?.get(project: ProjectName) = this?.get(project)
+    internal companion object {
+        operator fun ProjectBranch?.get(project: ProjectName) = this?.get(project)
     }
 
     /**

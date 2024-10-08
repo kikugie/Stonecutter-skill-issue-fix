@@ -54,6 +54,10 @@ internal val Project.stonecutterCachePath
 internal inline fun <T : Closeable?, R> T.useCatching(block: (T) -> R): Result<R> =
     runCatching { use(block) }
 
+internal inline fun <T> Iterable<T>.onEach(action: T.() -> Unit) {
+    for (element in this) element.action()
+}
+
 internal fun Path.isAvailable() = exists() && isRegularFile() && isReadable()
 
 /**

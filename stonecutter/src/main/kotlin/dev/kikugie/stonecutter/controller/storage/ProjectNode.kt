@@ -42,7 +42,7 @@ data class ProjectNode(
      * @param node Name of the node. Should be an existing [StonecutterProject.project]
      * @return Found [ProjectNode] or null if it doesn't exist
      */
-    fun peer(node: ProjectName): ProjectNode? = branch.nodes[node]
+    fun peer(node: ProjectName): ProjectNode? = branch[node]
 
     /**
      * Finds the same node in the given branch.

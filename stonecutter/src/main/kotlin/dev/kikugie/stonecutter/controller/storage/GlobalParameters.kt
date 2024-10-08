@@ -2,6 +2,7 @@ package dev.kikugie.stonecutter.controller.storage
 
 import dev.kikugie.stonecutter.TaskName
 import dev.kikugie.stonecutter.controller.ControllerParameters
+import kotlinx.serialization.Serializable
 
 /**
  * Stores [ControllerParameters] and chiseled task names to be passed to the versioned buildscript.
@@ -9,6 +10,7 @@ import dev.kikugie.stonecutter.controller.ControllerParameters
  * @property debug Debug flag used by the file processor
  * @property chiseled Registered chiseled tasks
  */
+@Serializable
 data class GlobalParameters(
     var debug: Boolean = false,
     val chiseled: MutableSet<TaskName> = mutableSetOf()

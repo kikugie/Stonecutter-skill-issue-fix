@@ -2,6 +2,8 @@ package dev.kikugie.stonecutter.build
 
 import dev.kikugie.stonecutter.*
 import dev.kikugie.stonecutter.controller.storage.*
+import dev.kikugie.stonecutter.data.BranchInfo.Companion.toBranchInfo
+import dev.kikugie.stonecutter.data.NodeModel
 import dev.kikugie.stonecutter.data.ProjectParameterContainer
 import dev.kikugie.stonecutter.data.ProjectTreeContainer
 import dev.kikugie.stonecutter.process.StonecutterTask
@@ -97,7 +99,10 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
             }
         }
 
-        afterEvaluate { configureSources() }
+        afterEvaluate {
+            configureSources()
+            serializeNode()
+        }
     }
 
     private fun Project.configureSources() {
@@ -129,6 +134,18 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
                 applyChiseled(it.resources)
             }
         } catch (_: MissingPropertyException) {
+        }
+    }
+
+    private fun serializeNode() {
+        val model = NodeModel(
+            current,
+            node.path.relativize(tree.path),
+            branch.toBranchInfo(node.path.relativize(branch.path)),
+            data,
+        )
+        NodeModel.save(node.stonecutterCachePath, model, NodeModel.serializer()).onFailure {
+            node.logger.warn("Failed to save node model for '${branch.name}:${current.project}'", it)
         }
     }
 }

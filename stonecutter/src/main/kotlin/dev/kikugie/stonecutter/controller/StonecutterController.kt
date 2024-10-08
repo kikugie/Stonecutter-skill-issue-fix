@@ -9,9 +9,9 @@ import dev.kikugie.stonecutter.controller.storage.GlobalParameters
 import dev.kikugie.stonecutter.controller.storage.ProjectBranch
 import dev.kikugie.stonecutter.controller.storage.ProjectNode
 import dev.kikugie.stonecutter.controller.storage.ProjectTree
-import dev.kikugie.stonecutter.data.ProjectParameterContainer
-import dev.kikugie.stonecutter.data.ProjectTreeContainer
-import dev.kikugie.stonecutter.data.TreeBuilderContainer
+import dev.kikugie.stonecutter.data.*
+import dev.kikugie.stonecutter.data.BranchInfo.Companion.toBranchInfo
+import dev.kikugie.stonecutter.data.NodeInfo.Companion.toNodeInfo
 import dev.kikugie.stonecutter.process.StonecutterTask
 import dev.kikugie.stonecutter.settings.builder.TreeBuilder
 import org.gradle.api.Action
@@ -186,6 +186,9 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
             configurations[it.branch to it.metadata]?.run { it.stonecutter.from(this) }
             for (build in builds) build.execute(it.stonecutter)
         }
+
+        serializeTree()
+        serializeBranches()
     }
 
     private inline fun createStonecutterTask(name: String, version: StonecutterProject, desc: () -> String) =
@@ -223,6 +226,30 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
             doLast {
                 manager.updateHeader(this.project.buildFile.toPath(), version.project)
             }
+        }
+    }
+
+    private fun serializeTree() {
+        val model = TreeModel(
+            vcsVersion,
+            current,
+            tree.branches.map { it.toBranchInfo(tree.path.relativize(it.path)) },
+            tree.nodes.map { it.toNodeInfo(tree.path.relativize(it.path)) },
+            parameters,
+        )
+        TreeModel.save(tree.stonecutterCachePath, model, TreeModel.serializer()).onFailure {
+            tree.logger.warn("Failed to save tree model", it)
+        }
+    }
+
+    private fun serializeBranches() = tree.branches.onEach {
+        val model = BranchModel(
+            id,
+            path.relativize(tree.path),
+            nodes.map { it.toNodeInfo(it.path.relativize(tree.path)) },
+        )
+        BranchModel.save(tree.stonecutterCachePath, model, BranchModel.serializer()).onFailure {
+            logger.warn("Failed to save branch model for '$name'", it)
         }
     }
 }
