@@ -4,6 +4,7 @@ import com.charleskorn.kaml.Yaml
 import kotlinx.serialization.KSerializer
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
+import kotlin.io.path.createDirectories
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
@@ -29,9 +30,10 @@ interface ModelLoader<T> {
      * @param serializer The serializer used to convert the model to a string.
      * @return A Result wrapping a Unit on success, or an exception if the operation fails.
      */
-    fun save(directory: Path, model: T, serializer: KSerializer<T>): Result<Unit> = kotlin.runCatching {
+    fun save(directory: Path, model: T, serializer: KSerializer<T>): Result<Unit> = directory.runCatching {
         val yaml = Yaml.default.encodeToString(serializer, model)
-        directory.resolve(filename).writeText(
+        createDirectories()
+        resolve(filename).writeText(
             yaml,
             Charsets.UTF_8,
             StandardOpenOption.WRITE,
@@ -47,8 +49,8 @@ interface ModelLoader<T> {
      * @param serializer The serializer used to deserialize the model from a string.
      * @return A Result wrapping the loaded model on success or an exception if the operation fails.
      */
-    fun load(directory: Path, serializer: KSerializer<T>): Result<T> = kotlin.runCatching {
-        val text = directory.resolve(filename).readText(Charsets.UTF_8)
+    fun load(directory: Path, serializer: KSerializer<T>): Result<T> = directory.runCatching {
+        val text = resolve(filename).readText(Charsets.UTF_8)
         Yaml.default.decodeFromString(serializer, text)
     }
 }

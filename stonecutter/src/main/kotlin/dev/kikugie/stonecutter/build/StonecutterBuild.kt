@@ -66,8 +66,6 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
 
     /**
      * The currently active version. Global for all instances of the build file.
-     *
-     * **May not exist in this branch!**
      */
     val active: StonecutterProject get() = tree.current
 
