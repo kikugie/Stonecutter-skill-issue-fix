@@ -140,6 +140,7 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
             current,
             node.path.relativize(tree.path),
             branch.toBranchInfo(node.path.relativize(branch.path)),
+            current.isActive,
             data,
         )
         NodeModel.save(node.stonecutterCachePath, model, NodeModel.serializer()).onFailure {

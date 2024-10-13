@@ -19,8 +19,9 @@ import java.nio.file.Path
 data class NodeInfo(
     val metadata: StonecutterProject,
     val path: Path,
+    val active: Boolean,
 ) {
     internal companion object {
-        fun ProjectNode.toNodeInfo(source: Path) = NodeInfo(metadata, source)
+        fun ProjectNode.toNodeInfo(source: Path, active: StonecutterProject) = NodeInfo(metadata, source, metadata == active)
     }
 }

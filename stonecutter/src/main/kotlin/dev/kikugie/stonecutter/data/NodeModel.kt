@@ -22,6 +22,7 @@ data class NodeModel(
     val metadata: StonecutterProject,
     val root: Path,
     val branch: BranchInfo,
+    val active: Boolean,
     val parameters: BuildParameters
 ) {
     /**

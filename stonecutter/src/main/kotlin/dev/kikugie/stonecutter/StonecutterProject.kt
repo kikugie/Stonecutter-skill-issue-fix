@@ -2,6 +2,7 @@ package dev.kikugie.stonecutter
 
 import dev.kikugie.semver.SemanticVersion
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /**
  * Represents a project entry in a Stonecutter branch.
@@ -21,6 +22,7 @@ data class StonecutterProject internal constructor(
     /**
      * Whenever this project is selected as active.
      */
+    @Transient
     var isActive: Boolean = false
         internal set
 

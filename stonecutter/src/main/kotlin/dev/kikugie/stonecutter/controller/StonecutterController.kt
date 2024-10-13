@@ -150,18 +150,6 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         }
     }
 
-    private fun configurePlatforms(projects: Iterable<Project>) {
-        val key = "loom.platform"
-        val platforms = mutableSetOf<String>()
-        for (it in projects) it.findProperty(key)?.run {
-            platforms += this.toString()
-        }
-        if (platforms.isEmpty()) return
-        for (it in projects) it.findProperty(key)?.run {
-            it.extensions.getByType<StonecutterBuild>().consts(this.toString(), platforms)
-        }
-    }
-
     private fun setupProject() {
         createStonecutterTask("Reset active project", tree.vcs) {
             "Sets active version to ${tree.vcs.project}. Run this before making a commit."
@@ -172,7 +160,6 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         for (it in versions) createStonecutterTask("Set active project to ${it.project}", it) {
             "Sets the active project to ${it.project}, processing all versioned comments."
         }
-        // FIXME doesn't yet whoops
         if (automaticPlatformConstants) configurePlatforms(tree.nodes)
 
         // Apply configurations
@@ -229,12 +216,25 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         }
     }
 
+    private fun configurePlatforms(projects: Iterable<Project>) {
+        val key = "loom.platform"
+        val platforms = buildSet {
+            for (it in projects) it.findProperty(key)?.run {
+                add(toString())
+            }
+        }.also { if (it.isEmpty()) return }
+        parameters {
+            val platform = node?.findProperty(key)?.toString() ?: "\n"
+            consts(platform, platforms)
+        }
+    }
+
     private fun serializeTree() {
         val model = TreeModel(
             vcsVersion,
             current,
             tree.branches.map { it.toBranchInfo(tree.path.relativize(it.path)) },
-            tree.nodes.map { it.toNodeInfo(tree.path.relativize(it.path)) },
+            tree.nodes.map { it.toNodeInfo(tree.path.relativize(it.path), current) },
             parameters,
         )
         TreeModel.save(tree.stonecutterCachePath, model, TreeModel.serializer()).onFailure {
@@ -246,7 +246,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         val model = BranchModel(
             id,
             path.relativize(tree.path),
-            nodes.map { it.toNodeInfo(it.path.relativize(tree.path)) },
+            nodes.map { it.toNodeInfo(it.path.relativize(tree.path), current) },
         )
         BranchModel.save(tree.stonecutterCachePath, model, BranchModel.serializer()).onFailure {
             logger.warn("Failed to save branch model for '$name'", it)
