@@ -59,6 +59,7 @@ entries:
     adjust: 4720000
   - name: sushi bar
   - name: telekinesis
+    cf_link: EXCLUDE
   - name: tt20
   - name: yacl
   - name: zoomify
@@ -75,3 +76,15 @@ entries:
     adjust: 850
   - name: legacy skins
   - name: deckedoutobs
+  - name: vinyls
+  - name: satisfying buttons
+  - name: armorful
+  - name: configurable
+  - name: wayfix
+  - name: model shifter
+  - name: shaderapi
+  - name: true-darkness-refabricated
+    mr_link: https://modrinth.com/mod/true-darkness-refabricated
+  - name: cit-resewn
+  - name: patpat
+  - name: do-a-barrel-roll
