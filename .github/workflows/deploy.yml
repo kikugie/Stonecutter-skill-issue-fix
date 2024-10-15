@@ -1,8 +1,7 @@
 name: Deploy VitePress site to Pages
 
 on:
-  push:
-    branches: ["0.4"]
+  workflow_call:
   workflow_dispatch:
 
 permissions:
@@ -34,6 +33,8 @@ jobs:
           java-version: '16'
       - name: Set execute permissions for gradle
         run: chmod +x ./gradlew
+      - name: Update hall of fame
+        run: ./gradlew updateHallOfFame
       - name: Run dokkaHtmlMultiModule
         run: ./gradlew dokkaHtmlMultiModule
       - name: Create directories
