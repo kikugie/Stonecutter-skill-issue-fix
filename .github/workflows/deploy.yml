@@ -34,12 +34,12 @@ jobs:
           java-version: '16'
       - name: Set execute permissions for gradle
         run: chmod +x ./gradlew
-      - name: Run dokkaHtmlCollector
-        run: ./gradlew dokkaHtmlCollector
+      - name: Run dokkaHtmlMultiModule
+        run: ./gradlew dokkaHtmlMultiModule
       - name: Create directories
         run: mkdir -p docs/public/dokka
       - name: Copy Dokka output
-        run: cp -r build/dokka/htmlCollector/* docs/public/dokka/
+        run: cp -r build/dokka/htmlMultiModule/* docs/public/dokka/
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Install dependencies
