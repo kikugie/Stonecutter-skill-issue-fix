@@ -17,7 +17,7 @@ export default defineVersionedConfig(__dirname, {
   title: 'Stonecutter',
   description: 'Modern Gradle plugin for multi-version management',
   versioning: {
-    latestVersion: '0.5-alpha.8',
+    latestVersion: '0.5-beta.2',
   },
   cleanUrls: true,
   appearance: 'dark',
@@ -53,29 +53,25 @@ export default defineVersionedConfig(__dirname, {
           text: 'Stonecutter',
           items: [
             {text: 'Introduction', link: '/stonecutter/introduction'},
-            {text: 'Setting up Stonecutter', link: '/stonecutter/setup'},
+            {text: 'Frequently asked questions', link: '/stonecutter/faq'},
             {
-              text: 'Configuration', items: [
-                {text: 'Project Settings', link: '/stonecutter/settings'},
-                {text: 'Project Controller', link: '/stonecutter/controller'},
-                {text: 'Project Build', link: '/stonecutter/build'},
+              text: 'Setup', items: [
+                {text: 'Setting up Stonecutter', link: '/stonecutter/guide/setup'},
+                {text: 'Stonecutter comments', link: '/stonecutter/guide/comments'},
               ]
             },
-            {
-              text: 'Details', items: [
-                {text: 'Comment Syntax', link: '/stonecutter/comments'},
-                {text: 'Project Trees', link: '/stonecutter/project-tree'},
-              ]
-            },
+            {text: 'Tips and tricks', link: '/stonecutter/tips'},
           ]
         }
       ]
     },
-
     socialLinks: [
       {icon: 'github', link: 'https://github.com/kikugie/stonecutter'},
       {icon: 'discord', link: 'https://discord.gg/TBgNUCfryS'},
-    ]
+    ],
+    footer: {
+      message: 'Released under the <a href="https://github.com/kikugie/stonecutter/blob/0.5/LICENSE">LGPL-3.0 License</a> by KikuGie (git.kikugie@protonmail.com she/her)'
+    }
   },
   sitemap: {
     hostname: "https://stonecutter.kikugie.dev/",
