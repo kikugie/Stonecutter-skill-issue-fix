@@ -42,39 +42,43 @@ dependencies {
     dokkaPlugin(libs.dokka.versioning)
 }
 
-tasks.register("extractOldDocs") {
-    val source = projectDir.resolve("docs/kdoc")
-    fun unzip(file: File, to: File) = ZipFile(file).use { zip ->
-        to.mkdirs()
-        zip.extractAll(to.absolutePath)
-    }
+tasks.register<Sync>("collectDocumentation") {
+    group = "documentation"
+    dependsOn(tasks.dokkaHtmlMultiModule)
 
-    onlyIf { !unzipTarget.exists() && source.listFiles()?.isNotEmpty() == true }
+    from(tasks.dokkaHtmlMultiModule.get().outputs.files)
+    into(projectDir.resolve("docs/public/dokka"))
+}
+
+tasks.register("extractOldDocs") {
+    group = "documentation"
+    val source = projectDir.resolve("docs/kdoc")
+    inputs.files(fileTree(source).matching { include("**/*.zip") })
+    outputs.dir(unzipTarget)
+
     doLast {
+        if (unzipTarget.exists()) unzipTarget.deleteRecursively()
         source.listFiles()!!.filter { it.extension == "zip" }.forEach {
-            unzip(it, unzipTarget.resolve(it.nameWithoutExtension))
+            it.unzip(unzipTarget.resolve(it.nameWithoutExtension))
         }
     }
 }
 
 tasks.register("updateVersion") {
+    val version4 = property("version4").toString()
     doLast {
-        fun replaceAndWrite(path: String, @Language("RegExp") pattern: String, replacement: String) {
-            val location = project.file(path)
-            require(location.exists() && location.isFile && location.canRead()) { "Path $path is invalid" }
-            val text = location.readText()
-            val new = text.replace(Regex(pattern, RegexOption.MULTILINE), replacement)
-            if (new != text) location.writeText(new)
-        }
+        rename("docs/.vitepress/sidebars/versioned", "0\\.4\\.\\d.json", "$version4.json")
+        rename("docs/versions", "0\\.4\\.\\d", version4)
+        replace("build.gradle.kts", "/0\\.4\\.\\d", "/$version4")
 
-        replaceAndWrite("docs/.vitepress/config.mts", "latestVersion: '.+'", "latestVersion: '$version'")
-        replaceAndWrite("docs/stonecutter/guide/setup.md", "stonecutter\"\\ version \".+\"", "stonecutter\" version \"$version\"")
-        replaceAndWrite("docs/stonecutter/guide/setup.md", "stonecutter\"\\) version \".+\"", "stonecutter\") version \"$version\"")
-        replaceAndWrite(
-            "stonecutter/src/main/kotlin/dev/kikugie/stonecutter/controller/StonecutterController.kt",
-            "\"Running Stonecutter .+\"",
-            "\"Running Stonecutter $version\""
-        )
+//        replace("docs/.vitepress/config.mts", "latestVersion: '.+'", "latestVersion: '$version'")
+//        replace("docs/stonecutter/guide/setup.md", "stonecutter\"\\ version \".+\"", "stonecutter\" version \"$version\"")
+//        replace("docs/stonecutter/guide/setup.md", "stonecutter\"\\) version \".+\"", "stonecutter\") version \"$version\"")
+//        replace(
+//            "stonecutter/src/main/kotlin/dev/kikugie/stonecutter/controller/StonecutterController.kt",
+//            "\"Running Stonecutter .+\"",
+//            "\"Running Stonecutter $version\""
+//        )
     }
 }
 

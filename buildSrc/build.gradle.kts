@@ -15,4 +15,5 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.12.0")
     implementation("com.charleskorn.kaml:kaml:0.60.0")
     implementation("com.github.ajalt.mordant:mordant:2.7.2")
+    implementation("net.lingala.zip4j:zip4j:2.11.5")
 }
