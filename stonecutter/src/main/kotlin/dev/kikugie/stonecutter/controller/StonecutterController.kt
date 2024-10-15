@@ -78,7 +78,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         }
 
     init {
-        println("Running Stonecutter 0.5-beta.1")
+        println("Running Stonecutter 0.5-beta.2")
         val data: TreeBuilder = checkNotNull(root.gradle.extensions.getByType<TreeBuilderContainer>()[root]) {
             "Project ${root.path} is not registered. This might've been caused by removing a project while its active"
         }
