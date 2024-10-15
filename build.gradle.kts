@@ -65,20 +65,19 @@ tasks.register("extractOldDocs") {
 }
 
 tasks.register("updateVersion") {
-    val version4 = property("version4").toString()
+    val version4 = project.property("version4").toString()
     doLast {
         rename("docs/.vitepress/sidebars/versioned", "0\\.4\\.\\d.json", "$version4.json")
         rename("docs/versions", "0\\.4\\.\\d", version4)
         replace("build.gradle.kts", "/0\\.4\\.\\d", "/$version4")
-
-//        replace("docs/.vitepress/config.mts", "latestVersion: '.+'", "latestVersion: '$version'")
-//        replace("docs/stonecutter/guide/setup.md", "stonecutter\"\\ version \".+\"", "stonecutter\" version \"$version\"")
-//        replace("docs/stonecutter/guide/setup.md", "stonecutter\"\\) version \".+\"", "stonecutter\") version \"$version\"")
-//        replace(
-//            "stonecutter/src/main/kotlin/dev/kikugie/stonecutter/controller/StonecutterController.kt",
-//            "\"Running Stonecutter .+\"",
-//            "\"Running Stonecutter $version\""
-//        )
+        replace("docs/.vitepress/config.mts", "latestVersion: '.+'", "latestVersion: '$version'")
+        replace("docs/stonecutter/guide/setup.md", "stonecutter\"\\ version \".+\"", "stonecutter\" version \"$version\"")
+        replace("docs/stonecutter/guide/setup.md", "stonecutter\"\\) version \".+\"", "stonecutter\") version \"$version\"")
+        replace(
+            "stonecutter/src/main/kotlin/dev/kikugie/stonecutter/controller/StonecutterController.kt",
+            "\"Running Stonecutter .+\"",
+            "\"Running Stonecutter $version\""
+        )
     }
 }
 
@@ -91,7 +90,7 @@ tasks.register("updateHallOfFame") {
         val text = template.readText().format(projects)
         val paths = mapOf(
             "" to project.file("docs/index.md"),
-            "/0.4.4" to project.file("docs/versions/0.4.4/index.md")
+            "/0.4.5" to project.file("docs/versions/0.4.5/index.md")
         )
         for ((version, file) in paths) file.toPath().writeText(
             text.replace(": /stonecutter", ": $version/stonecutter"),
