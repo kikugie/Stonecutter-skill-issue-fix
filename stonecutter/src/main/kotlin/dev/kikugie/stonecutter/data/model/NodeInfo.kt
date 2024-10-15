@@ -13,6 +13,7 @@ import java.nio.file.Path
  *
  * @property metadata Project data for this node
  * @property path Contextual path to this node. Refer to the `@see` section below
+ * @property active Whenever this node is selected as active
  * @see TreeModel.nodes
  * @see BranchModel.nodes
  */

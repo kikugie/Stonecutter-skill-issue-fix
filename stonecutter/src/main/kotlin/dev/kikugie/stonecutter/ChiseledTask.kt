@@ -25,6 +25,9 @@ abstract class ChiseledTask : DefaultTask() {
     @get:ApiStatus.Internal
     abstract val nodes: ListProperty<ProjectNode>
 
+    /**
+     * Versions used by the task.
+     */
     @get:Input
     @get:ApiStatus.ScheduledForRemoval(inVersion = "0.6")
     @get:Deprecated("Must assign nodes. Use versions() or nodes() to filter the tree directly.")

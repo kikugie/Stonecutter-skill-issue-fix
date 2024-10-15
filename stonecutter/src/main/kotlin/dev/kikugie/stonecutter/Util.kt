@@ -7,6 +7,9 @@ import kotlin.io.path.exists
 import kotlin.io.path.isReadable
 import kotlin.io.path.isRegularFile
 
+/**
+ * Compatibility with 0.4.
+ */
 @Deprecated("Use `stonecutter { }` instead")
 typealias StonecutterSettings = dev.kikugie.stonecutter.settings.StonecutterSettings
 

@@ -17,6 +17,7 @@ import java.nio.file.Path
  * @property root Tree root directory relative to this node
  * @property branch This node's branch. The path is relative to the node's directory
  * @property parameters Parameters used by the file processor
+ * @property active Whenever this node is selected as active
  */
 @Serializable
 data class NodeModel(
