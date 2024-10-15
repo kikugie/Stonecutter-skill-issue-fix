@@ -1,5 +1,3 @@
-import net.lingala.zip4j.ZipFile
-import org.intellij.lang.annotations.Language
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.AbstractDokkaLeafTask
@@ -40,14 +38,6 @@ repositories {
 
 dependencies {
     dokkaPlugin(libs.dokka.versioning)
-}
-
-tasks.register<Sync>("collectDocumentation") {
-    group = "documentation"
-    dependsOn(tasks.dokkaHtmlMultiModule)
-
-    from(tasks.dokkaHtmlMultiModule.get().outputs.files)
-    into(projectDir.resolve("docs/public/dokka"))
 }
 
 tasks.register("extractOldDocs") {
