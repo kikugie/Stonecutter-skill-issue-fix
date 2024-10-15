@@ -72,22 +72,20 @@ tasks.register("updateVersion") {
 }
 
 tasks.register("updateHallOfFame") {
-    doLast {
-        val template = project.file("util/index.md")
-        val mods = project.file("hall-of-fame.yml")
+    fun migrate(name: String, version: String?, projects: String) {
+        val file = project.file("util/$name.md")
+        val text = file.readText().format(projects)
+            .replace(": /stonecutter", ": ${if (version == null) "" else "/$version"}/stonecutter")
+        val path = project.file(if (version == null)
+            "docs/index.md" else "docs/versions/$version/index.md")
+        path.toPath().writeText(text, Charsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+    }
 
+    doLast {
+        val mods = project.file("hall-of-fame.yml")
         val projects = ProjectFinder.find(mods)
-        val text = template.readText().format(projects)
-        val paths = mapOf(
-            "" to project.file("docs/index.md"),
-            "/0.4.5" to project.file("docs/versions/0.4.5/index.md")
-        )
-        for ((version, file) in paths) file.toPath().writeText(
-            text.replace(": /stonecutter", ": $version/stonecutter"),
-            Charsets.UTF_8,
-            StandardOpenOption.CREATE,
-            StandardOpenOption.TRUNCATE_EXISTING
-        )
+        migrate("index", null, projects)
+        migrate("index4", project.property("version4").toString(), projects)
     }
 }
 
