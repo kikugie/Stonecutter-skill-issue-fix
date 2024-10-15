@@ -71,8 +71,9 @@ open class StonecutterSettings(settings: Settings) : SettingsConfiguration(setti
         name: ProjectName,
         root: ProjectDescriptor,
         setup: TreeBuilder,
-        branch: Iterable<StonecutterProject>
+        branch: Collection<StonecutterProject>
     ) {
+        require(branch.isNotEmpty()) { "Registered branch $name has no nodes" }
         val scope = if (name.isEmpty()) root else get("${root.path.sanitize()}:$name")
         val file = runCatching { setup.branches[name]!!.buildscript }.getOrNull() ?: centralScript
         scope.projectDir.toPath().createDirectories()
