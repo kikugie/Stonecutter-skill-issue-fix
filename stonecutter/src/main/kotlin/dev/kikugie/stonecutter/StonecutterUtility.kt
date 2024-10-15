@@ -22,6 +22,9 @@ interface StonecutterUtility {
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
     @Contract(pure = true)
+    @ApiStatus.Obsolete
+    @ApiStatus.ScheduledForRemoval(inVersion = "0.6")
+    @Deprecated("Use `eval()` instead")
     fun compare(left: String, right: String) =
         VersionParser.parse(left).value.compareTo(VersionParser.parse(right).value)
 
@@ -34,7 +37,9 @@ interface StonecutterUtility {
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
     @Contract(pure = true)
-    @ApiStatus.Experimental
+    @ApiStatus.Obsolete
+    @ApiStatus.ScheduledForRemoval(inVersion = "0.6")
+    @Deprecated("Use `evalLenient()` instead")
     fun compareLenient(left: String, right: String) =
         VersionParser.parseLenient(left).value.compareTo(VersionParser.parse(right).value)
 
@@ -49,7 +54,9 @@ interface StonecutterUtility {
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
     @Contract(pure = true)
-    @Deprecated("Use the non-infix variant", ReplaceWith("compare(this, other)"))
+    @ApiStatus.Obsolete
+    @ApiStatus.ScheduledForRemoval(inVersion = "0.6")
+    @Deprecated("Use `eval()` instead")
     infix fun String.comp(other: String) = compare(this, other)
 
     /**
@@ -77,7 +84,6 @@ interface StonecutterUtility {
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
     @Contract(pure = true)
-    @ApiStatus.Experimental
     fun evalLenient(version: String, predicate: String): Boolean {
         val target = VersionParser.parseLenient(version).value
         return predicate.split(' ').all {
