@@ -3,7 +3,7 @@
 After finishing the Gradle setup, you can start using versioned comments in your code.
 
 ## Conditional comments
-The [setup](/setup) guide creates four versions: `1.20.1`, `1.20.4`, `1.20.6` and `1.21-alpha.24.20.a`.
+The [setup](./setup) guide creates four versions: `1.20.1`, `1.20.4`, `1.20.6` and `1.21-alpha.24.20.a`.
 You can insert conditions based on those versions.
 
 Conditions must start with the `?` character, followed by an expression. 
