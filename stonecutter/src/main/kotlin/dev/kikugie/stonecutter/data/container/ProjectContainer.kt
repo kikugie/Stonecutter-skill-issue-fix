@@ -1,4 +1,4 @@
-package dev.kikugie.stonecutter.data
+package dev.kikugie.stonecutter.data.container
 
 import dev.kikugie.stonecutter.ProjectPath
 import org.gradle.api.Project

@@ -1,4 +1,4 @@
-package dev.kikugie.stonecutter.data
+package dev.kikugie.stonecutter.data.model
 
 import com.charleskorn.kaml.Yaml
 import kotlinx.serialization.KSerializer

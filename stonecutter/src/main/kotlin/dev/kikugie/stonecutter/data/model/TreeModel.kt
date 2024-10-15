@@ -1,9 +1,10 @@
 @file: UseSerializers(PathSerializer::class)
 
-package dev.kikugie.stonecutter.data
+package dev.kikugie.stonecutter.data.model
 
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.controller.storage.GlobalParameters
+import dev.kikugie.stonecutter.data.PathSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
