@@ -210,9 +210,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
 
             data.set(builds)
             sources.set(paths)
-            cacheDir.set { branch, version -> branch[version.project]?.stonecutterCachePath
-                ?: branch.stonecutterCachePath.resolve("out-of-bounds/$version")
-            }
+            cacheDir.set { branch, version -> branch.cachePath(version) }
 
             doLast {
                 manager.updateHeader(this.project.buildFile.toPath(), version.project)

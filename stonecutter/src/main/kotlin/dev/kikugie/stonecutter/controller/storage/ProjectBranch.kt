@@ -2,6 +2,7 @@ package dev.kikugie.stonecutter.controller.storage
 
 import dev.kikugie.stonecutter.ProjectName
 import dev.kikugie.stonecutter.StonecutterProject
+import dev.kikugie.stonecutter.stonecutterCachePath
 import org.gradle.api.Project
 import java.nio.file.Path
 
@@ -54,4 +55,7 @@ data class ProjectBranch(
      * @param project Project reference
      */
     operator fun get(project: Project) = get(project.path.substringAfterLast(':'))
+
+    internal fun cachePath(version: StonecutterProject) = get(version.project)?.stonecutterCachePath
+        ?: stonecutterCachePath.resolve("out-of-bounds/${version.project}")
 }
