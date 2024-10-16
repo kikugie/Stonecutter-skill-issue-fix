@@ -67,7 +67,8 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
 
     override var automaticPlatformConstants: Boolean = false
     override var debug: Boolean by parameters.named("debug")
-    override val defaultReceiver: Identifier by parameters.named("receiver") {
+    override var processFiles: Boolean by parameters.named("process")
+    override var defaultReceiver: Identifier by parameters.named("receiver") {
         require(it.isValid()) { "Invalid receiver '$it'" }
     }
 
@@ -80,10 +81,11 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         root.afterEvaluate { setupProject() }
     }
 
+    // link: wiki-controller-active
     /**
      * Sets the active project. **DO NOT call on your own**
      *
-     * @see stonecutter
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#active-version">Wiki page</a>
      */
     infix fun active(name: Identifier) = with(tree) {
         current.isActive = false
@@ -91,12 +93,12 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         current.isActive = true
     }
 
-    // link: wiki-controller-active
+    // link: wiki-chisel
     /**
      * Registers the task as chiseled. This is required for all tasks that need to build all versions.
      *
      * @see [ChiseledTask]
-     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#active-version">Wiki page</a>
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#chiseled-tasks">Wiki page</a>
      */
     infix fun registerChiseled(provider: TaskProvider<*>) {
         parameters.addTask(provider.name)

@@ -61,6 +61,8 @@ abstract class StonecutterTask : DefaultTask() {
      */
     @TaskAction
     fun run() {
+        if (!parameters.get().process) println("Switched to ${toVersion.get().project} (skipped file processing)")
+            .also { return }
         val callbacks = mutableListOf<() -> Unit>()
         val errors = mutableListOf<Throwable>()
         val time = measureTimeMillis {

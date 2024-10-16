@@ -24,6 +24,13 @@ interface ControllerParameters {
     val automaticPlatformConstants: Boolean
 
     /**
+     * Controls whenever Stonecutter should process files.
+     * Disabling it will speed up version switching,
+     * but naturally, all conditional comments will be ignored.
+     */
+    val processFiles: Boolean
+
+    /**
      * Specifies the default version checked in predicates.
      * Defaults to `minecraft`, making the following checks equivalent:
      * ```
