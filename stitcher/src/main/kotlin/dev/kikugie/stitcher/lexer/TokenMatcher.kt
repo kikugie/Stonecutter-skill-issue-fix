@@ -11,7 +11,7 @@ import dev.kikugie.stitcher.util.StringUtil.countStart
 class TokenMatcher(private val input: CharSequence) {
     companion object {
         fun Char.isValidIdentifier() = when (this) {
-            in 'a'..'z', in 'A'..'Z', in '0'..'9', '_', '-' -> true
+            in 'a'..'z', in 'A'..'Z', in '0'..'9', '_', '-', '.' -> true
             else -> false
         }
     }

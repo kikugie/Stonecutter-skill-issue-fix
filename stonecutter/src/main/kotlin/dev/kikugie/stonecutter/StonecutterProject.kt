@@ -1,6 +1,8 @@
 package dev.kikugie.stonecutter
 
-import dev.kikugie.semver.SemanticVersion
+import dev.kikugie.stonecutter.controller.StonecutterController
+import dev.kikugie.stonecutter.data.model.NodeModel
+import dev.kikugie.stonecutter.data.model.NodeInfo
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -9,38 +11,36 @@ import kotlinx.serialization.Transient
  */
 @Serializable
 data class StonecutterProject internal constructor(
+    /**The name of this project's directory, as in `versions/${project}`.*/
+    val project: Identifier,
     /**
-     * The name of this project's directory, as in `versions/${project}`.
-     */
-    val project: ProjectName,
-    /**
-     * The assigned version of this project. Must be a valid [SemanticVersion].
+     * The assigned version of this project. Can be either [SemanticVersion] or [AnyVersion].
      * By default, its equal to [project], unless assigned by using `vers()` in the project settings.
      */
-    val version: TargetVersion
+    val version: AnyVersion
 ) {
     /**
-     * Whenever this project is selected as active.
+     * Active status of this project.
+     *
+     * Assigned by [StonecutterController.active], but serialized separately in
+     * [NodeModel] and [NodeInfo].
      */
     @Transient
     var isActive: Boolean = false
         internal set
 
-    /**
-     * Checks if the versions are equal, excluding the [isActive] parameter.
-     *
-     * @param other Object to check against
-     * @return Whenever [project] and [version] are the same
-     */
+    init {
+        require(project.isNotBlank()) { "Project must not be blank" }
+        require(version.isNotBlank()) { "Version must not be blank" }
+        require(project.isValid()) { "Invalid project name: '$project'" }
+    }
+
+    /**Checks if the versions are equal, excluding the [isActive] parameter.*/
     override fun equals(other: Any?): Boolean =
         if (other !is StonecutterProject) false
         else project == other.project && version == other.version
 
-    /**
-     * Calculates the hash code, excluding the [isActive] parameter.
-     *
-     * @return Hash value
-     */
+    /**Calculates the hash code, excluding the [isActive] parameter.*/
     override fun hashCode(): Int {
         var result = project.hashCode()
         result = 31 * result + version.hashCode()

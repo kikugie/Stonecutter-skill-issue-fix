@@ -1,10 +1,7 @@
 package dev.kikugie.stonecutter.settings
 
 import dev.kikugie.semver.SemanticVersion
-import dev.kikugie.stonecutter.BNAN
-import dev.kikugie.stonecutter.ProjectName
-import dev.kikugie.stonecutter.StonecutterProject
-import dev.kikugie.stonecutter.TargetVersion
+import dev.kikugie.stonecutter.*
 import dev.kikugie.stonecutter.settings.builder.TreeBuilder
 
 /**
@@ -19,7 +16,7 @@ interface ProjectProvider {
      * @param version Version used by the comment processor to compare against.
      * Recommended to use a [SemanticVersion], but plain string values are accepted too.
      */
-    fun vers(name: ProjectName, version: TargetVersion)
+    fun vers(name: Identifier, version: AnyVersion)
 
     /**
      * Registers multiple [StonecutterProject]s with the same directory and target versions.
@@ -27,7 +24,7 @@ interface ProjectProvider {
      * @param versions Version and project identifiers.
      * Recommended to use a [SemanticVersion], but plain string values are accepted too.
      */
-    fun versions(versions: Iterable<TargetVersion>) =
+    fun versions(versions: Iterable<AnyVersion>) =
         versions.forEach { vers(it, it) }
 
     /**
@@ -36,12 +33,12 @@ interface ProjectProvider {
      * @param versions Version and project identifiers.
      * Recommended to use a [SemanticVersion], but plain string values are accepted too.
      */
-    fun versions(vararg versions: TargetVersion) =
+    fun versions(vararg versions: AnyVersion) =
         versions.forEach { vers(it, it) }
 
     /**
      * Registers multiple [StonecutterProject]s with separate directory and target versions.
-     * Recommended to use with Kotlin DSL:
+     * Recommended to use with Kotlin DSL.
      * ```kotlin
      * val entries = listOf(
      *     "1.20-fabric" to "1.20",
@@ -50,10 +47,8 @@ interface ProjectProvider {
      *
      * versions(entries)
      * ```
-     *
-     * @param versions
      */
-    fun versions(versions: Iterable<Pair<ProjectName, TargetVersion>>) =
+    fun versions(versions: Iterable<Pair<Identifier, AnyVersion>>) =
         versions.forEach { vers(it.first, it.second) }.let { BNAN }
 
     /**
@@ -65,9 +60,7 @@ interface ProjectProvider {
      *     "1.21-fabric" to "1.21"
      * )
      * ```
-     *
-     * @param versions
      */
-    fun versions(vararg versions: Pair<ProjectName, TargetVersion>) =
+    fun versions(vararg versions: Pair<Identifier, AnyVersion>) =
         versions.forEach { vers(it.first, it.second) }.let { BNAN }
 }

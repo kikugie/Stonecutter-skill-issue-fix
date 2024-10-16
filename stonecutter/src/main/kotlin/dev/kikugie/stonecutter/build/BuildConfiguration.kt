@@ -1,10 +1,8 @@
 package dev.kikugie.stonecutter.build
 
-import dev.kikugie.semver.VersionParser
-import dev.kikugie.semver.VersionParsingException
-import dev.kikugie.stitcher.lexer.TokenMatcher.Companion.isValidIdentifier
-import dev.kikugie.stonecutter.MapSetter
+import dev.kikugie.stonecutter.*
 import dev.kikugie.stonecutter.controller.StonecutterController
+import dev.kikugie.stonecutter.validateId
 import org.gradle.api.Project
 import org.jetbrains.annotations.ApiStatus
 import java.io.File
@@ -24,8 +22,8 @@ abstract class BuildConfiguration(private val project: Project) {
      * swaps["..."] = "..."
      * ```
      */
-    val swaps = object : MapSetter<String, String> {
-        override fun set(key: String, value: String) = swap(key, value)
+    val swaps = object : MapSetter<Identifier, String> {
+        override fun set(key: Identifier, value: String) = swap(key, value)
     }
 
     /**
@@ -34,8 +32,8 @@ abstract class BuildConfiguration(private val project: Project) {
      * consts["..."] = true
      * ```
      */
-    val consts = object : MapSetter<String, Boolean> {
-        override fun set(key: String, value: Boolean) = const(key, value)
+    val consts = object : MapSetter<Identifier, Boolean> {
+        override fun set(key: Identifier, value: Boolean) = const(key, value)
     }
 
     /**
@@ -44,8 +42,8 @@ abstract class BuildConfiguration(private val project: Project) {
      * dependencies["..."] = "..."
      * ```
      */
-    val dependencies = object : MapSetter<String, String> {
-        override fun set(key: String, value: String) = dependency(key, value)
+    val dependencies = object : MapSetter<Identifier, SemanticVersion> {
+        override fun set(key: Identifier, value: SemanticVersion) = dependency(key, value)
     }
 
     /**
@@ -55,8 +53,8 @@ abstract class BuildConfiguration(private val project: Project) {
      * @param replacement Replacement string
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#swaps">Wiki</a>
      */
-    fun swap(identifier: String, replacement: String) {
-        data.swaps[validateId(identifier)] = replacement
+    fun swap(identifier: Identifier, replacement: String) {
+        data.swaps[identifier.validateId()] = replacement
     }
 
     /**
@@ -66,8 +64,8 @@ abstract class BuildConfiguration(private val project: Project) {
      * @param value Boolean value
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
      */
-    fun const(identifier: String, value: Boolean) {
-        data.constants[validateId(identifier)] = value
+    fun const(identifier: Identifier, value: Boolean) {
+        data.constants[identifier.validateId()] = value
     }
 
     /**
@@ -77,8 +75,8 @@ abstract class BuildConfiguration(private val project: Project) {
      * @param version Dependency version to check against in semantic version format
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#dependencies">Wiki</a>
      */
-    fun dependency(identifier: String, version: String) {
-        data.dependencies[validateId(identifier)] = validateSemver(version)
+    fun dependency(identifier: Identifier, version: SemanticVersion) {
+        data.dependencies[identifier.validateId()] = version.validateVersion()
     }
 
     /**
@@ -126,7 +124,7 @@ abstract class BuildConfiguration(private val project: Project) {
      * @param replacement Replacement string
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#swaps">Wiki</a>
      */
-    fun swap(identifier: String, replacement: () -> String) {
+    fun swap(identifier: Identifier, replacement: () -> String) {
         swap(identifier, replacement())
     }
 
@@ -136,7 +134,7 @@ abstract class BuildConfiguration(private val project: Project) {
      * @param values Entries of ids to replacements
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#swaps">Wiki</a>
      */
-    fun swaps(vararg values: Pair<String, String>) {
+    fun swaps(vararg values: Pair<Identifier, String>) {
         values.forEach { (id, str) -> swap(id, str) }
     }
 
@@ -146,7 +144,7 @@ abstract class BuildConfiguration(private val project: Project) {
      * @param values Entries of ids to replacements
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#swaps">Wiki</a>
      */
-    fun swaps(values: Iterable<Pair<String, String>>) {
+    fun swaps(values: Iterable<Pair<Identifier, String>>) {
         values.forEach { (id, str) -> swap(id, str) }
     }
 
@@ -157,7 +155,7 @@ abstract class BuildConfiguration(private val project: Project) {
      * @param value Boolean value
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
      */
-    fun const(identifier: String, value: () -> Boolean) {
+    fun const(identifier: Identifier, value: () -> Boolean) {
         const(identifier, value())
     }
 
@@ -167,7 +165,7 @@ abstract class BuildConfiguration(private val project: Project) {
      * @param values Entries of ids to boolean values
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
      */
-    fun consts(vararg values: Pair<String, Boolean>) {
+    fun consts(vararg values: Pair<Identifier, Boolean>) {
         values.forEach { (id, str) -> const(id, str) }
     }
 
@@ -177,7 +175,7 @@ abstract class BuildConfiguration(private val project: Project) {
      * @param values Entries of ids to boolean values
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
      */
-    fun consts(values: Iterable<Pair<String, Boolean>>) {
+    fun consts(values: Iterable<Pair<Identifier, Boolean>>) {
         values.forEach { (id, str) -> const(id, str) }
     }
 
@@ -188,7 +186,7 @@ abstract class BuildConfiguration(private val project: Project) {
      * @param choices The list of choices to create constants for.
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
      */
-    fun consts(value: String, vararg choices: String) {
+    fun consts(value: Identifier, vararg choices: Identifier) {
         choices.forEach { const(it, it == value) }
     }
 
@@ -199,7 +197,7 @@ abstract class BuildConfiguration(private val project: Project) {
      * @param choices The list of choices to create constants for.
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#constants">Wiki</a>
      */
-    fun consts(value: String, choices: Iterable<String>) {
+    fun consts(value: Identifier, choices: Iterable<Identifier>) {
         choices.forEach { const(it, it == value) }
     }
 
@@ -210,7 +208,7 @@ abstract class BuildConfiguration(private val project: Project) {
      * @param version Dependency version to check against in semantic version format
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#dependencies">Wiki</a>
      */
-    fun dependency(identifier: String, version: () -> String) {
+    fun dependency(identifier: Identifier, version: () -> SemanticVersion) {
         dependency(identifier, version())
     }
 
@@ -220,7 +218,7 @@ abstract class BuildConfiguration(private val project: Project) {
      * @param values Entries of ids to versions
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#dependencies">Wiki</a>
      */
-    fun dependencies(vararg values: Pair<String, String>) {
+    fun dependencies(vararg values: Pair<Identifier, SemanticVersion>) {
         values.forEach { (id, ver) -> dependency(id, ver) }
     }
 
@@ -230,7 +228,7 @@ abstract class BuildConfiguration(private val project: Project) {
      * @param values Entries of ids to versions
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#dependencies">Wiki</a>
      */
-    fun dependencies(values: Iterable<Pair<String, String>>) {
+    fun dependencies(values: Iterable<Pair<Identifier, SemanticVersion>>) {
         values.forEach { (id, ver) -> dependency(id, ver) }
     }
 
@@ -240,17 +238,5 @@ abstract class BuildConfiguration(private val project: Project) {
         dependencies.putAll(other.data.dependencies)
         excludedPaths.addAll(other.data.excludedPaths)
         excludedExtensions.addAll(other.data.excludedExtensions)
-    }
-
-    private fun validateId(id: String) = id.apply {
-        require(all { it.isValidIdentifier() }) { "Invalid identifier: $this" }
-    }
-
-    private fun validateSemver(version: String) = try {
-        VersionParser.parse(version, full = true).value
-    } catch (e: VersionParsingException) {
-        throw IllegalArgumentException("Invalid semantic version: $version").apply {
-            initCause(e)
-        }
     }
 }

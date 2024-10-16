@@ -1,13 +1,10 @@
 package dev.kikugie.stonecutter.settings
 
-import dev.kikugie.stonecutter.ProjectName
-import dev.kikugie.stonecutter.StonecutterProject
-import dev.kikugie.stonecutter.StonecutterUtility
+import dev.kikugie.stonecutter.*
 import dev.kikugie.stonecutter.controller.manager.GroovyController
 import dev.kikugie.stonecutter.controller.manager.KotlinController
 import dev.kikugie.stonecutter.data.container.ProjectParameterContainer
 import dev.kikugie.stonecutter.data.container.ProjectTreeContainer
-import dev.kikugie.stonecutter.sanitize
 import dev.kikugie.stonecutter.settings.builder.TreeBuilder
 import dev.kikugie.stonecutter.data.container.TreeBuilderContainer
 import org.gradle.api.initialization.ProjectDescriptor
@@ -18,8 +15,9 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.notExists
 
 /**
- * Represents the Stonecutter configuration in `settings.gradle[.kts]`.
- * @see TODO(wiki page)
+ * Configures versions used by Stonecutter and creates the corresponding Gradle projects.
+ *
+ * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#settings-settings-gradle-kts">Wiki page</a>
  */
 @Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterSettings(settings: Settings) : SettingsConfiguration(settings), StonecutterUtility {
@@ -30,13 +28,10 @@ open class StonecutterSettings(settings: Settings) : SettingsConfiguration(setti
      * Enables Kotlin buildscripts for the controller.
      * - `stonecutter.gradle` -> `stonecutter.gradle.kts`
      */
-    var kotlinController = false
+    var kotlinController: Boolean = false
 
-    /**
-     * Buildscript used by all subprojects.
-     * Defaults to `build.gradle`.
-     */
-    var centralScript = "build.gradle"
+    /**Buildscript used by all subprojects. Defaults to `build.gradle`.*/
+    var centralScript: String = "build.gradle"
         set(value) {
             require(!value.startsWith("stonecutter.gradle")) {
                 "Build script must not override the controller"
@@ -63,35 +58,36 @@ open class StonecutterSettings(settings: Settings) : SettingsConfiguration(setti
         }
 
         setup.nodes.forEach { (name, branch) ->
-            createBranch(name.sanitize(), project, setup, branch)
+            createBranch(name, project, setup, branch)
         }
     }
 
     private fun createBranch(
-        name: ProjectName,
+        name: Identifier,
         root: ProjectDescriptor,
         setup: TreeBuilder,
         branch: Collection<StonecutterProject>
     ) {
         require(branch.isNotEmpty()) { "Registered branch $name has no nodes" }
-        val scope = if (name.isEmpty()) root else get("${root.path.sanitize()}:$name")
-        val file = runCatching { setup.branches[name]!!.buildscript }.getOrNull() ?: centralScript
-        scope.projectDir.toPath().createDirectories()
-        scope.buildFileName = controller.filename
-        branch.forEach { createProject(scope, it, file) }
+        val project = if (name.isEmpty()) root else "${root.path}:$name".project()
+        project.projectDir.toPath().createDirectories()
+        project.buildFileName = controller.filename
+
+        val buildscript = runCatching { setup.branches[name]!!.buildscript }.getOrElse { centralScript }
+        branch.forEach { createProject(project, it, buildscript) }
     }
 
     private fun createProject(
         root: ProjectDescriptor,
         version: StonecutterProject,
-        build: String
+        buildscript: String
     ) {
-        val project = get("${root.path.sanitize()}:${version.project}")
+        val project = "${root.path}:${version.project}".project()
         val versionDir = File("${root.projectDir}/versions/${version.project}")
         versionDir.mkdirs()
 
         project.projectDir = versionDir
         project.name = version.project
-        project.buildFileName = "../../$build"
+        project.buildFileName = "../../$buildscript"
     }
 }

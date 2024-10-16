@@ -1,13 +1,13 @@
 package dev.kikugie.stonecutter.controller.manager
 
-import dev.kikugie.stonecutter.ProjectName
+import dev.kikugie.stonecutter.Identifier
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import kotlin.io.path.writeText
 
 internal object KotlinController : ControllerManager {
     override val filename = "stonecutter.gradle.kts"
-    override fun createHeader(file: Path, version: ProjectName) {
+    override fun createHeader(file: Path, version: Identifier) {
         file.writeText(
             """
             plugins {
@@ -23,6 +23,6 @@ internal object KotlinController : ControllerManager {
         )
     }
 
-    override fun updateHeader(file: Path, version: ProjectName) =
+    override fun updateHeader(file: Path, version: Identifier) =
         updateFileWithKey(file, filename, "stonecutter active \"$version\" $KEY")
 }

@@ -1,8 +1,8 @@
 package dev.kikugie.stonecutter.settings.builder
 
-import dev.kikugie.stonecutter.ProjectName
+import dev.kikugie.stonecutter.AnyVersion
+import dev.kikugie.stonecutter.Identifier
 import dev.kikugie.stonecutter.StonecutterProject
-import dev.kikugie.stonecutter.TargetVersion
 import dev.kikugie.stonecutter.settings.ProjectProvider
 import dev.kikugie.stonecutter.settings.StonecutterSettings
 
@@ -11,22 +11,19 @@ import dev.kikugie.stonecutter.settings.StonecutterSettings
  *
  * @param id Subproject's name for this branch
  */
-class BranchBuilder(private val tree: TreeBuilder, private val id: ProjectName) : ProjectProvider {
+class BranchBuilder internal constructor(private val tree: TreeBuilder, private val id: Identifier) : ProjectProvider {
     /**
      * Buildscript filename override for this branch.
-     * Defaults to the one set in the [StonecutterSettings] configuration scope.
+     * Defaults to [StonecutterSettings.centralScript].
      */
     lateinit var buildscript: String
 
-    override fun vers(
-        name: ProjectName,
-        version: TargetVersion
-    ) = tree.add(id, tree.find(StonecutterProject(name, version)))
+    override fun vers(name: Identifier, version: AnyVersion) =
+        tree.add(id, StonecutterProject(name, version))
 
     /**
      * Copies nodes registered in [TreeBuilder] to this branch
      */
-    fun inherit() = checkNotNull(tree.nodes[""]) {
-        "No root node to inherit from"
-    }.forEach { tree.add(id, it) }
+    fun inherit() = tree.nodes[""]?.forEach { tree.add(id, it) }
+        ?: error("No root node to inherit from")
 }

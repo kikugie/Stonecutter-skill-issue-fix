@@ -9,7 +9,9 @@ import org.gradle.api.tasks.Input
 import org.jetbrains.annotations.ApiStatus
 
 /**
- * Chiseled tasks allow Stonecutter to run specified jobs for all versions.
+ * Wrapper task Stonecutter uses to configure the delegate provided by [ofTask] to run on all [nodes].
+ *
+ * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#chiseled-tasks">Wiki page</a>
  */
 @Suppress("LeakingThis", "unused", "DEPRECATION")
 abstract class ChiseledTask : DefaultTask() {
@@ -19,14 +21,16 @@ abstract class ChiseledTask : DefaultTask() {
     private val setupTask: Task = project.tasks.getByName("chiseledStonecutter")
 
     /**
-     * Project tree nodes used by the task. Use [nodes] or [versions] function.
+     * Project tree nodes used by the task. Can be assigned directly,
+     * but using [versions] or [nodes] function is preferred.
      */
     @get:Input
     @get:ApiStatus.Internal
     abstract val nodes: ListProperty<ProjectNode>
 
     /**
-     * Versions used by the task.
+     * Version filter used by this task. Can be assigned directly,
+     * but using [versions] function is preferred.
      */
     @get:Input
     @get:ApiStatus.ScheduledForRemoval(inVersion = "0.6")
@@ -34,21 +38,17 @@ abstract class ChiseledTask : DefaultTask() {
     abstract val versions: ListProperty<StonecutterProject>
 
     /**
-     * Assigns nodes to execute this task on from the tree.
+     * Filters the nodes by the project instance.
      * **Accessing project properties in Groovy at this stage might be inaccurate.**
-     *
-     * @param selector Node filtering function
-     * @see ProjectNode
      */
     fun nodes(selector: (ProjectNode) -> Boolean) {
         nodes.set(tree.nodes.filter(selector))
     }
 
     /**
-     * Assigns nodes to execute this task on from the tree.
+     * Filters the nodes by the branch name and the project metadata.
+     * If you're not using multi-platform builds, the branch parameter can be ignored.
      *
-     * @param selector Node filtering function
-     * @see NodeFilter
      * @see StonecutterProject
      */
     fun versions(selector: NodeFilter) {
@@ -77,17 +77,9 @@ abstract class ChiseledTask : DefaultTask() {
         }
     }
 
-    /**
-     * Filtering function for nodes, independent from the underlying Gradle project.
-     */
+    /**Filtering function for nodes, independent from the underlying Gradle project.*/
     fun interface NodeFilter {
-        /**
-         * Invokes the filter function for a given project branch and version.
-         *
-         * @param branch The name of the project branch
-         * @param version The Stonecutter project version
-         * @return A boolean indicating whether the filter criteria are met
-         */
-        operator fun invoke(branch: ProjectName, version: StonecutterProject): Boolean
+        /**Invokes the filter function for the given project [branch] and [version].*/
+        operator fun invoke(branch: Identifier, version: StonecutterProject): Boolean
     }
 }
