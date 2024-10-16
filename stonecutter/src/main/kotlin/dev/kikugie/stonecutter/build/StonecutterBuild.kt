@@ -73,7 +73,7 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
 
     private fun Project.configure() {
         tasks.register("setupChiseledBuild", StonecutterTask::class.java) {
-            parameters.set(params)
+            params.set(this@StonecutterBuild.params)
             toVersion.set(current)
             fromVersion.set(active)
 
@@ -96,7 +96,7 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
 
     private fun Project.configureSources() {
         try {
-            val useChiseledSrc = params.hasChiseled(gradle.startParameter.taskNames)
+            val useChiseledSrc = params.process && params.hasChiseled(gradle.startParameter.taskNames)
             val formatter: (Path) -> Any = when {
                 useChiseledSrc -> { src -> File(buildDirectoryFile, "chiseledSrc/$src") }
                 current.isActive -> { src -> "../../src/$src" }

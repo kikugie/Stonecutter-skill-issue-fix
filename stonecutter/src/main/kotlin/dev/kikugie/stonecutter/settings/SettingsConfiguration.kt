@@ -2,6 +2,7 @@ package dev.kikugie.stonecutter.settings
 
 import dev.kikugie.stonecutter.BNAN
 import dev.kikugie.stonecutter.ProjectPath
+import dev.kikugie.stonecutter.removeStarting
 import dev.kikugie.stonecutter.settings.builder.TreeBuilder
 import org.gradle.api.Action
 import org.gradle.api.initialization.ProjectDescriptor
@@ -67,11 +68,11 @@ abstract class SettingsConfiguration(private val settings: Settings) {
 
     protected abstract fun create(project: ProjectDescriptor, setup: TreeBuilder)
 
-    protected fun ProjectPath.project(): ProjectDescriptor = with(this.removePrefix(":")) {
-        if (isEmpty()) settings.rootProject
+    protected fun ProjectPath.project(): ProjectDescriptor = removeStarting(':').let {
+        if (it.isEmpty()) settings.rootProject
         else {
-            settings.include(this)
-            settings.project(":$this")
+            settings.include(it)
+            settings.project(":$it")
         }
     }
 }

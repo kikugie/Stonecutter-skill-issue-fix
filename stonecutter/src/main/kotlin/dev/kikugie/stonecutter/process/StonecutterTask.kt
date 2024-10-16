@@ -51,7 +51,7 @@ abstract class StonecutterTask : DefaultTask() {
 
     /**Parameters set by [StonecutterController].*/
     @get:Input
-    abstract val parameters: Property<GlobalParameters>
+    abstract val params: Property<GlobalParameters>
 
     private val statistics: ProcessStatistics = ProcessStatistics()
 
@@ -61,7 +61,7 @@ abstract class StonecutterTask : DefaultTask() {
      */
     @TaskAction
     fun run() {
-        if (!parameters.get().process) println("Switched to ${toVersion.get().project} (skipped file processing)")
+        if (!params.get().process) println("Switched to ${toVersion.get().project} (skipped file processing)")
             .also { return }
         val callbacks = mutableListOf<() -> Unit>()
         val errors = mutableListOf<Throwable>()
@@ -105,9 +105,9 @@ abstract class StonecutterTask : DefaultTask() {
             params.toFileFilter(),
             Charsets.UTF_8,
             CommentRecognizers.DEFAULT,
-            params.toTransformParams(toVersion.get().version, parameters.get().receiver),
+            params.toTransformParams(toVersion.get().version, this.params.get().receiver),
             statistics,
-            parameters.get().debug
+            this.params.get().debug
         )
         val message = buildString {
             appendLine("Processing branch ${branch.path}...")

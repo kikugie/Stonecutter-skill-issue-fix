@@ -13,7 +13,7 @@ object ModelLoader {
     fun <T> save(location: Path, model: T, serializer: KSerializer<T>): Result<Unit> = location.runCatching {
         val yaml = Yaml.default.encodeToString(serializer, model)
         parent.createDirectories()
-        .writeText(
+        writeText(
             yaml,
             Charsets.UTF_8,
             StandardOpenOption.WRITE,

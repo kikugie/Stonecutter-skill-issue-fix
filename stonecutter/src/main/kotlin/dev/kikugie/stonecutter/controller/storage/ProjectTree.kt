@@ -3,6 +3,7 @@ package dev.kikugie.stonecutter.controller.storage
 import dev.kikugie.stonecutter.Identifier
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.controller.StonecutterController
+import dev.kikugie.stonecutter.removeStarting
 import dev.kikugie.stonecutter.settings.builder.TreeBuilder
 import org.gradle.api.Project
 import java.nio.file.Path
@@ -56,5 +57,5 @@ data class ProjectTree(
      *
      * @param project Project reference
      */
-    operator fun get(project: Project) = get(project.path.removePrefix(":"))
+    operator fun get(project: Project) = get(project.path.removeStarting(':'))
 }

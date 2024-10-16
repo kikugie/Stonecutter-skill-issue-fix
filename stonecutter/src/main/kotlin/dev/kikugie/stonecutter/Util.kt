@@ -52,6 +52,12 @@ internal fun SemanticVersion.validateVersion() = try {
 
 internal fun Path.isAvailable() = exists() && isRegularFile() && isReadable()
 
+internal fun String.removeStarting(char: Char): String {
+    var index = 0
+    while (index < length && get(index) == char) index++
+    return substring(index)
+}
+
 /**
  * Delegates set operation. Meant to be used with Kotlin DSL.
  *

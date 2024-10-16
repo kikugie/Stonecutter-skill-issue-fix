@@ -154,15 +154,6 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     }
 
     private fun setupProject() {
-        createStonecutterTask("Reset active project", tree.vcs) {
-            "Sets active version to ${tree.vcs.project}. Run this before making a commit."
-        }
-        createStonecutterTask("Refresh active project", tree.current) {
-            "Runs the comment processor on the active version. Useful for fixing comments in wrong states."
-        }
-        for (it in versions) createStonecutterTask("Set active project to ${it.project}", it) {
-            "Sets the active project to ${it.project}, processing all versioned comments."
-        }
         if (automaticPlatformConstants) configurePlatforms(tree.nodes)
 
         // Apply configurations
@@ -171,10 +162,20 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
             actions.forEach { it.execute(holder) }
             configurations[br to ver] = holder
         }
-        
+
         tree.nodes.forEach {
             configurations[it.branch to it.metadata]?.run { it.stonecutter.from(this) }
             for (build in builds) build.execute(it.stonecutter)
+        }
+
+        createStonecutterTask("Reset active project", tree.vcs) {
+            "Sets active version to ${tree.vcs.project}. Run this before making a commit."
+        }
+        createStonecutterTask("Refresh active project", tree.current) {
+            "Runs the comment processor on the active version. Useful for fixing comments in wrong states."
+        }
+        for (it in versions) createStonecutterTask("Set active project to ${it.project}", it) {
+            "Sets the active project to ${it.project}, processing all versioned comments."
         }
 
         serializeTree()
@@ -185,13 +186,13 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         createStonecutterTask(name, version, desc())
 
     private fun createStonecutterTask(
-        name: Identifier,
+        name: String,
         version: StonecutterProject,
         desc: String,
     ) {
         root.tasks.create<StonecutterTask>(name) {
             val builds = tree.branches.associateWith {
-                it[name]?.extensions?.getByType<StonecutterBuild>()?.data
+                it[version.project]?.stonecutter?.data
                     ?: configurations[it to version]?.data
                     ?: BuildParameters()
             }
@@ -200,7 +201,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
             group = "stonecutter"
             description = desc
 
-            parameters.set(this.parameters)
+            params.set(parameters)
             toVersion.set(version)
             fromVersion.set(tree.current)
 
