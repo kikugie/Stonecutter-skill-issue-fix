@@ -21,7 +21,7 @@ class TreeBuilder internal constructor() : ProjectProvider {
         get() = field ?: versions.values.firstOrNull()?.project
         set(value) {
             requireNotNull(value) { "`vcsVersion` must be set to a non-null value." }
-            require(value in versions.values.map { it.project }) { "Version $value is not present in the tree." }
+            require(value in versions.values.map { it.project }) { "Version $value is not registered." }
             field = value
         }
     internal val vcsProject

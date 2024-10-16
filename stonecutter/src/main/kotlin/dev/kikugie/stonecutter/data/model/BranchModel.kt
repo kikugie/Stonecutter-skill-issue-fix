@@ -5,7 +5,6 @@ package dev.kikugie.stonecutter.data.model
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.controller.storage.ProjectBranch
 import dev.kikugie.stonecutter.data.PathSerializer
-import dev.kikugie.stonecutter.data.model.TreeModel.Companion.FILE
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
