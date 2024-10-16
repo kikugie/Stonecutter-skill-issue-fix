@@ -1,6 +1,5 @@
 package dev.kikugie.stonecutter.controller.storage
 
-import dev.kikugie.stonecutter.TaskName
 import dev.kikugie.stonecutter.controller.ControllerParameters
 import kotlinx.serialization.Serializable
 
@@ -13,8 +12,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GlobalParameters(
     var debug: Boolean = false,
-    val chiseled: MutableSet<TaskName> = mutableSetOf()
+    val chiseled: MutableSet<String> = mutableSetOf()
 ) {
-    internal fun addTask(task: TaskName) = chiseled.add(task)
-    internal fun hasChiseled(stack: Iterable<TaskName>) = stack.any { it in chiseled }
+    internal fun addTask(task: String) = chiseled.add(task)
+    internal fun hasChiseled(stack: Iterable<String>) = stack.any { it in chiseled }
 }

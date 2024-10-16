@@ -20,11 +20,12 @@ import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.invariantSeparatorsPathString
 
+// link: wiki-build
 /**
  * Stonecutter plugin applied to the versioned buildscript.
  *
  * @property project This plugin's project
- * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration">Wiki</a>
+ * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#versioning-build-gradle-kts">Wiki page</a>
  */
 @OptIn(ExperimentalPathApi::class)
 @Suppress("MemberVisibilityCanBePrivate")
@@ -52,26 +53,18 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
         "Branch '$parent' not found in [${tree.keys.joinToString { "'$it'" }}]"
     }
 
-    /**
-     * This project's node. Contains this project's metadata and provides API for traversing the tree.
-     */
+    /**This project's node. Contains this project's metadata and provides an interface for traversing the tree.*/
     val node: ProjectNode = requireNotNull(branch[project]) {
         "Project '$project' is not found in the branch {${branch.keys.joinToString { "'$it'" }}]"
     }
 
-    /**
-     * All version in this project's branch.
-     */
+    /**All versions in this project's branch.*/
     val versions: Collection<StonecutterProject> get() = branch.versions
 
-    /**
-     * The currently active version. Global for all instances of the build file.
-     */
+    /**The currently active version. Global for all instances of the build file.*/
     val active: StonecutterProject get() = tree.current
 
-    /**
-     * Metadata of the currently processed version.
-     */
+    /**Metadata of the currently processed version.*/
     val current: StonecutterProject = node.metadata
 
     init {
@@ -134,14 +127,13 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
     }
 
     private fun serializeNode() {
-        val model = NodeModel(
+        NodeModel(
             current,
             node.path.relativize(tree.path),
             branch.toBranchInfo(node.path.relativize(branch.path)),
             current.isActive,
             data,
-        )
-        NodeModel.save(node.stonecutterCachePath, model, NodeModel.serializer()).onFailure {
+        ).save(node.stonecutterCachePath).onFailure {
             node.logger.warn("Failed to save node model for '${branch.name}:${current.project}'", it)
         }
     }

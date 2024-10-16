@@ -30,14 +30,8 @@ data class BuildParameters(
     ),
     val excludedPaths: MutableSet<Path> = mutableSetOf()
 ) {
-    /**
-     * Creates parameters used by the file processor.
-     *
-     * @param version Version used for implicit checks (i.e. `? if <1.20`)
-     * @param key Key used for default explicit checks. Defaults to `minecraft` (i.e. `? if <1.20` == `? if minecraft: <1.20`)
-     * @return Parameters used by the parser and AST transformer
-     */
-    fun toTransformParams(version: String, key: String = "minecraft"): TransformParameters = with(dependencies) {
+    /**Creates parameters used by the file processor.*/
+    internal fun toTransformParams(version: String, key: String = "minecraft"): TransformParameters = with(dependencies) {
         getOrElse(key) { VersionParser.parseLenient(version).value }.let {
             put(key, it)
             put("", it)
@@ -45,8 +39,6 @@ data class BuildParameters(
         TransformParameters(swaps, constants, this)
     }
 
-    /**
-     * Creates a [FileFilter] from the specified excluded paths and extensions.
-     */
-    fun toFileFilter() = FileFilter(excludedExtensions, excludedPaths)
+    /**Creates a [FileFilter] from the specified excluded paths and extensions.*/
+    internal fun toFileFilter() = FileFilter(excludedExtensions, excludedPaths)
 }

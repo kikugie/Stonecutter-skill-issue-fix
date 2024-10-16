@@ -27,10 +27,11 @@ import org.gradle.kotlin.dsl.getByType
 
 internal typealias BranchEntry = Pair<ProjectBranch, StonecutterProject>
 
+// link: wiki-controller
 /**
  * Stonecutter plugin applied to `stonecutter.gradle[.kts]`.
  *
- * @see <a href="https://stonecutter.kikugie.dev/stonecutter/setup#project-controller">Wiki</a>
+ * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#controller-stonecutter-gradle-kts">Wiki page</a>
  */
 @Suppress("MemberVisibilityCanBePrivate")
 open class StonecutterController(internal val root: Project) : StonecutterUtility, ControllerParameters {
@@ -45,29 +46,23 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     private val builds: MutableList<Action<StonecutterBuild>> = mutableListOf()
     private val parameters: GlobalParameters = GlobalParameters()
 
-    /**
-     * The full project tree this controller operates on. The default branch is `""`.
-     */
+    /**The full project tree this controller operates on. The default branch is `""`.*/
     val tree: ProjectTree
 
-    /**
-     * Version control project used by `Reset active project` task.
-     */
+    /**Version control project used by `Reset active project` task.*/
     val vcsVersion: StonecutterProject get() = tree.vcs
 
-    /**
-     * All versions registered in the tree. Branches may have the same or a subset of these.
-     */
+    /**All versions registered in the tree. Branches may have the same or a subset of these.*/
     val versions: Collection<StonecutterProject> get() = tree.versions
 
+    // link: wiki-controller-active
     /**
      * The active version selected by `stonecutter.active "..."` call.
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#active-version">Wiki page</a>
      */
     val current: StonecutterProject get() = tree.current
 
-    /**
-     * Type of the chiseled task. Use in [registerChiseled].
-     */
+    /**Type of the chiseled task. Used with [registerChiseled].*/
     val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
 
     override var automaticPlatformConstants: Boolean = false
@@ -89,29 +84,32 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     /**
      * Sets the active project. **DO NOT call on your own**
      *
-     * @param name Name of the active project
+     * @see stonecutter
      */
-    infix fun active(name: ProjectName) = with(tree) {
+    infix fun active(name: Identifier) = with(tree) {
         current.isActive = false
         current = versions.find { it.project == name } ?: error("Project $name is not registered in ${root.path}")
         current.isActive = true
     }
 
+    // link: wiki-controller-active
     /**
      * Registers the task as chiseled. This is required for all tasks that need to build all versions.
      *
-     * @param provider Task configuration
+     * @see [ChiseledTask]
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#active-version">Wiki page</a>
      */
     infix fun registerChiseled(provider: TaskProvider<*>) {
         parameters.addTask(provider.name)
     }
 
+    // link: wiki-controller-params
     /**
      * Specifies configurations for all combinations of versions and branches.
-     * This provides parameters for non-existing versions to be used by the processor.
+     * This provides parameters for the processor to use non-existing versions.
      * If the given version exists, it will be applied to the [StonecutterBuild].
      *
-     * @param configuration Configuration scope
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#global-parameters">Wiki page</a>
      */
     infix fun parameters(configuration: Action<ParameterHolder>) = tree.branches.asSequence().flatMap { br ->
         versions.map { br to it }
@@ -186,7 +184,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         createStonecutterTask(name, version, desc())
 
     private fun createStonecutterTask(
-        name: ProjectName,
+        name: Identifier,
         version: StonecutterProject,
         desc: String,
     ) {
@@ -232,25 +230,23 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     }
 
     private fun serializeTree() = with(tree) {
-        val model = TreeModel(
+        TreeModel(
             vcsVersion,
             current,
             branches.map { it.toBranchInfo(path.relativize(it.path)) },
             nodes.map { it.toNodeInfo(path.relativize(it.path), current) },
             parameters,
-        )
-        TreeModel.save(stonecutterCachePath, model, TreeModel.serializer()).onFailure {
+        ).save(stonecutterCachePath).onFailure {
             logger.warn("Failed to save tree model", it)
         }
     }
 
     private fun serializeBranches() = tree.branches.onEach {
-        val model = BranchModel(
+        BranchModel(
             id,
             path.relativize(tree.path),
             nodes.map { it.toNodeInfo(it.path.relativize(tree.path), current) },
-        )
-        BranchModel.save(stonecutterCachePath, model, BranchModel.serializer()).onFailure {
+        ).save(stonecutterCachePath).onFailure {
             logger.warn("Failed to save branch model for '$name'", it)
         }
     }

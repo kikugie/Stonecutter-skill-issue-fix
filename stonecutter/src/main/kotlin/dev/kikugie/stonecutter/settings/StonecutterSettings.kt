@@ -14,6 +14,7 @@ import java.io.File
 import kotlin.io.path.createDirectories
 import kotlin.io.path.notExists
 
+// link: wiki-settings
 /**
  * Configures versions used by Stonecutter and creates the corresponding Gradle projects.
  *

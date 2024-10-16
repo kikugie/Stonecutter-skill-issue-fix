@@ -1,6 +1,6 @@
 package dev.kikugie.stonecutter.controller.storage
 
-import dev.kikugie.stonecutter.ProjectName
+import dev.kikugie.stonecutter.Identifier
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.build.StonecutterBuild
 import dev.kikugie.stonecutter.controller.storage.ProjectBranch.Companion.get
@@ -42,7 +42,7 @@ data class ProjectNode(
      * @param node Name of the node. Should be an existing [StonecutterProject.project]
      * @return Found [ProjectNode] or null if it doesn't exist
      */
-    fun peer(node: ProjectName): ProjectNode? = branch[node]
+    fun peer(node: Identifier): ProjectNode? = branch[node]
 
     /**
      * Finds the same node in the given branch.
@@ -50,7 +50,7 @@ data class ProjectNode(
      * @param branch Branch name. `""` targets the root branch
      * @return Found [ProjectNode] or null if it doesn't exist
      */
-    fun sibling(branch: ProjectName): ProjectNode? = this.branch.tree[branch][metadata.project]
+    fun sibling(branch: Identifier): ProjectNode? = this.branch.tree[branch][metadata.project]
 
     /**
      * Finds the given node in another branch.
@@ -59,5 +59,5 @@ data class ProjectNode(
      * @param node Name of the node. Should be an existing [StonecutterProject.project]
      * @return Found [ProjectNode] or null if it doesn't exist
      */
-    fun find(branch: ProjectName, node: ProjectName): ProjectNode? = this.branch.tree[branch][node]
+    fun find(branch: Identifier, node: Identifier): ProjectNode? = this.branch.tree[branch][node]
 }

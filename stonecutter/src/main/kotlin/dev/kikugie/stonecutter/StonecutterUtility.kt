@@ -6,6 +6,7 @@ import dev.kikugie.stonecutter.controller.StonecutterController
 import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.Contract
 
+// link: wiki-eval
 /**
  * Provides a set of pure functions to ease Stonecutter configurations.
  * Available in [StonecutterBuild] and [StonecutterController].
@@ -17,7 +18,6 @@ interface StonecutterUtility {
      * Parses both parameters as [SemanticVersion] and compares them.
      *
      * @return 1 if the first version is greater, -1 if the second is greater, 0 if they are equal
-     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
     @Contract(pure = true)
     @ApiStatus.Obsolete
@@ -30,7 +30,6 @@ interface StonecutterUtility {
      * Parses both parameters as [SemanticVersion] or [AnyVersion] and compares them.
      *
      * @return 1 if the first version is greater, -1 if the second is greater, 0 if they are equal
-     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
     @Contract(pure = true)
     @ApiStatus.Obsolete
@@ -44,7 +43,6 @@ interface StonecutterUtility {
      * This function is available inside a `stonecutter` block when using Kotlin DSL.
      *
      * @return 1 if the first version is greater, -1 if the second is greater, 0 if they are equal
-     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
      */
     @Suppress("DEPRECATION")
     @Contract(pure = true)
@@ -53,11 +51,13 @@ interface StonecutterUtility {
     @Deprecated("Use `eval()` instead", ReplaceWith("eval(this, other)"))
     infix fun SemanticVersion.comp(other: SemanticVersion) = compare(this, other)
 
+    // link: wiki-eval
     /**
      * Evaluates the passed version as [SemanticVersion] and compares to the given predicate(s).
      *
      * @return `true` if all predicates succeed
-     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
+     * @see [VersionParser.parsePredicate]
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#checking-versions">Wiki page</a>
      */
     @Contract(pure = true)
     fun eval(version: SemanticVersion, predicate: String): Boolean {
@@ -67,11 +67,13 @@ interface StonecutterUtility {
         }
     }
 
+    // link: wiki-eval
     /**
      * Evaluates the passed version as [SemanticVersion] or [AnyVersion] and compares to the given predicate(s).
      *
      * @return `true` if all predicates succeed
-     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/configuration.html#comparisons">Wiki</a>
+     * @see [VersionParser.parsePredicateLenient]
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#checking-versions">Wiki page</a>
      */
     @Contract(pure = true)
     fun evalLenient(version: AnyVersion, predicate: String): Boolean {

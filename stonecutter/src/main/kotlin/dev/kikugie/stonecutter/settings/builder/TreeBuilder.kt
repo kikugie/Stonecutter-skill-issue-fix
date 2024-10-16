@@ -9,16 +9,14 @@ internal typealias NodeMap = MutableMap<Identifier, Nodes>
 
 /**
  * Represents a project tree structure in the `settings.gradle[.kts]` file.
- * This tree only supports 3 layers of depth: `root -> branch -> node`.
+ * This tree only supports three layers of depth: `root -> branch -> node`.
  */
 class TreeBuilder internal constructor() : ProjectProvider {
     internal val versions: MutableMap<StonecutterProject, StonecutterProject> = mutableMapOf()
     internal val nodes: NodeMap = mutableMapOf()
     internal val branches: MutableMap<Identifier, BranchBuilder> = mutableMapOf()
 
-    /**
-     * Version used by the `Reset active project` task. Defaults to the first registered version.
-     */
+    /**Version used by the `Reset active project` task. Defaults to the first registered version.*/
     var vcsVersion: AnyVersion? = null
         get() = field ?: versions.values.firstOrNull()?.project
         set(value) {
@@ -40,19 +38,10 @@ class TreeBuilder internal constructor() : ProjectProvider {
     override fun vers(name: Identifier, version: AnyVersion) =
         add("", StonecutterProject(name, version))
 
-    /**
-     * Creates an inherited branch, which copies all the versions specified in this block.
-     *
-     * @param name Subproject's name for this branch
-     */
+    /**Creates an inherited branch, which copies all the versions specified in this block.*/
     fun branch(name: Identifier) = branch(name) { inherit() }
 
-    /**
-     * Creates a new branch in this tree with the provided configuration.
-     *
-     * @param name Subproject's name for this branch
-     * @param action Branch configuration
-     */
+    /**Creates a new branch in this tree with the provided configuration.*/
     fun branch(name: Identifier, action: Action<BranchBuilder>) {
         require(name.isNotBlank()) { "Branch name cannot be blank" }
         require(name.isValid()) { "Invalid branch name: '$name'" }

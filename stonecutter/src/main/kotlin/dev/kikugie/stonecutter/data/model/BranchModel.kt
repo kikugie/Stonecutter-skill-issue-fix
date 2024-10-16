@@ -3,7 +3,9 @@
 package dev.kikugie.stonecutter.data.model
 
 import dev.kikugie.stonecutter.StonecutterProject
+import dev.kikugie.stonecutter.controller.storage.ProjectBranch
 import dev.kikugie.stonecutter.data.PathSerializer
+import dev.kikugie.stonecutter.data.model.TreeModel.Companion.FILE
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
@@ -30,10 +32,13 @@ data class BranchModel(
     @Transient
     val versions: Set<StonecutterProject> = nodes.map { it.metadata }.toSet()
 
-    /**
-     * Branch model loader. *This is peak documentation.*
-     */
-    companion object : ModelLoader<BranchModel> {
-        override val filename = "branch.yml"
+    /**Saves the model to [FILE] in the given [directory] in the YAML format.*/
+    fun save(directory: Path) = ModelLoader.save(directory.resolve(FILE), this, serializer())
+
+    companion object {
+        /**Filename used to save and load the model*/
+        const val FILE = "branch.yml"
+        /**Loads model from the [FILE] in the given [directory].*/
+        @JvmStatic fun load(directory: Path) = ModelLoader.load(directory.resolve(FILE), serializer())
     }
 }

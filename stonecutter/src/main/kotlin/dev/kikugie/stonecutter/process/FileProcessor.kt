@@ -31,19 +31,8 @@ import kotlin.io.path.*
 
 private typealias ChecksumMap = MutableMap<String, ByteArray>
 
-/**
- * Represents a class for processing files.
- *
- * @property dirs The directory data containing the root and destination directories
- * @property filter The file filter used to determine which files to process
- * @property charset The character set used for reading and writing files. Defaults to UTF-8
- * @property recognizers The comment recognizers used for parsing and transforming files
- * @property params The transform parameters used for file transformation
- * @property statistics The process statistics for tracking the number of files processed
- * @property debug Determines whether debug mode is enabled
- */
 @OptIn(ExperimentalPathApi::class, ExperimentalEncodingApi::class, ExperimentalSerializationApi::class)
-class FileProcessor(
+internal class FileProcessor(
     private val dirs: DirectoryData,
     private val filter: FileFilter,
     private val charset: Charset,
@@ -78,20 +67,9 @@ class FileProcessor(
         }
     }
 
-    /**
-     * Processes a single file with a [LogCollector] assigned.
-     *
-     * @property source Source file relative to [dirs]
-     */
     inner class EntryProcessor(private val source: Path) {
         internal val collector = LogCollector(LOGGER, dirs.root.resolve(source), debug)
 
-        /**
-         * Processes the [source] file.
-         *
-         * @return `null` if the file is filtered or identical and should be skipped, otherwise the text to be written
-         * @throws [ProcessException] with nested exceptions for all reported syntax errors
-         */
         fun process(): String? {
             statistics.total++
             if (!filter(source)) return null logging "Skipping, filtered"
@@ -177,13 +155,6 @@ class FileProcessor(
         }
     }
 
-    /**
-     * Processes all files in the branch.
-     *
-     * @return Callback to apply the file changes
-     * @throws [ProcessException] with suppressed exceptions for each file's syntax errors
-     * and potentially other uncaught exceptions.
-     */
     fun process(): () -> Unit {
         if (dirs.temp.exists()) dirs.temp.deleteRecursively()
 

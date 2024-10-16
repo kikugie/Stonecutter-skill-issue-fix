@@ -4,10 +4,12 @@ package dev.kikugie.stonecutter.data.model
 
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.controller.storage.GlobalParameters
+import dev.kikugie.stonecutter.controller.storage.ProjectTree
 import dev.kikugie.stonecutter.data.PathSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
+import java.nio.file.Path
 
 /**
  * Represents the project tree saved on the disk.
@@ -33,10 +35,13 @@ data class TreeModel(
     @Transient
     val versions: Set<StonecutterProject> = nodes.map { it.metadata }.toSet()
 
-    /**
-     * Tree model loader. *This is peak documentation.*
-     */
-    companion object : ModelLoader<TreeModel> {
-        override val filename = "tree.yml"
+    /**Saves the model to [FILE] in the given [directory] in the YAML format.*/
+    fun save(directory: Path) = ModelLoader.save(directory.resolve(FILE), this, serializer())
+
+    companion object {
+        /**Filename used to save and load the model*/
+        const val FILE = "tree.yml"
+        /**Loads model from the [FILE] in the given [directory].*/
+        @JvmStatic fun load(directory: Path) = ModelLoader.load(directory.resolve(FILE), serializer())
     }
 }

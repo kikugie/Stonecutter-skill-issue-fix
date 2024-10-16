@@ -1,6 +1,5 @@
 package dev.kikugie.stonecutter.settings
 
-import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.stonecutter.*
 import dev.kikugie.stonecutter.settings.builder.TreeBuilder
 
@@ -11,17 +10,12 @@ import dev.kikugie.stonecutter.settings.builder.TreeBuilder
 interface ProjectProvider {
     /**
      * Registers a [StonecutterProject] with separate project directory and version.
-     *
-     * @param name Identifier for this subproject. Used in `versions/$name`
-     * @param version Version used by the comment processor to compare against.
      * Recommended to use a [SemanticVersion], but plain string values are accepted too.
      */
     fun vers(name: Identifier, version: AnyVersion)
 
     /**
      * Registers multiple [StonecutterProject]s with the same directory and target versions.
-     *
-     * @param versions Version and project identifiers.
      * Recommended to use a [SemanticVersion], but plain string values are accepted too.
      */
     fun versions(versions: Iterable<AnyVersion>) =
@@ -29,8 +23,6 @@ interface ProjectProvider {
 
     /**
      * Registers multiple [StonecutterProject]s with the same directory and target versions.
-     *
-     * @param versions Version and project identifiers.
      * Recommended to use a [SemanticVersion], but plain string values are accepted too.
      */
     fun versions(vararg versions: AnyVersion) =

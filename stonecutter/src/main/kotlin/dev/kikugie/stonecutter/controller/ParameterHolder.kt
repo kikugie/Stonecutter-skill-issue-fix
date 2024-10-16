@@ -6,12 +6,15 @@ import dev.kikugie.stonecutter.build.BuildConfiguration
 import dev.kikugie.stonecutter.controller.storage.ProjectBranch
 import dev.kikugie.stonecutter.controller.storage.ProjectNode
 
+// link: wiki-controller-params
 /**
  * Stores parameters configured in [StonecutterController.parameters].
  *
  * @property branch Currently processed branch
  * @property metadata Currently processed version.
  * **May not exist in the given branch**, but you should still provide the same set of parameters
+ *
+ * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#global-parameters">Wiki page</a>
  */
 class ParameterHolder(
     val branch: ProjectBranch,

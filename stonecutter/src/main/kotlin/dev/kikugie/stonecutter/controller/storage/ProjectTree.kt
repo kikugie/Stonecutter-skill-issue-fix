@@ -1,10 +1,9 @@
 package dev.kikugie.stonecutter.controller.storage
 
-import dev.kikugie.stonecutter.ProjectName
+import dev.kikugie.stonecutter.Identifier
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.controller.StonecutterController
 import dev.kikugie.stonecutter.settings.builder.TreeBuilder
-import dev.kikugie.stonecutter.sanitize
 import org.gradle.api.Project
 import java.nio.file.Path
 
@@ -20,8 +19,8 @@ import java.nio.file.Path
 data class ProjectTree(
     private val project: Project,
     val vcs: StonecutterProject,
-    private val _branches: Map<ProjectName, ProjectBranch>,
-) : Map<ProjectName, ProjectBranch> by _branches, Project by project {
+    private val _branches: Map<Identifier, ProjectBranch>,
+) : Map<Identifier, ProjectBranch> by _branches, Project by project {
     /**
      * Location of this tree on the disk.
      */
@@ -57,5 +56,5 @@ data class ProjectTree(
      *
      * @param project Project reference
      */
-    operator fun get(project: Project) = get(project.path.sanitize())
+    operator fun get(project: Project) = get(project.path.removePrefix(":"))
 }

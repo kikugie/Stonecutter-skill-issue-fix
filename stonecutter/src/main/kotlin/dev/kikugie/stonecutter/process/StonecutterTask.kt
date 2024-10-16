@@ -57,7 +57,7 @@ abstract class StonecutterTask : DefaultTask() {
     /**
      * Root directory provider for each version.
      * This is usually node's `build/stonecutter-cache`, however if it's not available
-     * branche's `build/stonecutter-cache/out-of-bounds/$project` is used.
+     * branch's `build/stonecutter-cache/out-of-bounds/$project` is used.
      */
     @get:Input
     abstract val cacheDir: Property<(ProjectBranch, StonecutterProject) -> Path>
@@ -71,7 +71,7 @@ abstract class StonecutterTask : DefaultTask() {
     private val statistics: ProcessStatistics = ProcessStatistics()
 
     /**
-     * Transforms the given branches. If no errors were reported applies the changes,
+     * Transforms the given branches. If no errors were reported, applies the changes,
      * otherwise prints the errors and throws and exception.
      */
     @TaskAction

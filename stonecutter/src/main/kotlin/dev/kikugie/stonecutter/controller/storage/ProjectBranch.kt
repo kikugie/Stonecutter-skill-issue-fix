@@ -1,6 +1,6 @@
 package dev.kikugie.stonecutter.controller.storage
 
-import dev.kikugie.stonecutter.ProjectName
+import dev.kikugie.stonecutter.Identifier
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.stonecutterCachePath
 import org.gradle.api.Project
@@ -17,11 +17,11 @@ import java.nio.file.Path
  */
 data class ProjectBranch(
     private val project: Project,
-    val id: ProjectName,
-    private val _nodes: Map<ProjectName, ProjectNode>,
-): Map<ProjectName, ProjectNode> by _nodes, Project by project {
+    val id: Identifier,
+    private val _nodes: Map<Identifier, ProjectNode>,
+): Map<Identifier, ProjectNode> by _nodes, Project by project {
     internal companion object {
-        operator fun ProjectBranch?.get(project: ProjectName) = this?.get(project)
+        operator fun ProjectBranch?.get(project: Identifier) = this?.get(project)
     }
 
     /**

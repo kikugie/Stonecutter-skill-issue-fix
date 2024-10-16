@@ -5,6 +5,7 @@ package dev.kikugie.stonecutter.data.model
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.build.BuildParameters
 import dev.kikugie.stonecutter.data.PathSerializer
+import dev.kikugie.stonecutter.data.model.TreeModel.Companion.FILE
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import java.nio.file.Path
@@ -27,10 +28,13 @@ data class NodeModel(
     val active: Boolean,
     val parameters: BuildParameters
 ) {
-    /**
-     * Node model loader. *This is peak documentation.*
-     */
-    companion object : ModelLoader<NodeModel> {
-        override val filename = "node.yml"
+    /**Saves the model to [FILE] in the given [directory] in the YAML format.*/
+    fun save(directory: Path) = ModelLoader.save(directory.resolve(FILE), this, serializer())
+
+    companion object {
+        /**Filename used to save and load the model*/
+        const val FILE = "node.yml"
+        /**Loads model from the [FILE] in the given [directory].*/
+        @JvmStatic fun load(directory: Path) = ModelLoader.load(directory.resolve(FILE), serializer())
     }
 }

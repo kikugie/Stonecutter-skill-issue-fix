@@ -8,6 +8,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Input
 import org.jetbrains.annotations.ApiStatus
 
+// link: wiki-chisel
 /**
  * Wrapper task Stonecutter uses to configure the delegate provided by [ofTask] to run on all [nodes].
  *
