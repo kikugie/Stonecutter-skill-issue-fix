@@ -66,11 +66,10 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
 
     override var automaticPlatformConstants: Boolean = false
-    override var debug
-        get() = parameters.debug
-        set(value) {
-            parameters.debug = value
-        }
+    override var debug: Boolean by parameters.named("debug")
+    override val defaultReceiver: Identifier by parameters.named("receiver") {
+        require(it.isValid()) { "Invalid receiver '$it'" }
+    }
 
     init {
         println("Running Stonecutter 0.5-beta.2")
@@ -199,7 +198,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
             group = "stonecutter"
             description = desc
 
-            debug.set(parameters.debug)
+            parameters.set(this.parameters)
             toVersion.set(version)
             fromVersion.set(tree.current)
 

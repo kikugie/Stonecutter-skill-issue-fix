@@ -2,6 +2,7 @@ package dev.kikugie.stonecutter.process
 
 import dev.kikugie.stitcher.scanner.CommentRecognizers
 import dev.kikugie.stonecutter.StonecutterProject
+import dev.kikugie.stonecutter.controller.StonecutterController
 import dev.kikugie.stonecutter.controller.storage.ProjectBranch
 import dev.kikugie.stonecutter.controller.storage.GlobalParameters
 import dev.kikugie.stonecutter.build.BuildParameters
@@ -14,43 +15,29 @@ import org.gradle.api.tasks.TaskAction
 import java.nio.file.Path
 import kotlin.system.measureTimeMillis
 
-/**
- * Task used by Stonecutter to transform files.
- */
+/**Task used by Stonecutter to transform files.*/
 abstract class StonecutterTask : DefaultTask() {
-    /**
-     * Stonecutter project to switch from.
-     */
+    /**Stonecutter project to switch from.*/
     @get:Input
     abstract val fromVersion: Property<StonecutterProject>
 
-    /**
-     * Stonecutter project to switch to.
-     */
+    /**Stonecutter project to switch to.*/
     @get:Input
     abstract val toVersion: Property<StonecutterProject>
 
-    /**
-     * Input directory relative to each [sources] entry.
-     */
+    /**Input directory relative to each [sources] entry.*/
     @get:Input
     abstract val input: Property<String>
 
-    /**
-     * Output directory relative to each [sources] entry.
-     */
+    /**Output directory relative to each [sources] entry.*/
     @get:Input
     abstract val output: Property<String>
 
-    /**
-     * Root directories for all processed branches.
-     */
+    /**Root directories for all processed branches.*/
     @get:Input
     abstract val sources: MapProperty<ProjectBranch, Path>
 
-    /**
-     * Build parameters for all processed branches.
-     */
+    /**Build parameters for all processed branches.*/
     @get:Input
     abstract val data: MapProperty<ProjectBranch, BuildParameters>
 
@@ -62,11 +49,9 @@ abstract class StonecutterTask : DefaultTask() {
     @get:Input
     abstract val cacheDir: Property<(ProjectBranch, StonecutterProject) -> Path>
 
-    /**
-     * Enables the debug functionality from [GlobalParameters].
-     */
+    /**Parameters set by [StonecutterController].*/
     @get:Input
-    abstract val debug: Property<Boolean>
+    abstract val parameters: Property<GlobalParameters>
 
     private val statistics: ProcessStatistics = ProcessStatistics()
 
@@ -118,9 +103,9 @@ abstract class StonecutterTask : DefaultTask() {
             params.toFileFilter(),
             Charsets.UTF_8,
             CommentRecognizers.DEFAULT,
-            params.toTransformParams(toVersion.get().version),
+            params.toTransformParams(toVersion.get().version, parameters.get().receiver),
             statistics,
-            debug.get()
+            parameters.get().debug
         )
         val message = buildString {
             appendLine("Processing branch ${branch.path}...")

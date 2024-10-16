@@ -1,5 +1,7 @@
 package dev.kikugie.stonecutter.controller
 
+import dev.kikugie.stonecutter.Identifier
+
 /**
  * Parameters applied globally in [StonecutterController].
  */
@@ -20,6 +22,17 @@ interface ControllerParameters {
      * ```
      */
     val automaticPlatformConstants: Boolean
+
+    /**
+     * Specifies the default version checked in predicates.
+     * Defaults to `minecraft`, making the following checks equivalent:
+     * ```
+     * //? if <1.21
+     * //? if minecraft: <1.21
+     * ```
+     * Modifying this property changes the receiver name.
+     */
+    val defaultReceiver: Identifier
 
     /**
      * Debug mode toggle for all nodes in the tree.

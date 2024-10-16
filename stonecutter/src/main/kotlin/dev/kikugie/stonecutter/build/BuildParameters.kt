@@ -31,7 +31,7 @@ data class BuildParameters(
     val excludedPaths: MutableSet<Path> = mutableSetOf()
 ) {
     /**Creates parameters used by the file processor.*/
-    internal fun toTransformParams(version: String, key: String = "minecraft"): TransformParameters = with(dependencies) {
+    internal fun toTransformParams(version: String, key: String): TransformParameters = with(dependencies) {
         getOrElse(key) { VersionParser.parseLenient(version).value }.let {
             put(key, it)
             put("", it)

@@ -73,7 +73,7 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
 
     private fun Project.configure() {
         tasks.register("setupChiseledBuild", StonecutterTask::class.java) {
-            debug.set(params.debug)
+            parameters.set(params)
             toVersion.set(current)
             fromVersion.set(active)
 
