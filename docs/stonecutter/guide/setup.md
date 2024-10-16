@@ -157,9 +157,7 @@ For example, if versions `1.18.2`, `1.19.4`, `1.20.1` and `1.21` are registered,
 ::: code-group
 ```kts [stonecutter.gradle.kts]
 stonecutter registerChiseled tasks.register("buildAbove1.20", stonecutter.chiseled) {
-    versions = stonecutter.versions.filter {
-        stonecutter.eval(it.version, ">=1.20")
-    }
+    versions { _, it -> stonecutter.eval(it.version, ">=1.20") }
     group = "project"
     ofTask("build")
 }
@@ -167,9 +165,7 @@ stonecutter registerChiseled tasks.register("buildAbove1.20", stonecutter.chisel
 
 ```groovy [stonecutter.gradle]
 stonecutter.registerChiseled tasks.register("buildAbove1.20", stonecutter.chiseled) {
-    versions = stonecutter.versions.findAll {
-        stonecutter.eval(it.version, ">=1.20")
-    }
+    versions { br, it -> stonecutter.eval(it.version, ">=1.20")}
     setGroup "project"
     ofTask "build"
 }
@@ -185,7 +181,7 @@ and may cause your IDE to incorrectly resolve library/Minecraft sources.
 ```kts [stonecutter.gradle.kts]
 for (ver in stonecutter.versions) {
     stonecutter registerChiseled tasks.register("build-${ver.project}", stonecutter.chiseled) {
-        versions = listOf(it)
+        versions { _, it -> it == ver }
         group = "project"
         ofTask("build")
     }
@@ -195,7 +191,7 @@ for (ver in stonecutter.versions) {
 ```groovy [stonecutter.gradle]
 for (ver in stonecutter.versions) {
     stonecutter.registerChiseled tasks.register("build-${ver.project}", stonecutter.chiseled) {
-        versions = [it]
+        versions { br, it -> it == ver }
         setGroup("project")
         ofTask("build")
     }
