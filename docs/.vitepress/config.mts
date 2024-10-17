@@ -66,11 +66,11 @@ export default defineVersionedConfig(__dirname, {
       ]
     },
     socialLinks: [
-      {icon: 'github', link: 'https://github.com/kikugie/stonecutter'},
+      {icon: 'github', link: 'https://github.com/stonecutter-versioning/stonecutter'},
       {icon: 'discord', link: 'https://discord.gg/TBgNUCfryS'},
     ],
     footer: {
-      message: 'Released under the <a href="https://github.com/kikugie/stonecutter/blob/0.5/LICENSE">LGPL-3.0 License</a> by KikuGie (git.kikugie@protonmail.com she/her)'
+      message: 'Released under the <a href="https://github.com/stonecutter-versioning/stonecutter/blob/0.5/LICENSE">LGPL-3.0 License</a> by KikuGie (git.kikugie@protonmail.com she/her)'
     }
   },
   sitemap: {

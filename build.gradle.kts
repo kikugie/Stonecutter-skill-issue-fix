@@ -116,7 +116,7 @@ subprojects {
 
             sourceLink {
                 localDirectory.set(projectDir)
-                remoteUrl.set("https://github.com/kikugie/stonecutter/tree/0.5/${project.name}/".URL)
+                remoteUrl.set("https://github.com/stonecutter-versioning/stonecutter/tree/0.5/${project.name}/".URL)
                 remoteLineSuffix.set("#L")
             }
 

@@ -3,7 +3,7 @@
     <id>dev.kikugie.stonecutter</id>
     <version>0.1.0-beta.3</version>
     <name>Stonecutter Dev</name>
-    <vendor email="git.kikugie@protonmail.com" url="https://github.com/kikugie/stonecutter">KikuGie</vendor>
+    <vendor email="git.kikugie@protonmail.com" url="https://github.com/stonecutter-versioning/stonecutter">KikuGie</vendor>
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->

@@ -104,7 +104,7 @@ In this example the property `mod.version` is global, but it works on versioned 
 ## Resource expansion
 
 By default, Gradle includes a token replacement functionality of its own.  
-And if you're using the [template mod](https://github.com/kikugie/stonecutter-template-fabric) you have it like this:
+And if you're using the [template mod](https://github.com/stonecutter-versioning/stonecutter-template-fabric) you have it like this:
 ```kotlin [build.gradle.kts]
 class ModData {
     val id = property("mod.id").toString()

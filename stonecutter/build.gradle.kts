@@ -159,7 +159,7 @@ publishing {
 
 gradlePlugin {
     website = "https://stonecutter.kikugie.dev/"
-    vcsUrl = "https://github.com/kikugie/stonecutter"
+    vcsUrl = "https://github.com/stonecutter-versioning/stonecutter"
 
     plugins {
         create("stonecutter") {
