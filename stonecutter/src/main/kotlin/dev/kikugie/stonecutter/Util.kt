@@ -65,11 +65,6 @@ internal fun String.removeStarting(char: Char): String {
  * @param V Value type
  */
 interface MapSetter<K, V> {
-    /**
-     * Sets the value for the specified key in the underlying map.
-     *
-     * @param key the key to set the value for
-     * @param value the value to set for the key
-     */
+    /**Sets the [value] for the specified [key] in the underlying map.*/
     operator fun set(key: K, value: V)
 }
