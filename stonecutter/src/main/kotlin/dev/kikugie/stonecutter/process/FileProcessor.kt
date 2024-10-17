@@ -148,6 +148,7 @@ internal class FileProcessor(
 
         private fun ErrorHandler.throwIfHasErrors(): Nothing? {
             if (errors.isEmpty()) return null
+            checksums.remove(source.invariantSeparatorsPathString)
             val path = dirs.root.resolve(source)
             throw ProcessException("Failed to parse ${path.absolutePathString()}").apply {
                 errors.forEach { addSuppressed(ProcessException(it.join())) }
@@ -171,12 +172,12 @@ internal class FileProcessor(
     private fun processEntry(file: Path): Throwable? {
         val relative = dirs.root.relativize(file)
         val processor = EntryProcessor(relative)
-        val result = runCatching {
+        val result = try {
             processor.process()
-        }.onFailure {
+        } catch (e: Exception) {
             processor.collector.release()
-            return it
-        }.getOrThrow()
+            return e
+        }
 
         return runCatching {
             saveToTemp(relative, result, file)

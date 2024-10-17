@@ -42,7 +42,6 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     private val parameterContainer: ProjectParameterContainer =
         root.gradle.extensions.getByType<ProjectParameterContainer>()
     private val configurations: MutableMap<BranchEntry, ParameterHolder> = mutableMapOf()
-    private val actions: MutableList<Action<ParameterHolder>> = mutableListOf()
     private val builds: MutableList<Action<StonecutterBuild>> = mutableListOf()
     private val parameters: GlobalParameters = GlobalParameters()
 
@@ -73,7 +72,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     }
 
     init {
-        println("Running Stonecutter 0.5-beta.2")
+        println("Running Stonecutter 0.5-beta.3")
         val data: TreeBuilder = checkNotNull(root.gradle.extensions.getByType<TreeBuilderContainer>()[root]) {
             "Project ${root.path} is not registered. This might've been caused by removing a project while its active"
         }
@@ -155,14 +154,6 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
 
     private fun setupProject() {
         if (automaticPlatformConstants) configurePlatforms(tree.nodes)
-
-        // Apply configurations
-        tree.branches.flatMap { br -> versions.map { br to it } }.forEach { (br, ver) ->
-            val holder = ParameterHolder(br, ver)
-            actions.forEach { it.execute(holder) }
-            configurations[br to ver] = holder
-        }
-
         tree.nodes.forEach {
             configurations[it.branch to it.metadata]?.run { it.stonecutter.from(this) }
             for (build in builds) build.execute(it.stonecutter)
