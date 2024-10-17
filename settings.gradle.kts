@@ -6,4 +6,4 @@ pluginManagement {
 }
 
 rootProject.name = "Stonecutter"
-include("stonecutter", "stitcher", "intellij")
+include("stonecutter", "stitcher")
