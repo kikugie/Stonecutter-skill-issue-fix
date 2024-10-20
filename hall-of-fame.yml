@@ -77,6 +77,8 @@ entries:
   - name: legacy skins
   - name: deckedoutobs
   - name: vinyls
+    cf_link: https://www.curseforge.com/minecraft/mc-mods/vinyls
+    adjust: 170
   - name: satisfying buttons
   - name: armorful
   - name: configurable
