@@ -43,7 +43,7 @@ internal class FileProcessor(
 ) {
     private val inPlace = dirs.root == dirs.dest
     private val parametersMatch = updateParameters() && !debug
-    private val checksums = readChecksumMap()
+    private val  checksums = readChecksumMap()
 
     internal companion object {
         val YAML = Yaml(
@@ -77,8 +77,8 @@ internal class FileProcessor(
             val text = dirs.root.resolve(source).readText(charset)
             val checksum = createChecksum(text, charset)
             val checksumsMatch = verifyChecksum(checksum)
-            checksums[source.invariantSeparatorsPathString] = checksum
             if (parametersMatch && checksumsMatch && !debug) readCachedOutput()?.let {
+                checksums[source.invariantSeparatorsPathString] = checksum
                 return if (it == text) null logging "Skipping, matches cache"
                 else it logging "Found output cache"
             }
@@ -98,6 +98,7 @@ internal class FileProcessor(
 
             val result = ast.join()
             writeCachedOutput(result)
+            checksums[source.invariantSeparatorsPathString] = checksum
             return if (result == text) null logging "Skipping, matches input"
             else result logging "Successfully processed"
         }
@@ -148,7 +149,6 @@ internal class FileProcessor(
 
         private fun ErrorHandler.throwIfHasErrors(): Nothing? {
             if (errors.isEmpty()) return null
-            checksums.remove(source.invariantSeparatorsPathString)
             val path = dirs.root.resolve(source)
             throw ProcessException("Failed to parse ${path.absolutePathString()}").apply {
                 errors.forEach { addSuppressed(ProcessException(it.join())) }
@@ -203,7 +203,6 @@ internal class FileProcessor(
         dirs.temp.copyToRecursively(dirs.dest, followLinks = false, overwrite = true, onError = { from, to, e ->
             throw IOException("Failed to copy $from to $to", e)
         })
-        dirs.temp.deleteRecursively()
     }
 
     private fun updateParameters(): Boolean {

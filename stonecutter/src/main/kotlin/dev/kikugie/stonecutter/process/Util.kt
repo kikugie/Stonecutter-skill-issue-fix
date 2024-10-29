@@ -23,7 +23,7 @@ private operator fun Char.times(n: Int) = if (n <= 0) "" else buildString { repe
 
 internal fun createChecksum(input: String, charset: Charset = Charsets.UTF_8): ByteArray {
     val bytes = input.toByteArray(charset)
-    val result = kotlin.run {
+    val result = run {
         var chunks = input.length / CHUNK * 8
         if (input.length % CHUNK != 0) chunks += 8
         ByteArray(chunks)
