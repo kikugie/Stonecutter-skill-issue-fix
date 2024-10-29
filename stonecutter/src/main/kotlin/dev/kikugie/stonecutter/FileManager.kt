@@ -93,7 +93,9 @@ internal class FileManager(
     private fun Path.cleanMatching(start: String) = parent.listDirectoryEntries().forEach {
         if (it.fileName.name.startsWith(start)) it.deleteExisting()
     }
-    private fun Path.hashName(hash: String, ext: String) = parent.resolve("${fileName.name}_$hash.$ext")
+    private fun Path.hashName(hash: String, ext: String) = "${fileName.name}_$hash.$ext".let {
+        if (parent == null) Path(it) else parent.resolve(it)
+    }
 
     private fun getCachedOutput(source: Path): String? = runIgnoring {
         val res = outputCache.resolve("result").resolve(source).readText(charset)
