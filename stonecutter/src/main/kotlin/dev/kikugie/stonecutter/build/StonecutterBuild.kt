@@ -86,6 +86,14 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
             data.set(mapOf(branch to this@StonecutterBuild.data))
             sources.set(mapOf(branch to branch.path))
             cacheDir.set { branch, version -> branch.cachePath(version) }
+
+            doFirst {
+                buildDirectoryPath.resolve("chiseledSrc").runCatching {
+                    if (exists()) deleteRecursively()
+                }.onFailure {
+                    logger.warn("Failed to clean chiseledSrc", it)
+                }
+            }
         }
 
         afterEvaluate {
