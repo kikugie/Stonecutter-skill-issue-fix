@@ -1,6 +1,8 @@
 package dev.kikugie.stonecutter.process
 
+import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.scanner.CommentRecognizers
+import dev.kikugie.stitcher.transformer.TransformParameters
 import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.controller.StonecutterController
 import dev.kikugie.stonecutter.controller.storage.ProjectBranch
@@ -12,6 +14,7 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import java.nio.charset.Charset
 import java.nio.file.Path
 import kotlin.system.measureTimeMillis
 
@@ -93,28 +96,30 @@ abstract class StonecutterTask : DefaultTask() {
     }
 
     private fun processBranch(branch: ProjectBranch, path: Path): Result<() -> Unit>? {
-        val params = data.get()[branch] ?: return null
-        val dirs = DirectoryData(
-            path.resolve(input.get()),
-            path.resolve(output.get()),
-            cacheDir.get()(branch, fromVersion.get()),
-            cacheDir.get()(branch, toVersion.get()),
-        )
-        val processor = FileProcessor(
-            dirs,
-            params.toFileFilter(),
-            Charsets.UTF_8,
-            CommentRecognizers.DEFAULT,
-            params.toTransformParams(toVersion.get().version, this.params.get().receiver),
-            statistics,
-            this.params.get().debug
-        )
+        val buildParams = data.get()[branch] ?: return null
+        val processParams = object : ProcessParameters {
+            override val directory = DirectoryData(
+                path.resolve(input.get()),
+                path.resolve(output.get()),
+                cacheDir.get()(branch, fromVersion.get()),
+                cacheDir.get()(branch, toVersion.get()),
+            )
+            override val filter = buildParams.toFileFilter()
+            override val parameters = buildParams.toTransformParams(toVersion.get().version, params.get().receiver)
+            override val statistics = ProcessStatistics()
+            override val recognizers = CommentRecognizers.DEFAULT
+            override val charset = Charsets.UTF_8
+            override val debug = params.get().debug
+            override val cache = false
+
+        }
+        val processor = FileProcessor(processParams)
         val message = buildString {
             appendLine("Processing branch ${branch.path}...")
-            appendLine("  Root: ${dirs.root}")
-            appendLine("  Dest: ${dirs.dest}")
-            appendLine("  Cache in: ${dirs.inputCache}")
-            appendLine("  Cache out: ${dirs.outputCache}")
+            appendLine("  Root: ${processParams.directory.root}")
+            appendLine("  Dest: ${processParams.directory.dest}")
+            appendLine("  Cache in: ${processParams.directory.inputCache}")
+            appendLine("  Cache out: ${processParams.directory.outputCache}")
         }
         project.logger.debug(message)
         return processor.runCatching {
