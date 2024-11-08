@@ -22,7 +22,7 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.5-beta.3"
+    id("dev.kikugie.stonecutter") version "0.5-beta.4"
 }
 
 stonecutter {
@@ -47,7 +47,7 @@ pluginManagement {
 }
 
 plugins {
-    id "dev.kikugie.stonecutter" version "0.5-beta.3"
+    id "dev.kikugie.stonecutter" version "0.5-beta.4"
 }
 
 stonecutter {
