@@ -30,5 +30,5 @@ object CommentRemover : Block.Visitor<CharSequence>, Scope.Visitor<String?> {
     }
 
     private fun unmap(token: Token) = unmap(token.value)
-    private fun unmap(str: CharSequence) = remap(str, '^', '*')
+    private fun unmap(str: CharSequence) = remap(str, '^', '*', false)
 }

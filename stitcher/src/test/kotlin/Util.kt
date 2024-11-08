@@ -11,6 +11,4 @@ fun MutableList<Token>.token(value: String, type: TokenType) {
     add(Token(value, type))
 }
 
-fun Sequence<Token>.yaml() = toList().yaml()
-fun List<Token>.yaml() = Yaml.default.encodeToString(this)
 inline fun <reified T> T.yaml() = Yaml.default.encodeToString(this)

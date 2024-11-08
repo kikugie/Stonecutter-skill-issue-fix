@@ -7,12 +7,15 @@ import dev.kikugie.stitcher.eval.isEmpty
 
 internal fun Scope.isCommented() = all { it is CommentBlock || it.isEmpty() }
 
-internal fun remap(str: CharSequence, from: Char, to: Char) = StringBuilder(str).apply {
+internal fun remap(str: CharSequence, from: Char, to: Char, flat: Boolean = true) = StringBuilder(str).apply {
+    var depth = 0
     var index = 0
     while (true) {
         index = indexOf(from, index)
         if (index < 0) break
-        if (getOrNull(index - 1) == '/' || getOrNull(index + 1) == '/')
+        if (getOrNull(index - 1) == '/' && (flat || depth++ == 0))
+            set(index, to)
+        if (getOrNull(index + 1) == '/' && (flat || --depth == 0))
             set(index, to)
         index++
     }

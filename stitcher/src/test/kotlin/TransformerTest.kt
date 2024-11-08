@@ -235,6 +235,68 @@ object TransformerTest {
                 constants["const"] = false
             }
         }
+        /**Nested comment bug provided by embeddedt*/
+        add("multinest test") {
+            input = """
+                package org.embeddedt.embeddium.impl.mixin.features.render.immediate.buffer_builder.sorting;
+
+                //? if >=1.18 <1.21 {
+
+                /*@Mixin(BufferBuilder.class)
+                public abstract class BufferBuilderMixin {
+
+                    //? if >=1.20 {
+                    
+                    @Overwrite
+                    private void putSortedQuadIndices(VertexFormat.IndexType indexType) {
+                        if (this.sorting != null) {
+                            int[] indices = this.sorting.sort(this.sortingPoints);
+                            this.writePrimitiveIndices(indexType, indices);
+                        }
+                    }
+                    //?} else {
+                    /^@Inject(method = "putSortedQuadIndices", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferBuilder;intConsumer(" + /^? if >=1.19 {^/ "I" + /^?}^/ "Lcom/mojang/blaze3d/vertex/VertexFormat}${'$'}IndexType;)Lit/unimi/dsi/fastutil/ints/IntConsumer;"), cancellable = true)
+                    private void putSortedQuadIndices(VertexFormat.IndexType indexType, CallbackInfo ci, @Local(ordinal = 0) int[] indices) {
+                        ci.cancel();
+                        this.writePrimitiveIndices(indexType, indices);
+                    }
+                    ^///?}
+                }
+
+                *///?}
+            """.trimIndent()
+            expected = """
+                package org.embeddedt.embeddium.impl.mixin.features.render.immediate.buffer_builder.sorting;
+
+                //? if >=1.18 <1.21 {
+
+                @Mixin(BufferBuilder.class)
+                public abstract class BufferBuilderMixin {
+
+                    //? if >=1.20 {
+                    
+                    @Overwrite
+                    private void putSortedQuadIndices(VertexFormat.IndexType indexType) {
+                        if (this.sorting != null) {
+                            int[] indices = this.sorting.sort(this.sortingPoints);
+                            this.writePrimitiveIndices(indexType, indices);
+                        }
+                    }
+                    //?} else {
+                    /*@Inject(method = "putSortedQuadIndices", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferBuilder;intConsumer(" + /^? if >=1.19 {^/ "I" + /^?}^/ "Lcom/mojang/blaze3d/vertex/VertexFormat}${'$'}IndexType;)Lit/unimi/dsi/fastutil/ints/IntConsumer;"), cancellable = true)
+                    private void putSortedQuadIndices(VertexFormat.IndexType indexType, CallbackInfo ci, @Local(ordinal = 0) int[] indices) {
+                        ci.cancel();
+                        this.writePrimitiveIndices(indexType, indices);
+                    }
+                    *///?}
+                }
+
+                //?}
+            """.trimIndent()
+            params {
+                dependencies[""] = "1.20"
+            }
+        }
     }
 
     @TestFactory
@@ -253,6 +315,7 @@ object TransformerTest {
 
         val parser = FileParser(data.input.scan(), data.params, handler)
         val scope = parser.parse()
+        scope.yaml().lines().forEach { println(cyan(it)) }
         assertNotNull(scope)
         checkHandlerErrors()
 

@@ -35,7 +35,7 @@ class Transformer(
 
     private fun processCondition(it: CodeBlock) {
         requireNotNull(it.scope) // Should be resolved by patch method
-        var bool = try {
+        var enabled = try {
             it.def.condition!!.accept(checker)
         } catch (e: Exception) {
             it.def.toSlice().report { "Failed to evaluate condition: ${e.message}" }
@@ -43,14 +43,14 @@ class Transformer(
         }
 
         if (!it.def.extension) previousResult = false
-        else bool = !previousResult && bool
-        previousResult = bool || previousResult
+        else enabled = !previousResult && enabled
+        previousResult = enabled || previousResult
 
-        val text = if (bool) it.scope.accept(CommentRemover)
+        val text = if (enabled) it.scope.accept(CommentRemover)
         else it.scope.accept(CommentAdder)
         when {
             text == null -> withSource(it.scope).process()
-            !bool -> listOf(ContentBlock(text)).assignTo(it.scope)
+            !enabled -> listOf(ContentBlock(text)).assignTo(it.scope)
             else -> withSource(text.parse()).process().assignTo(it.scope)
         }
     }
