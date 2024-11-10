@@ -26,5 +26,23 @@ object CommentAdder : Block.Visitor<CharSequence>, Scope.Visitor<String?> {
     }
 
     private fun map(token: Token) = map(token.value)
-    private fun map(str: CharSequence) = remap(str, '*', '^')
+    private fun map(str: CharSequence) = StringBuilder(str).apply {
+        val chars = charArrayOf('^', '*')
+        var index = 0
+        while (true) {
+            index = indexOfAny(chars, index)
+            if (index < 0) break
+            else if (charMatches(index - 1, '/')) when (this[index]) {
+                '*' -> this[index] = '^'
+                '^' -> if (writeSuperScriptAfter(index, readSuperScript(index + 1) + 1))
+                    index++
+            }
+            else if (charMatches(index + 1, '/')) when (this[index]) {
+                '*' -> this[index] = '^'
+                '^' -> if (writeSuperScriptBefore(index, readSuperScript(index - 1) + 1))
+                    index++
+            }
+            index++
+        }
+    }
 }

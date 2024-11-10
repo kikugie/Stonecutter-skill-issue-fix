@@ -18,10 +18,11 @@ object CommentRemover : Block.Visitor<CharSequence>, Scope.Visitor<String?> {
         if (it.end.isBlank()) append(it.end.value)
     }
 
-    override fun visitScope(it: Scope): String? = when(it.enclosure) {
+    override fun visitScope(it: Scope): String? = when (it.enclosure) {
         ScopeType.CLOSED -> if (!it.isCommented()) null else it.joinToString("") {
             it.accept(this)
         }
+
         else -> it.indexOfFirst { it.isNotEmpty() }.takeIf { it >= 0 }?.let { i ->
             val block = it[i].takeIf { it is CommentBlock } ?: return@let null
             it[i] = ContentBlock(block.accept(this))
@@ -30,5 +31,28 @@ object CommentRemover : Block.Visitor<CharSequence>, Scope.Visitor<String?> {
     }
 
     private fun unmap(token: Token) = unmap(token.value)
-    private fun unmap(str: CharSequence) = remap(str, '^', '*', false)
+    private fun unmap(str: CharSequence) = StringBuilder(str).apply {
+        var index = 0
+        while (true) {
+            index = indexOf('^', index)
+            if (index < 0) break
+            else if (charMatches(index - 1, '/')) when (val depth = readSuperScript(index + 1)) {
+                0, 1 -> {
+                    if (depth == 0) this[index] = '*'
+                    removeSuperScript(index + 1)
+                }
+
+                else -> writeSuperScriptAfter(index, depth - 1)
+            }
+            else if (charMatches(index + 1, '/')) when (val depth = readSuperScript(index - 1)) {
+                0, 1 -> {
+                    if (depth == 0) this[index] = '*'
+                    if (removeSuperScript(index - 1)) index++
+                }
+
+                else -> writeSuperScriptBefore(index, depth - 1)
+            }
+            index++
+        }
+    }
 }

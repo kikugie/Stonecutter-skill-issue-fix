@@ -5,21 +5,44 @@ import dev.kikugie.stitcher.data.scope.Scope
 import dev.kikugie.stitcher.data.scope.ScopeType
 import dev.kikugie.stitcher.eval.isEmpty
 
+private val SUPERSCRIPT_OOB = "Unable to nest at level %d - max is 9. Maybe consider refactoring your code?"
+private val SUPERSCRIPT_NUMBERS = charArrayOf('⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹')
 internal fun Scope.isCommented() = all { it is CommentBlock || it.isEmpty() }
 
-internal fun remap(str: CharSequence, from: Char, to: Char, flat: Boolean = true) = StringBuilder(str).apply {
-    var depth = 0
-    var index = 0
-    while (true) {
-        index = indexOf(from, index)
-        if (index < 0) break
-        if (getOrNull(index - 1) == '/' && (flat || depth++ == 0))
-            set(index, to)
-        if (getOrNull(index + 1) == '/' && (flat || --depth == 0))
-            set(index, to)
-        index++
+internal fun StringBuilder.readSuperScript(index: Int): Int =
+    SUPERSCRIPT_NUMBERS.indexOf(getOrSpace(index)).coerceAtLeast(0)
+
+// Returns true if the length was modified
+internal fun StringBuilder.removeSuperScript(index: Int): Boolean = when {
+    index < 0 || index >= length -> false
+    getOrSpace(index) !in SUPERSCRIPT_NUMBERS -> false
+    else -> true.also { deleteAt(index) }
+}
+
+internal fun StringBuilder.writeSuperScriptBefore(index: Int, depth: Int): Boolean {
+    require(depth in 0..9) { SUPERSCRIPT_OOB.format(depth) }
+    val char = SUPERSCRIPT_NUMBERS[depth]
+    return when {
+        index == 0 -> true.also { insert(0, char)}
+        this[index - 1] in SUPERSCRIPT_NUMBERS -> false.also { this[index - 1] = char }
+        else -> true.also { insert(index, char)}
     }
 }
+internal fun StringBuilder.writeSuperScriptAfter(index: Int, depth: Int): Boolean {
+    require(depth in 0..9) { SUPERSCRIPT_OOB.format(depth) }
+    val char = SUPERSCRIPT_NUMBERS[depth]
+    return when {
+        index == lastIndex -> true.also { append(char) }
+        this[index + 1] in SUPERSCRIPT_NUMBERS -> false.also { this[index + 1] = char }
+        else -> true.also { insert(index + 1, char)}
+    }
+}
+
+internal fun CharSequence.charMatches(index: Int, char: Char): Boolean =
+    if (index < 0 || index >= length) false
+    else char == get(index)
+
+internal fun CharSequence.getOrSpace(index: Int) = getOrElse(index) { ' ' }
 
 internal fun CharSequence.leadingSpaces() = buildString {
     for (c in this@leadingSpaces) if (c.isWhitespace()) append(c) else break

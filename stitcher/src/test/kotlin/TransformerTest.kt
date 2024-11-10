@@ -10,6 +10,7 @@ import dev.kikugie.stitcher.transformer.Transformer
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.DynamicTest
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 
 object TransformerTest {
@@ -149,7 +150,7 @@ object TransformerTest {
                 //? if const {
                 /*placeholder
                     /^? if const2^/
-                    placeholder
+                    /^placeholder^/
                 *///?}
             """.trimIndent()
             params {
@@ -235,66 +236,79 @@ object TransformerTest {
                 constants["const"] = false
             }
         }
-        /**Nested comment bug provided by embeddedt*/
-        add("multinest test") {
+        add("deep nesting") {
             input = """
-                package org.embeddedt.embeddium.impl.mixin.features.render.immediate.buffer_builder.sorting;
-
-                //? if >=1.18 <1.21 {
-
-                /*@Mixin(BufferBuilder.class)
-                public abstract class BufferBuilderMixin {
-
-                    //? if >=1.20 {
-                    
-                    @Overwrite
-                    private void putSortedQuadIndices(VertexFormat.IndexType indexType) {
-                        if (this.sorting != null) {
-                            int[] indices = this.sorting.sort(this.sortingPoints);
-                            this.writePrimitiveIndices(indexType, indices);
-                        }
-                    }
-                    //?} else {
-                    /^@Inject(method = "putSortedQuadIndices", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferBuilder;intConsumer(" + /^? if >=1.19 {^/ "I" + /^?}^/ "Lcom/mojang/blaze3d/vertex/VertexFormat}${'$'}IndexType;)Lit/unimi/dsi/fastutil/ints/IntConsumer;"), cancellable = true)
-                    private void putSortedQuadIndices(VertexFormat.IndexType indexType, CallbackInfo ci, @Local(ordinal = 0) int[] indices) {
-                        ci.cancel();
-                        this.writePrimitiveIndices(indexType, indices);
-                    }
-                    ^///?}
-                }
-
-                *///?}
+                /*? if false {*/
+                    dummy
+                    /*? if false {*/
+                        dummy
+                        /*? if false {*/
+                            dummy
+                            /*? if false {*/
+                                dummy
+                                /*? if false {*/
+                                    dummy
+                                    /*? if false {*/
+                                        dummy
+                                        /*? if false {*/
+                                            dummy
+                                            /*? if false {*/
+                                                dummy
+                                                /*? if false {*/
+                                                    dummy
+                                                    /*? if false {*/
+                                                        dummy
+                                                        /*? if false {*/
+                                                            dummy
+                                                        /*?} */
+                                                    /*?} */
+                                                /*?} */
+                                            /*?} */
+                                        /*?} */
+                                    /*?} */
+                                /*?} */
+                            /*?} */
+                        /*?} */
+                    /*?} */
+                /*?} */
             """.trimIndent()
             expected = """
-                package org.embeddedt.embeddium.impl.mixin.features.render.immediate.buffer_builder.sorting;
-
-                //? if >=1.18 <1.21 {
-
-                @Mixin(BufferBuilder.class)
-                public abstract class BufferBuilderMixin {
-
-                    //? if >=1.20 {
-                    
-                    @Overwrite
-                    private void putSortedQuadIndices(VertexFormat.IndexType indexType) {
-                        if (this.sorting != null) {
-                            int[] indices = this.sorting.sort(this.sortingPoints);
-                            this.writePrimitiveIndices(indexType, indices);
-                        }
-                    }
-                    //?} else {
-                    /*@Inject(method = "putSortedQuadIndices", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferBuilder;intConsumer(" + /^? if >=1.19 {^/ "I" + /^?}^/ "Lcom/mojang/blaze3d/vertex/VertexFormat}${'$'}IndexType;)Lit/unimi/dsi/fastutil/ints/IntConsumer;"), cancellable = true)
-                    private void putSortedQuadIndices(VertexFormat.IndexType indexType, CallbackInfo ci, @Local(ordinal = 0) int[] indices) {
-                        ci.cancel();
-                        this.writePrimitiveIndices(indexType, indices);
-                    }
-                    *///?}
-                }
-
-                //?}
+                /*? if false {*/
+                    /*dummy
+                    /^? if false {^/
+                        /^dummy
+                        /^¹? if false {¹^/
+                            /^¹dummy
+                            /^²? if false {²^/
+                                /^²dummy
+                                /^³? if false {³^/
+                                    /^³dummy
+                                    /^⁴? if false {⁴^/
+                                        /^⁴dummy
+                                        /^⁵? if false {⁵^/
+                                            /^⁵dummy
+                                            /^⁶? if false {⁶^/
+                                                /^⁶dummy
+                                                /^⁷? if false {⁷^/
+                                                    /^⁷dummy
+                                                    /^⁸? if false {⁸^/
+                                                        /^⁸dummy
+                                                        /^⁹? if false {⁹^/
+                                                            /^⁹dummy
+                                                        ⁹^//^⁹?}⁹^/
+                                                    ⁸^//^⁸?}⁸^/
+                                                ⁷^//^⁷?}⁷^/
+                                            ⁶^//^⁶?}⁶^/
+                                        ⁵^//^⁵?}⁵^/
+                                    ⁴^//^⁴?}⁴^/
+                                ³^//^³?}³^/
+                            ²^//^²?}²^/
+                        ¹^//^¹?}¹^/
+                    ^//^?}^/
+                *//*?}*/
             """.trimIndent()
             params {
-                dependencies[""] = "1.20"
+                constants["false"] = false
             }
         }
     }
@@ -315,7 +329,6 @@ object TransformerTest {
 
         val parser = FileParser(data.input.scan(), data.params, handler)
         val scope = parser.parse()
-        scope.yaml().lines().forEach { println(cyan(it)) }
         assertNotNull(scope)
         checkHandlerErrors()
 
