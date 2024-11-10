@@ -47,7 +47,7 @@ class Transformer(
         previousResult = enabled || previousResult
 
         val text = if (enabled) it.scope.accept(CommentRemover)
-        else it.scope.accept(CommentAdder)
+        else withSource(it.scope).process().accept(CommentAdder)
         when {
             text == null -> withSource(it.scope).process()
             !enabled -> listOf(ContentBlock(text)).assignTo(it.scope)
