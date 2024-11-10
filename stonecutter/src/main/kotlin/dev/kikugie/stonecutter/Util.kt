@@ -58,6 +58,11 @@ internal fun String.removeStarting(char: Char): String {
     return substring(index)
 }
 
+internal fun String.removeStarting(string: String): String {
+    val index = indexOf(string).takeIf { it >= 0 } ?: return this
+    return substring(index + string.length)
+}
+
 /**
  * Delegates set operation. Meant to be used with Kotlin DSL.
  *
