@@ -57,5 +57,5 @@ data class ProjectTree(
      *
      * @param project Project reference
      */
-    operator fun get(project: Project) = get(project.path.removeStarting(':'))
+    operator fun get(project: Project) = get(project.path.removePrefix(getPath()).removeStarting(':'))
 }
