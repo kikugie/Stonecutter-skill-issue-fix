@@ -140,7 +140,7 @@ object VersionParser {
     private fun parseStringVersion(input: CharSequence, start: Int): ParseResult<StringVersion> {
         if (start >= input.length || input[start].isWhitespace()) throw EMPTY_VERSION
         var cursor = start
-        while (cursor < input.length) if (input[cursor++].isValidIdentifier()) break
+        while (cursor < input.length) if (input[cursor].isValidIdentifier()) cursor++ else break
         return StringVersion(input.substring(start, cursor)) end cursor
     }
 
