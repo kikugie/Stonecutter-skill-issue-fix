@@ -27,10 +27,10 @@ import dev.kikugie.stitcher.transformer.TransformParameters
 import kotlin.math.min
 
 class CommentParser(
-    private val lexer: LexerAccess,
+    private val lexer: Lexer,
     private val handler: ErrorHandler,
     private val params: TransformParameters? = null,
-) : LexerAccess by lexer {
+) {
     companion object {
         fun create(
             input: CharSequence,
@@ -41,7 +41,7 @@ class CommentParser(
             return CommentParser(lexer, handler, params)
         }
     }
-    private val nextType get() = lookup()?.type
+    private val nextType get() = lexer.lookup()?.type
 
     fun parse(): Definition? {
         val marker = consume()?.type as? MarkerType ?: return null
@@ -65,8 +65,8 @@ class CommentParser(
         }
 
         if (nextType != null) {
-            lookup()!!.start().report { "Expected comment to end" }
-            do advance() while (nextType != null)
+            lexer.lookup()!!.start().report { "Expected comment to end" }
+            do lexer.advance() while (nextType != null)
         }
 
         return Definition(component, extension, closer)
@@ -77,7 +77,7 @@ class CommentParser(
         while (true) when (nextType) {
             null -> break
             SCOPE_OPEN, EXPECT_WORD -> {
-                if (extension) lookup()!!.report {
+                if (extension) lexer.lookup()!!.report {
                     "Extensions are not allowed in swap closers"
                 }
                 break
@@ -96,7 +96,7 @@ class CommentParser(
 
             else -> consume { it.report { "Unexpected token" } }
         }
-        if (!extension && identifier.isEmpty()) lookup()!!.end().report {
+        if (!extension && identifier.isEmpty()) lexer.lookup()!!.end().report {
             "Missing swap identifier"
         }
 
@@ -130,7 +130,7 @@ class CommentParser(
         }
         validateCondition(extension, sugar, expression)
         errors.forEach { it.report { "Unexpected token" } }
-        if (!extension && closed && expression.isEmpty()) lookup()!!.end().report {
+        if (!extension && closed && expression.isEmpty()) lexer.lookup()!!.end().report {
             "Missing condition statement"
         }
         return Condition(sugar.map { it.token }, expression)
@@ -240,6 +240,6 @@ class CommentParser(
         min(source.lastIndex, range.last + 1).let { LexSlice(new, it..it, source) }
 
     private fun consume(): LexSlice? = lexer.advance()
-    private inline fun <T> consume(action: (LexSlice) -> T): T = action(advance()!!)
+    private inline fun <T> consume(action: (LexSlice) -> T): T = action(lexer.advance()!!)
     private inline fun LexSlice.report(message: () -> String) = handler.accept(this, message())
 }

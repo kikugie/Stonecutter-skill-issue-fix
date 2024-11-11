@@ -78,7 +78,7 @@ class FileParser(
 
         if (def.extension)
             if (def.type == active.type) scopes.pop()
-            else handler.accept(lexer[1]!!, "${def.type} closes unmatched scope of ${active.type}")
+            else handler.accept(lexer.get(1)!!, "${def.type} closes unmatched scope of ${active.type}")
 
         val scope = if (def.isEmpty() && def.extension && def.enclosure == ScopeType.LINE) null
         else Scope(def.type, def.enclosure)

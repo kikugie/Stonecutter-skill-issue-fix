@@ -8,23 +8,22 @@ import dev.kikugie.stitcher.util.StringUtil.countStart
 class Lexer(
     private val input: CharSequence,
     private val handler: ErrorHandler,
-): LexerAccess {
+) {
     private val tokens: List<LexSlice> by lazy(::readTokens)
     private val matcher = TokenMatcher(input)
     private var index: Int = -1
 
-    override fun get(index: Int): LexSlice? = tokens.getOrNull(index)
-    override fun peek(): LexSlice? = tokens.getOrNull(index)
-    override fun rawLookup(offset: Int): LexSlice? = tokens.getOrNull(index + offset)
-    override fun rawAdvance(): LexSlice? = tokens.getOrNull(++index)
+    fun all(): List<LexSlice> = tokens.toList()
+    fun get(index: Int): LexSlice? = tokens.getOrNull(index)
+    fun peek(): LexSlice? = tokens.getOrNull(index)
 
-    override fun lookup(): LexSlice? {
+    fun lookup(): LexSlice? {
         var cursor = index
         do cursor++ while (tokens.getOrNull(cursor)?.type == WhitespaceType)
         return tokens.getOrNull(cursor)
     }
 
-    override fun advance(): LexSlice? {
+    fun advance(): LexSlice? {
         do index++ while (tokens.getOrNull(index)?.type == WhitespaceType)
         return tokens.getOrNull(index)
     }
