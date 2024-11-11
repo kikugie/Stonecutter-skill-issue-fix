@@ -120,6 +120,37 @@ method1();
 ```
 :::
 
+### Nested conditions
+Conditional blocks can be nested within each other **up to 10 times**.
+To avoid issues with multi-line comments, `/* */` replaced with `/^ ^/`,
+which may also include superscript numbers to correctly manage the blocks.
+::: tabs
+== Enabled
+```java [example.java]
+//? if <1.21 {
+method1();
+    //? if <1.20 {
+    method1();
+        //? if <1.19 {
+        method1();
+        //?}
+    //?}
+//?}
+```
+== Disabled
+```java [example.java]
+//? if <1.21 {
+/*method1();
+    //? if <1.20 {
+    /^method1();
+        //? if <1.19 {
+        /^¹method1();
+        ¹^///?}
+    ^///?}
+*///?}
+```
+:::
+
 ### Version predicates
 Stonecutter supports a variety of version comparison predicates:
 - `=`, `<`, `>`, `<=`, `>=` - basic equality checks.
