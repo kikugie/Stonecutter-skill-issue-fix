@@ -3,7 +3,11 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
 import com.github.ajalt.mordant.rendering.TextColors.*
+import dev.kikugie.stitcher.data.token.MarkerType
+import dev.kikugie.stitcher.data.token.StitcherTokenType
+import dev.kikugie.stitcher.data.token.WhitespaceType
 import dev.kikugie.stitcher.exception.StoringErrorHandler
+import dev.kikugie.stitcher.lexer.Lexer
 
 object CommentParserTest {
     val SUGAR_TESTS = listOf(
@@ -91,6 +95,10 @@ object CommentParserTest {
         "? hi my name is multiplier, no - market flyer, no - amplifier, no - marble fire" to false
     )
 
+    val LEXER_TESTS = listOf(
+        "? =vers vers" to listOf(MarkerType.CONDITION, WhitespaceType, StitcherTokenType.PREDICATE, WhitespaceType, StitcherTokenType.IDENTIFIER),
+    )
+
     @TestFactory
     fun `test sugar`() = SUGAR_TESTS.tests()
     @TestFactory
@@ -101,6 +109,15 @@ object CommentParserTest {
     fun `test scope`() = SCOPE_TESTS.tests()
     @TestFactory
     fun `misc space`() = MISC_TESTS.tests()
+    @TestFactory
+    fun `lexer tests`() = LEXER_TESTS.map {
+        DynamicTest.dynamicTest(it.first) {
+            val lexer = Lexer(it.first, StoringErrorHandler())
+            lexer.all().forEach { println(it) }
+            val types = lexer.all().map { it.type }
+            Assertions.assertIterableEquals(it.second, types)
+        }
+    }
 
     private fun Iterable<Pair<String, Boolean>>.tests() = map {
         val str = if (it.second) '+' else '-'

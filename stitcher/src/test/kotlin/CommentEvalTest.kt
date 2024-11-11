@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
 
-object ConditionTest {
+object CommentEvalTest {
     val SAMPLES = buildList {
         add("const && >=1 <=3", true) {
             dependencies[""] = "2"

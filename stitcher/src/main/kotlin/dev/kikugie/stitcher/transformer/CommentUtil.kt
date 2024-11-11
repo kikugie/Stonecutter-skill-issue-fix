@@ -5,7 +5,7 @@ import dev.kikugie.stitcher.data.scope.Scope
 import dev.kikugie.stitcher.data.scope.ScopeType
 import dev.kikugie.stitcher.eval.isEmpty
 
-private val SUPERSCRIPT_OOB = "Unable to nest at level %d - max is 9. Maybe consider refactoring your code?"
+private const val SUPERSCRIPT_OOB = "Unable to nest at level %d - max is 9. Maybe consider refactoring your code?"
 private val SUPERSCRIPT_NUMBERS = charArrayOf('⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹')
 internal fun Scope.isCommented() = all { it is CommentBlock || it.isEmpty() }
 

@@ -277,6 +277,37 @@ Constants and version predicates can be combined with a handful of operators:
 - `&&` - intersection (and): `if 1.20 && fabric`
 - `( )` - grouping: `if fabric && (1.20 || 1.21)`
 
+### Type resolution
+Stonecutter allows setting the default (Minecraft) version to non-semantic value.
+For example, with `versions("fabric", "forge", "neoforge")`. 
+This may cause issues if you have constants with the same names.
+
+The following sections explain some of the edge cases that may occur
+and the logic the parser uses to resolve them.
+
+::: details Numeric constants
+```java [example.java]
+//? if 1.0
+```
+If `1.0` is a constant, declared with `const("1.0", true)`, **it will not be recognized as such**.
+If a string is a valid semantic version, it will **always** be treated as a predicate.
+:::
+::: details Explicit predicates
+```java [example.java]
+//? if =const && const
+```
+`=const` is treated as a string version, whereas `const` is a defined constant.
+This way, comparison operators can be used to mark a string as a predicate 
+if normally it would have been recognized as a constant.
+:::
+::: details Chained predicates
+```java [example.java]
+//? if >1.20 const
+```
+`>1.20` is recognized as a semantic version predicate, which can have other predicates following it.
+Since there's no boolean operator, such as `&&` or `||`, `const` is treated as a second predicate.
+:::
+
 ## Condition dependencies
 When you write `if <1.20`, what does `<1.20` check against?
 Naturally, the Minecraft version you specified in `settings.gradle[.kts]` for this subproject.
