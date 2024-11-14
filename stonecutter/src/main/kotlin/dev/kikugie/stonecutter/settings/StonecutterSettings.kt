@@ -41,6 +41,7 @@ open class StonecutterSettings(settings: Settings) : SettingsConfiguration(setti
         }
 
     init {
+        println("Running Stonecutter $STONECUTTER") // Printed to help identify issues
         with(settings.gradle.extensions) {
             container = create<TreeBuilderContainer>("stonecutterTreeBuilders")
             create<ProjectTreeContainer>("stonecutterProjectTrees")

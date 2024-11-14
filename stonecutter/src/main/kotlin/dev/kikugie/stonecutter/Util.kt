@@ -3,6 +3,7 @@ package dev.kikugie.stonecutter
 import dev.kikugie.semver.VersionParser
 import dev.kikugie.semver.VersionParsingException
 import dev.kikugie.stitcher.lexer.TokenMatcher.Companion.isValidIdentifier
+import dev.kikugie.stonecutter.data.model.TreeModel
 import org.gradle.api.Project
 import java.io.Closeable
 import java.nio.file.Path
@@ -16,6 +17,12 @@ import kotlin.io.path.isRegularFile
  * have conflicting signatures on the JVM.
  */
 const val BNAN = "🍌"
+
+// Updated by the 'updateVersion' task
+/**
+ * Currently running Stonecutter version, serialised in [TreeModel].
+ */
+const val STONECUTTER = "0.5-beta.5"
 
 internal val Project.buildDirectoryFile
     get() = layout.buildDirectory.asFile.get()
