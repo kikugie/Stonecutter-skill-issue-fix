@@ -137,8 +137,8 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
     private fun serializeNode() {
         NodeModel(
             current,
-            node.path.relativize(tree.path),
-            branch.toBranchInfo(node.path.relativize(branch.path)),
+            node.location.relativize(tree.path),
+            branch.toBranchInfo(node.location.relativize(branch.path)),
             current.isActive,
             data,
         ).save(node.stonecutterCachePath).onFailure {

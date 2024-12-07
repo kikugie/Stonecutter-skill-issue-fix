@@ -52,6 +52,13 @@ export default defineVersionedConfig({
                 {text: 'Stonecutter comments', link: '/stonecutter/guide/comments'},
               ]
             },
+            {
+              text: 'Details', items: [
+                {text: 'Configuring Stonecutter', link: 'stonecutter/details/configuration'},
+                {text: 'Project trees', link: 'stonecutter/details/trees'},
+                {text: 'Project model', link: 'stonecutter/details/model'},
+              ]
+            },
             {text: 'Tips and tricks', link: '/stonecutter/tips'},
           ]
         }

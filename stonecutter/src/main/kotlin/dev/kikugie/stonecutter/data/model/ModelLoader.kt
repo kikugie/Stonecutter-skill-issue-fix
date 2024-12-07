@@ -10,7 +10,7 @@ import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
 object ModelLoader {
-    fun <T> save(location: Path, model: T, serializer: KSerializer<T>): Result<Unit> = location.runCatching {
+    internal fun <T> save(location: Path, model: T, serializer: KSerializer<T>): Result<Unit> = location.runCatching {
         val yaml = Yaml.default.encodeToString(serializer, model)
         parent.createDirectories()
         writeText(
@@ -22,7 +22,7 @@ object ModelLoader {
         )
     }
 
-    fun <T> load(location: Path, serializer: KSerializer<T>): Result<T> = location.runCatching {
+    internal fun <T> load(location: Path, serializer: KSerializer<T>): Result<T> = location.runCatching {
         if (location.notExists()) throw NoSuchFileException(location.toFile())
         val text = readText(Charsets.UTF_8)
         Yaml.default.decodeFromString(serializer, text)

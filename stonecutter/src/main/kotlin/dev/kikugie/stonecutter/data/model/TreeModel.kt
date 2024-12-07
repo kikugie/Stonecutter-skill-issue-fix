@@ -44,6 +44,6 @@ data class TreeModel(
         /**Filename used to save and load the model*/
         const val FILE = "tree.yml"
         /**Loads model from the [FILE] in the given [directory].*/
-        @JvmStatic fun load(directory: Path) = ModelLoader.load(directory.resolve(FILE), serializer())
+        @JvmStatic fun load(directory: Path): Result<TreeModel> = ModelLoader.load(directory.resolve(FILE), serializer())
     }
 }

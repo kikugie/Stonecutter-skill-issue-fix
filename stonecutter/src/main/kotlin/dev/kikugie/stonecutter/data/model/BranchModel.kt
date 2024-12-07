@@ -38,6 +38,6 @@ data class BranchModel(
         /**Filename used to save and load the model*/
         const val FILE = "branch.yml"
         /**Loads model from the [FILE] in the given [directory].*/
-        @JvmStatic fun load(directory: Path) = ModelLoader.load(directory.resolve(FILE), serializer())
+        @JvmStatic fun load(directory: Path): Result<BranchModel> = ModelLoader.load(directory.resolve(FILE), serializer())
     }
 }

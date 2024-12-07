@@ -55,6 +55,12 @@ data class GlobalParameters(
             }
         }
 
+    /**
+     * Creates a delegate property for the given [name] and [type].
+     * This is supposed to be called from [named] function.
+     *
+     * **Not a part of the public API**
+     */
     @ApiStatus.Internal
     fun <T : Any> provider(name: String, type: KClass<T>): ReadWriteProperty<Any, T> {
         val property = requireNotNull(this::class.declaredMemberProperties.find { it.name == name }) {

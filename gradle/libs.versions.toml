@@ -1,11 +1,9 @@
 [versions]
 # Plugins
-kotlin = "2.0.20"
+kotlin = "2.1.0"
 gradlepub = "1.2.1"
-shadow = "8.1.1"
-intellij = "1.17.3"
+shadow = "9.0.0-beta4"
 dokka = "1.9.20"
-blossom = "2.1.0"
 # Dependencies
 serialization = "1.7.3"
 coroutines = "1.9.0"
@@ -21,9 +19,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 gradle-publishing = { id = "com.gradle.plugin-publish", version.ref = "gradlepub" }
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
-intellij = { id = "org.jetbrains.intellij", version.ref = "intellij" }
-blossom = { id = "net.kyori.blossom", version.ref = "blossom" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 
 [libraries]
 kotlin-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "serialization" }

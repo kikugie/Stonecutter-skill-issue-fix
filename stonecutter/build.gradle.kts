@@ -13,7 +13,6 @@ plugins {
     java
     `kotlin-dsl`
     alias(libs.plugins.shadow)
-    alias(libs.plugins.blossom)
     alias(libs.plugins.gradle.publishing)
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.dokka)
@@ -34,22 +33,6 @@ dependencies {
 
     testImplementation(libs.bundles.test)
 }
-
-/*sourceSets {
-    fun TemplateSet.wiki(id: String, page: String, title: String = "Wiki page") {
-        property("wiki-$id", "<a href=\"https://stonecutter.kikugie.dev/stonecutter/$page\">$title</a>")
-    }
-
-    main {
-        blossom {
-            kotlinSources {
-                property("version", project.version.toString())
-                wiki("eval", "guide/setup#checking-versions")
-                wiki("chisel", "guide/setup#chiseled-tasks")
-            }
-        }
-    }
-}*/
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()

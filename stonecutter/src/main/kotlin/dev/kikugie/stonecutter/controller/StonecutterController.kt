@@ -223,10 +223,11 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
 
     private fun serializeTree() = with(tree) {
         TreeModel(
+            STONECUTTER,
             vcsVersion,
             current,
             branches.map { it.toBranchInfo(path.relativize(it.path)) },
-            nodes.map { it.toNodeInfo(path.relativize(it.path), current) },
+            nodes.map { it.toNodeInfo(path.relativize(it.location), current) },
             parameters,
         ).save(stonecutterCachePath).onFailure {
             logger.warn("Failed to save tree model", it)
@@ -237,7 +238,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         BranchModel(
             id,
             path.relativize(tree.path),
-            nodes.map { it.toNodeInfo(it.path.relativize(tree.path), current) },
+            nodes.map { it.toNodeInfo(it.location.relativize(tree.path), current) },
         ).save(stonecutterCachePath).onFailure {
             logger.warn("Failed to save branch model for '$name'", it)
         }

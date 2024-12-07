@@ -22,7 +22,7 @@ data class ProjectNode(
     /**
      * Location of this node on the disk.
      */
-    val path: Path = projectDir.toPath()
+    val location: Path = projectDir.toPath()
 
     /**
      * Stonecutter plugin for this node.
