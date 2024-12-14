@@ -122,7 +122,7 @@ publishing {
     repositories {
         maven {
             name = "kikugieMaven"
-            url = uri("https://maven.kikugie.dev/snapshots")
+            url = uri("https://maven.kikugie.dev/releases")
             credentials(PasswordCredentials::class)
             authentication {
                 create("basic", BasicAuthentication::class)

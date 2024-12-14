@@ -12,6 +12,7 @@ import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import java.nio.file.Path
@@ -34,9 +35,10 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
         "StonecutterBuild applied to a non-versioned buildscript"
     }
 
-    private val params: GlobalParameters = requireNotNull(project.gradle.extensions.getByType<ProjectParameterContainer>()[project]) {
-        "Global parameters not found for project '$project'"
-    }
+    private val params: GlobalParameters =
+        requireNotNull(project.gradle.extensions.getByType<ProjectParameterContainer>()[project]) {
+            "Global parameters not found for project '$project'"
+        }
 
     /**
      * The full tree this project belongs to. Without subprojects, it will only have the root branch.
@@ -45,6 +47,7 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
     val tree: ProjectTree = requireNotNull(project.gradle.extensions.getByType<ProjectTreeContainer>()[project]) {
         "Project '$project' is not versioned"
     }
+
     /**
      * The branch this project belongs to. Allows accessing other versions.
      * For most cases use [node] methods.
@@ -126,9 +129,12 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
                 }
             }
 
-            for (it in property("sourceSets") as SourceSetContainer) {
-                applyChiseled(it.allJava, it.java)
-                applyChiseled(it.resources)
+            for (src in property("sourceSets") as SourceSetContainer) {
+                applyChiseled(src.allJava, src.java)
+                applyChiseled(src.resources)
+                src.extensions.extensionsSchema
+                    .filter { it.publicType.concreteClass.interfaces.contains(SourceDirectorySet::class.java) }
+                    .forEach { applyChiseled(src.extensions[it.name] as SourceDirectorySet) }
             }
         } catch (_: MissingPropertyException) {
         }
