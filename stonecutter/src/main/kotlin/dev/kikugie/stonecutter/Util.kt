@@ -65,6 +65,11 @@ internal fun String.removeStarting(char: Char): String {
     return substring(index)
 }
 
+internal operator fun <K, V> Map<K, V>?.get(key: K): V? = this?.get(key)
+internal fun <K : Any, R: Any> memoize(memory: (K) -> R?): (K) -> R? = mutableMapOf<K, R?>().let { map ->
+    { key -> map.getOrPut(key) { memory(key) } }
+}
+
 /**
  * Delegates set operation. Meant to be used with Kotlin DSL.
  *
