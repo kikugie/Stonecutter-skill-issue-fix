@@ -1,20 +1,17 @@
 package dev.kikugie.stonecutter.process
 
-import dev.kikugie.stitcher.scanner.CommentRecognizer
 import dev.kikugie.stitcher.scanner.CommentRecognizers
-import dev.kikugie.stitcher.transformer.TransformParameters
 import dev.kikugie.stonecutter.StonecutterProject
-import dev.kikugie.stonecutter.controller.StonecutterController
-import dev.kikugie.stonecutter.controller.storage.ProjectBranch
-import dev.kikugie.stonecutter.controller.storage.GlobalParameters
 import dev.kikugie.stonecutter.build.BuildParameters
+import dev.kikugie.stonecutter.controller.StonecutterController
+import dev.kikugie.stonecutter.controller.storage.GlobalParameters
+import dev.kikugie.stonecutter.data.tree.LightBranch
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
-import java.nio.charset.Charset
 import java.nio.file.Path
 import kotlin.system.measureTimeMillis
 
@@ -38,11 +35,11 @@ abstract class StonecutterTask : DefaultTask() {
 
     /**Root directories for all processed branches.*/
     @get:Input
-    abstract val sources: MapProperty<ProjectBranch, Path>
+    abstract val sources: MapProperty<LightBranch, Path>
 
     /**Build parameters for all processed branches.*/
     @get:Input
-    abstract val data: MapProperty<ProjectBranch, BuildParameters>
+    abstract val data: MapProperty<LightBranch, BuildParameters>
 
     /**
      * Root directory provider for each version.
@@ -50,7 +47,7 @@ abstract class StonecutterTask : DefaultTask() {
      * branch's `build/stonecutter-cache/out-of-bounds/$project` is used.
      */
     @get:Input
-    abstract val cacheDir: Property<(ProjectBranch, StonecutterProject) -> Path>
+    abstract val cacheDir: Property<(LightBranch, StonecutterProject) -> Path>
 
     /**Parameters set by [StonecutterController].*/
     @get:Input
@@ -95,7 +92,7 @@ abstract class StonecutterTask : DefaultTask() {
         println(message)
     }
 
-    private fun processBranch(branch: ProjectBranch, path: Path): Result<() -> Unit>? {
+    private fun processBranch(branch: LightBranch, path: Path): Result<() -> Unit>? {
         val buildParams = data.get()[branch] ?: return null
         val processParams = object : ProcessParameters {
             override val directory = DirectoryData(
@@ -115,7 +112,7 @@ abstract class StonecutterTask : DefaultTask() {
         }
         val processor = FileProcessor(processParams)
         val message = buildString {
-            appendLine("Processing branch ${branch.path}...")
+            appendLine("Processing branch ${branch.location}...")
             appendLine("  Root: ${processParams.directory.root}")
             appendLine("  Dest: ${processParams.directory.dest}")
             appendLine("  Cache in: ${processParams.directory.inputCache}")

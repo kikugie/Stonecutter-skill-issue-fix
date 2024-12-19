@@ -6,9 +6,6 @@ import dev.kikugie.stonecutter.build.StonecutterBuild
 import dev.kikugie.stonecutter.controller.manager.ControllerManager
 import dev.kikugie.stonecutter.controller.manager.controller
 import dev.kikugie.stonecutter.controller.storage.GlobalParameters
-import dev.kikugie.stonecutter.controller.storage.ProjectBranch
-import dev.kikugie.stonecutter.controller.storage.ProjectNode
-import dev.kikugie.stonecutter.controller.storage.ProjectTree
 import dev.kikugie.stonecutter.data.container.ProjectParameterContainer
 import dev.kikugie.stonecutter.data.container.ProjectTreeContainer
 import dev.kikugie.stonecutter.data.container.TreeBuilderContainer
@@ -16,6 +13,7 @@ import dev.kikugie.stonecutter.data.model.BranchInfo.Companion.toBranchInfo
 import dev.kikugie.stonecutter.data.model.NodeInfo.Companion.toNodeInfo
 import dev.kikugie.stonecutter.data.model.BranchModel
 import dev.kikugie.stonecutter.data.model.TreeModel
+import dev.kikugie.stonecutter.data.tree.*
 import dev.kikugie.stonecutter.process.StonecutterTask
 import dev.kikugie.stonecutter.settings.builder.TreeBuilder
 import org.gradle.api.Action
@@ -25,7 +23,7 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 
-internal typealias BranchEntry = Pair<ProjectBranch, StonecutterProject>
+internal typealias BranchEntry = Pair<BranchPrototype<out NodePrototype>, StonecutterProject>
 
 // link: wiki-controller
 /**
@@ -44,6 +42,9 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     private val configurations: MutableMap<BranchEntry, ParameterHolder> = mutableMapOf()
     private val builds: MutableList<Action<StonecutterBuild>> = mutableListOf()
     private val parameters: GlobalParameters = GlobalParameters()
+
+    /**Project tree containing all data, but without access to the underlying Gradle [Project].*/
+    val lightTree: LightTree
 
     /**The full project tree this controller operates on. The default branch is `""`.*/
     val tree: ProjectTree
@@ -75,7 +76,9 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         val data: TreeBuilder = checkNotNull(root.gradle.extensions.getByType<TreeBuilderContainer>()[root]) {
             "Project ${root.path} is not registered. This might've been caused by removing a project while its active"
         }
-        tree = constructTree(data).also(::configureTree)
+        this.lightTree = constructTree(data)
+        this.tree = lightTree.withProject(root)
+        configureTree()
         root.afterEvaluate { setupProject() }
     }
 
@@ -85,7 +88,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
      *
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#active-version">Wiki page</a>
      */
-    infix fun active(name: Identifier) = with(tree) {
+    infix fun active(name: Identifier) = with(lightTree) {
         current.isActive = false
         current = versions.find { it.project == name } ?: error("Project $name is not registered in ${root.path}")
         current.isActive = true
@@ -129,20 +132,20 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         builds += configuration
     }
 
-    private fun constructTree(model: TreeBuilder): ProjectTree = model.nodes.mapValues { (name, nodes) ->
+    private fun constructTree(model: TreeBuilder): LightTree = model.nodes.mapValues { (name, nodes) ->
         val branch = if (name.isEmpty()) root else root.project(name)
         val versions = nodes.associate {
-            it.project to ProjectNode(branch.project(it.project), it)
+            it.project to LightNode(branch.project(it.project).projectDir.toPath(), it)
         }
-        ProjectBranch(branch, name, versions)
+        LightBranch(branch.projectDir.toPath(), name, versions)
     }.let {
-        ProjectTree(root, model.vcsProject, it)
+        LightTree(root.projectDir.toPath(), root.path, model.vcsProject, it)
     }
 
-    private fun configureTree(tree: ProjectTree) {
-        (tree.branches + tree.nodes).forEach {
-            treeContainer.register(it, tree)
-            parameterContainer.register(it, parameters)
+    private fun configureTree() {
+        (lightTree.branches + lightTree.nodes).forEach {
+            treeContainer.register(it.hierarchy, lightTree)
+            parameterContainer.register(it.hierarchy, parameters)
         }
         val task = root.tasks.create("chiseledStonecutter")
         for (it in tree.nodes) {
@@ -181,12 +184,12 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         desc: String,
     ) {
         root.tasks.create<StonecutterTask>(name) {
-            val builds = tree.branches.associateWith {
+            val builds = lightTree.branches.associateWith {
                 it[version.project]?.stonecutter?.data
                     ?: configurations[it to version]?.data
                     ?: BuildParameters()
             }
-            val paths = tree.branches.associateWith { it.path }
+            val paths = lightTree.branches.associateWith { it.location }
 
             group = "stonecutter"
             description = desc
@@ -200,7 +203,7 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
 
             data.set(builds)
             sources.set(paths)
-            cacheDir.set { branch, version -> branch.cachePath(version) }
+            cacheDir.set { branch, version -> branch.location.resolve("build/stonecutter-cache") } // Unused for now
 
             doLast {
                 manager.updateHeader(this.project.buildFile.toPath(), version.project)

@@ -22,6 +22,10 @@ private inline fun <K, V, R> Map<K, V>.remap(block: (K, V) -> Pair<K, R>): Set<M
     }
 }
 
+internal fun LightNode.withProject(project: Project): ProjectNode = ProjectNode(this, project)
+internal fun LightBranch.withProject(project: Project): ProjectBranch = ProjectBranch(this, project)
+internal fun LightTree.withProject(project: Project): ProjectTree = ProjectTree(this, project)
+
 /**Implementation of [NodePrototype] that can access the corresponding Gradle [project].*/
 class ProjectNode(internal val delegate: NodePrototype, project: Project) :
     NodePrototype by delegate,
@@ -63,6 +67,8 @@ class ProjectBranch(internal val delegate: BranchPrototype<out NodePrototype>, p
         delegate.values.map { cache(it.metadata.project)!! }
     }
 
+    override val nodes: Collection<ProjectNode>
+        get() = delegate.nodes as Collection<ProjectNode>
     override fun get(key: Identifier): ProjectNode? = cache(key)
     override fun containsValue(value: ProjectNode): Boolean =
         delegate.containsValue(value.delegate)
@@ -86,6 +92,10 @@ class ProjectTree(internal val delegate: TreePrototype<out BranchPrototype<out N
         delegate.values.map { cache(it.id)!! }
     }
 
+    override val branches: Collection<ProjectBranch>
+        get() = delegate.branches as Collection<ProjectBranch>
+    override val nodes: Collection<ProjectNode>
+        get() = delegate.nodes as Collection<ProjectNode>
     override fun get(key: Identifier): ProjectBranch? = cache(key)
     override fun containsValue(value: ProjectBranch): Boolean =
         delegate.containsValue(value.delegate)
