@@ -4,12 +4,9 @@ import dev.kikugie.stonecutter.Identifier
 import dev.kikugie.stonecutter.controller.ControllerParameters
 import dev.kikugie.stonecutter.controller.StonecutterController
 import kotlinx.serialization.Serializable
-import org.jetbrains.annotations.ApiStatus
 import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
-import kotlin.reflect.full.declaredMemberProperties
 
 /**
  * Stores [ControllerParameters] and chiseled task names to be passed to the versioned buildscript.
@@ -30,54 +27,51 @@ data class GlobalParameters(
     internal fun hasChiseled(stack: Iterable<String>) = stack.any { it in chiseled }
 
     /**
-     * Creates a Kotlin property for the given [name].
+     * Creates a Kotlin property for the given [property] name.
      * ```kotlin
      * var receiverName: String by parameters.named("receiver")
      * ```
      */
-    inline fun <reified T : Any> named(name: String): ReadWriteProperty<Any, T> =
-        provider(name, T::class)
+    fun <T : Any> named(property: String): ReadWriteProperty<Any, T> =
+        ParameterDelegate(property)
 
     /**
-     * Creates a Kotlin property for the given [name], with specified [verifier] for the setter.
+     * Creates a Kotlin property for the given [property] name, with specified [verifier] for the setter.
      * ```kotlin
      * var receiverName: String by parameters.named("receiver") {
      *     require(it != "minceraft") { "No rafts allowed!" }
      * }
      * ```
      */
-    inline fun <reified T : Any> named(name: String, crossinline verifier: (T) -> Unit): ReadWriteProperty<Any, T> =
+    inline fun <T : Any> named(property: String, crossinline verifier: (T) -> Unit): ReadWriteProperty<Any, T> =
         object : ReadWriteProperty<Any, T> {
-            private val provider: ReadWriteProperty<Any, T> = provider(name, T::class)
+            private val provider: ReadWriteProperty<Any, T> = named(property)
             override fun getValue(thisRef: Any, property: KProperty<*>): T = provider.getValue(thisRef, property)
             override fun setValue(thisRef: Any, property: KProperty<*>, value: T) = verifier.invoke(value).let {
                 provider.setValue(thisRef, property, value)
             }
         }
 
-    /**
-     * Creates a delegate property for the given [name] and [type].
-     * This is supposed to be called from [named] function.
-     *
-     * **Not a part of the public API**
-     */
-    @ApiStatus.Internal
-    fun <T : Any> provider(name: String, type: KClass<T>): ReadWriteProperty<Any, T> {
-        val property = requireNotNull(this::class.declaredMemberProperties.find { it.name == name }) {
-            "Property $name not found"
+    @Suppress("UNCHECKED_CAST")
+    private inner class ParameterDelegate<T>(private val property: String): ReadWriteProperty<Any, T> {
+        init {
+            require(property == "debug" || property == "process" || property == "receiver") {
+                "Invalid property name: $property"
+            }
         }
-        require(property is KMutableProperty1) { "Property $name is not mutable" }
-        require(property.returnType.classifier == type) {
-            "Property $name is not of the required type ${type.simpleName}"
-        }
-        @Suppress("UNCHECKED_CAST")
-        return Provider(property as KMutableProperty1<GlobalParameters, T>)
-    }
 
-    private inner class Provider<T>(private val property: KMutableProperty1<GlobalParameters, T>) :
-        ReadWriteProperty<Any, T> {
-        override fun getValue(thisRef: Any, property: KProperty<*>): T = this.property(this@GlobalParameters)
-        override fun setValue(thisRef: Any, property: KProperty<*>, value: T) =
-            this.property.set(this@GlobalParameters, value)
+        override fun getValue(thisRef: Any, property: KProperty<*>): T = when (this.property) {
+            "debug" -> debug as T
+            "process" -> process as T
+            "receiver" -> receiver as T
+            else -> throw UnsupportedOperationException("Checked at init")
+        }
+
+        override fun setValue(thisRef: Any, property: KProperty<*>, value: T) = when (this.property) {
+            "debug" -> debug = value as Boolean
+            "process" -> process = value as Boolean
+            "receiver" -> receiver = value as Identifier
+            else -> throw UnsupportedOperationException("Checked at init")
+        }
     }
 }
