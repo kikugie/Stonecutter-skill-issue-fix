@@ -47,3 +47,4 @@ internal operator fun <T> Provider<T>.invoke() = get()
 internal operator fun <T> Property<T>.invoke(value: T) = set(value)
 
 internal inline fun <T> Iterable<T>.onEach(action: T.() -> Unit) = forEach(action)
+internal infix fun <T> Any?.then(other: T): T = other

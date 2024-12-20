@@ -4,7 +4,13 @@ import dev.kikugie.stonecutter.*
 import dev.kikugie.stonecutter.data.ProjectHierarchy
 import dev.kikugie.stonecutter.data.container.ConfigurationService.Companion.of
 import dev.kikugie.stonecutter.data.parameters.BuildParameters
+import dev.kikugie.stonecutter.controller.ControllerAbstraction
 
+/**
+ * Contains logic for the versioned buildscript, which is separated to allow
+ * global configuration by [ControllerAbstraction.parameters].
+ * @property hierarchy Path of the corresponding project
+ */
 abstract class BuildAbstraction(protected val hierarchy: ProjectHierarchy) {
     /**
      * Delegates set operation. Meant to be used with Kotlin DSL.

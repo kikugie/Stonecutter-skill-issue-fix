@@ -24,7 +24,10 @@ private inline fun <K, V, R> Map<K, V>.remap(block: (K, V) -> Pair<K, R>): Set<M
 @StonecutterDelicate internal fun LightBranch.withProject(project: Project): ProjectBranch = ProjectBranch(this, project)
 @StonecutterDelicate internal fun LightTree.withProject(project: Project): ProjectTree = ProjectTree(this, project)
 
-/**Implementation of [NodePrototype] that can access the corresponding Gradle [project].*/
+/**
+ * Implementation of [NodePrototype] that can access the corresponding Gradle [project].
+ * @property light The underlying [LightNode]
+ */
 @StonecutterDelicate
 class ProjectNode(val light: LightNode, project: Project) :
     NodePrototype by light,
@@ -46,7 +49,10 @@ class ProjectNode(val light: LightNode, project: Project) :
         this.branch.tree[branch][node]
 }
 
-/**Implementation of [BranchPrototype] that can access the corresponding Gradle [project].*/
+/**
+ * Implementation of [BranchPrototype] that can access the corresponding Gradle [project].
+ * @property light The underlying [LightBranch]
+ */
 @StonecutterDelicate
 class ProjectBranch(val light: LightBranch, project: Project) :
     BranchPrototype<ProjectNode> by light as BranchPrototype<ProjectNode>,
@@ -74,7 +80,10 @@ class ProjectBranch(val light: LightBranch, project: Project) :
         get(project.path.substringAfterLast(':'))
 }
 
-/**Implementation of [TreePrototype] that can access the corresponding Gradle [project].*/
+/**
+ * Implementation of [TreePrototype] that can access the corresponding Gradle [project].
+ * @property light The underlying [LightTree]
+ */
 @StonecutterDelicate
 class ProjectTree(val light: LightTree, project: Project) :
     TreePrototype<ProjectBranch> by light as TreePrototype<ProjectBranch>,

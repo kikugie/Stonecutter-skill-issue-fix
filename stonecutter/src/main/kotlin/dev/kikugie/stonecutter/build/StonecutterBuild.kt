@@ -2,7 +2,6 @@ package dev.kikugie.stonecutter.build
 
 import dev.kikugie.stonecutter.*
 import dev.kikugie.stonecutter.StonecutterPlugin
-import dev.kikugie.stonecutter.data.ProjectHierarchy
 import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.hierarchy
 import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.locate
 import dev.kikugie.stonecutter.data.StonecutterProject
@@ -37,9 +36,9 @@ open class StonecutterBuild(private val project: Project) : BuildAbstraction(pro
 
     @StonecutterAPI val tree: LightTree = StonecutterPlugin.SERVICE.of(parent.hierarchy).tree
         ?: error("Tree for '${project.path}' not found")
-    @StonecutterAPI val branch: LightBranch = tree[parent.hierarchy.lastOrThis().removePrefix(":")]
+    @StonecutterAPI val branch: LightBranch = tree[parent.hierarchy.last().removePrefix(":")]
         ?: error("Branch for '${project.path}' not found")
-    @StonecutterAPI val node: LightNode = branch[project.hierarchy.lastOrThis().removePrefix(":")]
+    @StonecutterAPI val node: LightNode = branch[project.hierarchy.last().removePrefix(":")]
         ?: error("Node for '${project.path}' not found")
 
     /**All versions in this project's branch.*/

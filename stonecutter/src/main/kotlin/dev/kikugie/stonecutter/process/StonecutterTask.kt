@@ -3,36 +3,49 @@ package dev.kikugie.stonecutter.process
 import dev.kikugie.semver.VersionParser
 import dev.kikugie.stitcher.scanner.CommentRecognizers
 import dev.kikugie.stitcher.transformer.TransformParameters
-import dev.kikugie.stonecutter.StonecutterPlugin
 import dev.kikugie.stonecutter.data.ProjectHierarchy
 import dev.kikugie.stonecutter.data.StonecutterProject
 import dev.kikugie.stonecutter.data.container.ConfigurationService
 import dev.kikugie.stonecutter.data.parameters.BuildParameters
 import dev.kikugie.stonecutter.data.parameters.GlobalParameters
 import dev.kikugie.stonecutter.data.tree.LightBranch
+import dev.kikugie.stonecutter.data.tree.BranchPrototype
 import dev.kikugie.stonecutter.invoke
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Path
 import kotlin.io.path.extension
 import kotlin.io.path.isDirectory
 import kotlin.system.measureTimeMillis
 
+/**Task responsible for scanning versioned comments and modifying files to match the given version.*/
 abstract class StonecutterTask : DefaultTask() {
-    @get:Internal abstract val parameters: Property<ConfigurationService.Snapshot>
+    /**
+     * All collected build parameters.
+     * *This should've been done with a build service, but fate was against it.*
+     */
+    @get:Input abstract val parameters: Property<ConfigurationService.Snapshot>
 
+    /**Any key present in [parameters]. Used to retrieve [GlobalParameters].*/
     @get:Input abstract val instance: Property<ProjectHierarchy>
 
+    /**Current version, before the switch is done.*/
     @get:Input abstract val fromVersion: Property<StonecutterProject>
+
+    /**Version to be used after the switch, which is also used to retrieve [BuildParameters].*/
     @get:Input abstract val toVersion: Property<StonecutterProject>
 
+    /**Source directory relative to each [BranchPrototype.location] in [sources].*/
     @get:Input abstract val input: Property<String>
+
+    /**File destination directory relative to each [BranchPrototype.location] in [sources].*/
     @get:Input abstract val output: Property<String>
+
+    /**Branches to be processed by this task.*/
     @get:Input abstract val sources: ListProperty<LightBranch>
 
     private val statistics: ProcessStatistics = ProcessStatistics()
@@ -89,7 +102,7 @@ abstract class StonecutterTask : DefaultTask() {
         return FileProcessor(processParameters).runCatching { process() }
     }
 
-    companion object {
+    private companion object {
         private fun BuildParameters.toFileFilter(): (Path) -> Boolean = { file ->
             file.extension !in excludedExtensions && file !in excludedPaths && excludedPaths.none {
                 it.isDirectory() && file.startsWith(
