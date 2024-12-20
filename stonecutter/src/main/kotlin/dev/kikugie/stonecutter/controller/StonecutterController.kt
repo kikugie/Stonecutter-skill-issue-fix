@@ -1,70 +1,28 @@
 package dev.kikugie.stonecutter.controller
 
+import dev.kikugie.stonecutter.Identifier
+import dev.kikugie.stonecutter.StonecutterUtility
 import dev.kikugie.stonecutter.*
-import dev.kikugie.stonecutter.build.BuildParameters
-import dev.kikugie.stonecutter.build.StonecutterBuild
-import dev.kikugie.stonecutter.controller.manager.ControllerManager
-import dev.kikugie.stonecutter.controller.manager.controller
-import dev.kikugie.stonecutter.controller.storage.GlobalParameters
-import dev.kikugie.stonecutter.data.container.ProjectParameterContainer
-import dev.kikugie.stonecutter.data.container.ProjectTreeContainer
-import dev.kikugie.stonecutter.data.container.TreeBuilderContainer
-import dev.kikugie.stonecutter.data.model.BranchInfo.Companion.toBranchInfo
-import dev.kikugie.stonecutter.data.model.NodeInfo.Companion.toNodeInfo
-import dev.kikugie.stonecutter.data.model.BranchModel
-import dev.kikugie.stonecutter.data.model.TreeModel
+import dev.kikugie.stonecutter.data.ProjectHierarchy
+import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.hierarchy
+import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.locate
+import dev.kikugie.stonecutter.data.StonecutterProject
+import dev.kikugie.stonecutter.data.container.HierarchyMap
+import dev.kikugie.stonecutter.data.parameters.BuildParameters
+import dev.kikugie.stonecutter.data.parameters.GlobalParameters
 import dev.kikugie.stonecutter.data.tree.*
 import dev.kikugie.stonecutter.process.StonecutterTask
-import dev.kikugie.stonecutter.settings.builder.TreeBuilder
-import org.gradle.api.Action
 import org.gradle.api.Project
-import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.register
 
-internal typealias BranchEntry = Pair<BranchPrototype<out NodePrototype>, StonecutterProject>
-
-// link: wiki-controller
 /**
  * Stonecutter plugin applied to `stonecutter.gradle[.kts]`.
  *
  * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#controller-stonecutter-gradle-kts">Wiki page</a>
  */
 @Suppress("MemberVisibilityCanBePrivate")
-open class StonecutterController(internal val root: Project) : StonecutterUtility, ControllerParameters {
-    private val manager: ControllerManager = checkNotNull(root.controller()) {
-        "Project ${root.path} is not a Stonecutter controller. What did you even do to get this error?"
-    }
-    private val treeContainer: ProjectTreeContainer = root.gradle.extensions.getByType<ProjectTreeContainer>()
-    private val parameterContainer: ProjectParameterContainer =
-        root.gradle.extensions.getByType<ProjectParameterContainer>()
-    private val configurations: MutableMap<BranchEntry, ParameterHolder> = mutableMapOf()
-    private val builds: MutableList<Action<StonecutterBuild>> = mutableListOf()
-    private val parameters: GlobalParameters = GlobalParameters()
-
-    /**Project tree containing all data, but without access to the underlying Gradle [Project].*/
-    val lightTree: LightTree
-
-    /**The full project tree this controller operates on. The default branch is `""`.*/
-    val tree: ProjectTree
-
-    /**Version control project used by `Reset active project` task.*/
-    val vcsVersion: StonecutterProject get() = tree.vcs
-
-    /**All versions registered in the tree. Branches may have the same or a subset of these.*/
-    val versions: Collection<StonecutterProject> get() = tree.versions
-
-    // link: wiki-controller-active
-    /**
-     * The active version selected by `stonecutter.active "..."` call.
-     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#active-version">Wiki page</a>
-     */
-    val current: StonecutterProject get() = tree.current
-
-    /**Type of the chiseled task. Used with [registerChiseled].*/
-    val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
-
+open class StonecutterController(root: Project) : ControllerAbstraction(root), StonecutterUtility,
+    GlobalParametersAccess {
     override var automaticPlatformConstants: Boolean = false
     override var debug: Boolean by parameters.named("debug")
     override var processFiles: Boolean by parameters.named("process")
@@ -72,93 +30,51 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         require(it.isValid()) { "Invalid receiver '$it'" }
     }
 
+    @StonecutterDelicate fun withProject(node: LightNode): ProjectNode =
+        node.withProject(root.locate(node.hierarchy))
+
+    @StonecutterDelicate fun withProject(branch: LightBranch): ProjectBranch =
+        branch.withProject(root.locate(branch.hierarchy))
+
+    @StonecutterDelicate fun withProject(tree: LightTree): ProjectTree =
+        tree.withProject(root.locate(tree.hierarchy))
+
     init {
-        val data: TreeBuilder = checkNotNull(root.gradle.extensions.getByType<TreeBuilderContainer>()[root]) {
-            "Project ${root.path} is not registered. This might've been caused by removing a project while its active"
+        prepareConfiguration()
+        root.afterEvaluate { configureProject() }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    @OptIn(StonecutterDelicate::class)
+    private fun prepareConfiguration() = with(StonecutterPlugin.SERVICE()) {
+        val maps: Array<MutableMap<ProjectHierarchy, Any>> = arrayOf(mutableMapOf(), mutableMapOf(), mutableMapOf())
+        for (it in buildSet {
+            add(tree.hierarchy)
+            addAll(tree.branches.map(LightBranch::hierarchy))
+            tree.versions.flatMap { v -> tree.branches.map { it.hierarchy + v.project } }
+                .let(::addAll)
+        }) {
+            maps[0][it] = tree
+            maps[1][it] = BuildParameters()
+            maps[2][it] = this@StonecutterController.parameters
         }
-        this.lightTree = constructTree(data)
-        this.tree = lightTree.withProject(root)
-        configureTree()
-        root.afterEvaluate { setupProject() }
-    }
+        parameters.projectTrees.set(maps[0] as Map<ProjectHierarchy, LightTree>)
+        parameters.buildParameters.set(maps[1] as Map<ProjectHierarchy, BuildParameters>)
+        parameters.globalParameters.set(maps[2] as Map<ProjectHierarchy, GlobalParameters>)
 
-    // link: wiki-controller-active
-    /**
-     * Sets the active project. **DO NOT call on your own**
-     *
-     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#active-version">Wiki page</a>
-     */
-    infix fun active(name: Identifier) = with(lightTree) {
-        current.isActive = false
-        current = versions.find { it.project == name } ?: error("Project $name is not registered in ${root.path}")
-        current.isActive = true
-    }
-
-    // link: wiki-chisel
-    /**
-     * Registers the task as chiseled. This is required for all tasks that need to build all versions.
-     *
-     * @see [ChiseledTask]
-     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#chiseled-tasks">Wiki page</a>
-     */
-    infix fun registerChiseled(provider: TaskProvider<*>) {
-        parameters.addTask(provider.name)
-    }
-
-    // link: wiki-controller-params
-    /**
-     * Specifies configurations for all combinations of versions and branches.
-     * This provides parameters for the processor to use non-existing versions.
-     * If the given version exists, it will be applied to the [StonecutterBuild].
-     *
-     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#global-parameters">Wiki page</a>
-     */
-    infix fun parameters(configuration: Action<ParameterHolder>) = tree.branches.asSequence().flatMap { br ->
-        versions.map { br to it }
-    }.forEach {
-        configurations.getOrPut(it) { ParameterHolder(it.first, it.second) }.let(configuration::execute)
-    }
-
-    /**
-     * Executes the provided action on each node after the nodes are configured.
-     *
-     * This may miss configurations required for a multi-branch setup
-     * and may have issues accessing versioned project properties.
-     *
-     * @param configuration Versioned plugin configuration
-     */
-    @Deprecated(message = "Use `parameters {}` for global configuration.")
-    infix fun configureEach(configuration: Action<StonecutterBuild>) {
-        builds += configuration
-    }
-
-    private fun constructTree(model: TreeBuilder): LightTree = model.nodes.mapValues { (name, nodes) ->
-        val branch = if (name.isEmpty()) root else root.project(name)
-        val versions = nodes.associate {
-            it.project to LightNode(branch.project(it.project).projectDir.toPath(), it)
-        }
-        LightBranch(branch.projectDir.toPath(), name, versions)
-    }.let {
-        LightTree(root.projectDir.toPath(), root.path, model.vcsProject, it)
-    }
-
-    private fun configureTree() {
-        (lightTree.branches + lightTree.nodes).forEach {
-            treeContainer.register(it.hierarchy, lightTree)
-            parameterContainer.register(it.hierarchy, parameters)
-        }
-        val task = root.tasks.create("chiseledStonecutter")
+        val syncTask = root.tasks.create("chiseledStonecutter")
         for (it in tree.nodes) {
-            it.project.pluginManager.apply(StonecutterPlugin::class)
-            task.dependsOn("${it.project.path}:setupChiseledBuild")
+            withProject(it).pluginManager.apply(StonecutterPlugin::class.java)
+            syncTask.dependsOn("${it.hierarchy}:setupChiseledBuild")
         }
     }
 
-    private fun setupProject() {
-        if (automaticPlatformConstants) configurePlatforms(tree.nodes)
-        tree.nodes.forEach {
-            configurations[it.branch to it.metadata]?.run { it.stonecutter.from(this) }
-            for (build in builds) build.execute(it.stonecutter)
+    @OptIn(StonecutterDelicate::class)
+    private fun configureProject() {
+        for (it in tree.nodes) {
+            val plugin = withProject(it).stonecutter
+            configurations[it.branch to it.metadata]?.run { plugin.from(this) }
+            builds.onEach { execute(plugin) }
         }
 
         createStonecutterTask("Reset active project", tree.vcs) {
@@ -175,75 +91,50 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
         serializeBranches()
     }
 
-    private inline fun createStonecutterTask(name: String, version: StonecutterProject, desc: () -> String) =
-        createStonecutterTask(name, version, desc())
+    private fun createStonecutterTask(name: String, version: StonecutterProject, desc: () -> String) =
+        root.tasks.register<StonecutterTask>(name) {
+            group = "Stonecutter"
+            description = desc()
 
-    private fun createStonecutterTask(
-        name: String,
-        version: StonecutterProject,
-        desc: String,
-    ) {
-        root.tasks.create<StonecutterTask>(name) {
-            val builds = lightTree.branches.associateWith {
-                it[version.project]?.stonecutter?.data
-                    ?: configurations[it to version]?.data
-                    ?: BuildParameters()
-            }
-            val paths = lightTree.branches.associateWith { it.location }
+            instance(project.hierarchy)
 
-            group = "stonecutter"
-            description = desc
+            fromVersion(current)
+            toVersion(version)
 
-            params.set(parameters)
-            toVersion.set(version)
-            fromVersion.set(tree.current)
+            input("src")
+            output("src")
+            sources.set(tree.branches)
 
-            input.set("src")
-            output.set("src")
-
-            data.set(builds)
-            sources.set(paths)
-            cacheDir.set { branch, version -> branch.location.resolve("build/stonecutter-cache") } // Unused for now
-
-            doLast {
-                manager.updateHeader(this.project.buildFile.toPath(), version.project)
-            }
+            parameters(StonecutterPlugin.SERVICE().snapshot())
+            doLast { updateController(version) }
         }
-    }
-
-    private fun configurePlatforms(projects: Iterable<Project>) {
-        val key = "loom.platform"
-        val platforms = buildSet {
-            for (it in projects) it.findProperty(key)?.run {
-                add(toString())
-            }
-        }.also { if (it.isEmpty()) return }
-        parameters {
-            val platform = node?.findProperty(key)?.toString() ?: "\n"
-            consts(platform, platforms)
-        }
-    }
 
     private fun serializeTree() = with(tree) {
         TreeModel(
             STONECUTTER,
             vcsVersion,
             current,
-            branches.map { it.toBranchInfo(path.relativize(it.path)) },
-            nodes.map { it.toNodeInfo(path.relativize(it.location), current) },
-            parameters,
-        ).save(stonecutterCachePath).onFailure {
-            logger.warn("Failed to save tree model", it)
+            branches.map {
+                BranchInfo(it.id, location cut it.location)
+            },
+            nodes.map {
+                NodeInfo(it.metadata, location cut it.location, it.metadata.isActive)
+            },
+            parameters
+        ).save(tree.location.resolve("build/stonecutter-cache")).onFailure {
+            root.logger.warn("Failed to save tree model", it)
         }
     }
 
     private fun serializeBranches() = tree.branches.onEach {
         BranchModel(
             id,
-            path.relativize(tree.path),
-            nodes.map { it.toNodeInfo(it.location.relativize(tree.path), current) },
-        ).save(stonecutterCachePath).onFailure {
-            logger.warn("Failed to save branch model for '$name'", it)
+            location.relativize(tree.location),
+            nodes.map {
+                NodeInfo(it.metadata, location cut it.location, it.metadata.isActive)
+            }
+        ).save(tree.location.resolve("build/stonecutter-cache")).onFailure {
+            root.logger.warn("Failed to save branch model for '$id'", it)
         }
     }
 }

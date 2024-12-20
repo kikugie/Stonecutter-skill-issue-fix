@@ -1,10 +1,7 @@
-package dev.kikugie.stonecutter.build
+package dev.kikugie.stonecutter.data.parameters
 
 import dev.kikugie.semver.Version
-import dev.kikugie.semver.VersionParser
-import dev.kikugie.stitcher.transformer.TransformParameters
 import dev.kikugie.stonecutter.Identifier
-import dev.kikugie.stonecutter.process.FileFilter
 import kotlinx.serialization.Serializable
 import java.nio.file.Path
 
@@ -29,16 +26,4 @@ data class BuildParameters(
         "DS_Store", // Mac momentos
     ),
     val excludedPaths: MutableSet<Path> = mutableSetOf()
-) {
-    /**Creates parameters used by the file processor.*/
-    internal fun toTransformParams(version: String, key: String): TransformParameters = with(dependencies) {
-        getOrElse(key) { VersionParser.parseLenient(version).value }.let {
-            put(key, it)
-            put("", it)
-        }
-        TransformParameters(swaps, constants, this)
-    }
-
-    /**Creates a [FileFilter] from the specified excluded paths and extensions.*/
-    internal fun toFileFilter() = FileFilter(excludedExtensions, excludedPaths)
-}
+)

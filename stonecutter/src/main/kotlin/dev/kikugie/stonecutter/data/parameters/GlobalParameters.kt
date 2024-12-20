@@ -1,11 +1,8 @@
-package dev.kikugie.stonecutter.controller.storage
+package dev.kikugie.stonecutter.data.parameters
 
 import dev.kikugie.stonecutter.Identifier
-import dev.kikugie.stonecutter.controller.ControllerParameters
-import dev.kikugie.stonecutter.controller.StonecutterController
 import kotlinx.serialization.Serializable
 import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
 
 /**

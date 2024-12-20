@@ -1,7 +1,13 @@
-package dev.kikugie.stonecutter
+package dev.kikugie.stonecutter.controller
 
-import dev.kikugie.stonecutter.data.container.ProjectTreeContainer
+import dev.kikugie.stonecutter.Identifier
+import dev.kikugie.stonecutter.StonecutterPlugin
+import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.hierarchy
+import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.locate
+import dev.kikugie.stonecutter.data.StonecutterProject
+import dev.kikugie.stonecutter.data.container.ConfigurationService.Companion.of
 import dev.kikugie.stonecutter.data.tree.NodePrototype
+import dev.kikugie.stonecutter.invoke
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Input
@@ -16,9 +22,9 @@ import org.jetbrains.annotations.ApiStatus
 @Suppress("LeakingThis", "unused", "DEPRECATION")
 abstract class ChiseledTask : DefaultTask() {
     @Transient
-    private val tree = requireNotNull(project.gradle.extensions.getByType(ProjectTreeContainer::class.java)[project]) {
-        "Chiseled task registered in a non-Stonecutter project"
-    }
+    private val tree = StonecutterPlugin.SERVICE.of(project.hierarchy).tree
+        ?: error("Chiseled task registered in a non-Stonecutter project")
+
     @Transient
     private val setupTask: String = project.tasks.getByName("chiseledStonecutter").path
 
@@ -75,7 +81,7 @@ abstract class ChiseledTask : DefaultTask() {
         }
         // We can reference the project here, even though it's transient,
         // because this is called in the configuration stage.
-        project.project(it.hierarchy).tasks.findByName(name)?.let { task ->
+        project.locate(it.hierarchy).tasks.findByName(name)?.let { task ->
             finalizedBy(task)
             task.mustRunAfter(setupTask)
         }

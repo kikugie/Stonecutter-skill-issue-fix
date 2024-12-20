@@ -2,11 +2,9 @@
 
 package dev.kikugie.stonecutter.data.tree
 
-import dev.kikugie.stonecutter.Identifier
+import dev.kikugie.stonecutter.*
 import dev.kikugie.stonecutter.build.StonecutterBuild
-import dev.kikugie.stonecutter.memoize
-import dev.kikugie.stonecutter.get
-import dev.kikugie.stonecutter.removeStarting
+import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.locate
 import org.gradle.api.Project
 import org.gradle.api.UnknownDomainObjectException
 import org.gradle.kotlin.dsl.getByType
@@ -22,22 +20,21 @@ private inline fun <K, V, R> Map<K, V>.remap(block: (K, V) -> Pair<K, R>): Set<M
     }
 }
 
-internal fun LightNode.withProject(project: Project): ProjectNode = ProjectNode(this, project)
-internal fun LightBranch.withProject(project: Project): ProjectBranch = ProjectBranch(this, project)
-internal fun LightTree.withProject(project: Project): ProjectTree = ProjectTree(this, project)
+@StonecutterDelicate internal fun LightNode.withProject(project: Project): ProjectNode = ProjectNode(this, project)
+@StonecutterDelicate internal fun LightBranch.withProject(project: Project): ProjectBranch = ProjectBranch(this, project)
+@StonecutterDelicate internal fun LightTree.withProject(project: Project): ProjectTree = ProjectTree(this, project)
 
 /**Implementation of [NodePrototype] that can access the corresponding Gradle [project].*/
-class ProjectNode(internal val delegate: NodePrototype, project: Project) :
-    NodePrototype by delegate,
+@StonecutterDelicate
+class ProjectNode(val light: LightNode, project: Project) :
+    NodePrototype by light,
     Project by project {
     /**
      * Stonecutter plugin for this node.
      * @throws UnknownDomainObjectException if the plugin is not applied.
      */
     val stonecutter: StonecutterBuild get() = extensions.getByType<StonecutterBuild>()
-    override val branch: ProjectBranch by lazy {
-        ProjectBranch(delegate.branch, rootProject.project(delegate.branch.hierarchy))
-    }
+    override val branch: ProjectBranch by lazy { light.branch.let { ProjectBranch(it, locate(it.hierarchy)) } }
 
     override fun peer(node: Identifier): ProjectNode? =
         this.branch[node]
@@ -50,28 +47,27 @@ class ProjectNode(internal val delegate: NodePrototype, project: Project) :
 }
 
 /**Implementation of [BranchPrototype] that can access the corresponding Gradle [project].*/
-class ProjectBranch(internal val delegate: BranchPrototype<out NodePrototype>, project: Project) :
-    BranchPrototype<ProjectNode> by delegate as BranchPrototype<ProjectNode>,
+@StonecutterDelicate
+class ProjectBranch(val light: LightBranch, project: Project) :
+    BranchPrototype<ProjectNode> by light as BranchPrototype<ProjectNode>,
     Project by project {
     private val cache: (Identifier) -> ProjectNode? = memoize { id ->
-        delegate[id]?.let { ProjectNode(it, rootProject.project(it.hierarchy)) }
+        light[id]?.let { ProjectNode(it, locate(it.hierarchy)) }
     }
-    override val tree: ProjectTree by lazy {
-        val parent = if (hierarchy.isBlank() || hierarchy == ":") rootProject else rootProject.project(hierarchy)
-        ProjectTree(delegate.tree, parent)
-    }
+    override val tree: ProjectTree by lazy { ProjectTree(light.tree, locate(hierarchy - id)) }
     override val entries: Set<Map.Entry<Identifier, ProjectNode>> by lazy {
-        delegate.remap { id, _ -> id to cache(id)!! }
+        light.remap { id, _ -> id to cache(id)!! }
     }
     override val values: Collection<ProjectNode> by lazy {
-        delegate.values.map { cache(it.metadata.project)!! }
+        light.values.map { cache(it.metadata.project)!! }
     }
 
     override val nodes: Collection<ProjectNode>
-        get() = delegate.nodes as Collection<ProjectNode>
+        get() = light.nodes as Collection<ProjectNode>
+
     override fun get(key: Identifier): ProjectNode? = cache(key)
     override fun containsValue(value: ProjectNode): Boolean =
-        delegate.containsValue(value.delegate)
+        light.containsValue(value.light)
 
     /**Finds the [ProjectNode] corresponding to the given Gradle [project].*/
     operator fun get(project: Project): ProjectNode? =
@@ -79,26 +75,28 @@ class ProjectBranch(internal val delegate: BranchPrototype<out NodePrototype>, p
 }
 
 /**Implementation of [TreePrototype] that can access the corresponding Gradle [project].*/
-class ProjectTree(internal val delegate: TreePrototype<out BranchPrototype<out NodePrototype>>, project: Project) :
-    TreePrototype<ProjectBranch> by delegate as TreePrototype<ProjectBranch>,
+@StonecutterDelicate
+class ProjectTree(val light: LightTree, project: Project) :
+    TreePrototype<ProjectBranch> by light as TreePrototype<ProjectBranch>,
     Project by project {
     private val cache: (Identifier) -> ProjectBranch? = memoize { id ->
-        delegate[id]?.let { ProjectBranch(it, rootProject.project(it.hierarchy)) }
+        light[id]?.let { ProjectBranch(it, locate(it.hierarchy)) }
     }
     override val entries: Set<Map.Entry<Identifier, ProjectBranch>> by lazy {
-        delegate.remap { id, _ -> id to cache(id)!! }
+        light.remap { id, _ -> id to cache(id)!! }
     }
     override val values: Collection<ProjectBranch> by lazy {
-        delegate.values.map { cache(it.id)!! }
+        light.values.map { cache(it.id)!! }
     }
 
     override val branches: Collection<ProjectBranch>
-        get() = delegate.branches as Collection<ProjectBranch>
+        get() = light.branches as Collection<ProjectBranch>
     override val nodes: Collection<ProjectNode>
-        get() = delegate.nodes as Collection<ProjectNode>
+        get() = light.nodes as Collection<ProjectNode>
+
     override fun get(key: Identifier): ProjectBranch? = cache(key)
     override fun containsValue(value: ProjectBranch): Boolean =
-        delegate.containsValue(value.delegate)
+        light.containsValue(value.light)
 
     /**Finds the [ProjectBranch] corresponding to the given Gradle [project].*/
     operator fun get(project: Project): ProjectBranch? =

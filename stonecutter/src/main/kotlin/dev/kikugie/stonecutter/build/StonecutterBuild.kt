@@ -1,19 +1,22 @@
 package dev.kikugie.stonecutter.build
 
 import dev.kikugie.stonecutter.*
-import dev.kikugie.stonecutter.controller.storage.*
-import dev.kikugie.stonecutter.data.model.BranchInfo.Companion.toBranchInfo
-import dev.kikugie.stonecutter.data.model.NodeModel
-import dev.kikugie.stonecutter.data.container.ProjectParameterContainer
-import dev.kikugie.stonecutter.data.container.ProjectTreeContainer
+import dev.kikugie.stonecutter.StonecutterPlugin
+import dev.kikugie.stonecutter.data.ProjectHierarchy
+import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.hierarchy
+import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.locate
+import dev.kikugie.stonecutter.data.StonecutterProject
+import dev.kikugie.stonecutter.data.container.ConfigurationService.Companion.of
+import dev.kikugie.stonecutter.data.tree.*
 import dev.kikugie.stonecutter.process.StonecutterTask
-import dev.kikugie.stonecutter.stonecutterCachePath
+import dev.kikugie.stonecutter.projectPath
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.register
+import org.jetbrains.annotations.ApiStatus
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
@@ -29,87 +32,103 @@ import kotlin.io.path.invariantSeparatorsPathString
  * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#versioning-build-gradle-kts">Wiki page</a>
  */
 @OptIn(ExperimentalPathApi::class)
-@Suppress("MemberVisibilityCanBePrivate")
-open class StonecutterBuild(val project: Project) : BuildConfiguration(project.parent!!), StonecutterUtility {
-    private val parent: Project = requireNotNull(project.parent) {
-        "StonecutterBuild applied to a non-versioned buildscript"
-    }
+open class StonecutterBuild(private val project: Project) : BuildAbstraction(project.hierarchy), StonecutterUtility {
+    private val parent: Project = requireNotNull(project.parent) { "No parent project for '${project.path}'" }
 
-    private val params: GlobalParameters =
-        requireNotNull(project.gradle.extensions.getByType<ProjectParameterContainer>()[project]) {
-            "Global parameters not found for project '$project'"
-        }
-
-    /**
-     * The full tree this project belongs to. Without subprojects, it will only have the root branch.
-     * Allows traversing all branches if needed. For project access use [node] methods.
-     */
-    val tree: ProjectTree = requireNotNull(project.gradle.extensions.getByType<ProjectTreeContainer>()[project]) {
-        "Project '$project' is not versioned"
-    }
-
-    /**
-     * The branch this project belongs to. Allows accessing other versions.
-     * For most cases use [node] methods.
-     */
-    val branch: ProjectBranch = requireNotNull(tree[parent]) {
-        "Branch '$parent' not found in [${tree.keys.joinToString { "'$it'" }}]"
-    }
-
-    /**This project's node. Contains this project's metadata and provides an interface for traversing the tree.*/
-    val node: ProjectNode = requireNotNull(branch[project]) {
-        "Project '$project' is not found in the branch {${branch.keys.joinToString { "'$it'" }}]"
-    }
+    @StonecutterAPI val tree: LightTree = StonecutterPlugin.SERVICE.of(parent.hierarchy).tree
+        ?: error("Tree for '${project.path}' not found")
+    @StonecutterAPI val branch: LightBranch = tree[parent.hierarchy.lastOrThis().removePrefix(":")]
+        ?: error("Branch for '${project.path}' not found")
+    @StonecutterAPI val node: LightNode = branch[project.hierarchy.lastOrThis().removePrefix(":")]
+        ?: error("Node for '${project.path}' not found")
 
     /**All versions in this project's branch.*/
-    val versions: Collection<StonecutterProject> get() = branch.versions
+    @StonecutterAPI val versions: Collection<StonecutterProject> get() = branch.versions
 
     /**The currently active version. Global for all instances of the build file.*/
-    val active: StonecutterProject get() = tree.current
+    @StonecutterAPI val active: StonecutterProject get() = tree.current
 
     /**Metadata of the currently processed version.*/
-    val current: StonecutterProject = node.metadata
+    @StonecutterAPI val current: StonecutterProject = node.metadata
 
-    init {
-        project.configure()
+    @StonecutterDelicate fun withProject(node: LightNode): ProjectNode =
+        node.withProject(project.locate(node.hierarchy))
+
+    @StonecutterDelicate fun withProject(branch: LightBranch): ProjectBranch =
+        branch.withProject(project.locate(branch.hierarchy))
+
+    @StonecutterDelicate fun withProject(tree: LightTree): ProjectTree =
+        tree.withProject(project.locate(tree.hierarchy))
+
+    /**
+     * Excludes a file or directory from being processed.
+     */
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated("To be reworked in 0.6 with inverted behaviour using `include()`")
+    @ApiStatus.ScheduledForRemoval(inVersion = "0.6")
+    fun exclude(path: File) {
+        exclude(path.toPath())
     }
 
-    private fun Project.configure() {
-        tasks.register("setupChiseledBuild", StonecutterTask::class.java) {
-            params.set(this@StonecutterBuild.params)
-            toVersion.set(current)
-            fromVersion.set(active)
+    /**
+     * Excludes a file or directory from being processed.
+     */
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated("To be reworked in 0.6 with inverted behaviour using `include()`")
+    @ApiStatus.ScheduledForRemoval(inVersion = "0.6")
+    fun exclude(path: Path) {
+        data.excludedPaths.add(path)
+    }
 
-            input.set("src")
-            project.buildDirectoryPath.resolve("chiseledSrc").let {
-                if (it.exists()) it.deleteRecursively()
-                output.set(branch.path.relativize(it).invariantSeparatorsPathString)
-            }
+    /**
+     * Excludes a file or directory from being processed.
+     *
+     * @param path Path to the file relative to the parent project directory (where `stonecutter.gradle[.kts]` is located)
+     * or a file extension qualifier (i.e. `*.json`).
+     */
+    @Deprecated("To be reworked in 0.6 with inverted behaviour using `include()`")
+    @ApiStatus.ScheduledForRemoval(inVersion = "0.6")
+    fun exclude(path: String) {
+        require(path.isNotBlank()) { "Path must not be empty" }
+        if (path.startsWith("*.")) data.excludedExtensions.add(path.substring(2))
+        else data.excludedPaths.add(project.file(path).toPath())
+    }
 
-            data.set(mapOf(branch to this@StonecutterBuild.data))
-            sources.set(mapOf(branch to branch.path))
-            cacheDir.set { branch, version -> branch.cachePath(version) }
-
-            doFirst {
-                buildDirectoryPath.resolve("chiseledSrc").runCatching {
-                    if (exists()) deleteRecursively()
-                }.onFailure {
-                    logger.warn("Failed to clean chiseledSrc", it)
-                }
-            }
-        }
-
-        afterEvaluate {
-            configureSources()
+    init {
+        createSetupTask()
+        project.afterEvaluate {
+            configureProject()
             serializeNode()
         }
     }
 
-    private fun Project.configureSources() {
+    private fun createSetupTask() = project.tasks.register<StonecutterTask>("setupChiseledBuild") {
+        val chiseledSrc = project.projectPath.resolve("build/chiseledSrc")
+        instance(project.hierarchy)
+
+        fromVersion.set(active)
+        toVersion.set(current)
+
+        input("src")
+        output(parent.projectPath.relativize(chiseledSrc).invariantSeparatorsPathString)
+        sources.set(listOf(branch))
+
+        parameters(StonecutterPlugin.SERVICE().snapshot())
+        doFirst {
+            chiseledSrc
+                .runCatching { if (exists()) deleteRecursively() }
+                .onFailure { logger.warn("Failed to clean chiseledSrc", it) }
+        }
+    }
+
+    private fun configureProject() = with(project) {
         try {
-            val useChiseledSrc = params.process && params.hasChiseled(gradle.startParameter.taskNames)
+            val globalParameters = StonecutterPlugin.SERVICE.of(hierarchy).global
+                ?: error("No global parameters for '${hierarchy}'")
+            val useChiseledSrc =
+                globalParameters.process && globalParameters.hasChiseled(gradle.startParameter.taskNames)
             val formatter: (Path) -> Any = when {
-                useChiseledSrc -> { src -> File(buildDirectoryFile, "chiseledSrc/$src") }
+                useChiseledSrc -> { src -> projectDir.resolve("build/chiseledSrc/$src") }
                 current.isActive -> { src -> "../../src/$src" }
                 else -> return
             }
@@ -143,12 +162,12 @@ open class StonecutterBuild(val project: Project) : BuildConfiguration(project.p
     private fun serializeNode() {
         NodeModel(
             current,
-            node.location.relativize(tree.path),
-            branch.toBranchInfo(node.location.relativize(branch.path)),
+            node.location.relativize(tree.location),
+            BranchInfo(branch.id, node.location.relativize(branch.location)),
             current.isActive,
-            data,
-        ).save(node.stonecutterCachePath).onFailure {
-            node.logger.warn("Failed to save node model for '${branch.name}:${current.project}'", it)
+            data
+        ).save(tree.location.resolve("build/stonecutter-cache")).onFailure {
+            project.logger.warn("Failed to save node model for '${branch.id}:${current.project}'", it)
         }
     }
 }

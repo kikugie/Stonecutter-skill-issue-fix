@@ -1,7 +1,9 @@
-package dev.kikugie.stonecutter.settings.builder
+package dev.kikugie.stonecutter.data.tree
 
 import dev.kikugie.stonecutter.*
+import dev.kikugie.stonecutter.data.StonecutterProject
 import dev.kikugie.stonecutter.settings.ProjectProvider
+import dev.kikugie.stonecutter.settings.StonecutterSettings
 import org.gradle.api.Action
 
 internal typealias Nodes = MutableSet<StonecutterProject>
@@ -17,7 +19,7 @@ class TreeBuilder internal constructor() : ProjectProvider {
     internal val branches: MutableMap<Identifier, BranchBuilder> = mutableMapOf()
 
     /**Version used by the `Reset active project` task. Defaults to the first registered version.*/
-    var vcsVersion: AnyVersion? = null
+    @StonecutterAPI var vcsVersion: AnyVersion? = null
         get() = field ?: versions.values.firstOrNull()?.project
         set(value) {
             requireNotNull(value) { "`vcsVersion` must be set to a non-null value." }
@@ -39,12 +41,34 @@ class TreeBuilder internal constructor() : ProjectProvider {
         add("", StonecutterProject(name, version))
 
     /**Creates an inherited branch, which copies all the versions specified in this block.*/
-    fun branch(name: Identifier) = branch(name) { inherit() }
+    @StonecutterAPI fun branch(name: Identifier) = branch(name) { inherit() }
 
     /**Creates a new branch in this tree with the provided configuration.*/
-    fun branch(name: Identifier, action: Action<BranchBuilder>) {
+    @StonecutterAPI fun branch(name: Identifier, action: Action<BranchBuilder>) {
         require(name.isNotBlank()) { "Branch name cannot be blank" }
         require(name.isValid()) { "Invalid branch name: '$name'" }
         branches.getOrPut(name) { BranchBuilder(this, name) }.let(action::execute)
     }
+}
+
+/**
+ * Proxy class for adding nodes to the given branch in the tree.
+ *
+ * @param id Subproject's name for this branch
+ */
+class BranchBuilder internal constructor(private val tree: TreeBuilder, private val id: Identifier) : ProjectProvider {
+    /**
+     * Buildscript filename overrides for this branch.
+     * Defaults to [StonecutterSettings.centralScript].
+     */
+    lateinit var buildscript: String
+
+    override fun vers(name: Identifier, version: AnyVersion) =
+        tree.add(id, StonecutterProject(name, version))
+
+    /**
+     * Copies nodes registered in [TreeBuilder] to this branch
+     */
+    @StonecutterAPI fun inherit() = tree.nodes[""]?.forEach { tree.add(id, it) }
+        ?: error("No root node to inherit from")
 }

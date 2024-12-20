@@ -5,7 +5,7 @@ import dev.kikugie.stonecutter.Identifier
 /**
  * Parameters applied globally in [StonecutterController].
  */
-interface ControllerParameters {
+interface GlobalParametersAccess {
     /**
      * Sets up platform constants (like `fabric`, `forge`, etc.)
      * from project properties.

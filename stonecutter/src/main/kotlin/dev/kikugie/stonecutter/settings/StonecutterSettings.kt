@@ -1,15 +1,13 @@
 package dev.kikugie.stonecutter.settings
 
 import dev.kikugie.stonecutter.*
-import dev.kikugie.stonecutter.controller.manager.GroovyController
-import dev.kikugie.stonecutter.controller.manager.KotlinController
-import dev.kikugie.stonecutter.data.container.ProjectParameterContainer
-import dev.kikugie.stonecutter.data.container.ProjectTreeContainer
-import dev.kikugie.stonecutter.settings.builder.TreeBuilder
+import dev.kikugie.stonecutter.controller.manager.*
+import dev.kikugie.stonecutter.data.StonecutterProject
+import dev.kikugie.stonecutter.data.tree.TreeBuilder
 import dev.kikugie.stonecutter.data.container.TreeBuilderContainer
+import dev.kikugie.stonecutter.data.container.createContainer
 import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings
-import org.gradle.kotlin.dsl.create
 import java.io.File
 import kotlin.io.path.createDirectories
 import kotlin.io.path.notExists
@@ -21,18 +19,18 @@ import kotlin.io.path.notExists
  * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#settings-settings-gradle-kts">Wiki page</a>
  */
 @Suppress("MemberVisibilityCanBePrivate")
-open class StonecutterSettings(settings: Settings) : SettingsConfiguration(settings), StonecutterUtility {
-    private val container: TreeBuilderContainer
+open class StonecutterSettings(settings: Settings) : SettingsAbstraction(settings), StonecutterUtility {
+    private val container: TreeBuilderContainer = settings.gradle.createContainer()
     private val controller get() = if (kotlinController) KotlinController else GroovyController
 
     /**
      * Enables Kotlin buildscripts for the controller.
      * - `stonecutter.gradle` -> `stonecutter.gradle.kts`
      */
-    var kotlinController: Boolean = false
+    @StonecutterAPI var kotlinController: Boolean = false
 
     /**Buildscript used by all subprojects. Defaults to `build.gradle`.*/
-    var centralScript: String = "build.gradle"
+    @StonecutterAPI var centralScript: String = "build.gradle"
         set(value) {
             require(!value.startsWith("stonecutter.gradle")) {
                 "Build script must not override the controller"
@@ -42,11 +40,6 @@ open class StonecutterSettings(settings: Settings) : SettingsConfiguration(setti
 
     init {
         println("Running Stonecutter $STONECUTTER") // Printed to help identify issues
-        with(settings.gradle.extensions) {
-            container = create<TreeBuilderContainer>("stonecutterTreeBuilders")
-            create<ProjectTreeContainer>("stonecutterProjectTrees")
-            create<ProjectParameterContainer>("stonecutterProjectParameters")
-        }
     }
 
     override fun create(project: ProjectDescriptor, setup: TreeBuilder) {

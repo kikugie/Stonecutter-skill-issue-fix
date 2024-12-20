@@ -1,7 +1,8 @@
 package dev.kikugie.stonecutter.data.tree
 
 import dev.kikugie.stonecutter.Identifier
-import dev.kikugie.stonecutter.StonecutterProject
+import dev.kikugie.stonecutter.data.ProjectHierarchy
+import dev.kikugie.stonecutter.data.StonecutterProject
 import org.gradle.api.Project
 import java.nio.file.Path
 
@@ -11,7 +12,7 @@ interface GradleMember {
     val location: Path
 
     /**Project path in Gradle notation. I.e. `:subproject1:subproject2`*/
-    val hierarchy: String
+    val hierarchy: ProjectHierarchy
 }
 
 /**

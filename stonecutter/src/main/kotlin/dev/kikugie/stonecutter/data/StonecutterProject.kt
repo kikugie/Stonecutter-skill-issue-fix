@@ -1,8 +1,10 @@
-package dev.kikugie.stonecutter
+package dev.kikugie.stonecutter.data
 
-import dev.kikugie.stonecutter.controller.StonecutterController
-import dev.kikugie.stonecutter.data.model.NodeModel
-import dev.kikugie.stonecutter.data.model.NodeInfo
+import dev.kikugie.stonecutter.AnyVersion
+import dev.kikugie.stonecutter.Identifier
+import dev.kikugie.stonecutter.data.tree.NodeModel
+import dev.kikugie.stonecutter.data.tree.NodeInfo
+import dev.kikugie.stonecutter.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -12,12 +14,12 @@ import kotlinx.serialization.Transient
 @Serializable
 data class StonecutterProject internal constructor(
     /**The name of this project's directory, as in `versions/${project}`.*/
-    val project: Identifier,
+    @StonecutterAPI val project: Identifier,
     /**
      * The assigned version of this project. Can be either [SemanticVersion] or [AnyVersion].
      * By default, its equal to [project], unless assigned by using `vers()` in the project settings.
      */
-    val version: AnyVersion
+    @StonecutterAPI val version: AnyVersion
 ) {
     /**
      * Active status of this project.
@@ -26,7 +28,7 @@ data class StonecutterProject internal constructor(
      * [NodeModel] and [NodeInfo].
      */
     @Transient
-    var isActive: Boolean = false
+    @StonecutterAPI var isActive: Boolean = false
         internal set
 
     init {

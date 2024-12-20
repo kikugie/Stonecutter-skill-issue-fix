@@ -4,6 +4,8 @@ import dev.kikugie.stitcher.lexer.TokenMatcher
 import dev.kikugie.semver.SemanticVersion
 import dev.kikugie.semver.StringVersion
 import dev.kikugie.semver.VersionParser
+import dev.kikugie.semver.VersionParsingException
+import dev.kikugie.stitcher.lexer.TokenMatcher.Companion.isValidIdentifier
 
 /**Compatibility alias for migrating from 0.4 due to the changed file structure.*/
 @Deprecated("Use `stonecutter { }` instead")
@@ -19,6 +21,10 @@ typealias StonecutterSettings = dev.kikugie.stonecutter.settings.StonecutterSett
  * @see [TokenMatcher.isValidIdentifier]
  */
 typealias Identifier = String
+internal fun Identifier.isValid() = all { it.isValidIdentifier() }
+internal fun Identifier.validateId() = apply {
+    require(isValid()) { "Invalid identifier: $this" }
+}
 
 /**
  * Stonecutter version that may be either a [SemanticVersion] or a [StringVersion].
@@ -39,6 +45,13 @@ typealias AnyVersion = String
  * @see [VersionParser.parseSemanticVersion]
  */
 typealias SemanticVersion = String
+internal fun dev.kikugie.stonecutter.SemanticVersion.validateVersion() = try {
+    VersionParser.parse(this, full = true).value
+} catch (e: VersionParsingException) {
+    throw IllegalArgumentException("Invalid semantic version: $this").apply {
+        initCause(e)
+    }
+}
 
 /**
  * Path in the Gradle project hierarchy.

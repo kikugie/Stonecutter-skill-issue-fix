@@ -1,10 +1,10 @@
 package dev.kikugie.stonecutter.controller
 
-import dev.kikugie.stonecutter.StonecutterProject
 import dev.kikugie.stonecutter.StonecutterUtility
-import dev.kikugie.stonecutter.build.BuildConfiguration
-import dev.kikugie.stonecutter.controller.storage.ProjectBranch
-import dev.kikugie.stonecutter.controller.storage.ProjectNode
+import dev.kikugie.stonecutter.build.BuildAbstraction
+import dev.kikugie.stonecutter.data.StonecutterProject
+import dev.kikugie.stonecutter.data.tree.LightBranch
+import dev.kikugie.stonecutter.data.tree.LightNode
 
 // link: wiki-controller-params
 /**
@@ -17,12 +17,12 @@ import dev.kikugie.stonecutter.controller.storage.ProjectNode
  * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#global-parameters">Wiki page</a>
  */
 class ParameterHolder(
-    val branch: ProjectBranch,
+    val branch: LightBranch,
     val metadata: StonecutterProject
-) : BuildConfiguration(branch), StonecutterUtility {
+) : BuildAbstraction(branch.hierarchy), StonecutterUtility {
     /**
      * Project node matching [project] on [branch].
      * May be `null` when branches have different sets of versions.
      */
-    val node: ProjectNode? = branch[metadata.project]
+    val node: LightNode? = branch[metadata.project]
 }

@@ -1,72 +1,52 @@
 package dev.kikugie.stonecutter.process
 
+import dev.kikugie.semver.VersionParser
 import dev.kikugie.stitcher.scanner.CommentRecognizers
-import dev.kikugie.stonecutter.StonecutterProject
-import dev.kikugie.stonecutter.build.BuildParameters
-import dev.kikugie.stonecutter.controller.StonecutterController
-import dev.kikugie.stonecutter.controller.storage.GlobalParameters
+import dev.kikugie.stitcher.transformer.TransformParameters
+import dev.kikugie.stonecutter.StonecutterPlugin
+import dev.kikugie.stonecutter.data.ProjectHierarchy
+import dev.kikugie.stonecutter.data.StonecutterProject
+import dev.kikugie.stonecutter.data.container.ConfigurationService
+import dev.kikugie.stonecutter.data.parameters.BuildParameters
+import dev.kikugie.stonecutter.data.parameters.GlobalParameters
 import dev.kikugie.stonecutter.data.tree.LightBranch
+import dev.kikugie.stonecutter.invoke
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
-import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Path
+import kotlin.io.path.extension
+import kotlin.io.path.isDirectory
 import kotlin.system.measureTimeMillis
 
-/**Task used by Stonecutter to transform files.*/
 abstract class StonecutterTask : DefaultTask() {
-    /**Stonecutter project to switch from.*/
-    @get:Input
-    abstract val fromVersion: Property<StonecutterProject>
+    @get:Internal abstract val parameters: Property<ConfigurationService.Snapshot>
 
-    /**Stonecutter project to switch to.*/
-    @get:Input
-    abstract val toVersion: Property<StonecutterProject>
+    @get:Input abstract val instance: Property<ProjectHierarchy>
 
-    /**Input directory relative to each [sources] entry.*/
-    @get:Input
-    abstract val input: Property<String>
+    @get:Input abstract val fromVersion: Property<StonecutterProject>
+    @get:Input abstract val toVersion: Property<StonecutterProject>
 
-    /**Output directory relative to each [sources] entry.*/
-    @get:Input
-    abstract val output: Property<String>
-
-    /**Root directories for all processed branches.*/
-    @get:Input
-    abstract val sources: MapProperty<LightBranch, Path>
-
-    /**Build parameters for all processed branches.*/
-    @get:Input
-    abstract val data: MapProperty<LightBranch, BuildParameters>
-
-    /**
-     * Root directory provider for each version.
-     * This is usually node's `build/stonecutter-cache`, however if it's not available
-     * branch's `build/stonecutter-cache/out-of-bounds/$project` is used.
-     */
-    @get:Input
-    abstract val cacheDir: Property<(LightBranch, StonecutterProject) -> Path>
-
-    /**Parameters set by [StonecutterController].*/
-    @get:Input
-    abstract val params: Property<GlobalParameters>
+    @get:Input abstract val input: Property<String>
+    @get:Input abstract val output: Property<String>
+    @get:Input abstract val sources: ListProperty<LightBranch>
 
     private val statistics: ProcessStatistics = ProcessStatistics()
 
-    /**
-     * Transforms the given branches. If no errors were reported, applies the changes,
-     * otherwise prints the errors and throws and exception.
-     */
     @TaskAction
     fun run() {
-        if (!params.get().process) println("Switched to ${toVersion.get().project} (skipped file processing)")
-            .also { return }
+        val globalParameters = requireNotNull(parameters().global[instance()]) {
+            "Missing global parameters for project ${instance()}: [${parameters().global.keys.joinToString()}]"
+        }
+        if (!globalParameters.process) return logger.lifecycle("Switched to ${instance()} (skipped file processing)")
         val callbacks = mutableListOf<() -> Unit>()
         val errors = mutableListOf<Throwable>()
         val time = measureTimeMillis {
-            for ((branch, path) in sources.get()) processBranch(branch, path)
+            for (branch in sources.get()) process(branch)
                 ?.onSuccess { callbacks.add(it) }
                 ?.onFailure { errors.add(it) }
         }
@@ -79,48 +59,64 @@ abstract class StonecutterTask : DefaultTask() {
             throw Exception("Failed to switch from ${fromVersion.get().project} to ${toVersion.get().project}")
         }
 
-        val message = buildString {
-            append("Switched to ${toVersion.get().project} in ${time}ms.")
-            append(" (")
-            append("${statistics.total} total")
-            append(" | ")
-            append("${statistics.processed} processed")
-            append(" | ")
-            append("${statistics.total - statistics.processed} skipped")
-            append(")")
-        }
-        println(message)
+        val message = "Switched to %s in %sms. (%d total | %d processed | %d skipped)".format(
+            toVersion().project,
+            time,
+            statistics.total,
+            statistics.processed,
+            statistics.total - statistics.processed
+        )
+        logger.lifecycle(message)
     }
 
-    private fun processBranch(branch: LightBranch, path: Path): Result<() -> Unit>? {
-        val buildParams = data.get()[branch] ?: return null
-        val processParams = object : ProcessParameters {
-            override val directory = DirectoryData(
-                path.resolve(input.get()),
-                path.resolve(output.get()),
-                cacheDir.get()(branch, fromVersion.get()),
-                cacheDir.get()(branch, toVersion.get()),
-            )
-            override val filter = buildParams.toFileFilter()
-            override val parameters = buildParams.toTransformParams(toVersion.get().version, params.get().receiver)
-            override val statistics = ProcessStatistics()
-            override val recognizers = CommentRecognizers.DEFAULT
-            override val charset = Charsets.UTF_8
-            override val debug = params.get().debug
-            override val cache = false
+    private fun process(branch: LightBranch): Result<() -> Unit>? {
+        val globalParameters: GlobalParameters = parameters().global[instance()] ?: return null
+        val buildParameters: BuildParameters = parameters().build[branch.hierarchy + toVersion().project] ?: return null
+        val processParameters = ProcessParameters(
+            dirs = DirectoryData(
+                input = branch.location.resolve(input()),
+                output = branch.location.resolve(output()),
+                debug = branch[fromVersion().project]!!.location.resolve("build/stonecutter-cache/debug"),
+                temp = branch[toVersion().project]!!.location.resolve("build/stonecutter-cache/temp")
+            ),
+            filter = buildParameters.toFileFilter(),
+            parameters = buildParameters.toTransformParameters(toVersion().version, globalParameters.receiver),
+            recognizers = CommentRecognizers.DEFAULT,
+            statistics = statistics,
+            charset = Charsets.UTF_8,
+            debug = globalParameters.debug
+        )
+        return FileProcessor(processParameters).runCatching { process() }
+    }
 
+    companion object {
+        private fun BuildParameters.toFileFilter(): (Path) -> Boolean = { file ->
+            file.extension !in excludedExtensions && file !in excludedPaths && excludedPaths.none {
+                it.isDirectory() && file.startsWith(
+                    it
+                )
+            }
         }
-        val processor = FileProcessor(processParams)
-        val message = buildString {
-            appendLine("Processing branch ${branch.location}...")
-            appendLine("  Root: ${processParams.directory.root}")
-            appendLine("  Dest: ${processParams.directory.dest}")
-            appendLine("  Cache in: ${processParams.directory.inputCache}")
-            appendLine("  Cache out: ${processParams.directory.outputCache}")
+
+        private fun BuildParameters.toTransformParameters(version: String, key: String) = with(dependencies) {
+            getOrElse(key) { VersionParser.parseLenient(version).value }.let {
+                put(key, it)
+                put("", it)
+            }
+            TransformParameters(swaps, constants, this)
         }
-        project.logger.debug(message)
-        return processor.runCatching {
-            process()
+
+        private fun printErrors(vararg errors: Throwable): Unit = printErrors(0, *errors)
+        private fun printErrors(indent: Int, vararg errors: Throwable): Unit = errors.forEach {
+            buildString {
+                appendLine("${it.message}".prependIndent('\t' * indent))
+                if (it !is ProcessException) it.stackTrace.forEach { trace -> appendLine("${'\t' * (indent + 2)}at $trace") }
+            }.let(::printErr)
+            it.cause?.let { cause -> printErrors(indent + 1, cause) }
+            it.suppressed.forEach { suppressed -> printErrors(indent + 1, suppressed) }
         }
+
+        private fun printErr(any: Any) = System.err.print(any)
+        private operator fun Char.times(n: Int) = if (n <= 0) "" else buildString { repeat(n) { append(this@times) } }
     }
 }
