@@ -11,7 +11,8 @@ interface GradleMember {
     /**Project location on the disk relative to the root.*/
     val location: Path
 
-    /**Project path in Gradle notation. I.e. `:subproject1:subproject2`*/
+    /**Absolute project path in Gradle notation.
+     * The wrapping class ensures the correct data kind when it's required.*/
     val hierarchy: ProjectHierarchy
 }
 

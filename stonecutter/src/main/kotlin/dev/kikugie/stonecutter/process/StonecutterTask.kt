@@ -23,7 +23,8 @@ import kotlin.io.path.isDirectory
 import kotlin.system.measureTimeMillis
 
 /**Task responsible for scanning versioned comments and modifying files to match the given version.*/
-abstract class StonecutterTask : DefaultTask() {
+@PublishedApi
+internal abstract class StonecutterTask : DefaultTask() {
     /**
      * All collected build parameters.
      * *This should've been done with a build service, but fate was against it.*

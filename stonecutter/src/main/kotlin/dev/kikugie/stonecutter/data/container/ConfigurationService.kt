@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 internal typealias HierarchyMap<T> = MapProperty<ProjectHierarchy, T>
 
-abstract class ConfigurationService @Inject constructor() : BuildService<ConfigurationService.Parameters> {
+internal abstract class ConfigurationService @Inject constructor() : BuildService<ConfigurationService.Parameters> {
     fun of(path: ProjectHierarchy) = HierarchyScope(path)
     fun snapshot(): Snapshot = Snapshot(
         trees = parameters.projectTrees.get(),

@@ -21,7 +21,9 @@ import org.gradle.kotlin.dsl.register
  * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#controller-stonecutter-gradle-kts">Wiki page</a>
  */
 @Suppress("MemberVisibilityCanBePrivate")
-open class StonecutterController(root: Project) : ControllerAbstraction(root), StonecutterUtility,
+open class StonecutterController(root: Project) :
+    ControllerAbstraction(root),
+    StonecutterUtility,
     GlobalParametersAccess {
     override var automaticPlatformConstants: Boolean = false
     override var debug: Boolean by parameters.named("debug")
@@ -29,15 +31,6 @@ open class StonecutterController(root: Project) : ControllerAbstraction(root), S
     override var defaultReceiver: Identifier by parameters.named("receiver") {
         require(it.isValid()) { "Invalid receiver '$it'" }
     }
-
-    @StonecutterDelicate fun withProject(node: LightNode): ProjectNode =
-        node.withProject(root.locate(node.hierarchy))
-
-    @StonecutterDelicate fun withProject(branch: LightBranch): ProjectBranch =
-        branch.withProject(root.locate(branch.hierarchy))
-
-    @StonecutterDelicate fun withProject(tree: LightTree): ProjectTree =
-        tree.withProject(root.locate(tree.hierarchy))
 
     init {
         prepareConfiguration()

@@ -34,10 +34,18 @@ import kotlin.io.path.invariantSeparatorsPathString
 open class StonecutterBuild(private val project: Project) : BuildAbstraction(project.hierarchy), StonecutterUtility {
     private val parent: Project = requireNotNull(project.parent) { "No parent project for '${project.path}'" }
 
+    /**Project tree instance containing the necessary data and safe to use with configuration cache.
+     * @see [withProject]*/
     @StonecutterAPI val tree: LightTree = StonecutterPlugin.SERVICE.of(parent.hierarchy).tree
         ?: error("Tree for '${project.path}' not found")
+
+    /**Branch this node belongs to containing the necessary data and safe to use with configuration cache.
+     * @see [withProject]*/
     @StonecutterAPI val branch: LightBranch = tree[parent.hierarchy.last().removePrefix(":")]
         ?: error("Branch for '${project.path}' not found")
+
+    /**This project's node containing only the necessary data and safe to use with configuration cache.
+     * @see [withProject]*/
     @StonecutterAPI val node: LightNode = branch[project.hierarchy.last().removePrefix(":")]
         ?: error("Node for '${project.path}' not found")
 
@@ -50,14 +58,20 @@ open class StonecutterBuild(private val project: Project) : BuildAbstraction(pro
     /**Metadata of the currently processed version.*/
     @StonecutterAPI val current: StonecutterProject = node.metadata
 
-    @StonecutterDelicate fun withProject(node: LightNode): ProjectNode =
-        node.withProject(project.locate(node.hierarchy))
+    /**Creates a tree wrapper that implements its Gradle [Project].
+     * Can be used to retrieve properties from other projects, but unsafe to use in tasks.*/
+    @StonecutterDelicate fun withProject(tree: LightTree): ProjectTree =
+        tree.withProject(project.locate(tree.hierarchy))
 
+    /**Creates a branch wrapper that implements its Gradle [Project].
+     * Can be used to retrieve properties from other projects, but unsafe to use in tasks.*/
     @StonecutterDelicate fun withProject(branch: LightBranch): ProjectBranch =
         branch.withProject(project.locate(branch.hierarchy))
 
-    @StonecutterDelicate fun withProject(tree: LightTree): ProjectTree =
-        tree.withProject(project.locate(tree.hierarchy))
+    /**Creates a node wrapper that implements its Gradle [Project].
+     * Can be used to retrieve properties from other projects, but unsafe to use in tasks.*/
+    @StonecutterDelicate fun withProject(node: LightNode): ProjectNode =
+        node.withProject(project.locate(node.hierarchy))
 
     /**
      * Excludes a file or directory from being processed.
