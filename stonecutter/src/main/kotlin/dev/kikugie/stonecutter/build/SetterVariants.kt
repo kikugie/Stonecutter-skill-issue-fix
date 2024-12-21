@@ -3,7 +3,9 @@ package dev.kikugie.stonecutter.build
 import dev.kikugie.stonecutter.Identifier
 import dev.kikugie.stonecutter.SemanticVersion
 import dev.kikugie.stonecutter.StonecutterAPI
+import dev.kikugie.stonecutter.StonecutterDelicate
 import dev.kikugie.stonecutter.data.parameters.BuildParameters
+import org.intellij.lang.annotations.Language
 
 /**Delegates set operation. Meant to be used with Kotlin DSL.*/
 interface MapSetter<K, V> {
@@ -69,9 +71,10 @@ interface SwapVariants {
      * @sample stonecutter_samples.swaps.setter
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#value-swaps">Wiki page</a>
      */
-    @StonecutterAPI val swaps get() = object : MapSetter<Identifier, String> {
-        override fun set(key: Identifier, value: String) = swap(key, value)
-    }
+    @StonecutterAPI val swaps
+        get() = object : MapSetter<Identifier, String> {
+            override fun set(key: Identifier, value: String) = swap(key, value)
+        }
 }
 
 /**Declutters const function variants, directing them to a single implementation.*/
@@ -152,9 +155,10 @@ interface ConstantVariants {
      * @sample stonecutter_samples.constants.setter
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants">Wiki page</a>
      */
-    @StonecutterAPI val consts get() = object : MapSetter<Identifier, Boolean> {
-        override fun set(key: Identifier, value: Boolean) = const(key, value)
-    }
+    @StonecutterAPI val consts
+        get() = object : MapSetter<Identifier, Boolean> {
+            override fun set(key: Identifier, value: Boolean) = const(key, value)
+        }
 }
 
 /**Declutters dependency function variants, directing them to a single implementation.*/
@@ -215,9 +219,46 @@ interface DependencyVariants {
      * @sample stonecutter_samples.dependencies.setter
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-dependencies">Wiki page</a>
      */
-    @StonecutterAPI val dependencies get() = object : MapSetter<Identifier, SemanticVersion> {
-        override fun set(key: Identifier, value: SemanticVersion) = dependency(key, value)
-    }
+    @StonecutterAPI val dependencies
+        get() = object : MapSetter<Identifier, SemanticVersion> {
+            override fun set(key: Identifier, value: SemanticVersion) = dependency(key, value)
+        }
+}
+
+interface ReplacementVariants {
+    /**
+     * Creates a plain string find&replace entry for the file processor.
+     * When [direction] is `true` it will replace [source] with [target],
+     * or vice versa when [direction] is `false`.
+     *
+     * @sample stonecutter_samples.replacements.basic_correct
+     * @sample stonecutter_samples.replacements.basic_ambiguous
+     * @sample stonecutter_samples.replacements.basic_circular
+     * @throws IllegalArgumentException If [source] already has a registered replacement
+     * or if [source] and [target] create a circular reference with registered entries.
+     */
+    @StonecutterAPI fun replacement(direction: Boolean, source: String, target: String)
+
+    /**
+     * Creates a regex replacement entry for the file processor.
+     * When [direction] is `true` it will find all occurrences of the [sourcePattern]
+     * and replace them with [targetValue].
+     * Otherwise, it will do the same for [targetPattern] and [sourceValue].
+     *
+     * **This functionality doesn't have the same safety features as plain-string replacements**, namely:
+     * - It doesn't group entries or check for ambiguous replacements, therefore, **replacements are order-dependent**.
+     * - It doesn't verify whenever the replaced value can be reversed when switching back to the original version.
+     *   **When using this, it's your responsibility to make sure replacements are reversible.**
+     *
+     * Provided expressions are evaluated after plain-text ones.
+     */
+    @StonecutterDelicate fun replacement(
+        direction: Boolean,
+        @Language("regex") sourcePattern: String,
+        targetValue: String,
+        @Language("regex") targetPattern: String,
+        sourceValue: String
+    )
 }
 
 /**Declutters file filtering function variants, directing them to a single implementation.*/

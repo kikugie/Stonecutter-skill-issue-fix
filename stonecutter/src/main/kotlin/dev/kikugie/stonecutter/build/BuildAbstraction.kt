@@ -14,7 +14,7 @@ import kotlin.io.path.invariantSeparatorsPathString
  * @property hierarchy Path of the corresponding project
  */
 abstract class BuildAbstraction(protected val hierarchy: ProjectHierarchy) :
-    SwapVariants, ConstantVariants, DependencyVariants, FilterVariants {
+    SwapVariants, ConstantVariants, DependencyVariants, FilterVariants, ReplacementVariants {
     protected val data: BuildParameters = checkNotNull(StonecutterPlugin.SERVICE.of(hierarchy).build) {
         "Stonecutter build parameters not found"
     }
@@ -29,6 +29,23 @@ abstract class BuildAbstraction(protected val hierarchy: ProjectHierarchy) :
 
     override fun dependency(identifier: Identifier, version: SemanticVersion) {
         data.dependencies[identifier.validateId()] = version.validateVersion()
+    }
+
+    override fun replacement(direction: Boolean, source: String, target: String) {
+        if (direction) data.replacements.basic(source, target)
+        else data.replacements.basic(target, source)
+    }
+
+    @StonecutterDelicate
+    override fun replacement(
+        direction: Boolean,
+        sourcePattern: String,
+        targetValue: String,
+        targetPattern: String,
+        sourceValue: String
+    ) {
+        if (direction) data.replacements.regex(sourcePattern, targetValue)
+        else data.replacements.regex(targetPattern, sourceValue)
     }
 
     override fun allowExtensions(extensions: Iterable<String>) {

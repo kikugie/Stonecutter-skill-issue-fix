@@ -213,3 +213,41 @@ object excludeFiles {
         stonecutter.excludeFiles(files)
     }
 }
+
+object replacements {
+    fun basic_correct() {
+        /* Multiple replacements without ambiguity
+           1.21: ['A', 'B'] -> 'C'
+           1.20: ['A', 'C'] -> 'B'
+           1.19: ['B', 'C'] -> 'A'
+         */
+        stonecutter {
+            replacement(eval(current.version, "<1.21"), "A", "B")
+            replacement(eval(current.version, "<1.20"), "B", "C")
+        }
+    }
+
+    fun basic_ambiguous() {
+        /* Multiple replacements with an ambiguous target
+           1.21: ['A', 'B'] -> 'C'
+           1.20: ['B'] -> 'A' and ['B'] -> 'C' !!!
+           1.19: ['B', 'C'] -> 'A'
+         */
+        stonecutter {
+            replacement(eval(current.version, ">=1.21"), "A", "B")
+            replacement(eval(current.version, ">=1.20"), "B", "C")
+        }
+    }
+
+    fun basic_circular() {
+        /* Multiple replacements causing circular reference
+           1.21: ['B'] -> 'A' and ['A'] -> 'B' !!!
+           1.20: ['A'] -> 'B'
+           1.19: ['A'] -> 'B' and ['B'] -> 'A' !!!
+         */
+        stonecutter {
+            replacement(eval(current.version, "<1.21"), "A", "B")
+            replacement(eval(current.version, "<1.20"), "B", "A")
+        }
+    }
+}
