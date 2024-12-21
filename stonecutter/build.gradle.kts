@@ -24,10 +24,6 @@ sourceSets {
         kotlin.srcDir("src/samples/kotlin")
         compileClasspath += sourceSets.main.get().output
     }
-
-    main {
-        compileClasspath += samples.get().output
-    }
 }
 
 repositories {
@@ -79,6 +75,9 @@ tasks.named<Jar>("javadocJar") {
 
 tasks.withType<AbstractDokkaLeafTask> {
     moduleName = "Stonecutter Gradle"
+    dokkaSourceSets.configureEach {
+        samples.from("src/samples/kotlin")
+    }
 }
 
 tasks.register("addWikiLinks") {
