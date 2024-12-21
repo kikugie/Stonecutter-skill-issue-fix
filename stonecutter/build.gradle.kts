@@ -19,6 +19,17 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+sourceSets {
+    val samples by registering {
+        kotlin.srcDir("src/samples/kotlin")
+        compileClasspath += sourceSets.main.get().output
+    }
+
+    main {
+        compileClasspath += samples.get().output
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -28,8 +39,6 @@ dependencies {
     implementation(libs.kotlin.serialization)
     implementation(libs.kotlin.coroutines)
     implementation(libs.kaml)
-    implementation(libs.cbor)
-    implementation(libs.lz4)
 
     testImplementation(libs.bundles.test)
 }

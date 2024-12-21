@@ -73,40 +73,6 @@ open class StonecutterBuild(private val project: Project) : BuildAbstraction(pro
     @StonecutterDelicate fun withProject(node: LightNode): ProjectNode =
         node.withProject(project.locate(node.hierarchy))
 
-    /**
-     * Excludes a file or directory from being processed.
-     */
-    @Suppress("DeprecatedCallableAddReplaceWith")
-    @Deprecated("To be reworked in 0.6 with inverted behaviour using `include()`")
-    @ApiStatus.ScheduledForRemoval(inVersion = "0.6")
-    fun exclude(path: File) {
-        exclude(path.toPath())
-    }
-
-    /**
-     * Excludes a file or directory from being processed.
-     */
-    @Suppress("DeprecatedCallableAddReplaceWith")
-    @Deprecated("To be reworked in 0.6 with inverted behaviour using `include()`")
-    @ApiStatus.ScheduledForRemoval(inVersion = "0.6")
-    fun exclude(path: Path) {
-        data.excludedPaths.add(path)
-    }
-
-    /**
-     * Excludes a file or directory from being processed.
-     *
-     * @param path Path to the file relative to the parent project directory (where `stonecutter.gradle[.kts]` is located)
-     * or a file extension qualifier (i.e. `*.json`).
-     */
-    @Deprecated("To be reworked in 0.6 with inverted behaviour using `include()`")
-    @ApiStatus.ScheduledForRemoval(inVersion = "0.6")
-    fun exclude(path: String) {
-        require(path.isNotBlank()) { "Path must not be empty" }
-        if (path.startsWith("*.")) data.excludedExtensions.add(path.substring(2))
-        else data.excludedPaths.add(project.file(path).toPath())
-    }
-
     init {
         createSetupTask()
         project.afterEvaluate {

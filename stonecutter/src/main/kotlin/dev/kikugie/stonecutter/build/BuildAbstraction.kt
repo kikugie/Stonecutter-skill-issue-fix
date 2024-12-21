@@ -5,6 +5,8 @@ import dev.kikugie.stonecutter.data.ProjectHierarchy
 import dev.kikugie.stonecutter.data.container.ConfigurationService.Companion.of
 import dev.kikugie.stonecutter.data.parameters.BuildParameters
 import dev.kikugie.stonecutter.controller.ControllerAbstraction
+import kotlin.io.path.Path
+import kotlin.io.path.invariantSeparatorsPathString
 
 /**
  * Contains logic for the versioned buildscript, which is separated to allow
@@ -192,11 +194,69 @@ abstract class BuildAbstraction(protected val hierarchy: ProjectHierarchy) {
         values.forEach { (id, ver) -> dependency(id, ver) }
     }
 
+    /**
+     * Allows provided [extensions] to be processed by Stonecutter.
+     * **Entries must not start with a dot**.
+     *
+     * @sample stonecutter_samples.allowExtensionsVararg
+     * @see BuildParameters.extensions
+     */
+    @StonecutterAPI fun allowExtensions(vararg extensions: String) =
+        allowExtensions(extensions.asIterable())
+
+    /**
+     * Allows provided [extensions] to be processed by Stonecutter.
+     * **Entries must not start with a dot**.
+     *
+     * @sample stonecutter_samples.allowExtensionsIterable
+     * @see BuildParameters.extensions
+     */
+    @StonecutterAPI fun allowExtensions(extensions: Iterable<String>) =
+        extensions.forEach { data.extensions.add(it) }
+
+    /**
+     * Replaces allowed extensions with the provided list.
+     * **Entries must not start with a dot**.
+     *
+     * @sample stonecutter_samples.overrideExtensionsVararg
+     */
+    @StonecutterAPI fun overrideExtensions(vararg extensions: String) =
+        overrideExtensions(extensions.asIterable())
+
+    /**
+     * Replaces allowed extensions with the provided list.
+     * **Entries must not start with a dot**.
+     *
+     * @sample stonecutter_samples.overrideExtensionsIterable
+     */
+    @StonecutterAPI fun overrideExtensions(extensions: Iterable<String>) =
+        data.extensions.clear() then allowExtensions(extensions)
+
+    /**
+     * Excludes specific files or directories from being processed.
+     * **Paths must be relative to the branch's directory and start with `src/`**.
+     *
+     * @sample stonecutter_samples.excludeFilesVararg
+     */
+    @StonecutterAPI fun excludeFiles(vararg files: String) =
+        excludeFiles(files.asIterable())
+
+    /**
+     * Excludes specific files or directories from being processed.
+     * **Paths must be relative to the branch's directory and start with `src/`**.
+     *
+     * @sample stonecutter_samples.excludeFilesIterable
+     */
+    @StonecutterAPI fun excludeFiles(files: Iterable<String>) = files.forEach {
+        require(it.startsWith("src/")) { "File path must start with 'src/': $it" }
+        Path(it).normalize().invariantSeparatorsPathString.let(data.exclusions::add)
+    }
+
     internal fun from(other: BuildAbstraction): Unit = with(data) {
         swaps.putAll(other.data.swaps)
         constants.putAll(other.data.constants)
         dependencies.putAll(other.data.dependencies)
-        excludedPaths.addAll(other.data.excludedPaths)
-        excludedExtensions.addAll(other.data.excludedExtensions)
+        extensions.addAll(other.data.extensions)
+        exclusions.addAll(other.data.exclusions)
     }
 }

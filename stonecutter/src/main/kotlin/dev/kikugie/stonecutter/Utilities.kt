@@ -3,6 +3,7 @@ package dev.kikugie.stonecutter
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import dev.kikugie.stonecutter.data.tree.TreeModel
 import java.nio.file.Path
 
 /**

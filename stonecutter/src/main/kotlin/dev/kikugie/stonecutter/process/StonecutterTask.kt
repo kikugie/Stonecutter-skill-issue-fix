@@ -11,6 +11,7 @@ import dev.kikugie.stonecutter.data.parameters.GlobalParameters
 import dev.kikugie.stonecutter.data.tree.LightBranch
 import dev.kikugie.stonecutter.data.tree.BranchPrototype
 import dev.kikugie.stonecutter.invoke
+import dev.kikugie.stonecutter.then
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.ListProperty
@@ -18,8 +19,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.Path
-import kotlin.io.path.extension
-import kotlin.io.path.isDirectory
+import kotlin.io.path.*
 import kotlin.system.measureTimeMillis
 
 /**Task responsible for scanning versioned comments and modifying files to match the given version.*/
@@ -50,6 +50,7 @@ internal abstract class StonecutterTask : DefaultTask() {
     @get:Input abstract val sources: ListProperty<LightBranch>
 
     private val statistics: ProcessStatistics = ProcessStatistics()
+    private var encounteredSymlink = false
 
     @TaskAction
     fun run() {
@@ -103,34 +104,44 @@ internal abstract class StonecutterTask : DefaultTask() {
         return FileProcessor(processParameters).runCatching { process() }
     }
 
-    private companion object {
-        private fun BuildParameters.toFileFilter(): (Path) -> Boolean = { file ->
-            file.extension !in excludedExtensions && file !in excludedPaths && excludedPaths.none {
-                it.isDirectory() && file.startsWith(
-                    it
-                )
-            }
-        }
-
-        private fun BuildParameters.toTransformParameters(version: String, key: String) = with(dependencies) {
-            getOrElse(key) { VersionParser.parseLenient(version).value }.let {
-                put(key, it)
-                put("", it)
-            }
-            TransformParameters(swaps, constants, this)
-        }
-
-        private fun printErrors(vararg errors: Throwable): Unit = printErrors(0, *errors)
-        private fun printErrors(indent: Int, vararg errors: Throwable): Unit = errors.forEach {
-            buildString {
-                appendLine("${it.message}".prependIndent('\t' * indent))
-                if (it !is ProcessException) it.stackTrace.forEach { trace -> appendLine("${'\t' * (indent + 2)}at $trace") }
-            }.let(::printErr)
-            it.cause?.let { cause -> printErrors(indent + 1, cause) }
-            it.suppressed.forEach { suppressed -> printErrors(indent + 1, suppressed) }
-        }
-
-        private fun printErr(any: Any) = System.err.print(any)
-        private operator fun Char.times(n: Int) = if (n <= 0) "" else buildString { repeat(n) { append(this@times) } }
+    private fun reportSymlink() {
+        if (encounteredSymlink) return else encounteredSymlink = true
+        """
+            Encountered symbolic links during file processing.
+            Stonecutter will skip processing them because it can cause unexpected behavior.
+        """.trimIndent().let(logger::error)
     }
+
+    private fun BuildParameters.allowFile(file: Path): Boolean = file.invariantSeparatorsPathString.let { path ->
+        require(path.startsWith("src/")) { "Encountered non-source file $path" } // TODO: Testing
+        return when {
+            file.isSymbolicLink() -> false.also { reportSymlink(); logger.warn("Skipping symbolic link: $path") }
+            file.isDirectory() -> path !in exclusions
+            file.isRegularFile() -> file.extension in extensions && path !in exclusions
+            else -> false.also { logger.warn("Unknown file type: $path") }
+        }
+    }
+
+    private fun BuildParameters.toFileFilter(): (Path) -> Boolean = { allowFile(it) }
+
+    private fun BuildParameters.toTransformParameters(version: String, key: String) = with(dependencies) {
+        getOrElse(key) { VersionParser.parseLenient(version).value }.let {
+            put(key, it)
+            put("", it)
+        }
+        TransformParameters(swaps, constants, this)
+    }
+
+    private fun printErrors(vararg errors: Throwable): Unit = printErrors(0, *errors)
+    private fun printErrors(indent: Int, vararg errors: Throwable): Unit = errors.forEach {
+        buildString {
+            appendLine("${it.message}".prependIndent('\t' * indent))
+            if (it !is ProcessException) it.stackTrace.forEach { trace -> appendLine("${'\t' * (indent + 2)}at $trace") }
+        }.let(::printErr)
+        it.cause?.let { cause -> printErrors(indent + 1, cause) }
+        it.suppressed.forEach { suppressed -> printErrors(indent + 1, suppressed) }
+    }
+
+    private fun printErr(any: Any) = System.err.print(any)
+    private operator fun Char.times(n: Int) = if (n <= 0) "" else buildString { repeat(n) { append(this@times) } }
 }
