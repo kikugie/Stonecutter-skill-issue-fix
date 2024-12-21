@@ -1,7 +1,9 @@
 package dev.kikugie.stonecutter
 
 import dev.kikugie.semver.VersionParser
-import org.jetbrains.annotations.ApiStatus
+import dev.kikugie.semver.VersionParsingException
+import dev.kikugie.stonecutter.build.StonecutterBuild
+import dev.kikugie.stonecutter.controller.StonecutterController
 import org.jetbrains.annotations.Contract
 
 // link: wiki-eval
@@ -12,52 +14,18 @@ import org.jetbrains.annotations.Contract
  * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#checking-versions">Wiki page</a>
  */
 interface StonecutterUtility {
-    /**
-     * Parses both parameters as [SemanticVersion] and compares them.
-     *
-     * @return 1 if the first version is greater, -1 if the second is greater, 0 if they are equal
-     */
-    @Contract(pure = true)
-    @ApiStatus.Obsolete
-    @ApiStatus.ScheduledForRemoval(inVersion = "0.6")
-    @Deprecated("Use `eval()` instead", ReplaceWith("eval(left, right)"))
-    fun compare(left: SemanticVersion, right: SemanticVersion) =
-        VersionParser.parse(left).value.compareTo(VersionParser.parse(right).value)
-
-    /**
-     * Parses both parameters as [SemanticVersion] or [AnyVersion] and compares them.
-     *
-     * @return 1 if the first version is greater, -1 if the second is greater, 0 if they are equal
-     */
-    @Contract(pure = true)
-    @ApiStatus.Obsolete
-    @ApiStatus.ScheduledForRemoval(inVersion = "0.6")
-    @Deprecated("Use `evalLenient()` instead", ReplaceWith("evalLenient(left, right)"))
-    fun compareLenient(left: AnyVersion, right: AnyVersion) =
-        VersionParser.parseLenient(left).value.compareTo(VersionParser.parse(right).value)
-
-    /**
-     * Parses both parameters as semantic versions and compares them.
-     * This function is available inside a `stonecutter` block when using Kotlin DSL.
-     *
-     * @return 1 if the first version is greater, -1 if the second is greater, 0 if they are equal
-     */
-    @Suppress("DEPRECATION")
-    @Contract(pure = true)
-    @ApiStatus.Obsolete
-    @ApiStatus.ScheduledForRemoval(inVersion = "0.6")
-    @Deprecated("Use `eval()` instead", ReplaceWith("eval(this, other)"))
-    infix fun SemanticVersion.comp(other: SemanticVersion) = compare(this, other)
-
     // link: wiki-eval
     /**
-     * Evaluates the passed version as [SemanticVersion] and compares to the given predicate(s).
+     * Evaluates the passed version as [SemanticVersion] and compares to the given predicate(s),
+     * which have to be separated by a space.
+     * If the passed version is invalid [VersionParsingException] will be thrown
      *
-     * @return `true` if all predicates succeed
-     * @see [VersionParser.parsePredicate]
+     * @sample stonecutter_samples.eval.strict
+     * @throws VersionParsingException
+     * @see VersionParser.parsePredicate
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#checking-versions">Wiki page</a>
      */
-    @Contract(pure = true)
+    @Contract(pure = true) @StonecutterAPI
     fun eval(version: SemanticVersion, predicate: String): Boolean {
         val target = VersionParser.parse(version).value
         return predicate.split(' ').all {
@@ -69,11 +37,11 @@ interface StonecutterUtility {
     /**
      * Evaluates the passed version as [SemanticVersion] or [AnyVersion] and compares to the given predicate(s).
      *
-     * @return `true` if all predicates succeed
-     * @see [VersionParser.parsePredicateLenient]
+     * @sample stonecutter_samples.eval.lenient
+     * @see VersionParser.parsePredicateLenient
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#checking-versions">Wiki page</a>
      */
-    @Contract(pure = true)
+    @Contract(pure = true) @StonecutterAPI
     fun evalLenient(version: AnyVersion, predicate: String): Boolean {
         val target = VersionParser.parseLenient(version).value
         return predicate.split(' ').all {
