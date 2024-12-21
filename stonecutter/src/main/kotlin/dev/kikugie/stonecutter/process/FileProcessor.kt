@@ -10,6 +10,7 @@ import dev.kikugie.stitcher.exception.StoringErrorHandler
 import dev.kikugie.stitcher.exception.join
 import dev.kikugie.stitcher.parser.FileParser
 import dev.kikugie.stitcher.transformer.Transformer
+import dev.kikugie.stonecutter.ReplacementPhase
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -39,13 +40,14 @@ internal class FileProcessor(private val params: ProcessParameters) {
     inner class EntryProcessor(private val source: Path) {
         internal val collector = LogCollector(LOGGER, params.dirs.input.resolve(source), params.debug)
 
-        fun process(): String? {
+        fun process(): CharSequence? {
             params.statistics.total++
             if (!params.filter(source)) return null logging "Skipping, filtered"
-            val text = params.dirs.input.resolve(source).readText(params.charset)
+            var text: CharSequence = params.dirs.input.resolve(source).readText(params.charset)
 
             val handler = StoringErrorHandler()
             params.statistics.processed++
+            text = ReplacementPhase.FIRST.replace(text, params.parameters.replacements)
             val parser = FileParser.create(text, handler, params.recognizers, params.parameters)
             val ast = parser.parse().also {
                 if (params.debug) writeDebugAst(it)
@@ -57,7 +59,7 @@ internal class FileProcessor(private val params: ProcessParameters) {
             collector.push("Transformed AST, ${handler.errors.size} errors")
             handler.throwIfHasErrors()
 
-            val result = ast.join()
+            val result = ReplacementPhase.LAST.replace(ast.join(), params.parameters.replacements)
             return if (result == text) null logging "Skipping, matches input"
             else result logging "Successfully processed"
         }
@@ -118,7 +120,7 @@ internal class FileProcessor(private val params: ProcessParameters) {
         }.exceptionOrNull()
     }
 
-    private fun saveToTemp(relative: Path, it: String?, file: Path) {
+    private fun saveToTemp(relative: Path, it: CharSequence?, file: Path) {
         val dest = params.dirs.temp.resolveChecked(relative)
         if (it != null) dest.writeText(it, params.charset, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
         else if (!inPlace) file.copyTo(dest, true)

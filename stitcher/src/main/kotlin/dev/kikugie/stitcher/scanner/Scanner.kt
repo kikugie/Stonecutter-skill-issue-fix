@@ -17,7 +17,7 @@ import dev.kikugie.stitcher.data.token.Token
  */
 class Scanner(
     private val input: CharSequence,
-    private val recognizers: Iterable<CommentRecognizer>,
+    private val recognizers: Iterable<CommentRecognizer>
 ) : Iterator<Token> {
     companion object {
         /**
@@ -27,7 +27,8 @@ class Scanner(
          * @param recognizers The collection of comment recognizers to use for tokenization
          * @return an [Iterable] of [Token]s representing the scanned input
          */
-        fun scan(input: CharSequence, recognizers: Iterable<CommentRecognizer>) = Scanner(input, recognizers).asIterable()
+        fun scan(input: CharSequence, recognizers: Iterable<CommentRecognizer>) =
+            Scanner(input, recognizers).asIterable()
     }
 
     /**

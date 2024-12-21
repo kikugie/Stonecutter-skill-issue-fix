@@ -31,7 +31,7 @@ class FileParser(
 ) {
     companion object {
         fun create(
-            input: String,
+            input: CharSequence,
             handler: ErrorHandler,
             recognizers: Iterable<CommentRecognizer>,
             params: TransformParameters? = null,

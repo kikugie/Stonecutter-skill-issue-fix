@@ -1,9 +1,7 @@
 package dev.kikugie.stonecutter.build
 
-import dev.kikugie.stonecutter.Identifier
-import dev.kikugie.stonecutter.SemanticVersion
-import dev.kikugie.stonecutter.StonecutterAPI
-import dev.kikugie.stonecutter.StonecutterDelicate
+import dev.kikugie.stonecutter.*
+import dev.kikugie.stonecutter.ReplacementPhase.LAST
 import dev.kikugie.stonecutter.data.parameters.BuildParameters
 import org.intellij.lang.annotations.Language
 
@@ -237,7 +235,51 @@ interface ReplacementVariants {
      * @throws IllegalArgumentException If [source] already has a registered replacement
      * or if [source] and [target] create a circular reference with registered entries.
      */
-    @StonecutterAPI fun replacement(direction: Boolean, source: String, target: String)
+    @StonecutterAPI fun replacement(
+        phase: ReplacementPhase,
+        direction: Boolean,
+        source: String,
+        target: String
+    )
+
+    /**
+     * Creates a plain string find&replace entry for the file processor.
+     * When [direction] is `true` it will replace [source] with [target],
+     * or vice versa when [direction] is `false`.
+     *
+     * @sample stonecutter_samples.replacements.basic_correct
+     * @sample stonecutter_samples.replacements.basic_ambiguous
+     * @sample stonecutter_samples.replacements.basic_circular
+     * @throws IllegalArgumentException If [source] already has a registered replacement
+     * or if [source] and [target] create a circular reference with registered entries.
+     */
+    fun replacement(
+        direction: Boolean,
+        source: String,
+        target: String
+    ) = replacement(LAST, direction, source, target)
+
+    /**
+     * Creates a regex replacement entry for the file processor.
+     * When [direction] is `true` it will find all occurrences of the [sourcePattern]
+     * and replace them with [targetValue].
+     * Otherwise, it will do the same for [targetPattern] and [sourceValue].
+     *
+     * **This functionality doesn't have the same safety features as plain-string replacements**, namely:
+     * - It doesn't group entries or check for ambiguous replacements, therefore, **replacements are order-dependent**.
+     * - It doesn't verify whenever the replaced value can be reversed when switching back to the original version.
+     *   **When using this, it's your responsibility to make sure replacements are reversible.**
+     *
+     * Provided expressions are evaluated after plain-text ones.
+     */
+    @StonecutterDelicate fun replacement(
+        phase: ReplacementPhase = LAST,
+        direction: Boolean,
+        @Language("regex") sourcePattern: String,
+        targetValue: String,
+        @Language("regex") targetPattern: String,
+        sourceValue: String
+    )
 
     /**
      * Creates a regex replacement entry for the file processor.
@@ -258,7 +300,7 @@ interface ReplacementVariants {
         targetValue: String,
         @Language("regex") targetPattern: String,
         sourceValue: String
-    )
+    ) = replacement(LAST, direction, sourcePattern, targetValue, targetPattern, sourceValue)
 }
 
 /**Declutters file filtering function variants, directing them to a single implementation.*/

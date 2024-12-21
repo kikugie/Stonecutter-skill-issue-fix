@@ -1,4 +1,4 @@
-package dev.kikugie.stonecutter.data
+package dev.kikugie.stitcher.util
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind

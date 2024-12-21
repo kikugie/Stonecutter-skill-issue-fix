@@ -31,21 +31,22 @@ abstract class BuildAbstraction(protected val hierarchy: ProjectHierarchy) :
         data.dependencies[identifier.validateId()] = version.validateVersion()
     }
 
-    override fun replacement(direction: Boolean, source: String, target: String) {
-        if (direction) data.replacements.basic(source, target)
-        else data.replacements.basic(target, source)
+    override fun replacement(phase: ReplacementPhase, direction: Boolean, source: String, target: String) {
+        if (direction) data.replacements.string(phase, source, target)
+        else data.replacements.string(phase, target, source)
     }
 
     @StonecutterDelicate
     override fun replacement(
+        phase: ReplacementPhase,
         direction: Boolean,
         sourcePattern: String,
         targetValue: String,
         targetPattern: String,
         sourceValue: String
     ) {
-        if (direction) data.replacements.regex(sourcePattern, targetValue)
-        else data.replacements.regex(targetPattern, sourceValue)
+        if (direction) data.replacements.regex(phase, sourcePattern, targetValue)
+        else data.replacements.regex(phase, targetPattern, sourceValue)
     }
 
     override fun allowExtensions(extensions: Iterable<String>) {

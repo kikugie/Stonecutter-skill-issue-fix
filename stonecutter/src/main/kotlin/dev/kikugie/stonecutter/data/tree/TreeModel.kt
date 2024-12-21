@@ -5,7 +5,7 @@ package dev.kikugie.stonecutter.data.tree
 import com.charleskorn.kaml.Yaml
 import dev.kikugie.stonecutter.StonecutterAPI
 import dev.kikugie.stonecutter.data.parameters.BuildParameters
-import dev.kikugie.stonecutter.data.PathSerializer
+import dev.kikugie.stitcher.util.PathSerializer
 import dev.kikugie.stonecutter.data.StonecutterProject
 import dev.kikugie.stonecutter.data.parameters.GlobalParameters
 import kotlinx.serialization.KSerializer

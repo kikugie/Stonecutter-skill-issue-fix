@@ -2,16 +2,17 @@ package dev.kikugie.stonecutter.process
 
 import dev.kikugie.semver.VersionParser
 import dev.kikugie.stitcher.scanner.CommentRecognizers
+import dev.kikugie.stitcher.transformer.Replacements
 import dev.kikugie.stitcher.transformer.TransformParameters
 import dev.kikugie.stonecutter.data.ProjectHierarchy
 import dev.kikugie.stonecutter.data.StonecutterProject
 import dev.kikugie.stonecutter.data.container.ConfigurationService
 import dev.kikugie.stonecutter.data.parameters.BuildParameters
+import dev.kikugie.stonecutter.data.parameters.BuildParameters.ReplacementGraph
 import dev.kikugie.stonecutter.data.parameters.GlobalParameters
 import dev.kikugie.stonecutter.data.tree.LightBranch
 import dev.kikugie.stonecutter.data.tree.BranchPrototype
 import dev.kikugie.stonecutter.invoke
-import dev.kikugie.stonecutter.then
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.ListProperty
@@ -129,8 +130,13 @@ internal abstract class StonecutterTask : DefaultTask() {
             put(key, it)
             put("", it)
         }
-        TransformParameters(swaps, constants, this)
+        TransformParameters(swaps, constants, this, toReplacementData())
     }
+
+    private fun BuildParameters.toReplacementData() = Replacements.ReplacementData(
+        replacements.string.map(ReplacementGraph::lock),
+        replacements.regex.toList()
+    )
 
     private fun printErrors(vararg errors: Throwable): Unit = printErrors(0, *errors)
     private fun printErrors(indent: Int, vararg errors: Throwable): Unit = errors.forEach {
