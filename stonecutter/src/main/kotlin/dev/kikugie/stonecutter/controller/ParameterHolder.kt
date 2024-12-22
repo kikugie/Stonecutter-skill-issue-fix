@@ -1,5 +1,6 @@
 package dev.kikugie.stonecutter.controller
 
+import dev.kikugie.stonecutter.StonecutterAPI
 import dev.kikugie.stonecutter.StonecutterUtility
 import dev.kikugie.stonecutter.build.BuildAbstraction
 import dev.kikugie.stonecutter.data.StonecutterProject
@@ -17,12 +18,12 @@ import dev.kikugie.stonecutter.data.tree.LightNode
  * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#global-parameters">Wiki page</a>
  */
 class ParameterHolder(
-    val branch: LightBranch,
-    val metadata: StonecutterProject
-) : BuildAbstraction(branch.hierarchy), StonecutterUtility {
+    @StonecutterAPI val branch: LightBranch,
+    @StonecutterAPI val metadata: StonecutterProject
+) : BuildAbstraction(branch.hierarchy + metadata.project), StonecutterUtility {
     /**
-     * Project node matching [project] on [branch].
+     * Project node matching [metadata] on [branch].
      * May be `null` when branches have different sets of versions.
      */
-    val node: LightNode? = branch[metadata.project]
+    @StonecutterAPI val node: LightNode? = branch[metadata.project]
 }

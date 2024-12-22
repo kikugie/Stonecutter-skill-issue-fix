@@ -17,8 +17,8 @@ object Replacements {
 
         /**Runs replacers if their phase matches the current one.*/
         fun replace(text: CharSequence, data: ReplacementData): CharSequence = StringBuilder(text)
-            .replace(data.replacements.filter { it.phase == this })
-            .replace(data.regexes.filter { it.phase == this })
+            .replaceString(data.replacements.filter { it.phase == this })
+            .replaceRegex(data.regexes.filter { it.phase == this })
     }
 
     @Serializable
@@ -33,7 +33,7 @@ object Replacements {
     @Serializable
     data class RegexReplacement(val phase: ReplacementPhase, val regex: Regex, val target: String)
 
-    private fun StringBuilder.replace(entries: List<StringReplacement>): StringBuilder {
+    private fun StringBuilder.replaceString(entries: List<StringReplacement>): StringBuilder {
         if (isEmpty() || entries.isEmpty()) return this
         val lookup = entries.flatMap { e -> e.sources.map { it to e.target } }.toMap()
         for ((key, value) in lookup) {
@@ -47,7 +47,7 @@ object Replacements {
         return this
     }
 
-    private fun StringBuilder.replace(entries: List<RegexReplacement>): StringBuilder {
+    private fun StringBuilder.replaceRegex(entries: List<RegexReplacement>): StringBuilder {
         if (isEmpty() || entries.isEmpty()) return this
         var string = ""
         for ((_, regex, target) in entries) string = regex.replace(this, target)

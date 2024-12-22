@@ -51,7 +51,6 @@ internal abstract class StonecutterTask : DefaultTask() {
     @get:Input abstract val sources: ListProperty<LightBranch>
 
     private val statistics: ProcessStatistics = ProcessStatistics()
-    private var encounteredSymlink = false
 
     @TaskAction
     fun run() {
@@ -105,23 +104,10 @@ internal abstract class StonecutterTask : DefaultTask() {
         return FileProcessor(processParameters).runCatching { process() }
     }
 
-    private fun reportSymlink() {
-        if (encounteredSymlink) return else encounteredSymlink = true
-        """
-            Encountered symbolic links during file processing.
-            Stonecutter will skip processing them because it can cause unexpected behavior.
-        """.trimIndent().let(logger::error)
-    }
-
-    private fun BuildParameters.allowFile(file: Path): Boolean = file.invariantSeparatorsPathString.let { path ->
-        require(path.startsWith("src/")) { "Encountered non-source file $path" } // TODO: Testing
-        return when {
-            file.isSymbolicLink() -> false.also { reportSymlink(); logger.warn("Skipping symbolic link: $path") }
-            file.isDirectory() -> path !in exclusions
-            file.isRegularFile() -> file.extension in extensions && path !in exclusions
-            else -> false.also { logger.warn("Unknown file type: $path") }
+    private fun BuildParameters.allowFile(file: Path): Boolean =
+        file.invariantSeparatorsPathString.removePrefix(input()).let { path ->
+            file.extension in extensions && path !in exclusions
         }
-    }
 
     private fun BuildParameters.toFileFilter(): (Path) -> Boolean = { allowFile(it) }
 
