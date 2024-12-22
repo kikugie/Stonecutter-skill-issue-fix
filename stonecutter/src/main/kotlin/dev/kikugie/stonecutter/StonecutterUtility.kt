@@ -48,4 +48,22 @@ interface StonecutterUtility {
             VersionParser.parsePredicateLenient(it).value.eval(target)
         }
     }
+
+    /**
+     * Parses both parameters as [SemanticVersion] and compares them.
+     *
+     * @return 1 if the [left] is greater, -1 if the [right] is greater, 0 if they are equal
+     */
+    @Contract(pure = true) @StonecutterAPI
+    fun compare(left: SemanticVersion, right: SemanticVersion) =
+        VersionParser.parse(left).value.compareTo(VersionParser.parse(right).value)
+
+    /**
+     * Parses both parameters as [SemanticVersion] or [AnyVersion] and compares them.
+     *
+     * @return 1 if the [left] is greater, -1 if the [right] is greater, 0 if they are equal
+     */
+    @Contract(pure = true) @StonecutterAPI
+    fun compareLenient(left: AnyVersion, right: AnyVersion) =
+        VersionParser.parseLenient(left).value.compareTo(VersionParser.parse(right).value)
 }
