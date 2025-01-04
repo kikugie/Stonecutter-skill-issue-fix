@@ -23,6 +23,7 @@ public open class StonecutterController(root: Project) :
     ControllerAbstraction(root),
     StonecutterUtility,
     GlobalParametersAccess {
+    override val generateIdeaRunConfigs: Boolean = true
     override var automaticPlatformConstants: Boolean = false
     override var debug: Boolean by parameters.named("debug")
     override var processFiles: Boolean by parameters.named("process")
@@ -84,10 +85,12 @@ public open class StonecutterController(root: Project) :
     }
 
     private fun setupConfigurationTasks() = with(root.rootProject) {
-        tasks.register<IdeaSetupTask>("stonecutterIdea") {}
-        if (System.getProperty("idea.sync.active", "false").toBoolean()) gradle.startParameter.let { st ->
-            if (st.taskRequests.none { "stonecutterIdea" in it.args })
-                st.setTaskRequests(st.taskRequests + DefaultTaskExecutionRequest(listOf("stonecutterIdea")))
+        if (generateIdeaRunConfigs) {
+            tasks.register<IdeaSetupTask>("stonecutterIdea") {}
+            if (System.getProperty("idea.sync.active", "false").toBoolean()) gradle.startParameter.let { st ->
+                if (st.taskRequests.none { "stonecutterIdea" in it.args })
+                    st.setTaskRequests(st.taskRequests + DefaultTaskExecutionRequest(listOf("stonecutterIdea")))
+            }
         }
     }
 

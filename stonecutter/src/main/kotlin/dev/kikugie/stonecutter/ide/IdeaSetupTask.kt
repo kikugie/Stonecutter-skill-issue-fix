@@ -27,7 +27,7 @@ internal abstract class IdeaSetupTask : DefaultTask() {
 
     init {
         group = "ide"
-        trees.convention(StonecutterPlugin.SERVICE().parameters.projectTrees().values)
+        trees.convention(StonecutterPlugin.SERVICE().parameters.projectTrees().values.distinctBy { it.hierarchy })
     }
 
     @TaskAction
