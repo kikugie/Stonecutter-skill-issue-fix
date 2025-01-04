@@ -22,6 +22,8 @@ public value class ProjectHierarchy(private val path: String) {
         get() = if (path == ":") emptyList()
         else path.substring(1).split(":")
 
+    public fun orBlank(): String = if (isEmpty()) "" else path
+
     /**Whenever this path is the root project.*/
     public fun isEmpty(): Boolean = path == ":"
 

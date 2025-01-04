@@ -50,9 +50,9 @@ internal abstract class IdeaSetupTask : DefaultTask() {
 
     private fun MutableList<String>.writeConfiguration(project: ProjectHierarchy, name: String, task: String = name) {
         val xml = TEMPLATE.getOrThrow()
-            .replaceChecked("%FOLDER_NAME%", if (project.isEmpty()) "Stonecutter" else "Stonecutter:$project")
+            .replaceChecked("%FOLDER_NAME%", "Stonecutter${project.orBlank()}")
             .replaceChecked("%ENTRY_NAME%", name)
-            .replaceChecked("%TASK_NAME%", task)
+            .replaceChecked("%TASK_NAME%", "${project.orBlank()}:$task")
         val filename = "Stonecutter${project.toString().replace(':', '_')}_${name.replace(' ', '_')}.xml"
         kotlin.runCatching {
             folder.resolve(filename)
