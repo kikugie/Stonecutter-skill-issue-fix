@@ -7,8 +7,10 @@ import dev.kikugie.stonecutter.data.StonecutterProject
 import dev.kikugie.stonecutter.data.parameters.BuildParameters
 import dev.kikugie.stonecutter.data.parameters.GlobalParameters
 import dev.kikugie.stonecutter.data.tree.*
+import dev.kikugie.stonecutter.ide.IdeaSetupTask
 import dev.kikugie.stonecutter.process.StonecutterTask
 import org.gradle.api.Project
+import org.gradle.internal.DefaultTaskExecutionRequest
 import org.gradle.kotlin.dsl.register
 
 /**
@@ -78,6 +80,15 @@ public open class StonecutterController(root: Project) :
 
         serializeTree()
         serializeBranches()
+        setupConfigurationTasks()
+    }
+
+    private fun setupConfigurationTasks() = with(root.rootProject) {
+        tasks.register<IdeaSetupTask>("stonecutterIdea") {}
+        if (System.getProperty("idea.sync.active", "false").toBoolean()) gradle.startParameter.let { st ->
+            if (st.taskRequests.none { "stonecutterIdea" in it.args })
+                st.setTaskRequests(st.taskRequests + DefaultTaskExecutionRequest(listOf("stonecutterIdea")))
+        }
     }
 
     private fun createStonecutterTask(name: String, version: StonecutterProject, desc: () -> String) =

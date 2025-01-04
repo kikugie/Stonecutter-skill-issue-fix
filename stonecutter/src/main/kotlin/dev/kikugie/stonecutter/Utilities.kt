@@ -17,7 +17,7 @@ public const val BNAN: String = "🍌"
 /**
  * Currently running Stonecutter version, serialised in [TreeModel].
  */
-public const val STONECUTTER: String = "0.6-alpha.1"
+public const val STONECUTTER: String = "0.6-alpha.2"
 
 internal operator fun <K, V> Map<K, V>?.get(key: K): V? = this?.get(key)
 internal fun <K : Any, R : Any> memoize(memory: (K) -> R?): (K) -> R? = mutableMapOf<K, R?>().let { map ->
@@ -49,3 +49,8 @@ internal operator fun <T> Property<T>.invoke(value: T) = set(value)
 
 internal inline fun <T> Iterable<T>.onEach(action: T.() -> Unit) = forEach(action)
 internal infix fun <T> Any?.then(other: T): T = other
+
+internal fun readResource(path: String): Result<String> = runCatching {
+    StonecutterPlugin::class.java.classLoader.getResourceAsStream(path)?.use { it.reader().readText() }
+        ?: error("Resource $path not found")
+}

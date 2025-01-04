@@ -63,7 +63,7 @@ tasks.register("updateVersion") {
         replace("docs/.vitepress/config.mts", "latestVersion: '.+'", "latestVersion: '$version'")
         replace("docs/stonecutter/guide/setup.md", "stonecutter\"\\ version \".+\"", "stonecutter\" version \"$version\"")
         replace("docs/stonecutter/guide/setup.md", "stonecutter\"\\) version \".+\"", "stonecutter\") version \"$version\"")
-        replace("stonecutter/src/main/kotlin/dev/kikugie/stonecutter/Utilities.kt", "const val STONECUTTER = .+\"", "const val STONECUTTER = \"$version\"")
+        replace("stonecutter/src/main/kotlin/dev/kikugie/stonecutter/Utilities.kt", "val STONECUTTER = .+\"", "val STONECUTTER = \"$version\"")
     }
 }
 
