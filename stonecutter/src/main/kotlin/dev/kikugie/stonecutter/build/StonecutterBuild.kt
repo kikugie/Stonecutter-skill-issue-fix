@@ -1,22 +1,18 @@
 package dev.kikugie.stonecutter.build
 
 import dev.kikugie.stonecutter.*
-import dev.kikugie.stonecutter.StonecutterPlugin
 import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.hierarchy
 import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.locate
 import dev.kikugie.stonecutter.data.StonecutterProject
 import dev.kikugie.stonecutter.data.container.ConfigurationService.Companion.of
 import dev.kikugie.stonecutter.data.tree.*
 import dev.kikugie.stonecutter.process.StonecutterTask
-import dev.kikugie.stonecutter.projectPath
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.register
-import org.jetbrains.annotations.ApiStatus
-import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.deleteRecursively
@@ -31,46 +27,46 @@ import kotlin.io.path.invariantSeparatorsPathString
  * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#versioning-build-gradle-kts">Wiki page</a>
  */
 @OptIn(ExperimentalPathApi::class)
-open class StonecutterBuild(private val project: Project) : BuildAbstraction(project.hierarchy), StonecutterUtility {
+public open class StonecutterBuild(private val project: Project) : BuildAbstraction(project.hierarchy), StonecutterUtility {
     private val parent: Project = requireNotNull(project.parent) { "No parent project for '${project.path}'" }
 
     /**Project tree instance containing the necessary data and safe to use with configuration cache.
      * @see [withProject]*/
-    @StonecutterAPI val tree: LightTree = StonecutterPlugin.SERVICE.of(parent.hierarchy).tree
+    @StonecutterAPI public val tree: LightTree = StonecutterPlugin.SERVICE.of(parent.hierarchy).tree
         ?: error("Tree for '${project.path}' not found")
 
     /**Branch this node belongs to containing the necessary data and safe to use with configuration cache.
      * @see [withProject]*/
-    @StonecutterAPI val branch: LightBranch = tree[parent.hierarchy.last().removePrefix(":")]
+    @StonecutterAPI public val branch: LightBranch = tree[parent.hierarchy.last().removePrefix(":")]
         ?: error("Branch for '${project.path}' not found")
 
     /**This project's node containing only the necessary data and safe to use with configuration cache.
      * @see [withProject]*/
-    @StonecutterAPI val node: LightNode = branch[project.hierarchy.last().removePrefix(":")]
+    @StonecutterAPI public val node: LightNode = branch[project.hierarchy.last().removePrefix(":")]
         ?: error("Node for '${project.path}' not found")
 
     /**All versions in this project's branch.*/
-    @StonecutterAPI val versions: Collection<StonecutterProject> get() = branch.versions
+    @StonecutterAPI public val versions: Collection<StonecutterProject> get() = branch.versions
 
     /**The currently active version. Global for all instances of the build file.*/
-    @StonecutterAPI val active: StonecutterProject get() = tree.current
+    @StonecutterAPI public val active: StonecutterProject get() = tree.current
 
     /**Metadata of the currently processed version.*/
-    @StonecutterAPI val current: StonecutterProject = node.metadata
+    @StonecutterAPI public val current: StonecutterProject = node.metadata
 
     /**Creates a tree wrapper that implements its Gradle [Project].
      * Can be used to retrieve properties from other projects, but unsafe to use in tasks.*/
-    @StonecutterDelicate fun withProject(tree: LightTree): ProjectTree =
+    @StonecutterDelicate public fun withProject(tree: LightTree): ProjectTree =
         tree.withProject(project.locate(tree.hierarchy))
 
     /**Creates a branch wrapper that implements its Gradle [Project].
      * Can be used to retrieve properties from other projects, but unsafe to use in tasks.*/
-    @StonecutterDelicate fun withProject(branch: LightBranch): ProjectBranch =
+    @StonecutterDelicate public fun withProject(branch: LightBranch): ProjectBranch =
         branch.withProject(project.locate(branch.hierarchy))
 
     /**Creates a node wrapper that implements its Gradle [Project].
      * Can be used to retrieve properties from other projects, but unsafe to use in tasks.*/
-    @StonecutterDelicate fun withProject(node: LightNode): ProjectNode =
+    @StonecutterDelicate public fun withProject(node: LightNode): ProjectNode =
         node.withProject(project.locate(node.hierarchy))
 
     init {

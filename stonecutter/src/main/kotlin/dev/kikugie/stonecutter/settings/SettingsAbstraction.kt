@@ -7,61 +7,61 @@ import org.gradle.api.initialization.ProjectDescriptor
 import org.gradle.api.initialization.Settings
 
 /**Method variations for [StonecutterSettings]*/
-abstract class SettingsAbstraction(private val settings: Settings) {
+public abstract class SettingsAbstraction(private val settings: Settings) {
     private lateinit var shared: TreeBuilder
     /**Stores the provided configuration to be used in [create] methods.*/
-    @StonecutterAPI fun shared(action: Action<TreeBuilder>) {
+    @StonecutterAPI public fun shared(action: Action<TreeBuilder>) {
         shared = TreeBuilder().also(action::execute)
     }
 
     /**Configures the specified project to be versioned with setup provided by [shared].*/
-    @StonecutterAPI fun create(project: ProjectPath) {
+    @StonecutterAPI public fun create(project: ProjectPath) {
         create(project.project(), shared)
     }
 
     /**Configures the specified project to be versioned with setup provided by [shared].*/
-    @StonecutterAPI fun create(project: ProjectDescriptor) {
+    @StonecutterAPI public fun create(project: ProjectDescriptor) {
         create(project, shared)
     }
 
     /**Configures the specified projects to be versioned with setup provided by [shared].*/
-    @StonecutterAPI fun create(vararg projects: ProjectPath) =
+    @StonecutterAPI public fun create(vararg projects: ProjectPath): Unit =
         projects.forEach(::create)
 
     /**Configures the specified projects to be versioned with setup provided by [shared].*/
-    @StonecutterAPI fun create(vararg projects: ProjectDescriptor) =
+    @StonecutterAPI public fun create(vararg projects: ProjectDescriptor): Unit =
         projects.forEach(::create)
 
     /**Configures the specified projects to be versioned with setup provided by [shared].*/
-    @StonecutterAPI fun create(projects: Iterable<ProjectPath>) =
+    @StonecutterAPI public fun create(projects: Iterable<ProjectPath>): Unit =
         projects.forEach(::create)
 
     /**Configures the specified projects to be versioned with setup provided by [shared].*/
-    @StonecutterAPI fun create(projects: Iterable<ProjectDescriptor>) =
+    @StonecutterAPI public fun create(projects: Iterable<ProjectDescriptor>): String =
         projects.forEach(::create).let { BNAN }
 
     /**Configures the specified project to be versioned with setup provided by [action].*/
-    @StonecutterAPI fun create(project: ProjectPath, action: Action<TreeBuilder>) =
+    @StonecutterAPI public fun create(project: ProjectPath, action: Action<TreeBuilder>): Unit =
         create(project.project(), action)
 
     /**Configures the specified project to be versioned with setup provided by [action].*/
-    @StonecutterAPI fun create(project: ProjectDescriptor, action: Action<TreeBuilder>) =
+    @StonecutterAPI public fun create(project: ProjectDescriptor, action: Action<TreeBuilder>): Unit =
         create(project, TreeBuilder().also(action::execute))
 
     /**Configures the specified projects to be versioned with setup provided by [action].*/
-    @StonecutterAPI fun create(vararg projects: ProjectPath, action: Action<TreeBuilder>) =
+    @StonecutterAPI public fun create(vararg projects: ProjectPath, action: Action<TreeBuilder>): Unit =
         projects.forEach { create(it, action) }
 
     /**Configures the specified projects to be versioned with setup provided by [action].*/
-    @StonecutterAPI fun create(vararg projects: ProjectDescriptor, action: Action<TreeBuilder>) =
+    @StonecutterAPI public fun create(vararg projects: ProjectDescriptor, action: Action<TreeBuilder>): Unit =
         projects.forEach { create(it, action) }
 
     /**Configures the specified projects to be versioned with setup provided by [action].*/
-    @StonecutterAPI fun create(projects: Iterable<ProjectPath>, action: Action<TreeBuilder>) =
+    @StonecutterAPI public fun create(projects: Iterable<ProjectPath>, action: Action<TreeBuilder>): Unit =
         projects.forEach { create(it, action) }
 
     /**Configures the specified projects to be versioned with setup provided by [action].*/
-    @StonecutterAPI fun create(projects: Iterable<ProjectDescriptor>, action: Action<TreeBuilder>) =
+    @StonecutterAPI public fun create(projects: Iterable<ProjectDescriptor>, action: Action<TreeBuilder>): String =
         projects.forEach { create(it, action) }.let { BNAN }
 
     protected abstract fun create(project: ProjectDescriptor, setup: TreeBuilder)

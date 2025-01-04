@@ -1,13 +1,9 @@
 package dev.kikugie.stonecutter.controller
 
-import dev.kikugie.stonecutter.Identifier
-import dev.kikugie.stonecutter.StonecutterUtility
 import dev.kikugie.stonecutter.*
 import dev.kikugie.stonecutter.data.ProjectHierarchy
 import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.hierarchy
-import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.locate
 import dev.kikugie.stonecutter.data.StonecutterProject
-import dev.kikugie.stonecutter.data.container.HierarchyMap
 import dev.kikugie.stonecutter.data.parameters.BuildParameters
 import dev.kikugie.stonecutter.data.parameters.GlobalParameters
 import dev.kikugie.stonecutter.data.tree.*
@@ -21,7 +17,7 @@ import org.gradle.kotlin.dsl.register
  * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#controller-stonecutter-gradle-kts">Wiki page</a>
  */
 @Suppress("MemberVisibilityCanBePrivate")
-open class StonecutterController(root: Project) :
+public open class StonecutterController(root: Project) :
     ControllerAbstraction(root),
     StonecutterUtility,
     GlobalParametersAccess {

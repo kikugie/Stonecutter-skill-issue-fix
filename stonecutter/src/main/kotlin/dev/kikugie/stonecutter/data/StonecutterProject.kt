@@ -4,6 +4,7 @@ import dev.kikugie.stonecutter.AnyVersion
 import dev.kikugie.stonecutter.Identifier
 import dev.kikugie.stonecutter.data.tree.NodeModel
 import dev.kikugie.stonecutter.data.tree.NodeInfo
+import dev.kikugie.stonecutter.controller.StonecutterController
 import dev.kikugie.stonecutter.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -12,7 +13,7 @@ import kotlinx.serialization.Transient
  * Represents a project entry in a Stonecutter branch.
  */
 @Serializable
-data class StonecutterProject internal constructor(
+public data class StonecutterProject internal constructor(
     /**The name of this project's directory, as in `versions/${project}`.*/
     @StonecutterAPI val project: Identifier,
     /**
@@ -24,7 +25,7 @@ data class StonecutterProject internal constructor(
     /**
      * Active status of this project.
      *
-     * Assigned by [StonecutterController.active], but serialized separately in
+     * Assigned by [StonecutterController.active], but serialised separately in
      * [NodeModel] and [NodeInfo].
      */
     @Transient

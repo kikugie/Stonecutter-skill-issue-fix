@@ -2,6 +2,7 @@
 @file:OptIn(ExperimentalPathApi::class)
 
 import org.jetbrains.dokka.gradle.AbstractDokkaLeafTask
+import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.nio.file.Path
 import kotlin.io.path.ExperimentalPathApi
@@ -53,6 +54,7 @@ java {
 }
 
 tasks.compileKotlin {
+    explicitApiMode = ExplicitApiMode.Strict
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_16)
     }

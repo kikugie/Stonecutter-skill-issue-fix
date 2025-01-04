@@ -37,31 +37,31 @@ private fun <T> load(location: Path, serializer: KSerializer<T>): Result<T> = lo
 }
 
 @Serializable
-data class NodeInfo(
+public data class NodeInfo(
     val metadata: StonecutterProject,
     val path: Path,
     val active: Boolean = false,
 )
 
 @Serializable
-data class BranchInfo(
+public data class BranchInfo(
     val id: String,
     val path: Path,
 )
 
 @Serializable
-data class NodeModel(
+public data class NodeModel(
     val metadata: StonecutterProject,
     val root: Path,
     val branch: BranchInfo,
     val active: Boolean,
     val parameters: BuildParameters
 ) {
-    companion object {
-        const val FILENAME = "node.yml"
+    public companion object {
+        public const val FILENAME: String = "node.yml"
 
         @JvmStatic @StonecutterAPI
-        fun load(directory: Path): Result<NodeModel> =
+        public fun load(directory: Path): Result<NodeModel> =
             load(directory.resolve(FILENAME), serializer())
     }
 
@@ -70,16 +70,16 @@ data class NodeModel(
 }
 
 @Serializable
-data class BranchModel(
+public data class BranchModel(
     val id: String,
     val root: Path,
     val nodes: List<NodeInfo>,
 ) {
-    companion object {
-        const val FILENAME = "branch.yml"
+    public companion object {
+        public const val FILENAME: String = "branch.yml"
 
         @JvmStatic @StonecutterAPI
-        fun load(directory: Path): Result<BranchModel> =
+        public fun load(directory: Path): Result<BranchModel> =
             load(directory.resolve(FILENAME), serializer())
     }
 
@@ -88,7 +88,7 @@ data class BranchModel(
 }
 
 @Serializable
-data class TreeModel(
+public data class TreeModel(
     val stonecutter: String,
     val vcs: StonecutterProject,
     val current: StonecutterProject,
@@ -96,11 +96,11 @@ data class TreeModel(
     val nodes: List<NodeInfo>,
     val parameters: GlobalParameters,
 ) {
-    companion object {
-        const val FILENAME = "tree.yml"
+    public companion object {
+        public const val FILENAME: String = "tree.yml"
 
         @JvmStatic @StonecutterAPI
-        fun load(directory: Path): Result<TreeModel> =
+        public fun load(directory: Path): Result<TreeModel> =
             load(directory.resolve(FILENAME), serializer())
     }
 

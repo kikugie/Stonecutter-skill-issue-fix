@@ -1,19 +1,20 @@
 package dev.kikugie.stonecutter.data.tree
 
 import dev.kikugie.stonecutter.Identifier
+import dev.kikugie.stonecutter.StonecutterAPI
 import dev.kikugie.stonecutter.data.ProjectHierarchy
 import dev.kikugie.stonecutter.data.StonecutterProject
 import org.gradle.api.Project
 import java.nio.file.Path
 
 /**Represents properties of a Gradle project.*/
-interface GradleMember {
+public interface GradleMember {
     /**Project location on the disk relative to the root.*/
-    val location: Path
+    @StonecutterAPI public val location: Path
 
     /**Absolute project path in Gradle notation.
      * The wrapping class ensures the correct data kind when it's required.*/
-    val hierarchy: ProjectHierarchy
+    @StonecutterAPI public val hierarchy: ProjectHierarchy
 }
 
 /**
@@ -22,21 +23,21 @@ interface GradleMember {
  * It's available as [ProjectNode], which serves as an access point for the
  * corresponding Gradle [Project], and as [LightNode], which only stores the data.
  */
-interface NodePrototype : GradleMember {
+public interface NodePrototype : GradleMember {
     /**Subproject name and assigned version for this node.*/
-    val metadata: StonecutterProject
+    @StonecutterAPI public val metadata: StonecutterProject
 
     /**Reference to the container branch.*/
-    val branch: BranchPrototype<out NodePrototype>
+    @StonecutterAPI public val branch: BranchPrototype<out NodePrototype>
 
     /**Finds the given [node] in the current branch.*/
-    fun peer(node: Identifier): NodePrototype?
+    @StonecutterAPI public fun peer(node: Identifier): NodePrototype?
 
     /**Finds the node with the same metadata in the given [branch].*/
-    fun sibling(branch: Identifier): NodePrototype?
+    @StonecutterAPI public fun sibling(branch: Identifier): NodePrototype?
 
     /**Finds the given [node] in the [branch].*/
-    fun find(branch: Identifier, node: Identifier): NodePrototype?
+    @StonecutterAPI public fun find(branch: Identifier, node: Identifier): NodePrototype?
 }
 
 /**
@@ -46,19 +47,19 @@ interface NodePrototype : GradleMember {
  * corresponding Gradle [Project], and as [LightBranch], which only stores the data.
  * @param T [NodePrototype] kind required for the correct [Map] implementation
  */
-interface BranchPrototype<T> : GradleMember,
+public interface BranchPrototype<T> : GradleMember,
     Map<Identifier, T> where T : NodePrototype {
     /**Unique identifier for this branch, which serves as a subproject name as well. For the root branch it's `""`.*/
-    val id: Identifier
+    @StonecutterAPI public val id: Identifier
 
     /**Reference to the container tree.*/
-    val tree: TreePrototype<out BranchPrototype<out NodePrototype>>
+    @StonecutterAPI public val tree: TreePrototype<out BranchPrototype<out NodePrototype>>
 
     /**All nodes in the branch.*/
-    val nodes: Collection<NodePrototype>
+    @StonecutterAPI public val nodes: Collection<NodePrototype>
 
     /**All versions registered in the branch.*/
-    val versions: Collection<StonecutterProject>
+    @StonecutterAPI public val versions: Collection<StonecutterProject>
 }
 
 /**
@@ -68,20 +69,20 @@ interface BranchPrototype<T> : GradleMember,
  * corresponding Gradle [Project], and as [LightTree], which only stores the data.
  * @param T [BranchPrototype] kind required for the correct [Map] implementation
  */
-interface TreePrototype<T> : GradleMember,
+public interface TreePrototype<T> : GradleMember,
     Map<Identifier, T> where T : BranchPrototype<out NodePrototype> {
     /**Version control version. It's used by the `Reset active version` task.*/
-    val vcs: StonecutterProject
+    @StonecutterAPI public val vcs: StonecutterProject
 
     /**Currently active version set in `stonecutter.gradle[.kts]`.*/
-    val current: StonecutterProject
+    @StonecutterAPI public val current: StonecutterProject
 
     /**All branches in the tree.*/
-    val branches: Collection<T>
+    @StonecutterAPI public val branches: Collection<T>
 
     /**All nodes across all branches in the tree.*/
-    val nodes: Collection<NodePrototype>
+    @StonecutterAPI public val nodes: Collection<NodePrototype>
 
     /**All unique versions in the tree.*/
-    val versions: Collection<StonecutterProject>
+    @StonecutterAPI public val versions: Collection<StonecutterProject>
 }

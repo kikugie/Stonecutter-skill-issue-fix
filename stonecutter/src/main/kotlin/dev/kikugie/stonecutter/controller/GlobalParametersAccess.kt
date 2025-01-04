@@ -5,7 +5,7 @@ import dev.kikugie.stonecutter.Identifier
 /**
  * Parameters applied globally in [StonecutterController].
  */
-interface GlobalParametersAccess {
+public interface GlobalParametersAccess {
     /**
      * Sets up platform constants (like `fabric`, `forge`, etc.)
      * from project properties.
@@ -21,14 +21,14 @@ interface GlobalParametersAccess {
      * }
      * ```
      */
-    val automaticPlatformConstants: Boolean
+    public val automaticPlatformConstants: Boolean
 
     /**
      * Controls whenever Stonecutter should process files.
      * Disabling it will speed up version switching,
      * but naturally, all conditional comments will be ignored.
      */
-    val processFiles: Boolean
+    public val processFiles: Boolean
 
     /**
      * Specifies the default version checked in predicates.
@@ -39,7 +39,7 @@ interface GlobalParametersAccess {
      * ```
      * Modifying this property changes the receiver name.
      */
-    val defaultReceiver: Identifier
+    public val defaultReceiver: Identifier
 
     /**
      * Debug mode toggle for all nodes in the tree.
@@ -52,5 +52,5 @@ interface GlobalParametersAccess {
      * - Debug ASTs in `.yml` format are written to `build/stonecutter-cache/debug`.
      * - All processing steps are written in the main log.
      */
-    val debug: Boolean
+    public val debug: Boolean
 }

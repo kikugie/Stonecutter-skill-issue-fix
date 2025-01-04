@@ -9,7 +9,7 @@ package dev.kikugie.stonecutter
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.BINARY)
 @MustBeDocumented
-annotation class StonecutterAPI
+public annotation class StonecutterAPI
 
 /**
  * Annotated members are still treated as public API, but may cause issues when misused.
@@ -18,4 +18,4 @@ annotation class StonecutterAPI
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.BINARY)
 @MustBeDocumented
-annotation class StonecutterDelicate
+public annotation class StonecutterDelicate

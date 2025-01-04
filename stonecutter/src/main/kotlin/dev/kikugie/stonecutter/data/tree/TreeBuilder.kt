@@ -13,13 +13,13 @@ internal typealias NodeMap = MutableMap<Identifier, Nodes>
  * Represents a project tree structure in the `settings.gradle[.kts]` file.
  * This tree only supports three layers of depth: `root -> branch -> node`.
  */
-class TreeBuilder internal constructor() : ProjectProvider {
+public class TreeBuilder internal constructor() : ProjectProvider {
     internal val versions: MutableMap<StonecutterProject, StonecutterProject> = mutableMapOf()
     internal val nodes: NodeMap = mutableMapOf()
     internal val branches: MutableMap<Identifier, BranchBuilder> = mutableMapOf()
 
     /**Version used by the `Reset active project` task. Defaults to the first registered version.*/
-    @StonecutterAPI var vcsVersion: AnyVersion? = null
+    @StonecutterAPI public var vcsVersion: AnyVersion? = null
         get() = field ?: versions.values.firstOrNull()?.project
         set(value) {
             requireNotNull(value) { "`vcsVersion` must be set to a non-null value." }
@@ -37,14 +37,14 @@ class TreeBuilder internal constructor() : ProjectProvider {
             node += versions.getOrPut(project) { project }
         }
 
-    override fun vers(name: Identifier, version: AnyVersion) =
+    override fun vers(name: Identifier, version: AnyVersion): Unit =
         add("", StonecutterProject(name, version))
 
     /**Creates an inherited branch, which copies all the versions specified in this block.*/
-    @StonecutterAPI fun branch(name: Identifier) = branch(name) { inherit() }
+    @StonecutterAPI public fun branch(name: Identifier): Unit = branch(name) { inherit() }
 
     /**Creates a new branch in this tree with the provided configuration.*/
-    @StonecutterAPI fun branch(name: Identifier, action: Action<BranchBuilder>) {
+    @StonecutterAPI public fun branch(name: Identifier, action: Action<BranchBuilder>) {
         require(name.isNotBlank()) { "Branch name cannot be blank" }
         require(name.isValid()) { "Invalid branch name: '$name'" }
         branches.getOrPut(name) { BranchBuilder(this, name) }.let(action::execute)
@@ -56,19 +56,19 @@ class TreeBuilder internal constructor() : ProjectProvider {
  *
  * @param id Subproject's name for this branch
  */
-class BranchBuilder internal constructor(private val tree: TreeBuilder, private val id: Identifier) : ProjectProvider {
+public class BranchBuilder internal constructor(private val tree: TreeBuilder, private val id: Identifier) : ProjectProvider {
     /**
      * Buildscript filename overrides for this branch.
      * Defaults to [StonecutterSettings.centralScript].
      */
-    lateinit var buildscript: String
+    public lateinit var buildscript: String
 
-    override fun vers(name: Identifier, version: AnyVersion) =
+    override fun vers(name: Identifier, version: AnyVersion): Unit =
         tree.add(id, StonecutterProject(name, version))
 
     /**
      * Copies nodes registered in [TreeBuilder] to this branch
      */
-    @StonecutterAPI fun inherit() = tree.nodes[""]?.forEach { tree.add(id, it) }
+    @StonecutterAPI public fun inherit(): Unit = tree.nodes[""]?.forEach { tree.add(id, it) }
         ?: error("No root node to inherit from")
 }

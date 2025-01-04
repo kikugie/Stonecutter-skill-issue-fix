@@ -13,7 +13,7 @@ private inline fun <K, V, R> Map<K, V>.remap(block: (K, V) -> Pair<K, R>): Set<M
     entries.map { (key, value) ->
         block(key, value).let {
             object : Map.Entry<K, R> {
-                override val key = it.first;
+                override val key = it.first
                 override val value = it.second
             }
         }
@@ -29,14 +29,14 @@ private inline fun <K, V, R> Map<K, V>.remap(block: (K, V) -> Pair<K, R>): Set<M
  * @property light The underlying [LightNode]
  */
 @StonecutterDelicate
-class ProjectNode(val light: LightNode, project: Project) :
+public class ProjectNode(public val light: LightNode, project: Project) :
     NodePrototype by light,
     Project by project {
     /**
      * Stonecutter plugin for this node.
      * @throws UnknownDomainObjectException if the plugin is not applied.
      */
-    val stonecutter: StonecutterBuild get() = extensions.getByType<StonecutterBuild>()
+    public val stonecutter: StonecutterBuild get() = extensions.getByType<StonecutterBuild>()
     override val branch: ProjectBranch by lazy { light.branch.let { ProjectBranch(it, locate(it.hierarchy)) } }
 
     override fun peer(node: Identifier): ProjectNode? =
@@ -54,7 +54,7 @@ class ProjectNode(val light: LightNode, project: Project) :
  * @property light The underlying [LightBranch]
  */
 @StonecutterDelicate
-class ProjectBranch(val light: LightBranch, project: Project) :
+public class ProjectBranch(public val light: LightBranch, project: Project) :
     BranchPrototype<ProjectNode> by light as BranchPrototype<ProjectNode>,
     Project by project {
     private val cache: (Identifier) -> ProjectNode? = memoize { id ->
@@ -76,7 +76,7 @@ class ProjectBranch(val light: LightBranch, project: Project) :
         light.containsValue(value.light)
 
     /**Finds the [ProjectNode] corresponding to the given Gradle [project].*/
-    operator fun get(project: Project): ProjectNode? =
+    public operator fun get(project: Project): ProjectNode? =
         get(project.path.substringAfterLast(':'))
 }
 
@@ -85,7 +85,7 @@ class ProjectBranch(val light: LightBranch, project: Project) :
  * @property light The underlying [LightTree]
  */
 @StonecutterDelicate
-class ProjectTree(val light: LightTree, project: Project) :
+public class ProjectTree(public val light: LightTree, project: Project) :
     TreePrototype<ProjectBranch> by light as TreePrototype<ProjectBranch>,
     Project by project {
     private val cache: (Identifier) -> ProjectBranch? = memoize { id ->
@@ -108,6 +108,6 @@ class ProjectTree(val light: LightTree, project: Project) :
         light.containsValue(value.light)
 
     /**Finds the [ProjectBranch] corresponding to the given Gradle [project].*/
-    operator fun get(project: Project): ProjectBranch? =
+    public operator fun get(project: Project): ProjectBranch? =
         get(project.path.removePrefix(path).removeStarting(':'))
 }

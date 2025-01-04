@@ -1,13 +1,13 @@
 package dev.kikugie.stonecutter.controller
 
 import dev.kikugie.stonecutter.Identifier
+import dev.kikugie.stonecutter.StonecutterAPI
 import dev.kikugie.stonecutter.StonecutterPlugin
 import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.hierarchy
 import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.locate
 import dev.kikugie.stonecutter.data.StonecutterProject
 import dev.kikugie.stonecutter.data.container.ConfigurationService.Companion.of
 import dev.kikugie.stonecutter.data.tree.NodePrototype
-import dev.kikugie.stonecutter.invoke
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Input
@@ -20,7 +20,7 @@ import org.jetbrains.annotations.ApiStatus
  * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#chiseled-tasks">Wiki page</a>
  */
 @Suppress("LeakingThis", "unused", "DEPRECATION")
-abstract class ChiseledTask : DefaultTask() {
+public abstract class ChiseledTask : DefaultTask() {
     @Transient
     private val tree = StonecutterPlugin.SERVICE.of(project.hierarchy).tree
         ?: error("Chiseled task registered in a non-Stonecutter project")
@@ -34,7 +34,7 @@ abstract class ChiseledTask : DefaultTask() {
      */
     @get:Input
     @get:ApiStatus.Internal
-    abstract val nodes: ListProperty<NodePrototype>
+    public abstract val nodes: ListProperty<NodePrototype>
 
     /**
      * Version filter used by this task. Can be assigned directly,
@@ -43,13 +43,13 @@ abstract class ChiseledTask : DefaultTask() {
     @get:Input
     @get:ApiStatus.ScheduledForRemoval(inVersion = "0.6")
     @get:Deprecated("Must assign nodes. Use versions() or nodes() to filter the tree directly.")
-    abstract val versions: ListProperty<StonecutterProject>
+    public abstract val versions: ListProperty<StonecutterProject>
 
     /**
      * Filters the nodes by the project instance.
      * **Accessing project properties in Groovy at this stage might be inaccurate.**
      */
-    fun nodes(selector: (NodePrototype) -> Boolean) {
+    @StonecutterAPI public fun nodes(selector: (NodePrototype) -> Boolean) {
         tree.nodes.filter(selector).let(nodes::set)
     }
 
@@ -59,7 +59,7 @@ abstract class ChiseledTask : DefaultTask() {
      *
      * @see StonecutterProject
      */
-    fun versions(selector: NodeFilter) {
+    @StonecutterAPI public fun versions(selector: NodeFilter) {
         tree.nodes.filter { selector(it.branch.id, it.metadata) }.let(nodes::set)
     }
 
@@ -75,7 +75,7 @@ abstract class ChiseledTask : DefaultTask() {
      *
      * @param name The name of the task to be executed
      */
-    fun ofTask(name: String) = nodes.get().forEach {
+    @StonecutterAPI public fun ofTask(name: String): Unit = nodes.get().forEach {
         versions.get().run {
             if (isNotEmpty() && it.metadata !in this) return@forEach
         }
@@ -88,8 +88,8 @@ abstract class ChiseledTask : DefaultTask() {
     }
 
     /**Filtering function for nodes, independent from the underlying Gradle project.*/
-    fun interface NodeFilter {
+    public fun interface NodeFilter {
         /**Invokes the filter function for the given project [branch] and [version].*/
-        operator fun invoke(branch: Identifier, version: StonecutterProject): Boolean
+        public operator fun invoke(branch: Identifier, version: StonecutterProject): Boolean
     }
 }

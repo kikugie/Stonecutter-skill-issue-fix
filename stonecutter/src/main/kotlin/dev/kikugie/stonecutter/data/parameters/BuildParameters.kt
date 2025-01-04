@@ -21,7 +21,7 @@ import kotlin.text.Regex
  * @property dependencies Dependency versions set by [BuildAbstraction.dependency]
  */
 @Serializable
-data class BuildParameters(
+public data class BuildParameters(
     val constants: MutableMap<Identifier, Boolean> = mutableMapOf(),
     val swaps: MutableMap<Identifier, String> = mutableMapOf(),
     val dependencies: MutableMap<Identifier, Version> = mutableMapOf(),
@@ -30,7 +30,7 @@ data class BuildParameters(
     val exclusions: MutableSet<String> = mutableSetOf()
 ) {
     @Serializable
-    class ReplacementData {
+    public class ReplacementData {
         internal val string: MutableList<ReplacementGraph> = mutableListOf()
         internal val regex: MutableList<RegexReplacement> = mutableListOf()
 

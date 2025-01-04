@@ -21,7 +21,7 @@ import org.gradle.api.tasks.TaskProvider
 internal typealias BranchEntry = Pair<LightBranch, StonecutterProject>
 
 /**Separates public API properties from the controller configuration functionality.*/
-abstract class ControllerAbstraction(protected val root: Project) {
+public abstract class ControllerAbstraction(protected val root: Project) {
     protected val parameters: GlobalParameters = GlobalParameters()
     protected val configurations: MutableMap<BranchEntry, ParameterHolder> = mutableMapOf()
     protected val builds: MutableList<Action<StonecutterBuild>> = mutableListOf()
@@ -31,37 +31,37 @@ abstract class ControllerAbstraction(protected val root: Project) {
 
     /**Project tree instance containing the necessary data and safe to use with configuration cache.
      * @see [withProject]*/
-    @StonecutterAPI val tree: LightTree = constructTree()
+    @StonecutterAPI public val tree: LightTree = constructTree()
 
     /**Version control project used by the `Reset active project` task.*/
-    @StonecutterAPI val vcsVersion: StonecutterProject get() = tree.vcs
+    @StonecutterAPI public val vcsVersion: StonecutterProject get() = tree.vcs
 
     /**All unique versions registered in the tree.
      * Branches may have the same or a subset of these.*/
-    @StonecutterAPI val versions: Collection<StonecutterProject> get() = tree.versions
+    @StonecutterAPI public val versions: Collection<StonecutterProject> get() = tree.versions
     // link: wiki-controller-active
     /**
      * The active version selected by `stonecutter.active "..."` call.
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#active-version">Wiki page</a>
      */
-    @StonecutterAPI val current: StonecutterProject get() = tree.current
+    @StonecutterAPI public val current: StonecutterProject get() = tree.current
 
     /**Type of the chiseled task. Used with [registerChiseled].*/
-    @StonecutterAPI val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
+    @StonecutterAPI public val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
 
     /**Creates a tree wrapper that implements its Gradle [Project].
      * Can be used to retrieve properties from other projects, but unsafe to use in tasks.*/
-    @StonecutterDelicate fun withProject(tree: LightTree): ProjectTree =
+    @StonecutterDelicate public fun withProject(tree: LightTree): ProjectTree =
         tree.withProject(root.locate(tree.hierarchy))
 
     /**Creates a branch wrapper that implements its Gradle [Project].
      * Can be used to retrieve properties from other projects, but unsafe to use in tasks.*/
-    @StonecutterDelicate fun withProject(branch: LightBranch): ProjectBranch =
+    @StonecutterDelicate public fun withProject(branch: LightBranch): ProjectBranch =
         branch.withProject(root.locate(branch.hierarchy))
 
     /**Creates a node wrapper that implements its Gradle [Project].
      * Can be used to retrieve properties from other projects, but unsafe to use in tasks.*/
-    @StonecutterDelicate fun withProject(node: LightNode): ProjectNode =
+    @StonecutterDelicate public fun withProject(node: LightNode): ProjectNode =
         node.withProject(root.locate(node.hierarchy))
 
     // link: wiki-controller-active
@@ -69,7 +69,7 @@ abstract class ControllerAbstraction(protected val root: Project) {
      * Sets the active project. **DO NOT call on your own**.
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#active-version">Wiki page</a>
      */
-    infix fun active(name: Identifier) = with(tree) {
+    public infix fun active(name: Identifier): Unit = with(tree) {
         current.isActive = false
         current = versions.find { it.project == name } ?: error("Project $name is not registered in ${root.path}")
         current.isActive = true
@@ -82,7 +82,7 @@ abstract class ControllerAbstraction(protected val root: Project) {
      * @see [ChiseledTask]
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#chiseled-tasks">Wiki page</a>
      */
-    @StonecutterAPI infix fun registerChiseled(provider: TaskProvider<*>) {
+    @StonecutterAPI public infix fun registerChiseled(provider: TaskProvider<*>) {
         parameters.addTask(provider.name)
     }
 
@@ -94,7 +94,7 @@ abstract class ControllerAbstraction(protected val root: Project) {
      *
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#global-parameters">Wiki page</a>
      */
-    @StonecutterAPI infix fun parameters(configuration: Action<ParameterHolder>) = tree.branches.asSequence()
+    @StonecutterAPI public infix fun parameters(configuration: Action<ParameterHolder>): Unit = tree.branches.asSequence()
         .flatMap { b -> versions.map { b to it } }
         .forEach {
             configurations.getOrPut(it) { ParameterHolder(it.first, it.second) }.let(configuration::execute)
@@ -107,11 +107,11 @@ abstract class ControllerAbstraction(protected val root: Project) {
      */
     @Suppress("DeprecatedCallableAddReplaceWith")
     @Deprecated("Use `parameters {}` for global configuration.")
-    @StonecutterAPI infix fun configureEach(action: Action<StonecutterBuild>) {
+    @StonecutterAPI public infix fun configureEach(action: Action<StonecutterBuild>) {
         builds += action
     }
 
-    protected fun updateController(version: StonecutterProject) =
+    protected fun updateController(version: StonecutterProject): Unit =
         manager.updateHeader(root.buildFile.toPath(), version.project)
 
     private fun constructTree(): LightTree {

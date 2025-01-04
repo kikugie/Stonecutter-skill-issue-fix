@@ -17,13 +17,13 @@ import dev.kikugie.stonecutter.data.tree.LightNode
  *
  * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#global-parameters">Wiki page</a>
  */
-class ParameterHolder(
-    @StonecutterAPI val branch: LightBranch,
-    @StonecutterAPI val metadata: StonecutterProject
+public class ParameterHolder(
+    @StonecutterAPI public val branch: LightBranch,
+    @StonecutterAPI public val metadata: StonecutterProject
 ) : BuildAbstraction(branch.hierarchy + metadata.project), StonecutterUtility {
     /**
      * Project node matching [metadata] on [branch].
      * May be `null` when branches have different sets of versions.
      */
-    @StonecutterAPI val node: LightNode? = branch[metadata.project]
+    @StonecutterAPI public val node: LightNode? = branch[metadata.project]
 }

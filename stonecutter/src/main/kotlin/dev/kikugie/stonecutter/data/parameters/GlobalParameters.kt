@@ -1,20 +1,22 @@
 package dev.kikugie.stonecutter.data.parameters
 
 import dev.kikugie.stonecutter.Identifier
+import dev.kikugie.stonecutter.controller.GlobalParametersAccess
+import dev.kikugie.stonecutter.controller.StonecutterController
 import kotlinx.serialization.Serializable
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 /**
- * Stores [ControllerParameters] and chiseled task names to be passed to the versioned buildscript.
+ * Stores [GlobalParametersAccess] and chiseled task names to be passed to the versioned buildscript.
  *
- * @property debug Debug flag used by the file processor, set by [ControllerParameters.debug]
- * @property process Whenever Stonecutter will scan for versioned comments, set by [ControllerParameters.processFiles]
- * @property receiver Default dependency used by the file processor, set by [ControllerParameters.defaultReceiver]
+ * @property debug Debug flag used by the file processor, set by [StonecutterController.debug]
+ * @property process Whenever Stonecutter will scan for versioned comments, set by [StonecutterController.processFiles]
+ * @property receiver Default dependency used by the file processor, set by [StonecutterController.defaultReceiver]
  * @property chiseled Registered chiseled tasks, set by [StonecutterController.registerChiseled]
  */
 @Serializable
-data class GlobalParameters(
+public data class GlobalParameters(
     var debug: Boolean = false,
     var process: Boolean = true,
     var receiver: Identifier = "minecraft",
@@ -29,7 +31,7 @@ data class GlobalParameters(
      * var receiverName: String by parameters.named("receiver")
      * ```
      */
-    fun <T : Any> named(property: String): ReadWriteProperty<Any, T> =
+    public fun <T : Any> named(property: String): ReadWriteProperty<Any, T> =
         ParameterDelegate(property)
 
     /**
@@ -40,7 +42,7 @@ data class GlobalParameters(
      * }
      * ```
      */
-    inline fun <T : Any> named(property: String, crossinline verifier: (T) -> Unit): ReadWriteProperty<Any, T> =
+    public inline fun <T : Any> named(property: String, crossinline verifier: (T) -> Unit): ReadWriteProperty<Any, T> =
         object : ReadWriteProperty<Any, T> {
             private val provider: ReadWriteProperty<Any, T> = named(property)
             override fun getValue(thisRef: Any, property: KProperty<*>): T = provider.getValue(thisRef, property)

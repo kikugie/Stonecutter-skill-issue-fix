@@ -6,13 +6,13 @@ import dev.kikugie.stonecutter.data.parameters.BuildParameters
 import org.intellij.lang.annotations.Language
 
 /**Delegates set operation. Meant to be used with Kotlin DSL.*/
-interface MapSetter<K, V> {
+public interface MapSetter<K, V> {
     /**Sets the [value] for the specified [key] in the underlying map.*/
-    operator fun set(key: K, value: V)
+    operator public fun set(key: K, value: V)
 }
 
-/**Declutters swap function variants, directing them to a single implementation.*/
-interface SwapVariants {
+/**Declutters swap public function variants, directing them to a single implementation.*/
+public interface SwapVariants {
     // link: wiki-build-swaps
     /**
      * Creates a swap with the given [identifier] and [replacement] value.
@@ -20,7 +20,7 @@ interface SwapVariants {
      * @sample stonecutter_samples.swaps.single
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#value-swaps">Wiki page</a>
      */
-    @StonecutterAPI fun swap(identifier: Identifier, replacement: String)
+    @StonecutterAPI public fun swap(identifier: Identifier, replacement: String)
 
     // link: wiki-build-swaps
     /**
@@ -29,7 +29,7 @@ interface SwapVariants {
      * @sample stonecutter_samples.swaps.provider
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#value-swaps">Wiki page</a>
      */
-    @StonecutterAPI fun swap(identifier: Identifier, replacement: () -> String) =
+    @StonecutterAPI public fun swap(identifier: Identifier, replacement: () -> String): Unit =
         swap(identifier, replacement())
 
     // link: wiki-build-swaps
@@ -39,7 +39,7 @@ interface SwapVariants {
      * @sample stonecutter_samples.swaps.vararg
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#value-swaps">Wiki page</a>
      */
-    @StonecutterAPI fun swaps(vararg values: Pair<Identifier, String>) =
+    @StonecutterAPI public fun swaps(vararg values: Pair<Identifier, String>): Unit =
         swaps(values.asIterable())
 
     // link: wiki-build-swaps
@@ -49,7 +49,7 @@ interface SwapVariants {
      * @sample stonecutter_samples.swaps.iterable
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#value-swaps">Wiki page</a>
      */
-    @StonecutterAPI fun swaps(values: Iterable<Pair<Identifier, String>>) =
+    @StonecutterAPI public fun swaps(values: Iterable<Pair<Identifier, String>>): Unit =
         values.forEach { (id, str) -> swap(id, str) }
 
     // link: wiki-build-swaps
@@ -59,7 +59,7 @@ interface SwapVariants {
      * @sample stonecutter_samples.swaps.map
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#value-swaps">Wiki page</a>
      */
-    @StonecutterAPI fun swaps(values: Map<Identifier, String>) =
+    @StonecutterAPI public fun swaps(values: Map<Identifier, String>): Unit =
         swaps(values.toList())
 
     // link: wiki-build-swaps
@@ -69,14 +69,14 @@ interface SwapVariants {
      * @sample stonecutter_samples.swaps.setter
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#value-swaps">Wiki page</a>
      */
-    @StonecutterAPI val swaps
+    @StonecutterAPI public val swaps:  MapSetter<Identifier, String>
         get() = object : MapSetter<Identifier, String> {
-            override fun set(key: Identifier, value: String) = swap(key, value)
+            override fun set(key: Identifier, value: String): Unit = swap(key, value)
         }
 }
 
-/**Declutters const function variants, directing them to a single implementation.*/
-interface ConstantVariants {
+/**Declutters const public function variants, directing them to a single implementation.*/
+public interface ConstantVariants {
     // link: wiki-build-consts
     /**
      * Creates a constant accessible in stonecutter conditions with the given [identifier] and corresponding boolean [value].
@@ -84,7 +84,7 @@ interface ConstantVariants {
      * @sample stonecutter_samples.constants.single
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants">Wiki page</a>
      */
-    @StonecutterAPI fun const(identifier: Identifier, value: Boolean)
+    @StonecutterAPI public fun const(identifier: Identifier, value: Boolean)
 
     // link: wiki-build-consts
     /**
@@ -93,7 +93,7 @@ interface ConstantVariants {
      * @sample stonecutter_samples.constants.provider
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants">Wiki page</a>
      */
-    @StonecutterAPI fun const(identifier: Identifier, value: () -> Boolean) =
+    @StonecutterAPI public fun const(identifier: Identifier, value: () -> Boolean): Unit =
         const(identifier, value())
 
     // link: wiki-build-consts
@@ -103,7 +103,7 @@ interface ConstantVariants {
      * @sample stonecutter_samples.constants.vararg
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants">Wiki page</a>
      */
-    @StonecutterAPI fun consts(vararg values: Pair<Identifier, Boolean>) =
+    @StonecutterAPI public fun consts(vararg values: Pair<Identifier, Boolean>): Unit =
         consts(values.asIterable())
 
     // link: wiki-build-consts
@@ -113,7 +113,7 @@ interface ConstantVariants {
      * @sample stonecutter_samples.constants.iterable
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants">Wiki page</a>
      */
-    @StonecutterAPI fun consts(values: Iterable<Pair<Identifier, Boolean>>) =
+    @StonecutterAPI public fun consts(values: Iterable<Pair<Identifier, Boolean>>): Unit =
         values.forEach { (id, str) -> const(id, str) }
 
     // link: wiki-build-consts
@@ -123,7 +123,7 @@ interface ConstantVariants {
      * @sample stonecutter_samples.constants.map
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants">Wiki page</a>
      */
-    @StonecutterAPI fun consts(values: Map<Identifier, Boolean>) =
+    @StonecutterAPI public fun consts(values: Map<Identifier, Boolean>): Unit =
         consts(values.toList())
 
     // link: wiki-build-consts
@@ -133,7 +133,7 @@ interface ConstantVariants {
      * @sample stonecutter_samples.constants.choices_vararg
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants">Wiki page</a>
      */
-    @StonecutterAPI fun consts(value: Identifier, vararg choices: Identifier) =
+    @StonecutterAPI public fun consts(value: Identifier, vararg choices: Identifier): Unit =
         consts(value, choices.asIterable())
 
     // link: wiki-build-consts
@@ -143,7 +143,7 @@ interface ConstantVariants {
      * @sample stonecutter_samples.constants.choices_iterable
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants">Wiki page</a>
      */
-    @StonecutterAPI fun consts(value: Identifier, choices: Iterable<Identifier>) =
+    @StonecutterAPI public fun consts(value: Identifier, choices: Iterable<Identifier>): Unit =
         choices.forEach { const(it, it == value) }
 
     // link: wiki-build-consts
@@ -153,14 +153,14 @@ interface ConstantVariants {
      * @sample stonecutter_samples.constants.setter
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants">Wiki page</a>
      */
-    @StonecutterAPI val consts
+    @StonecutterAPI public val consts: MapSetter<Identifier, Boolean>
         get() = object : MapSetter<Identifier, Boolean> {
-            override fun set(key: Identifier, value: Boolean) = const(key, value)
+            override fun set(key: Identifier, value: Boolean): Unit = const(key, value)
         }
 }
 
-/**Declutters dependency function variants, directing them to a single implementation.*/
-interface DependencyVariants {
+/**Declutters dependency public function variants, directing them to a single implementation.*/
+public interface DependencyVariants {
     // link: wiki-build-deps
     /**
      * Creates a dependency to the predicate checks with the given [identifier] and corresponding [version].
@@ -168,7 +168,7 @@ interface DependencyVariants {
      * @sample stonecutter_samples.dependencies.single
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-dependencies">Wiki page</a>
      */
-    @StonecutterAPI fun dependency(identifier: Identifier, version: SemanticVersion)
+    @StonecutterAPI public fun dependency(identifier: Identifier, version: SemanticVersion)
 
     // link: wiki-build-deps
     /**
@@ -177,7 +177,7 @@ interface DependencyVariants {
      * @sample stonecutter_samples.dependencies.provider
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-dependencies">Wiki page</a>
      */
-    @StonecutterAPI fun dependency(identifier: Identifier, version: () -> SemanticVersion) =
+    @StonecutterAPI public fun dependency(identifier: Identifier, version: () -> SemanticVersion): Unit =
         dependency(identifier, version())
 
     // link: wiki-build-deps
@@ -187,7 +187,7 @@ interface DependencyVariants {
      * @sample stonecutter_samples.dependencies.vararg
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-dependencies">Wiki page</a>
      */
-    @StonecutterAPI fun dependencies(vararg values: Pair<Identifier, SemanticVersion>) =
+    @StonecutterAPI public fun dependencies(vararg values: Pair<Identifier, SemanticVersion>): Unit =
         dependencies(values.asIterable())
 
     // link: wiki-build-deps
@@ -197,7 +197,7 @@ interface DependencyVariants {
      * @sample stonecutter_samples.dependencies.iterable
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-dependencies">Wiki page</a>
      */
-    @StonecutterAPI fun dependencies(values: Iterable<Pair<Identifier, SemanticVersion>>) =
+    @StonecutterAPI public fun dependencies(values: Iterable<Pair<Identifier, SemanticVersion>>): Unit =
         values.forEach { (id, ver) -> dependency(id, ver) }
 
     // link: wiki-build-deps
@@ -207,7 +207,7 @@ interface DependencyVariants {
      * @sample stonecutter_samples.dependencies.map
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-dependencies">Wiki page</a>
      */
-    @StonecutterAPI fun dependencies(values: Map<Identifier, SemanticVersion>) =
+    @StonecutterAPI public fun dependencies(values: Map<Identifier, SemanticVersion>): Unit =
         dependencies(values.toList())
 
     // link: wiki-build-deps
@@ -217,13 +217,13 @@ interface DependencyVariants {
      * @sample stonecutter_samples.dependencies.setter
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-dependencies">Wiki page</a>
      */
-    @StonecutterAPI val dependencies
+    @StonecutterAPI public val dependencies: MapSetter<Identifier, SemanticVersion>
         get() = object : MapSetter<Identifier, SemanticVersion> {
-            override fun set(key: Identifier, value: SemanticVersion) = dependency(key, value)
+            override fun set(key: Identifier, value: SemanticVersion): Unit = dependency(key, value)
         }
 }
 
-interface ReplacementVariants {
+public interface ReplacementVariants {
     /**
      * Creates a plain string find&replace entry for the file processor.
      * When [direction] is `true` it will replace [source] with [target],
@@ -235,7 +235,7 @@ interface ReplacementVariants {
      * @throws IllegalArgumentException If [source] already has a registered replacement
      * or if [source] and [target] create a circular reference with registered entries.
      */
-    @StonecutterAPI fun replacement(
+    @StonecutterAPI public fun replacement(
         phase: ReplacementPhase,
         direction: Boolean,
         source: String,
@@ -253,11 +253,11 @@ interface ReplacementVariants {
      * @throws IllegalArgumentException If [source] already has a registered replacement
      * or if [source] and [target] create a circular reference with registered entries.
      */
-    fun replacement(
+    public fun replacement(
         direction: Boolean,
         source: String,
         target: String
-    ) = replacement(LAST, direction, source, target)
+    ): Unit = replacement(LAST, direction, source, target)
 
     /**
      * Creates a regex replacement entry for the file processor.
@@ -265,14 +265,14 @@ interface ReplacementVariants {
      * and replace them with [targetValue].
      * Otherwise, it will do the same for [targetPattern] and [sourceValue].
      *
-     * **This functionality doesn't have the same safety features as plain-string replacements**, namely:
+     * **This public functionality doesn't have the same safety features as plain-string replacements**, namely:
      * - It doesn't group entries or check for ambiguous replacements, therefore, **replacements are order-dependent**.
      * - It doesn't verify whenever the replaced value can be reversed when switching back to the original version.
      *   **When using this, it's your responsibility to make sure replacements are reversible.**
      *
      * Provided expressions are evaluated after plain-text ones.
      */
-    @StonecutterDelicate fun replacement(
+    @StonecutterDelicate public fun replacement(
         phase: ReplacementPhase = LAST,
         direction: Boolean,
         @Language("regex") sourcePattern: String,
@@ -287,24 +287,24 @@ interface ReplacementVariants {
      * and replace them with [targetValue].
      * Otherwise, it will do the same for [targetPattern] and [sourceValue].
      *
-     * **This functionality doesn't have the same safety features as plain-string replacements**, namely:
+     * **This public functionality doesn't have the same safety features as plain-string replacements**, namely:
      * - It doesn't group entries or check for ambiguous replacements, therefore, **replacements are order-dependent**.
      * - It doesn't verify whenever the replaced value can be reversed when switching back to the original version.
      *   **When using this, it's your responsibility to make sure replacements are reversible.**
      *
      * Provided expressions are evaluated after plain-text ones.
      */
-    @StonecutterDelicate fun replacement(
+    @StonecutterDelicate public fun replacement(
         direction: Boolean,
         @Language("regex") sourcePattern: String,
         targetValue: String,
         @Language("regex") targetPattern: String,
         sourceValue: String
-    ) = replacement(LAST, direction, sourcePattern, targetValue, targetPattern, sourceValue)
+    ): Unit = replacement(LAST, direction, sourcePattern, targetValue, targetPattern, sourceValue)
 }
 
-/**Declutters file filtering function variants, directing them to a single implementation.*/
-interface FilterVariants {
+/**Declutters file filtering public function variants, directing them to a single implementation.*/
+public interface FilterVariants {
     /**
      * Allows provided [extensions] to be processed by Stonecutter.
      * **Entries must not start with a dot**.
@@ -312,7 +312,7 @@ interface FilterVariants {
      * @sample stonecutter_samples.allowExtensions.vararg
      * @see BuildParameters.extensions
      */
-    @StonecutterAPI fun allowExtensions(vararg extensions: String) =
+    @StonecutterAPI public fun allowExtensions(vararg extensions: String): Unit =
         allowExtensions(extensions.asIterable())
 
     /**
@@ -322,7 +322,7 @@ interface FilterVariants {
      * @sample stonecutter_samples.allowExtensions.iterable
      * @see BuildParameters.extensions
      */
-    @StonecutterAPI fun allowExtensions(extensions: Iterable<String>)
+    @StonecutterAPI public fun allowExtensions(extensions: Iterable<String>)
 
     /**
      * Replaces allowed extensions with the provided list.
@@ -330,7 +330,7 @@ interface FilterVariants {
      *
      * @sample stonecutter_samples.overrideExtensions.vararg
      */
-    @StonecutterAPI fun overrideExtensions(vararg extensions: String) =
+    @StonecutterAPI public fun overrideExtensions(vararg extensions: String): Unit =
         overrideExtensions(extensions.asIterable())
 
     /**
@@ -339,7 +339,7 @@ interface FilterVariants {
      *
      * @sample stonecutter_samples.overrideExtensions.iterable
      */
-    @StonecutterAPI fun overrideExtensions(extensions: Iterable<String>)
+    @StonecutterAPI public fun overrideExtensions(extensions: Iterable<String>)
 
     /**
      * Excludes specific files or directories from being processed.
@@ -347,7 +347,7 @@ interface FilterVariants {
      *
      * @sample stonecutter_samples.excludeFiles.vararg
      */
-    @StonecutterAPI fun excludeFiles(vararg files: String) =
+    @StonecutterAPI public fun excludeFiles(vararg files: String): Unit =
         excludeFiles(files.asIterable())
 
     /**
@@ -356,5 +356,5 @@ interface FilterVariants {
      *
      * @sample stonecutter_samples.excludeFiles.iterable
      */
-    @StonecutterAPI fun excludeFiles(files: Iterable<String>)
+    @StonecutterAPI public fun excludeFiles(files: Iterable<String>)
 }

@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Contract
  *
  * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#checking-versions">Wiki page</a>
  */
-interface StonecutterUtility {
+public interface StonecutterUtility {
     // link: wiki-eval
     /**
      * Evaluates the passed version as [SemanticVersion] and compares to the given predicate(s),
@@ -26,7 +26,7 @@ interface StonecutterUtility {
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#checking-versions">Wiki page</a>
      */
     @Contract(pure = true) @StonecutterAPI
-    fun eval(version: SemanticVersion, predicate: String): Boolean {
+    public fun eval(version: SemanticVersion, predicate: String): Boolean {
         val target = VersionParser.parse(version).value
         return predicate.split(' ').all {
             VersionParser.parsePredicateLenient(it).value.eval(target)
@@ -42,7 +42,7 @@ interface StonecutterUtility {
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#checking-versions">Wiki page</a>
      */
     @Contract(pure = true) @StonecutterAPI
-    fun evalLenient(version: AnyVersion, predicate: String): Boolean {
+    public fun evalLenient(version: AnyVersion, predicate: String): Boolean {
         val target = VersionParser.parseLenient(version).value
         return predicate.split(' ').all {
             VersionParser.parsePredicateLenient(it).value.eval(target)
@@ -55,7 +55,7 @@ interface StonecutterUtility {
      * @return 1 if the [left] is greater, -1 if the [right] is greater, 0 if they are equal
      */
     @Contract(pure = true) @StonecutterAPI
-    fun compare(left: SemanticVersion, right: SemanticVersion) =
+    public fun compare(left: SemanticVersion, right: SemanticVersion): Int =
         VersionParser.parse(left).value.compareTo(VersionParser.parse(right).value)
 
     /**
@@ -64,6 +64,6 @@ interface StonecutterUtility {
      * @return 1 if the [left] is greater, -1 if the [right] is greater, 0 if they are equal
      */
     @Contract(pure = true) @StonecutterAPI
-    fun compareLenient(left: AnyVersion, right: AnyVersion) =
+    public fun compareLenient(left: AnyVersion, right: AnyVersion): Int =
         VersionParser.parseLenient(left).value.compareTo(VersionParser.parse(right).value)
 }

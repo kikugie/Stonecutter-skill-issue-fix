@@ -5,55 +5,43 @@ import dev.kikugie.stonecutter.data.StonecutterProject
 import dev.kikugie.stonecutter.data.tree.TreeBuilder
 
 /**
- * Methods available in [SettingsConfiguration.shared], [SettingsConfiguration.create] and [TreeBuilder.branch].
+ * Methods available in [SettingsAbstraction.shared], [SettingsAbstraction.create] and [TreeBuilder.branch].
  * Extracted to an interface to ease configuration.
  */
-interface ProjectProvider {
+public interface ProjectProvider {
     /**
      * Registers a [StonecutterProject] with separate project directory and version.
-     * Recommended to use a [SemanticVersion], but plain string values are accepted too.
+     * @sample stonecutter_samples.settings.single
      */
-    @StonecutterAPI fun vers(name: Identifier, version: AnyVersion)
+    @StonecutterAPI public fun vers(name: Identifier, version: AnyVersion)
 
     /**
      * Registers multiple [StonecutterProject]s with the same directory and target versions.
-     * Recommended to use a [SemanticVersion], but plain string values are accepted too.
+     * @sample stonecutter_samples.settings.basic_iterable
      */
-    @StonecutterAPI fun versions(versions: Iterable<AnyVersion>) =
+    @StonecutterAPI public fun versions(versions: Iterable<AnyVersion>): Unit =
         versions.forEach { vers(it, it) }
 
     /**
      * Registers multiple [StonecutterProject]s with the same directory and target versions.
-     * Recommended to use a [SemanticVersion], but plain string values are accepted too.
+     * @sample stonecutter_samples.settings.basic_vararg
      */
-    @StonecutterAPI fun versions(vararg versions: AnyVersion) =
+    @StonecutterAPI public fun versions(vararg versions: AnyVersion): Unit =
         versions.forEach { vers(it, it) }
 
     /**
      * Registers multiple [StonecutterProject]s with separate directory and target versions.
-     * Recommended to use with Kotlin DSL.
-     * ```kotlin
-     * val entries = listOf(
-     *     "1.20-fabric" to "1.20",
-     *     "1.21-fabric" to "1.21"
-     * )
-     *
-     * versions(entries)
-     * ```
+     * @sample stonecutter_samples.settings.pairs_iterable
+     * @return [BNAN]
      */
-    @StonecutterAPI fun versions(versions: Iterable<Pair<Identifier, AnyVersion>>) =
+    @StonecutterAPI public fun versions(versions: Iterable<Pair<Identifier, AnyVersion>>): String =
         versions.forEach { vers(it.first, it.second) }.let { BNAN }
 
     /**
      * Registers multiple [StonecutterProject]s with separate directory and target versions.
-     * Recommended to use with Kotlin DSL:
-     * ```kotlin
-     * versions(
-     *     "1.20-fabric" to "1.20",
-     *     "1.21-fabric" to "1.21"
-     * )
-     * ```
+     * @sample stonecutter_samples.settings.pairs_vararg
+     * @return [BNAN]
      */
-    @StonecutterAPI fun versions(vararg versions: Pair<Identifier, AnyVersion>) =
+    @StonecutterAPI public fun versions(vararg versions: Pair<Identifier, AnyVersion>): String =
         versions.forEach { vers(it.first, it.second) }.let { BNAN }
 }

@@ -6,7 +6,7 @@ import dev.kikugie.stonecutter.data.StonecutterProject
 import java.nio.file.Path
 
 /**Default implementation of the [NodePrototype]. Other variants like [ProjectNode] can access it via composition or delegation.*/
-data class LightNode(
+public data class LightNode(
     override val location: Path,
     override val metadata: StonecutterProject
 ) : NodePrototype {
@@ -24,7 +24,7 @@ data class LightNode(
 }
 
 /**Default implementation of the [BranchPrototype]. Other variants like [ProjectBranch] can access it via composition or delegation.*/
-data class LightBranch(
+public data class LightBranch(
     override val location: Path,
     override val id: Identifier,
     private val delegate: Map<Identifier, LightNode>
@@ -36,7 +36,7 @@ data class LightBranch(
 }
 
 /**Default implementation of the [TreePrototype]. Other variants like [ProjectTree] can access it via composition or delegation.*/
-data class LightTree(
+public data class LightTree(
     override val location: Path,
     override val hierarchy: ProjectHierarchy,
     override val vcs: StonecutterProject,

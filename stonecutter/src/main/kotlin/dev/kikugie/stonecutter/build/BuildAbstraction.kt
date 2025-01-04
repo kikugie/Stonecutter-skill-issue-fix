@@ -13,7 +13,7 @@ import kotlin.io.path.invariantSeparatorsPathString
  * global configuration by [ControllerAbstraction.parameters].
  * @property hierarchy Path of the corresponding project
  */
-abstract class BuildAbstraction(protected val hierarchy: ProjectHierarchy) :
+public abstract class BuildAbstraction(protected val hierarchy: ProjectHierarchy) :
     SwapVariants, ConstantVariants, DependencyVariants, FilterVariants, ReplacementVariants {
     protected val data: BuildParameters = checkNotNull(StonecutterPlugin.SERVICE.of(hierarchy).build) {
         "Stonecutter build parameters not found"
@@ -53,10 +53,10 @@ abstract class BuildAbstraction(protected val hierarchy: ProjectHierarchy) :
         data.extensions += extensions
     }
 
-    override fun overrideExtensions(extensions: Iterable<String>) =
+    override fun overrideExtensions(extensions: Iterable<String>): Unit =
         data.extensions.clear() then allowExtensions(extensions)
 
-    override fun excludeFiles(files: Iterable<String>) = files.forEach {
+    override fun excludeFiles(files: Iterable<String>): Unit = files.forEach {
         require(it.startsWith("src/")) { "File path must start with 'src/': $it" }
         Path(it).normalize().invariantSeparatorsPathString.let(data.exclusions::add)
     }

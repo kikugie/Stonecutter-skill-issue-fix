@@ -9,9 +9,9 @@ import dev.kikugie.stitcher.lexer.TokenMatcher.Companion.isValidIdentifier
 
 /**Compatibility alias for migrating from 0.4 due to the changed file structure.*/
 @Deprecated("Use `stonecutter { }` instead")
-typealias StonecutterSettings = dev.kikugie.stonecutter.settings.StonecutterSettings
+public typealias StonecutterSettings = dev.kikugie.stonecutter.settings.StonecutterSettings
 
-typealias ReplacementPhase = dev.kikugie.stitcher.transformer.Replacements.ReplacementPhase
+public typealias ReplacementPhase = dev.kikugie.stitcher.transformer.Replacements.ReplacementPhase
 
 /**
  * Stonecutter identifiers may only contain alphanumeric characters,
@@ -22,7 +22,7 @@ typealias ReplacementPhase = dev.kikugie.stitcher.transformer.Replacements.Repla
  *
  * @see [TokenMatcher.isValidIdentifier]
  */
-typealias Identifier = String
+public typealias Identifier = String
 internal fun Identifier.isValid() = all { it.isValidIdentifier() }
 internal fun Identifier.validateId() = apply {
     require(isValid()) { "Invalid identifier: $this" }
@@ -36,7 +36,7 @@ internal fun Identifier.validateId() = apply {
  * @see [VersionParser.parseStringVersion]
  * @see [TokenMatcher.isValidIdentifier]
  */
-typealias AnyVersion = String
+public typealias AnyVersion = String
 
 /**
  * Stonecutter version that must be a valid string representation of a [SemanticVersion].
@@ -46,7 +46,7 @@ typealias AnyVersion = String
  *
  * @see [VersionParser.parseSemanticVersion]
  */
-typealias SemanticVersion = String
+public typealias SemanticVersion = String
 internal fun dev.kikugie.stonecutter.SemanticVersion.validateVersion() = try {
     VersionParser.parse(this, full = true).value
 } catch (e: VersionParsingException) {
@@ -62,4 +62,4 @@ internal fun dev.kikugie.stonecutter.SemanticVersion.validateVersion() = try {
  * Subprojects must be valid [Identifier]s, separated by `:`,
  * optionally having `:` at the start.
  */
-typealias ProjectPath = String
+public typealias ProjectPath = String
