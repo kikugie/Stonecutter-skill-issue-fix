@@ -1,12 +1,12 @@
 package dev.kikugie.stonecutter.ide
 
-import dev.kikugie.stonecutter.StonecutterPlugin
 import dev.kikugie.stonecutter.data.ProjectHierarchy
 import dev.kikugie.stonecutter.data.tree.TreePrototype
 import dev.kikugie.stonecutter.invoke
 import dev.kikugie.stonecutter.readResource
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.StandardOpenOption
@@ -14,31 +14,39 @@ import kotlin.io.path.deleteExisting
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.writeText
 
-@Suppress("LeakingThis")
 internal abstract class IdeaSetupTask : DefaultTask() {
     companion object {
         val TEMPLATE: Result<String> by lazy { readResource("idea_config.xml") }
     }
 
     @get:Input
+    abstract val types: ListProperty<RunConfigType>
+
+    @get:Input
     abstract val trees: ListProperty<TreePrototype<*>>
 
-    private val folder = project.rootDir.absoluteFile.resolve(".idea/runConfigurations").toPath()
+    @get:Input
+    abstract val tasks: MapProperty<ProjectHierarchy, Iterable<String>>
 
-    init {
-        group = "ide"
-        trees.convention(StonecutterPlugin.SERVICE().parameters.projectTrees().values.distinctBy { it.hierarchy })
-    }
+    private val folder = project.rootDir.absoluteFile.resolve(".idea/runConfigurations").toPath()
 
     @TaskAction
     fun run() {
         if (TEMPLATE.isFailure) return logger.error("Failed to read template configuration file", TEMPLATE.exceptionOrNull())
 
         val files = mutableSetOf<String>()
-        for (tree in trees()) files.addAll(configureTree(tree))
+        if (RunConfigType.SWITCH in types()) for (tree in trees())
+            files.addAll(configureTree(tree))
 
-        for (file in folder.listDirectoryEntries()) if (file.fileName.toString() !in files) kotlin.runCatching { file.deleteExisting() }
-            .onFailure { logger.error("Failed to delete configuration file $file", it) }
+        if (RunConfigType.CHISEL in types()) for ((project, tasks) in tasks())
+            files.addAll(configureChiseled(project, tasks))
+
+        for (file in folder.listDirectoryEntries()) if (file.fileName.toString().let { it.startsWith("Stonecutter") && it !in files })
+            kotlin.runCatching { file.deleteExisting() }.onFailure { logger.error("Failed to delete configuration file $file", it) }
+    }
+
+    private fun configureChiseled(project: ProjectHierarchy, tasks: Iterable<String>) = buildList {
+        for (it in tasks) writeConfiguration(project, "Task: $it", it)
     }
 
     private fun configureTree(tree: TreePrototype<*>) = buildList {

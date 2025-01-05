@@ -1,6 +1,7 @@
 package dev.kikugie.stonecutter.controller
 
 import dev.kikugie.stonecutter.Identifier
+import dev.kikugie.stonecutter.RunConfigType
 
 /**
  * Parameters applied globally in [StonecutterController].
@@ -8,9 +9,8 @@ import dev.kikugie.stonecutter.Identifier
 public interface GlobalParametersAccess {
     /**
      * Creates IntelliJ IDEA run configurations for version switching.
-     * Enabled by default.
      */
-    public val generateIdeaRunConfigs: Boolean
+    public val generateRunConfigs: Collection<RunConfigType>
 
     /**
      * Sets up platform constants (like `fabric`, `forge`, etc.)

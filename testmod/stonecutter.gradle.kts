@@ -1,6 +1,7 @@
 @file:OptIn(StonecutterDelicate::class)
 
 import dev.kikugie.stonecutter.StonecutterDelicate
+import dev.kikugie.stonecutter.RunConfigType
 
 plugins {
     id("dev.kikugie.stonecutter")

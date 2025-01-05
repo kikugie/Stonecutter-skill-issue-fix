@@ -23,7 +23,7 @@ public open class StonecutterController(root: Project) :
     ControllerAbstraction(root),
     StonecutterUtility,
     GlobalParametersAccess {
-    override val generateIdeaRunConfigs: Boolean = true
+    override var generateRunConfigs: Collection<RunConfigType> = setOf(RunConfigType.SWITCH, RunConfigType.CHISEL)
     override var automaticPlatformConstants: Boolean = false
     override var debug: Boolean by parameters.named("debug")
     override var processFiles: Boolean by parameters.named("process")
@@ -85,8 +85,21 @@ public open class StonecutterController(root: Project) :
     }
 
     private fun setupConfigurationTasks() = with(root.rootProject) {
-        if (generateIdeaRunConfigs) {
-            tasks.register<IdeaSetupTask>("stonecutterIdea") {}
+        if ("stonecutterIdea" !in tasks.names) {
+            val parameters = StonecutterPlugin.SERVICE().parameters
+            val uniqueTrees = parameters.projectTrees()
+                .values.distinctBy { it.hierarchy }
+            val rootProjects = uniqueTrees
+                .map { it.hierarchy }.toSet()
+            val chiseledTasks = parameters.globalParameters()
+                .filter { (key, _) -> key in rootProjects }
+                .mapValues { (_, value) -> value.chiseled }
+            tasks.register<IdeaSetupTask>("stonecutterIdea") {
+                group = "ide"
+                types.set(generateRunConfigs)
+                trees.set(uniqueTrees)
+                tasks.set(chiseledTasks)
+            }
             if (System.getProperty("idea.sync.active", "false").toBoolean()) gradle.startParameter.let { st ->
                 if (st.taskRequests.none { "stonecutterIdea" in it.args })
                     st.setTaskRequests(st.taskRequests + DefaultTaskExecutionRequest(listOf("stonecutterIdea")))

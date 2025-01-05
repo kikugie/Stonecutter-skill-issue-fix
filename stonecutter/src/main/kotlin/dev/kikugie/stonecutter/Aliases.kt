@@ -12,6 +12,7 @@ import dev.kikugie.stitcher.lexer.TokenMatcher.Companion.isValidIdentifier
 public typealias StonecutterSettings = dev.kikugie.stonecutter.settings.StonecutterSettings
 
 public typealias ReplacementPhase = dev.kikugie.stitcher.transformer.Replacements.ReplacementPhase
+public typealias RunConfigType = dev.kikugie.stonecutter.ide.RunConfigType
 
 /**
  * Stonecutter identifiers may only contain alphanumeric characters,
