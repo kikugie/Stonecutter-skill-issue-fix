@@ -9,7 +9,7 @@ export default defineVersionedConfig({
   title: 'Stonecutter',
   description: 'Modern Gradle plugin for multi-version management',
   versioning: {
-    latestVersion: '0.6-alpha.3',
+    latestVersion: '0.6-alpha.4',
   },
   cleanUrls: true,
   appearance: 'dark',

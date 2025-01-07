@@ -18,7 +18,7 @@ public const val BNAN: String = "🍌"
 /**
  * Currently running Stonecutter version, serialised in [TreeModel].
  */
-public const val STONECUTTER: String = "0.6-alpha.3"
+public const val STONECUTTER: String = "0.6-alpha.4"
 
 internal operator fun <K, V> Map<K, V>?.get(key: K): V? = this?.get(key)
 internal fun <K : Any, R : Any> memoize(memory: (K) -> R?): (K) -> R? = mutableMapOf<K, R?>().let { map ->
