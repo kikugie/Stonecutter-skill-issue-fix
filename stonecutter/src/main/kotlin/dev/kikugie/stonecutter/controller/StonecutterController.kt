@@ -43,16 +43,15 @@ public open class StonecutterController(root: Project) :
         for (it in buildSet {
             add(tree.hierarchy)
             addAll(tree.branches.map(LightBranch::hierarchy))
-            tree.versions.flatMap { v -> tree.branches.map { it.hierarchy + v.project } }
-                .let(::addAll)
+            addAll(tree.versions.flatMap { v -> tree.branches.map { it.hierarchy + v.project } })
         }) {
             maps[0][it] = tree
             maps[1][it] = BuildParameters()
             maps[2][it] = this@StonecutterController.parameters
         }
-        parameters.projectTrees.set(maps[0] as Map<ProjectHierarchy, LightTree>)
-        parameters.buildParameters.set(maps[1] as Map<ProjectHierarchy, BuildParameters>)
-        parameters.globalParameters.set(maps[2] as Map<ProjectHierarchy, GlobalParameters>)
+        parameters.projectTrees.putAll(maps[0] as Map<ProjectHierarchy, LightTree>)
+        parameters.buildParameters.putAll(maps[1] as Map<ProjectHierarchy, BuildParameters>)
+        parameters.globalParameters.putAll(maps[2] as Map<ProjectHierarchy, GlobalParameters>)
 
         val syncTask = root.tasks.create("chiseledStonecutter")
         for (it in tree.nodes) {

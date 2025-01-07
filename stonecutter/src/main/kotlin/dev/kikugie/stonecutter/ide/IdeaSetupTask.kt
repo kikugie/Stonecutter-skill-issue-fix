@@ -10,9 +10,7 @@ import org.gradle.api.provider.MapProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.StandardOpenOption
-import kotlin.io.path.deleteExisting
-import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.writeText
+import kotlin.io.path.*
 
 internal abstract class IdeaSetupTask : DefaultTask() {
     companion object {
@@ -33,6 +31,8 @@ internal abstract class IdeaSetupTask : DefaultTask() {
     @TaskAction
     fun run() {
         if (TEMPLATE.isFailure) return logger.error("Failed to read template configuration file", TEMPLATE.exceptionOrNull())
+        if (folder.parent.notExists()) return logger.debug("No run configurations folder found")
+        kotlin.runCatching { folder.createDirectories() }.onFailure { return logger.error("Failed to create run configurations folder", it) }
 
         val files = mutableSetOf<String>()
         if (RunConfigType.SWITCH in types()) for (tree in trees())

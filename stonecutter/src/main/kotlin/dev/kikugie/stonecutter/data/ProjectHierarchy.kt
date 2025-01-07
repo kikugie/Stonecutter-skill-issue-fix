@@ -27,8 +27,8 @@ public value class ProjectHierarchy(private val path: String) {
     /**Whenever this path is the root project.*/
     public fun isEmpty(): Boolean = path == ":"
 
-    /**Last subproject entry in the path or `:` if this is the root project.*/
-    public fun last(): String = lastOrNull() ?: path
+    /**Last subproject entry in the path or empty string if this is the root project.*/
+    public fun last(): String = lastOrNull() ?: ""
 
     /**Last subproject entry in the path or `null` if this is the root project.*/
     private fun lastOrNull(): String? = when (path) {
@@ -39,7 +39,9 @@ public value class ProjectHierarchy(private val path: String) {
     /**Creates a new path, with the [child] attached. The [child] property must not start with `:`.*/
     public operator fun plus(child: String): ProjectHierarchy = require(!child.startsWith(":")) then when (path) {
         ":" -> ProjectHierarchy(":$child")
-        else -> ProjectHierarchy("$path:$child")
+        else -> when(child) {
+            "" -> this
+            else -> ProjectHierarchy("$path:$child")}
     }
 
     /**Creates a new path, without the [child] attached. The [child] property must not start with `:`.*/

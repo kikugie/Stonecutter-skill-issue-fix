@@ -20,6 +20,12 @@ internal abstract class ConfigurationService @Inject constructor() : BuildServic
         build = parameters.buildParameters.get()
     )
 
+    init {
+        parameters.projectTrees.convention(mutableMapOf())
+        parameters.globalParameters.convention(mutableMapOf())
+        parameters.buildParameters.convention(mutableMapOf())
+    }
+
     interface Parameters : BuildServiceParameters {
         val projectTrees: HierarchyMap<LightTree>
         val globalParameters: HierarchyMap<GlobalParameters>

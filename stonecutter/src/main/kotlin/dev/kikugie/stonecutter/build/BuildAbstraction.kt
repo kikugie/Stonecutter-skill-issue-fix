@@ -16,7 +16,8 @@ import kotlin.io.path.invariantSeparatorsPathString
 public abstract class BuildAbstraction(protected val hierarchy: ProjectHierarchy) :
     SwapVariants, ConstantVariants, DependencyVariants, FilterVariants, ReplacementVariants {
     protected val data: BuildParameters = checkNotNull(StonecutterPlugin.SERVICE.of(hierarchy).build) {
-        "Stonecutter build parameters not found"
+        "Stonecutter build parameters not found for $hierarchy. Present keys:\n%s"
+            .format(StonecutterPlugin.SERVICE().parameters.buildParameters.keysToString())
     }
 
     override fun swap(identifier: Identifier, replacement: String) {

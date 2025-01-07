@@ -28,22 +28,25 @@ import kotlin.io.path.invariantSeparatorsPathString
  */
 @OptIn(ExperimentalPathApi::class)
 public open class StonecutterBuild(private val project: Project) : BuildAbstraction(project.hierarchy), StonecutterUtility {
-    private val parent: Project = requireNotNull(project.parent) { "No parent project for '${project.path}'" }
+    private val parent: Project = requireNotNull(project.parent) { "No parent project for '${project.hierarchy}'" }
 
     /**Project tree instance containing the necessary data and safe to use with configuration cache.
      * @see [withProject]*/
     @StonecutterAPI public val tree: LightTree = StonecutterPlugin.SERVICE.of(parent.hierarchy).tree
-        ?: error("Tree for '${project.path}' not found")
+        ?: error("Tree for '${project.hierarchy}' not found. Present keys:\n%s"
+            .format(StonecutterPlugin.SERVICE().parameters.projectTrees.keysToString()))
 
     /**Branch this node belongs to containing the necessary data and safe to use with configuration cache.
      * @see [withProject]*/
-    @StonecutterAPI public val branch: LightBranch = tree[parent.hierarchy.last().removePrefix(":")]
-        ?: error("Branch for '${project.path}' not found")
+    @StonecutterAPI public val branch: LightBranch = tree[parent.hierarchy]
+        ?: error("Branch for '${parent.hierarchy}' not found in ${tree.hierarchy}. Present keys:\n%s"
+            .format(tree.keysToString()))
 
     /**This project's node containing only the necessary data and safe to use with configuration cache.
      * @see [withProject]*/
-    @StonecutterAPI public val node: LightNode = branch[project.hierarchy.last().removePrefix(":")]
-        ?: error("Node for '${project.path}' not found")
+    @StonecutterAPI public val node: LightNode = branch[project.hierarchy]
+        ?: error("Node for '${project.hierarchy}' not found in ${branch.hierarchy}. Present keys:\n%s"
+            .format(branch.keysToString()))
 
     /**All versions in this project's branch.*/
     @StonecutterAPI public val versions: Collection<StonecutterProject> get() = branch.versions

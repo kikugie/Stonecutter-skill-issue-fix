@@ -60,6 +60,10 @@ public interface BranchPrototype<T> : GradleMember,
 
     /**All versions registered in the branch.*/
     @StonecutterAPI public val versions: Collection<StonecutterProject>
+
+    /**Gets the [node] by its absolute path.*/
+    public operator fun get(node: ProjectHierarchy): T? =
+        this[node.toString().removePrefix(hierarchy.toString()).removePrefix(":")]
 }
 
 /**
@@ -85,4 +89,8 @@ public interface TreePrototype<T> : GradleMember,
 
     /**All unique versions in the tree.*/
     @StonecutterAPI public val versions: Collection<StonecutterProject>
+
+    /**Gets the [branch] by its absolute path*/
+    public operator fun get(branch: ProjectHierarchy): T? =
+        this[branch.toString().removePrefix(hierarchy.toString()).removePrefix(":")]
 }

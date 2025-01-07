@@ -1,7 +1,6 @@
 package dev.kikugie.stonecutter.controller
 
-import dev.kikugie.stonecutter.Identifier
-import dev.kikugie.stonecutter.StonecutterAPI
+import dev.kikugie.stonecutter.*
 import dev.kikugie.stonecutter.StonecutterPlugin
 import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.hierarchy
 import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.locate
@@ -23,7 +22,8 @@ import org.jetbrains.annotations.ApiStatus
 public abstract class ChiseledTask : DefaultTask() {
     @Transient
     private val tree = StonecutterPlugin.SERVICE.of(project.hierarchy).tree
-        ?: error("Chiseled task registered in a non-Stonecutter project")
+        ?: error("Chiseled task registered in a non-Stonecutter project ${project.hierarchy}. Available projects:\n%s"
+            .format(StonecutterPlugin.SERVICE().parameters.projectTrees.keysToString()))
 
     @Transient
     private val setupTask: String = project.tasks.getByName("chiseledStonecutter").path
