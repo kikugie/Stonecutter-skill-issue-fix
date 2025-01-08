@@ -13,23 +13,6 @@ public interface GlobalParametersAccess {
     public val generateRunConfigs: Collection<RunConfigType>
 
     /**
-     * Sets up platform constants (like `fabric`, `forge`, etc.)
-     * from project properties.
-     *
-     * This replaces the need for
-     * ```kt
-     * // build.gradle.kts
-     * val platform = property("loom.platform").toString()
-     * stonecutter {
-     *     const("fabric", platform == "fabric")
-     *     const("forge", platform == "forge")
-     *     ...
-     * }
-     * ```
-     */
-    public val automaticPlatformConstants: Boolean
-
-    /**
      * Controls whenever Stonecutter should process files.
      * Disabling it will speed up version switching,
      * but naturally, all conditional comments will be ignored.

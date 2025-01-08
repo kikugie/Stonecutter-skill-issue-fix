@@ -24,7 +24,6 @@ public open class StonecutterController(root: Project) :
     StonecutterUtility,
     GlobalParametersAccess {
     override var generateRunConfigs: Collection<RunConfigType> = setOf(RunConfigType.SWITCH, RunConfigType.CHISEL)
-    override var automaticPlatformConstants: Boolean = false
     override var debug: Boolean by parameters.named("debug")
     override var processFiles: Boolean by parameters.named("process")
     override var defaultReceiver: Identifier by parameters.named("receiver") {

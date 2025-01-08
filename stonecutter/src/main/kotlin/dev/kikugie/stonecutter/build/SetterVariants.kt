@@ -253,7 +253,7 @@ public interface ReplacementVariants {
      * @throws IllegalArgumentException If [source] already has a registered replacement
      * or if [source] and [target] create a circular reference with registered entries.
      */
-    public fun replacement(
+    @StonecutterAPI  public fun replacement(
         direction: Boolean,
         source: String,
         target: String

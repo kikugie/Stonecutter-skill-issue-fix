@@ -37,15 +37,6 @@ public abstract class ChiseledTask : DefaultTask() {
     public abstract val nodes: ListProperty<NodePrototype>
 
     /**
-     * Version filter used by this task. Can be assigned directly,
-     * but using [versions] function is preferred.
-     */
-    @get:Input
-    @get:ApiStatus.ScheduledForRemoval(inVersion = "0.6")
-    @get:Deprecated("Must assign nodes. Use versions() or nodes() to filter the tree directly.")
-    public abstract val versions: ListProperty<StonecutterProject>
-
-    /**
      * Filters the nodes by the project instance.
      * **Accessing project properties in Groovy at this stage might be inaccurate.**
      */
@@ -66,7 +57,6 @@ public abstract class ChiseledTask : DefaultTask() {
     init {
         dependsOn(setupTask)
         nodes.convention(tree.nodes)
-        versions.convention(emptyList())
     }
 
     /**
@@ -76,9 +66,6 @@ public abstract class ChiseledTask : DefaultTask() {
      * @param name The name of the task to be executed
      */
     @StonecutterAPI public fun ofTask(name: String): Unit = nodes.get().forEach {
-        versions.get().run {
-            if (isNotEmpty() && it.metadata !in this) return@forEach
-        }
         // We can reference the project here, even though it's transient,
         // because this is called in the configuration stage.
         project.locate(it.hierarchy).tasks.findByName(name)?.let { task ->
