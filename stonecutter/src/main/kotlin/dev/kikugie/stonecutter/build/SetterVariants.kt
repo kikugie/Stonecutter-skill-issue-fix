@@ -1,18 +1,31 @@
 package dev.kikugie.stonecutter.build
 
+import dev.kikugie.semver.Version
+import dev.kikugie.semver.SemanticVersion as SemanticVersionImpl
 import dev.kikugie.stonecutter.*
 import dev.kikugie.stonecutter.ReplacementPhase.LAST
 import dev.kikugie.stonecutter.data.parameters.BuildParameters
 import org.intellij.lang.annotations.Language
 
-/**Delegates set operation. Meant to be used with Kotlin DSL.*/
-public interface MapSetter<K, V> {
-    /**Sets the [value] for the specified [key] in the underlying map.*/
-    operator public fun set(key: K, value: V)
+internal class CheckedMap<K, V>(
+    private val delegate: MutableMap<K, V>,
+    private val check: (K, V) -> Unit
+) : MutableMap<K, V> by delegate {
+    override fun put(key: K, value: V): V? = check(key, value) then delegate.put(key, value)
+    override fun putAll(from: Map<out K, V>) = delegate.forEach { (k, v) -> check(k, v) } then delegate.putAll(from)
 }
 
 /**Declutters swap public function variants, directing them to a single implementation.*/
 public interface SwapVariants {
+    // link: wiki-build-swaps
+    /**
+     * Creates a swap with the given identifier and replacement value.
+     *
+     * @sample stonecutter_samples.swaps.setter
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#value-swaps">Wiki page</a>
+     */
+    @StonecutterAPI public val swaps: MutableMap<Identifier, String>
+
     // link: wiki-build-swaps
     /**
      * Creates a swap with the given [identifier] and [replacement] value.
@@ -20,7 +33,8 @@ public interface SwapVariants {
      * @sample stonecutter_samples.swaps.single
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#value-swaps">Wiki page</a>
      */
-    @StonecutterAPI public fun swap(identifier: Identifier, replacement: String)
+    @StonecutterAPI public fun swap(identifier: Identifier, replacement: String): Unit =
+        swaps.set(identifier, replacement)
 
     // link: wiki-build-swaps
     /**
@@ -61,22 +75,19 @@ public interface SwapVariants {
      */
     @StonecutterAPI public fun swaps(values: Map<Identifier, String>): Unit =
         swaps(values.toList())
-
-    // link: wiki-build-swaps
-    /**
-     * Creates a swap with the given identifier and replacement value.
-     *
-     * @sample stonecutter_samples.swaps.setter
-     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#value-swaps">Wiki page</a>
-     */
-    @StonecutterAPI public val swaps:  MapSetter<Identifier, String>
-        get() = object : MapSetter<Identifier, String> {
-            override fun set(key: Identifier, value: String): Unit = swap(key, value)
-        }
 }
 
 /**Declutters const public function variants, directing them to a single implementation.*/
 public interface ConstantVariants {
+    // link: wiki-build-consts
+    /**
+     * Creates a constant accessible in stonecutter conditions with the given identifier and corresponding boolean value.
+     *
+     * @sample stonecutter_samples.constants.setter
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants">Wiki page</a>
+     */
+    @StonecutterAPI public val consts: MutableMap<Identifier, Boolean>
+
     // link: wiki-build-consts
     /**
      * Creates a constant accessible in stonecutter conditions with the given [identifier] and corresponding boolean [value].
@@ -84,7 +95,8 @@ public interface ConstantVariants {
      * @sample stonecutter_samples.constants.single
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants">Wiki page</a>
      */
-    @StonecutterAPI public fun const(identifier: Identifier, value: Boolean)
+    @StonecutterAPI public fun const(identifier: Identifier, value: Boolean): Unit =
+        consts.set(identifier, value)
 
     // link: wiki-build-consts
     /**
@@ -145,22 +157,36 @@ public interface ConstantVariants {
      */
     @StonecutterAPI public fun consts(value: Identifier, choices: Iterable<Identifier>): Unit =
         choices.forEach { const(it, it == value) }
-
-    // link: wiki-build-consts
-    /**
-     * Creates a constant accessible in stonecutter conditions with the given identifier and corresponding boolean value.
-     *
-     * @sample stonecutter_samples.constants.setter
-     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-constants">Wiki page</a>
-     */
-    @StonecutterAPI public val consts: MapSetter<Identifier, Boolean>
-        get() = object : MapSetter<Identifier, Boolean> {
-            override fun set(key: Identifier, value: Boolean): Unit = const(key, value)
-        }
 }
 
 /**Declutters dependency public function variants, directing them to a single implementation.*/
 public interface DependencyVariants {
+    /**Mutable [Version] map that allows setting values from strings.*/
+    public class VersionMap(delegate: MutableMap<Identifier, Version>) : MutableMap<Identifier, Version> by delegate {
+        /**Converts the provided [value] to [SemanticVersionImpl] and stores it in the backing map.*/
+        public operator fun set(key: Identifier, value: SemanticVersion): Unit = set(key, value.validateVersion())
+
+        /**Converts the provided [value] to [SemanticVersionImpl] and stores it in the backing map.*/
+        public fun put(key: Identifier, value: Identifier): Version? = put(key, value.validateVersion())
+
+        /**Converts values in the provided [map] to [SemanticVersionImpl] and stores each pair in the backing map.*/
+        public fun putAll(map: Map<out Identifier, Any>): Unit = map.forEach { (k, v) -> set(k, convert(v)) }
+
+        private fun convert(value: Any): Version = when (value) {
+            is String -> value.validateVersion()
+            is Version -> value
+            else -> throw IllegalArgumentException("Invalid version type: ${value::class.simpleName}")
+        }
+    }
+    // link: wiki-build-deps
+    /**
+     * Creates a dependency to the semver checks with the given identifier and corresponding version.
+     *
+     * @sample stonecutter_samples.dependencies.setter
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-dependencies">Wiki page</a>
+     */
+    @StonecutterAPI public val dependencies: VersionMap
+
     // link: wiki-build-deps
     /**
      * Creates a dependency to the predicate checks with the given [identifier] and corresponding [version].
@@ -168,7 +194,8 @@ public interface DependencyVariants {
      * @sample stonecutter_samples.dependencies.single
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-dependencies">Wiki page</a>
      */
-    @StonecutterAPI public fun dependency(identifier: Identifier, version: SemanticVersion)
+    @StonecutterAPI public fun dependency(identifier: Identifier, version: SemanticVersion): Unit =
+        dependencies.set(identifier, version)
 
     // link: wiki-build-deps
     /**
@@ -209,18 +236,6 @@ public interface DependencyVariants {
      */
     @StonecutterAPI public fun dependencies(values: Map<Identifier, SemanticVersion>): Unit =
         dependencies(values.toList())
-
-    // link: wiki-build-deps
-    /**
-     * Creates a dependency to the semver checks with the given identifier and corresponding version.
-     *
-     * @sample stonecutter_samples.dependencies.setter
-     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/comments#condition-dependencies">Wiki page</a>
-     */
-    @StonecutterAPI public val dependencies: MapSetter<Identifier, SemanticVersion>
-        get() = object : MapSetter<Identifier, SemanticVersion> {
-            override fun set(key: Identifier, value: SemanticVersion): Unit = dependency(key, value)
-        }
 }
 
 public interface ReplacementVariants {
@@ -253,7 +268,7 @@ public interface ReplacementVariants {
      * @throws IllegalArgumentException If [source] already has a registered replacement
      * or if [source] and [target] create a circular reference with registered entries.
      */
-    @StonecutterAPI  public fun replacement(
+    @StonecutterAPI public fun replacement(
         direction: Boolean,
         source: String,
         target: String

@@ -20,17 +20,10 @@ public abstract class BuildAbstraction(protected val hierarchy: ProjectHierarchy
             .format(StonecutterPlugin.SERVICE().parameters.buildParameters.keysToString())
     }
 
-    override fun swap(identifier: Identifier, replacement: String) {
-        data.swaps[identifier.validateId()] = replacement
-    }
-
-    override fun const(identifier: Identifier, value: Boolean) {
-        data.constants[identifier.validateId()] = value
-    }
-
-    override fun dependency(identifier: Identifier, version: SemanticVersion) {
-        data.dependencies[identifier.validateId()] = version.validateVersion()
-    }
+    override val swaps: MutableMap<Identifier, String> = CheckedMap(data.swaps) { k, _ -> k.validateId() }
+    override val consts: MutableMap<Identifier, Boolean> = CheckedMap(data.constants) { k, _ -> k.validateId() }
+    override val dependencies: DependencyVariants.VersionMap = CheckedMap(data.dependencies) { k, _ -> k.validateId() }
+        .let(DependencyVariants::VersionMap)
 
     override fun replacement(phase: ReplacementPhase, direction: Boolean, source: String, target: String) {
         if (direction) data.replacements.string(phase, source, target)
