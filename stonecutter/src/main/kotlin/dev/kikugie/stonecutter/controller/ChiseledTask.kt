@@ -18,7 +18,7 @@ import org.jetbrains.annotations.ApiStatus
  *
  * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#chiseled-tasks">Wiki page</a>
  */
-@Suppress("LeakingThis", "unused", "DEPRECATION")
+@Suppress("LeakingThis", "unused")
 public abstract class ChiseledTask : DefaultTask() {
     @Transient
     private val tree = StonecutterPlugin.SERVICE.of(project.hierarchy).tree
