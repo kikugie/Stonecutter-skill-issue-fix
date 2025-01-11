@@ -170,7 +170,7 @@ public interface DependencyVariants {
         public fun put(key: Identifier, value: Identifier): Version? = put(key, value.validateVersion())
 
         /**Converts values in the provided [map] to [SemanticVersionImpl] and stores each pair in the backing map.*/
-        public fun putAll(map: Map<out Identifier, Any>): Unit = map.forEach { (k, v) -> set(k, convert(v)) }
+        public fun put(map: Map<out Identifier, Any>): Unit = map.forEach { (k, v) -> set(k, convert(v)) }
 
         private fun convert(value: Any): Version = when (value) {
             is String -> value.validateVersion()
