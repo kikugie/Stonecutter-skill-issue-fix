@@ -3,35 +3,6 @@
 ## Global parameters
 Global parameters are available in `stonecutter.gradle[.kts]` and affect the overall behaviour of the plugin.
 
-### `automaticPlatformConstants`
-When set to `true` this option triggers scanning for `loom.platform` property
-across registered subprojects and adds corresponding Stonecutter constants.
-::: code-group
-```properties [1.20.1-forge/gradle.properties]
-loom.platform=forge
-```
-```properties [1.20.1-fabric/gradle.properties]
-loom.platform=fabric
-```
-```properties [1.21.1-neoforge/gradle.properties]
-loom.platform=neoforge
-```
-```properties [1.21.1-fabric/gradle.properties]
-loom.platform=fabric
-```
-:::
-The given setup is equivalent to using the following code in `build.gradle[.kts]`:
-::: code-group
-```kotlin [build.gradle.kts]
-val platform = property("loom.platform").toString()
-stonecutter {
-    const("fabric", platform == "fabric")
-    const("forge", platform == "forge")
-    const("neoforge", platform == "neoforge")
-}
-```
-:::
-
 ### `processFiles`
 When set to `false` disables file processing and `chiseledSrc` source altogether.
 This can be used if versioning is only used to verify compatibility with different dependencies
@@ -126,6 +97,24 @@ stonecutter {
 ```
 Options can be provided as a variadic argument or an iterable.
 All values will be assigned a constant, but only the one matching selector will be `true`.
+
+::: details Assigning mod loader constants
+Given a setup with both multiple Minecraft versions and mod loaders, such as:
+```text
+- versions
+  |- 1.20.1-fabric
+  |- 1.20.1-forge
+  |- 1.21.1-fabric
+  \- 1.21.1-neoforge
+```
+This function can be used to assign multiple constants in one call:
+```kotlin
+stonecutter.parameters {
+    val loader = metadata.project.substringAfterLast()
+    consts(loader, "fabric", "forge", "neoforge")
+}
+```
+:::
 
 ### File filtering
 ::: warning Deprecations notice

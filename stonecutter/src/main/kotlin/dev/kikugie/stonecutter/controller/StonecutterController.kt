@@ -24,6 +24,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
+import org.jetbrains.annotations.ApiStatus
 
 internal typealias BranchEntry = Pair<ProjectBranch, StonecutterProject>
 
@@ -64,6 +65,8 @@ open class StonecutterController(internal val root: Project) : StonecutterUtilit
     /**Type of the chiseled task. Used with [registerChiseled].*/
     val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
 
+    @ApiStatus.ScheduledForRemoval(inVersion = "0.6")
+    @Deprecated("Should be explicitly declared. See https://stonecutter.kikugie.dev/stonecutter/details/configuration#constant-selection")
     override var automaticPlatformConstants: Boolean = false
     override var debug: Boolean by parameters.named("debug")
     override var processFiles: Boolean by parameters.named("process")
