@@ -76,7 +76,7 @@ entries:
   - id: UpcraftLP/mc-data-sync
     valid: false
   - id: IMB11/Sounds
-    curseforge: https://www.curseforge.com/members/imb11
+    curseforge: https://www.curseforge.com/minecraft/mc-mods/sound
   - id: snackbag/TT20
     curseforge: "%EXCLUDED%"
   - id: kikugie/malilib-extras
