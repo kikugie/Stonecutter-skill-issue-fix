@@ -4,9 +4,8 @@ import org.jetbrains.dokka.gradle.AbstractDokkaLeafTask
 import org.jetbrains.dokka.gradle.AbstractDokkaParentTask
 import org.jetbrains.dokka.versioning.VersioningConfiguration
 import org.jetbrains.dokka.versioning.VersioningPlugin
+import tasks.HallOfFameTask
 import java.net.URI
-import java.nio.file.StandardOpenOption
-import kotlin.io.path.writeText
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
@@ -67,22 +66,18 @@ tasks.register("updateVersion") {
     }
 }
 
-tasks.register("updateHallOfFame") {
-    fun migrate(name: String, version: String?, projects: String) {
-        val file = project.file("util/$name.md")
-        val text = file.readText().format(projects)
-            .replace(": /stonecutter", ": ${if (version == null) "" else "/$version"}/stonecutter")
-        val path = project.file(if (version == null)
-            "docs/index.md" else "docs/versions/$version/index.md")
-        path.toPath().writeText(text, Charsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
-    }
+tasks.register<HallOfFameTask>("updateHallOfFame") {
+    group = "documentation"
+    description = "Updates the Hall of Fame"
 
-    doLast {
-        val mods = project.file("hall-of-fame.yml")
-        val projects = ProjectFinder.find(mods)
-        migrate("index", null, projects)
-        migrate("index4", project.property("version4").toString(), projects)
-    }
+    file("env").takeIf { it.exists() }
+        ?.useLines { it.find { it.startsWith("GITHUB_TOKEN=") }?.substringAfter("=") }
+        ?.let { githubToken.set(it) }
+
+    configFile.set(file("docs/hof/config.yml"))
+    cacheFile.set(file("docs/hof/search.cache.yml"))
+    templateFile.set(file("docs/hof/template.md"))
+    outputFiles.set(files("docs/index.md"))
 }
 
 tasks.withType<AbstractDokkaParentTask> {

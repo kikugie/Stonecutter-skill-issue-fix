@@ -26,3 +26,4 @@ run
 /docs/.vitepress/dist/
 /.vitepress/
 *index.md
+/.env
