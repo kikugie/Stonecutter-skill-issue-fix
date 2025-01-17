@@ -176,7 +176,9 @@
   name: '!Sounds'
   source: '!https://github.com/IMB11/Sounds'
   modrinth: '!https://modrinth.com/mod/sound'
-  curseforge: https://www.curseforge.com/members/imb11
+  curseforge: https://www.curseforge.com/minecraft/mc-mods/sound
+  internal:
+    curseforge_id: "925889"
 - id: snackbag/TT20
   name: '!TT20 (TPS Fixer)'
   source: '!https://github.com/snackbag/TT20'
