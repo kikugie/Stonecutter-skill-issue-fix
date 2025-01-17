@@ -9,6 +9,7 @@ import com.github.ajalt.mordant.rendering.TextColors
 import dev.kikugie.hall_of_fame.indentLines
 import dev.kikugie.hall_of_fame.printStyled
 import dev.kikugie.hall_of_fame.search.Collector
+import dev.kikugie.hall_of_fame.search.Excluded
 import dev.kikugie.hall_of_fame.search.ProjectInfo
 import dev.kikugie.hall_of_fame.search.SearchConfig
 import dev.kikugie.hall_of_fame.search.SearchEntry
@@ -80,6 +81,7 @@ abstract class HallOfFameTask : DefaultTask() {
         cacheFile.writeYaml(ListSerializer(SearchEntry.serializer()), entries.toList())
 
         val template = templateFile.get().asFile.readText()
+        println(projects.values.sumOf { it.downloads }.toString() + " downloads in " + projects.size + " projects")
         val js = projects.values
             .sortedByDescending { it.updated }
             .joinToString(",\n") { it.toJS() }
@@ -91,9 +93,9 @@ abstract class HallOfFameTask : DefaultTask() {
     private fun writeUnresolved(entries: List<SearchEntry>) = entries.mapNotNull {
         if (!it.valid) return@mapNotNull null
         mutableMapOf<String, String>().apply {
-            if (!it.source.isKnown) this["source"] = "?"
-            if (!it.modrinth.isKnown) this["modrinth"] = "?"
-            if (!it.curseforge.isKnown) this["curseforge"] = "?"
+            if (it.source.let { !it.isKnown && it !is Excluded }) this["source"] = "?"
+            if (it.modrinth.let { !it.isKnown && it !is Excluded }) this["modrinth"] = "?"
+            if (it.curseforge.let { !it.isKnown && it !is Excluded }) this["curseforge"] = "?"
         }.takeIf { it.isNotEmpty() }?.let { m->
             mutableMapOf("id" to it.id).apply {
                 putAll(m)

@@ -70,7 +70,7 @@ tasks.register<HallOfFameTask>("updateHallOfFame") {
     group = "documentation"
     description = "Updates the Hall of Fame"
 
-    file("env").takeIf { it.exists() }
+    file(".env").takeIf { it.exists() }
         ?.useLines { it.find { it.startsWith("GITHUB_TOKEN=") }?.substringAfter("=") }
         ?.let { githubToken.set(it) }
 

@@ -1,20 +1,28 @@
 - id: Qendolin/better-clouds
+  name: '!Better Clouds'
+  source: '!https://github.com/Qendolin/better-clouds'
+  modrinth: '!https://modrinth.com/mod/better-clouds'
   curseforge: '%EXCLUDED%'
 - id: Wilyicaro/Legacy-Minecraft
   valid: false
   name: ?Legacy-Minecraft
   source: '!https://github.com/Wilyicaro/Legacy-Minecraft'
 - id: Superkat32/Explosive-Enhancement
+  name: '!Explosive Enhancement'
+  source: '!https://github.com/Superkat32/Explosive-Enhancement'
+  modrinth: '!https://modrinth.com/mod/explosive-enhancement'
   curseforge: '%EXCLUDED%'
 - id: enjarai/shared-resources
   name: '!Shared Resources'
-  source: '!"https://github.com/enjarai/shared-resources"'
+  source: '!https://github.com/enjarai/shared-resources'
+  modrinth: '!https://modrinth.com/mod/shared-resources'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/shared-resources
   internal:
     curseforge_id: "679045"
 - id: RedRain0o0/legacy-skins
   name: '!Legacy Skins'
-  source: '!"https://github.com/RedRain0o0/legacy-skins"'
+  source: '!https://github.com/RedRain0o0/legacy-skins'
+  modrinth: '!https://modrinth.com/mod/legacy-skins'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/legacy-skins
   internal:
     curseforge_id: "1090749"
@@ -23,39 +31,57 @@
   name: ?Rober-Carpet
   source: '!https://github.com/RLLD576/Rober-Carpet'
 - id: Membercat-Studios/ModelShifter
+  name: '!ModelShifter'
+  source: '!https://github.com/Membercat-Studios/ModelShifter'
+  modrinth: '!https://modrinth.com/mod/model-shifter'
   curseforge: '%EXCLUDED%'
 - id: anastarawneh/MCCINametagMod
   name: MCC Island Nametag Mod
+  source: '!https://github.com/anastarawneh/MCCINametagMod'
   modrinth: '!https://modrinth.com/mod/mcc-island-nametag-mod'
   curseforge: '%EXCLUDED%'
 - id: GravityCY/QuickStore
   name: '!quickStore-Remake'
-  source: '!"https://github.com/KlNon/quickstore"'
+  source: '!https://github.com/GravityCY/QuickStore'
   modrinth: '%EXCLUDED%'
   curseforge: '!https://www.curseforge.com/minecraft/mc-mods/quickstore'
   internal:
     curseforge_id: "688299"
 - id: enjarai/memories-are-all-we-have
+  name: '!Memories Are All We Have'
+  source: '!https://github.com/enjarai/memories-are-all-we-have'
+  modrinth: '!https://modrinth.com/mod/memories'
   curseforge: '%EXCLUDED%'
 - id: IMB11/ExtraShields
   name: '!Extra Shields'
-  source: '!"https://github.com/IMB11/ExtraShields"'
+  source: '!https://github.com/IMB11/ExtraShields'
+  modrinth: '!https://modrinth.com/mod/extra-shields'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/extra-shields
   internal:
     curseforge_id: "1169734"
 - id: EmilAhmaBoy/saturative
+  name: '!Saturative'
+  source: '!https://github.com/EmilAhmaBoy/saturative'
+  modrinth: '!https://modrinth.com/mod/saturative'
   curseforge: '%EXCLUDED%'
 - id: axialeaa/Glissando
+  name: '!Glissando'
+  source: '!https://github.com/axialeaa/Glissando'
+  modrinth: '!https://modrinth.com/mod/glissando'
   curseforge: '%EXCLUDED%'
 - id: Overcontrol1/RandomFishing
+  name: '!Random Fishing'
+  source: '!https://github.com/Overcontrol1/RandomFishing'
+  modrinth: '!https://modrinth.com/mod/random-fishing'
   curseforge: '%EXCLUDED%'
 - id: Chailotl/inventory-sort
   name: Chai's Inventory Sorter
+  source: '!https://github.com/Chailotl/inventory-sort'
   modrinth: '!https://modrinth.com/mod/chais-inventory-sorter'
   curseforge: '%EXCLUDED%'
 - id: Mirsario/Minecraft-CameraOverhaul
   name: Camera Overhaul
-  source: '!"https://github.com/Mirsario/Minecraft-CameraOverhaul"'
+  source: '!https://github.com/Mirsario/Minecraft-CameraOverhaul'
   modrinth: '!https://modrinth.com/mod/cameraoverhaul'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/cameraoverhaul
   internal:
@@ -70,73 +96,122 @@
   source: '!https://github.com/LopyMine/Mossy'
 - id: IMB11/MRU
   name: '!M.R.U'
-  source: '!null'
+  source: '!https://github.com/IMB11/MRU'
+  modrinth: '!https://modrinth.com/mod/mru'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/mru
   internal:
     curseforge_id: "669659"
 - id: sirstotes/Pucks-Parity-Mod
+  name: '!Puck''s Parity Mod'
+  source: '!https://github.com/sirstotes/Pucks-Parity-Mod'
+  modrinth: '!https://modrinth.com/mod/pucks-parity-mod'
   curseforge: '%EXCLUDED%'
 - id: sailex428/HudEnhancer
+  name: '!HudEnhancer'
+  source: '!https://github.com/sailex428/HudEnhancer'
+  modrinth: '!https://modrinth.com/mod/hudenhancer'
   curseforge: '%EXCLUDED%'
 - id: BareMinimumStudios/Guilded
+  name: '!Guilded'
+  source: '!https://github.com/BareMinimumStudios/Guilded'
+  modrinth: '!https://modrinth.com/mod/guilded-parties'
   curseforge: '%EXCLUDED%'
 - id: LopyMine/Fast-Recipe
   name: '!Fast Recipe'
-  source: '!"https://github.com/LopyMine/fast-recipe"'
+  source: '!https://github.com/LopyMine/Fast-Recipe'
+  modrinth: '!https://modrinth.com/mod/fast-recipe'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/fast-recipe
   internal:
     curseforge_id: "1069070"
 - id: Vulpeus-Server/kyoyu
+  name: '!kyoyu'
+  source: '!https://github.com/Vulpeus-Server/kyoyu'
+  modrinth: '!https://modrinth.com/mod/kyoyu'
   curseforge: '%EXCLUDED%'
 - id: axialeaa/BlockyBubbles
+  name: '!Blocky Bubbles'
+  source: '!https://github.com/axialeaa/BlockyBubbles'
+  modrinth: '!https://modrinth.com/mod/blocky-bubbles'
   curseforge: '%EXCLUDED%'
 - id: ViolaFlower/Legacy-Tweaks
   valid: false
   name: ?Legacy-Tweaks
   source: '!https://github.com/ViolaFlower/Legacy-Tweaks'
 - id: o7Moon/OpenBoatUtils
+  name: '!OpenBoatUtils'
+  source: '!https://github.com/o7Moon/OpenBoatUtils'
+  modrinth: '!https://modrinth.com/mod/openboatutils'
   curseforge: '%EXCLUDED%'
 - id: GravityCY/FishingButGood
   valid: false
   name: ?FishingButGood
   source: '!https://github.com/GravityCY/FishingButGood'
 - id: skycatminepokie/autocut
+  name: '!Autocut'
+  source: '!https://github.com/skycatminepokie/autocut'
+  modrinth: '!https://modrinth.com/mod/autocut'
   curseforge: '%EXCLUDED%'
 - id: Wilyicaro/FactoryAPI
   name: '!Factory API'
-  source: '!"https://github.com/Wilyicaro/FactoryAPI"'
+  source: '!https://github.com/Wilyicaro/FactoryAPI'
+  modrinth: '!https://modrinth.com/mod/factory-api'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/factory-api
   internal:
     curseforge_id: "704136"
 - id: Kyagara/fred
+  name: '!Fred'
+  source: '!https://github.com/Kyagara/fred'
+  modrinth: '!https://modrinth.com/mod/fred'
   curseforge: '%EXCLUDED%'
 - id: naari3/offers-hud
+  name: '!OffersHUD'
+  source: '!https://github.com/naari3/offers-hud'
+  modrinth: '!https://modrinth.com/mod/offershud'
   curseforge: '%EXCLUDED%'
 - id: UpcraftLP/mc-data-sync
   valid: false
   name: ?mc-data-sync
   source: '!https://github.com/UpcraftLP/mc-data-sync'
 - id: IMB11/Sounds
+  name: '!Sounds'
+  source: '!https://github.com/IMB11/Sounds'
+  modrinth: '!https://modrinth.com/mod/sound'
   curseforge: https://www.curseforge.com/members/imb11
 - id: snackbag/TT20
+  name: '!TT20 (TPS Fixer)'
+  source: '!https://github.com/snackbag/TT20'
+  modrinth: '!https://modrinth.com/mod/tt20'
   curseforge: '%EXCLUDED%'
 - id: kikugie/malilib-extras
+  name: '!Malilib Extras'
+  source: '!https://github.com/kikugie/malilib-extras'
+  modrinth: '!https://modrinth.com/mod/malilib-extras'
   curseforge: '%EXCLUDED%'
 - id: Anime-pdf/i-cant-do-math
   name: '!I Can''t Do Math!'
-  source: '!"https://github.com/Anime-pdf/i-cant-do-math"'
+  source: '!https://github.com/Anime-pdf/i-cant-do-math'
+  modrinth: '!https://modrinth.com/mod/i-cant-do-math!'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/i-cant-do-math
   internal:
     curseforge_id: "1158132"
 - id: enjarai/restart-detector
+  name: '!Restart Detector'
+  source: '!https://github.com/enjarai/restart-detector'
+  modrinth: '!https://modrinth.com/mod/restart-detector'
   curseforge: '%EXCLUDED%'
 - id: axialeaa/FlorumSporum
+  name: '!Florum Sporum'
+  source: '!https://github.com/axialeaa/FlorumSporum'
+  modrinth: '!https://modrinth.com/mod/florum-sporum'
   curseforge: '%EXCLUDED%'
 - id: Chailotl/sushi-bar
+  name: '!Sushi Bar'
+  source: '!https://github.com/Chailotl/sushi-bar'
+  modrinth: '!https://modrinth.com/mod/sushi-bar'
   curseforge: '%EXCLUDED%'
 - id: enjarai/cicada-lib
   name: CICADA
-  source: '!"https://github.com/enjarai/cicada-lib"'
+  source: '!https://github.com/enjarai/cicada-lib'
   modrinth: '!https://modrinth.com/mod/cicada'
   curseforge: '!https://www.curseforge.com/minecraft/mc-mods/cicada'
   internal:
@@ -146,18 +221,23 @@
   name: ?lasers-mod
   source: '!https://github.com/natri0/lasers-mod'
 - id: DuperKnight/DuperAutoWalk
-  name: '!Duper''s AutoWalk'
-  source: '!"https://github.com/Dupernite/DuperAutoWalk"'
+  name: '!Duper''s Auto Walk'
+  source: '!https://github.com/DuperKnight/DuperAutoWalk'
+  modrinth: '!https://modrinth.com/mod/autowalker'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/dupers-autowalk
   internal:
     curseforge_id: "1088788"
 - id: Faboslav/it-takes-a-pillage
-  name: '!It Takes a Pillage Continuation'
-  source: '!"https://github.com/Faboslav/it-takes-a-pillage"'
+  name: '!It Takes a Pillage'
+  source: '!https://github.com/Faboslav/it-takes-a-pillage'
+  modrinth: '!https://modrinth.com/mod/it-takes-a-pillage'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/it-takes-a-pillage-continuation
   internal:
     curseforge_id: "1111063"
 - id: Mat0u5/LifeSeries
+  name: '!Life Series'
+  source: '!https://github.com/Mat0u5/LifeSeries'
+  modrinth: '!https://modrinth.com/mod/life-series'
   curseforge: '%EXCLUDED%'
 - id: IMB11/SkinShufflePlugin
   valid: false
@@ -169,13 +249,14 @@
   source: '!https://github.com/kikugie/multilib'
 - id: Lemonnik6484/BetterWalls
   name: '!Better Walls'
-  source: '!"https://github.com/Lemon4ik6484/BetterWalls"'
+  source: '!https://github.com/Lemonnik6484/BetterWalls'
+  modrinth: '!https://modrinth.com/mod/betterwalls'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/better-walls
   internal:
     curseforge_id: "1059737"
 - id: ProunceDev/BetterCooldownsHUD
   name: '!BetterCooldownsHUD'
-  source: '!"https://github.com/ProunceDev/BetterCooldownsHUD"'
+  source: '!https://github.com/ProunceDev/BetterCooldownsHUD'
   modrinth: https://www.curseforge.com/minecraft/mc-mods/bettercooldownshud
   curseforge: '!https://www.curseforge.com/minecraft/mc-mods/bettercooldownshud'
   internal:
@@ -185,24 +266,40 @@
   name: ?loading-bar
   source: '!https://github.com/FokshaWasTaken/loading-bar'
 - id: Lemonnik6484/MossMod
+  name: '!Modsmod'
+  source: '!https://github.com/Lemonnik6484/MossMod'
+  modrinth: '!https://modrinth.com/mod/modsmod'
   curseforge: '%EXCLUDED%'
 - id: Kyagara/CoopTweaks
+  name: '!CoopTweaks'
+  source: '!https://github.com/Kyagara/CoopTweaks'
+  modrinth: '!https://modrinth.com/mod/cooptweaks'
   curseforge: '%EXCLUDED%'
 - id: btwonion/autodrop
+  name: '!autodrop'
+  source: '!https://github.com/btwonion/autodrop'
+  modrinth: '!https://modrinth.com/mod/autodrop'
   curseforge: '%EXCLUDED%'
 - id: Imajo24I/Naturally-Trimmed
   valid: false
   name: ?Naturally-Trimmed
   source: '!https://github.com/Imajo24I/Naturally-Trimmed'
 - id: Aeldit/CyanSetHome
+  name: '!CyanSetHome'
+  source: '!https://github.com/Aeldit/CyanSetHome'
+  modrinth: '!https://modrinth.com/mod/cyansethome'
   curseforge: '%EXCLUDED%'
 - id: Raik176/datapack-utils
   name: '!Datapack Utils'
-  source: '!"https://github.com/Raik176/datapack-utils"'
+  source: '!https://github.com/Raik176/datapack-utils'
+  modrinth: '!https://modrinth.com/mod/datapack-utils'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/datapack-utils
   internal:
     curseforge_id: "1138955"
 - id: Seggan/deathview
+  name: '!DeathView'
+  source: '!https://github.com/Seggan/deathview'
+  modrinth: '!https://modrinth.com/mod/deathview'
   curseforge: '%EXCLUDED%'
 - id: Drathonix/bringhomethebeacon
   valid: false
@@ -210,43 +307,66 @@
   source: '!https://github.com/Drathonix/bringhomethebeacon'
 - id: Crendgrim/DynamicCrosshairCompat
   name: '!Dynamic Crosshair Compat'
-  source: '!"https://github.com/Crendgrim/DynamicCrosshairCompat"'
+  source: '!https://github.com/Crendgrim/DynamicCrosshairCompat'
+  modrinth: '!https://modrinth.com/mod/dynamiccrosshaircompat'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/dynamic-crosshair-compat
   internal:
     curseforge_id: "632420"
 - id: not-coded/WayFix
+  name: '!WayFix'
+  source: '!https://github.com/not-coded/WayFix'
+  modrinth: '!https://modrinth.com/mod/wayfix'
   curseforge: '%EXCLUDED%'
 - id: btwonion/better-boat-movement
+  name: '!Better Boat Movement'
+  source: '!https://github.com/btwonion/better-boat-movement'
+  modrinth: '!https://modrinth.com/mod/better-boat-movement'
   curseforge: '%EXCLUDED%'
 - id: Raik176/detail-armor-bar-compat
   name: '!Detail Armor Bar Compat'
-  source: '!"https://github.com/Raik176/detail-armor-bar-compat"'
+  source: '!https://github.com/Raik176/detail-armor-bar-compat'
+  modrinth: '!https://modrinth.com/mod/detailab-compat'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/detailab-compat
   internal:
     curseforge_id: "1152394"
 - id: zly2006/x-backup
+  name: '!X Backup'
+  source: '!https://github.com/zly2006/x-backup'
+  modrinth: '!https://modrinth.com/mod/x-backup'
   curseforge: '%EXCLUDED%'
 - id: Crendgrim/libbamboo
   valid: false
   name: ?libbamboo
   source: '!https://github.com/Crendgrim/libbamboo'
 - id: Raik176/mod-credits-reborn
+  name: '!Mod Credits Reborn'
+  source: '!https://github.com/Raik176/mod-credits-reborn'
+  modrinth: '!https://modrinth.com/mod/mod-credits-reborn'
   curseforge: '%EXCLUDED%'
 - id: sailex428/AI-NPC
+  name: '!AI NPCs'
+  source: '!https://github.com/sailex428/AI-NPC'
+  modrinth: '!https://modrinth.com/mod/ai-npc'
   curseforge: '%EXCLUDED%'
 - id: finnhartshorn/controlify-integrations
+  name: ?controlify-integrations
+  source: '!https://github.com/finnhartshorn/controlify-integrations'
   modrinth: '%EXCLUDED%'
   curseforge: '%EXCLUDED%'
 - id: plasmoapp/pv-addon-discs
   name: '!pv-addon-discs'
-  source: '!https://github.com/plasmoapp/pv-addon-discs/'
+  source: '!https://github.com/plasmoapp/pv-addon-discs'
   modrinth: https://modrinth.com/plugin/pv-addon-discs
   curseforge: '%EXCLUDED%'
 - id: rosebudmods/skin-overrides
+  name: '!skin overrides'
+  source: '!https://github.com/rosebudmods/skin-overrides'
+  modrinth: '!https://modrinth.com/mod/skin-overrides'
   curseforge: '%EXCLUDED%'
 - id: txnimc/SodiumDynamicLights
-  name: '!Sodium/Embeddium Dynamic Lights'
-  source: '!"https://github.com/txnimc/SodiumDynamicLights"'
+  name: '!Sodium Dynamic Lights'
+  source: '!https://github.com/txnimc/SodiumDynamicLights'
+  modrinth: '!https://modrinth.com/mod/sodium-dynamic-lights'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/dynamiclights-reforged
   internal:
     curseforge_id: "551736"
@@ -255,18 +375,26 @@
   name: ?celestialwynn
   source: '!https://github.com/celestialfault/celestialwynn'
 - id: nobaboy/NobaAddons
+  name: '!NobaAddons'
+  source: '!https://github.com/nobaboy/NobaAddons'
+  modrinth: '!https://modrinth.com/mod/nobaaddons'
   curseforge: '%EXCLUDED%'
 - id: meza/ServerRedstoneBlock
   name: '!Server Redstone Block'
-  source: '!"https://github.com/meza/ServerRedstoneBlock"'
+  source: '!https://github.com/meza/ServerRedstoneBlock'
+  modrinth: '!https://modrinth.com/mod/server-redstone-block'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/server-redstone-block
   internal:
     curseforge_id: "919522"
 - id: celestialfault/toggle-toggle-sprint
+  name: '!Toggle Toggle Sprint'
+  source: '!https://github.com/celestialfault/toggle-toggle-sprint'
+  modrinth: '!https://modrinth.com/mod/toggle-toggle-sprint'
   curseforge: '%EXCLUDED%'
 - id: txnimc/PackAnalytics
   name: '!Pack Analytics'
-  source: '!"https://github.com/txnimc/PackAnalytics"'
+  source: '!https://github.com/txnimc/PackAnalytics'
+  modrinth: '!https://modrinth.com/mod/pack-analytics'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/pack-analytics
   internal:
     curseforge_id: "1129768"
@@ -279,33 +407,41 @@
     curseforge_id: "667299"
 - id: cassiancc/Item-Descriptions
   name: '!Item Descriptions'
-  source: '!"https://github.com/cassiancc/Item-Descriptions"'
+  source: '!https://github.com/cassiancc/Item-Descriptions'
+  modrinth: '!https://modrinth.com/mod/item-descriptions'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/item-descriptions
   internal:
     curseforge_id: "1101501"
 - id: Event-Alerts/EventUtils
+  name: '!EventUtils'
+  source: '!https://github.com/Event-Alerts/EventUtils'
+  modrinth: '!https://modrinth.com/mod/alerts'
   curseforge: '%EXCLUDED%'
 - id: lvoegl/libanalog-mc
   name: LibAnalog
-  source: '!"https://github.com/lvoegl/libanalog-mc"'
+  source: '!https://github.com/lvoegl/libanalog-mc'
   modrinth: '!https://modrinth.com/mod/libanalog'
   curseforge: '!https://www.curseforge.com/minecraft/mc-mods/libanalog'
   internal:
     curseforge_id: "1159992"
 - id: lvoegl/analogmovement-mc
   name: '!AnalogMovement'
-  source: '!"https://github.com/lvoegl/analogmovement-mc"'
+  source: '!https://github.com/lvoegl/analogmovement-mc'
+  modrinth: '!https://modrinth.com/mod/analogmovement'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/analogmovement
   internal:
     curseforge_id: "1160677"
 - id: OmriPH/Penguins
   name: '!Penguins'
-  source: '!"https://github.com/Selim042/SM-Penguins"'
+  source: '!https://github.com/OmriPH/Penguins'
   modrinth: '%EXCLUDED%'
   curseforge: '!https://www.curseforge.com/minecraft/mc-mods/penguins'
   internal:
     curseforge_id: "292762"
 - id: txnimc/PronounMC
+  name: '!PronounMC'
+  source: '!https://github.com/txnimc/PronounMC'
+  modrinth: '!https://modrinth.com/mod/pronounmc-neo'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/pronounmc
   internal:
     curseforge_id: "1091373"
@@ -314,6 +450,9 @@
   name: ?item-cooldown-api
   source: '!https://github.com/Raik176/item-cooldown-api'
 - id: Raik176/rose-gold
+  name: '!Rose Gold'
+  source: '!https://github.com/Raik176/rose-gold'
+  modrinth: '!https://modrinth.com/mod/rose-gold'
   curseforge: '%EXCLUDED%'
 - id: isXander/armadilloader
   valid: false
@@ -321,7 +460,7 @@
   source: '!https://github.com/isXander/armadilloader'
 - id: Bawnorton/DCFixes
   name: '!DCFixes'
-  source: '!"https://github.com/Bawnorton/DCFixes"'
+  source: '!https://github.com/Bawnorton/DCFixes'
   modrinth: '%EXCLUDED%'
   curseforge: '!https://www.curseforge.com/minecraft/mc-mods/dcfixes'
   internal:
@@ -331,22 +470,38 @@
   name: ?SakuraCake
   source: '!https://github.com/Awakened-Redstone/SakuraCake'
 - id: btwonion/KotlinLangForge
+  name: '!KotlinLangForge'
+  source: '!https://github.com/btwonion/KotlinLangForge'
+  modrinth: '!https://modrinth.com/mod/kotlin-lang-forge'
   curseforge: '%EXCLUDED%'
 - id: meza/DeckedOutOBS
+  name: '!DeckedOutOBS'
+  source: '!https://github.com/meza/DeckedOutOBS'
+  modrinth: '!https://modrinth.com/mod/deckedoutobs'
   curseforge: '%EXCLUDED%'
 - id: Aeldit/CTMSelector
+  name: '!CTM Selector'
+  source: '!https://github.com/Aeldit/CTMSelector'
+  modrinth: '!https://modrinth.com/mod/ctm-selector'
   curseforge: '%EXCLUDED%'
 - id: MisterCheezeCake/SkyblockTweaks
+  name: '!Skyblock Tweaks'
+  source: '!https://github.com/MisterCheezeCake/SkyblockTweaks'
+  modrinth: '!https://modrinth.com/mod/skyblock-tweaks'
   curseforge: '%EXCLUDED%'
 - id: Koralix-Studios/one-for-all
   valid: false
   name: ?one-for-all
   source: '!https://github.com/Koralix-Studios/one-for-all'
 - id: ModLabsCC/ShaderAPI
+  name: '!ShaderAPI'
+  source: '!https://github.com/ModLabsCC/ShaderAPI'
+  modrinth: '!https://modrinth.com/mod/shaderapi'
   curseforge: '%EXCLUDED%'
 - id: isXander/opti-painting
   name: '!OptiPainting'
-  source: '!"https://github.com/isXander/opti-painting"'
+  source: '!https://github.com/isXander/opti-painting'
+  modrinth: '!https://modrinth.com/mod/optipainting'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/optipainting
   internal:
     curseforge_id: "1017042"
@@ -355,26 +510,39 @@
   name: ?experiencedworlds2
   source: '!https://github.com/Drathonix/experiencedworlds2'
 - id: imide/ChatHistoryPlus
+  name: '!Chat History Plus'
+  source: '!https://github.com/imide/ChatHistoryPlus'
+  modrinth: '!https://modrinth.com/mod/chat-history-plus'
   curseforge: '%EXCLUDED%'
 - id: meza/Disable-Christmas-Chests
   name: '!Disable Christmas Chests'
-  source: '!null'
+  source: '!https://github.com/meza/Disable-Christmas-Chests'
+  modrinth: '!https://modrinth.com/mod/disable-christmas-chests'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/disablechristmaschests
   internal:
     curseforge_id: "945775"
 - id: not-coded/codelib
+  name: '!CodeLib'
+  source: '!https://github.com/not-coded/codelib'
+  modrinth: '!https://modrinth.com/mod/codelib'
   curseforge: '%EXCLUDED%'
 - id: kanzakirei/resources
   valid: false
   name: ?resources
   source: '!https://github.com/kanzakirei/resources'
 - id: Aeldit/Cyan
+  name: '!Cyan'
+  source: '!https://github.com/Aeldit/Cyan'
+  modrinth: '!https://modrinth.com/mod/cyan'
   curseforge: '%EXCLUDED%'
 - id: Aeldit/CyanLib
+  name: '!CyanLib'
+  source: '!https://github.com/Aeldit/CyanLib'
+  modrinth: '!https://modrinth.com/mod/cyanlib'
   curseforge: '%EXCLUDED%'
 - id: txnimc/DoesItTickSC
   name: Does It Tick?
-  source: '!"https://github.com/txnimc/DoesItTickSC"'
+  source: '!https://github.com/txnimc/DoesItTickSC'
   modrinth: '!https://modrinth.com/mod/does-it-tick'
   curseforge: '!https://www.curseforge.com/minecraft/mc-mods/does-it-tick'
   internal:
@@ -393,13 +561,14 @@
   source: '!https://github.com/nvb-uy/Effect-Adjuster'
 - id: nvb-uy/Combat-Effects
   name: '!Combat Effects'
-  source: '!"https://github.com/nvb-uy/Combat-Effects"'
+  source: '!https://github.com/nvb-uy/Combat-Effects'
+  modrinth: '!https://modrinth.com/mod/combat-effects'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/combat-effects
   internal:
     curseforge_id: "1148519"
 - id: nvb-uy/OffHandTickFix
   name: Off Hand Tick Fix
-  source: '!"https://github.com/nvb-uy/OffHandTickFix"'
+  source: '!https://github.com/nvb-uy/OffHandTickFix'
   modrinth: '%EXCLUDED%'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/off-hand-tick-fix
   internal:
@@ -410,25 +579,29 @@
   source: '!https://github.com/nvb-uy/BossUltimatum'
 - id: Raik176/better-saved-tabs
   name: '!Better Saved Tabs'
-  source: '!"https://github.com/Raik176/better-saved-tabs"'
+  source: '!https://github.com/Raik176/better-saved-tabs'
+  modrinth: '!https://modrinth.com/mod/better-saved-tabs'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/better-saved-tabs
   internal:
     curseforge_id: "1136934"
 - id: Raik176/undertale-death-screen
   name: '!Undertale Death Screen'
-  source: '!null'
+  source: '!https://github.com/Raik176/undertale-death-screen'
+  modrinth: '!https://modrinth.com/mod/undertale-death-screen'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/undertale-death-screen
   internal:
     curseforge_id: "1161177"
 - id: txnitxnichopper/PronounMC
-  name: '!PronounUSA'
-  source: '!"https://github.com/txnimc/PronounMC"'
+  name: '!PronounMC'
+  source: '!https://github.com/txnitxnichopper/PronounMC'
+  modrinth: '!https://modrinth.com/mod/pronounmc-neo'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/pronounmc
   internal:
     curseforge_id: "1091373"
 - id: txnimc/SodiumOptionsModCompat
-  name: '!Sodium/Embeddium Options Mod Compat'
-  source: '!"https://github.com/txnimc/SodiumOptionsModCompat"'
+  name: '!Sodium Options Mod Compat'
+  source: '!https://github.com/txnimc/SodiumOptionsModCompat'
+  modrinth: '!https://modrinth.com/mod/sodium-options-mod-compat'
   curseforge: https://www.curseforge.com/minecraft/mc-mods/sodium-embeddium-options-mod-compat
   internal:
     curseforge_id: "1146393"
@@ -581,6 +754,38 @@
   curseforge: '!https://www.curseforge.com/minecraft/mc-mods/xanders-sodium-options'
   internal:
     curseforge_id: "678306"
+- id: GravityCY/ViewBobbingOptions
+  name: '!View Bobbing Options'
+  source: '!https://github.com/GravityCY/ViewBobbingOptions'
+  modrinth: '!https://modrinth.com/mod/viewboboptions'
+  curseforge: '!https://www.curseforge.com/minecraft/mc-mods/viewboboptions'
+  internal:
+    curseforge_id: "901484"
+- id: Lemonnik6484/FasterSpawners
+  name: '!Faster Spawners'
+  source: '!https://github.com/Lemonnik6484/FasterSpawners'
+  modrinth: '!https://modrinth.com/mod/faster-spawners'
+  curseforge: '!https://www.curseforge.com/minecraft/mc-mods/faster-spawners'
+  internal:
+    curseforge_id: "1104462"
+- id: SHsuperCM/Stonecutter
+  valid: false
+  name: ?Stonecutter
+  source: '!https://github.com/SHsuperCM/Stonecutter'
+- id: GravityCY/EasyRename
+  name: '!Easy Rename'
+  source: '!https://github.com/GravityCY/EasyRename'
+  modrinth: '!https://modrinth.com/mod/easyrename'
+  curseforge: '!https://www.curseforge.com/minecraft/mc-mods/easyrename'
+  internal:
+    curseforge_id: "1027188"
+- id: pbone64/armor-toughness-bar
+  name: '!Armor Toughness Bar'
+  source: '!https://github.com/pbone64/armor-toughness-bar'
+  modrinth: '!https://modrinth.com/mod/armor-toughness-bar'
+  curseforge: '!https://www.curseforge.com/minecraft/mc-mods/armor-toughness-bar'
+  internal:
+    curseforge_id: "313816"
 - id: isXander/Controlify
   name: '!Controlify'
   source: '!https://github.com/isXander/Controlify'
@@ -807,13 +1012,6 @@
   curseforge: '!https://www.curseforge.com/minecraft/mc-mods/all-the-trims'
   internal:
     curseforge_id: "876154"
-- id: GravityCY/ViewBobbingOptions
-  name: '!View Bobbing Options'
-  source: '!https://github.com/GravityCY/ViewBobbingOptions'
-  modrinth: '!https://modrinth.com/mod/viewboboptions'
-  curseforge: '!https://www.curseforge.com/minecraft/mc-mods/viewboboptions'
-  internal:
-    curseforge_id: "901484"
 - id: Furq07/ResourcePackCached
   name: '!ResourcePackCached'
   source: '!https://github.com/Furq07/ResourcePackCached'
@@ -929,31 +1127,6 @@
   curseforge: '!https://www.curseforge.com/minecraft/mc-mods/hollowengine'
   internal:
     curseforge_id: "906903"
-- id: Lemonnik6484/FasterSpawners
-  name: '!Faster Spawners'
-  source: '!https://github.com/Lemonnik6484/FasterSpawners'
-  modrinth: '!https://modrinth.com/mod/faster-spawners'
-  curseforge: '!https://www.curseforge.com/minecraft/mc-mods/faster-spawners'
-  internal:
-    curseforge_id: "1104462"
-- id: SHsuperCM/Stonecutter
-  valid: false
-  name: ?Stonecutter
-  source: '!https://github.com/SHsuperCM/Stonecutter'
-- id: GravityCY/EasyRename
-  name: '!Easy Rename'
-  source: '!https://github.com/GravityCY/EasyRename'
-  modrinth: '!https://modrinth.com/mod/easyrename'
-  curseforge: '!https://www.curseforge.com/minecraft/mc-mods/easyrename'
-  internal:
-    curseforge_id: "1027188"
-- id: pbone64/armor-toughness-bar
-  name: '!Armor Toughness Bar'
-  source: '!https://github.com/pbone64/armor-toughness-bar'
-  modrinth: '!https://modrinth.com/mod/armor-toughness-bar'
-  curseforge: '!https://www.curseforge.com/minecraft/mc-mods/armor-toughness-bar'
-  internal:
-    curseforge_id: "313816"
 - id: nvb-uy/Death-Knights
   name: '!Death Knights (RPG Series)'
   source: '!https://github.com/nvb-uy/Death-Knights'
