@@ -1,46 +1,32 @@
 package tasks
 
-import com.charleskorn.kaml.SingleLineStringStyle
-import com.charleskorn.kaml.Yaml
-import com.charleskorn.kaml.YamlConfiguration
-import com.charleskorn.kaml.decodeFromStream
-import com.charleskorn.kaml.encodeToStream
+import com.charleskorn.kaml.*
 import com.github.ajalt.mordant.rendering.TextColors
 import dev.kikugie.hall_of_fame.indentLines
 import dev.kikugie.hall_of_fame.printStyled
-import dev.kikugie.hall_of_fame.search.Collector
-import dev.kikugie.hall_of_fame.search.Excluded
-import dev.kikugie.hall_of_fame.search.ProjectInfo
-import dev.kikugie.hall_of_fame.search.SearchConfig
-import dev.kikugie.hall_of_fame.search.SearchEntry
-import groovy.lang.Closure
+import dev.kikugie.hall_of_fame.search.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.Serializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.encodeToString
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import java.nio.file.StandardOpenOption
-import java.time.Instant
 import kotlin.io.path.writeText
 
 abstract class HallOfFameTask : DefaultTask() {
     private companion object {
         val YAML = Yaml(configuration = YamlConfiguration(
-            singleLineStringStyle = SingleLineStringStyle.PlainExceptAmbiguous,
+            polymorphismStyle = PolymorphismStyle.None,
+            singleLineStringStyle = SingleLineStringStyle.Plain,
+            ambiguousQuoteStyle = AmbiguousQuoteStyle.SingleQuoted,
             encodeDefaults = false
         ))
 
@@ -81,7 +67,6 @@ abstract class HallOfFameTask : DefaultTask() {
         cacheFile.writeYaml(ListSerializer(SearchEntry.serializer()), entries.toList())
 
         val template = templateFile.get().asFile.readText()
-        println(projects.values.sumOf { it.downloads }.toString() + " downloads in " + projects.size + " projects")
         val js = projects.values
             .sortedByDescending { it.updated }
             .joinToString(",\n") { it.toJS() }
