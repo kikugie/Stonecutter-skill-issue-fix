@@ -64,6 +64,7 @@ abstract class HallOfFameTask : DefaultTask() {
         else cacheFile.readYaml(ListSerializer(SearchEntry.serializer()))
 
         val (entries, projects) = runBlocking { Collector.get(token, config, cache) }
+        entries.forEach { it.internal.remove("downloads") }
         cacheFile.writeYaml(ListSerializer(SearchEntry.serializer()), entries.toList())
 
         val template = templateFile.get().asFile.readText()
