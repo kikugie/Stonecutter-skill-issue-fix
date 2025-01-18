@@ -3,9 +3,6 @@
   source: (!) https://github.com/Qendolin/better-clouds
   modrinth: (!) https://modrinth.com/mod/better-clouds
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-12-18T23:08:23.849968Z
-    icon: https://cdn.modrinth.com/data/5srFLIaK/68edb3cf18c96196450b84f467e7870f29a29554_96.webp
 - id: Wilyicaro/Legacy-Minecraft
   valid: false
   name: (?) Legacy-Minecraft
@@ -15,9 +12,6 @@
   source: (!) https://github.com/Superkat32/Explosive-Enhancement
   modrinth: (!) https://modrinth.com/mod/explosive-enhancement
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-12-21T02:46:42.217391Z
-    icon: https://cdn.modrinth.com/data/OSQ8mw2r/88f44e9ed022061b1eb865996b2f98fe01937de6.png
 - id: enjarai/shared-resources
   name: (!) Shared Resources
   source: (!) https://github.com/enjarai/shared-resources
@@ -25,8 +19,6 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/shared-resources
   internal:
     curseforge_id: 679045
-    updated: 2024-12-28T18:55:40.321644Z
-    icon: https://cdn.modrinth.com/data/8CsGxc95/f1d33853af9a7c9a05f2562fc72750187b3ed988.png
 - id: RedRain0o0/legacy-skins
   name: (!) Legacy Skins
   source: (!) https://github.com/RedRain0o0/legacy-skins
@@ -34,8 +26,6 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/legacy-skins
   internal:
     curseforge_id: 1090749
-    updated: 2025-01-02T07:10:49.130074Z
-    icon: https://cdn.modrinth.com/data/4UNJZ4cX/f18f7ae4b04d4f3002099bf6c152f301ca2afaad_96.webp
 - id: RLLD576/Rober-Carpet
   valid: false
   name: (?) Rober-Carpet
@@ -45,17 +35,11 @@
   source: (!) https://github.com/Membercat-Studios/ModelShifter
   modrinth: (!) https://modrinth.com/mod/model-shifter
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-11-12T22:02:30.054425Z
-    icon: https://cdn.modrinth.com/data/uvyhfdbG/8062f7fa2f1c54a199988db04d711dac86b71d8f_96.webp
 - id: anastarawneh/MCCINametagMod
   name: MCC Island Nametag Mod
   source: (!) https://github.com/anastarawneh/MCCINametagMod
   modrinth: (!) https://modrinth.com/mod/mcc-island-nametag-mod
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-10-28T19:32:49.350544Z
-    icon: https://cdn.modrinth.com/data/TBQr8ROh/b092cf15b0e51b27740df11220d4a8c51fd0b08e.png
 - id: GravityCY/QuickStore
   name: (!) quickStore-Remake
   source: (!) https://github.com/GravityCY/QuickStore
@@ -63,16 +47,11 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/quickstore
   internal:
     curseforge_id: 688299
-    updated: 2022-11-23T12:32:58.143Z
-    icon: https://media.forgecdn.net/avatars/622/443/638015042012548366.png
 - id: enjarai/memories-are-all-we-have
   name: (!) Memories Are All We Have
   source: (!) https://github.com/enjarai/memories-are-all-we-have
   modrinth: (!) https://modrinth.com/mod/memories
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-01-09T19:19:25.353310Z
-    icon: https://cdn.modrinth.com/data/vGj8LFja/639ba53d3631faa424693c6f577826cec05b89b6_96.webp
 - id: IMB11/ExtraShields
   name: (!) Extra Shields
   source: (!) https://github.com/IMB11/ExtraShields
@@ -80,40 +59,26 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/extra-shields
   internal:
     curseforge_id: 1169734
-    updated: 2025-01-06T17:53:19.550251Z
-    icon: https://cdn.modrinth.com/data/GPVR65Ju/22d4eb8641ad009bda2fd6679d0dde399093adb0_96.webp
 - id: EmilAhmaBoy/saturative
   name: (!) Saturative
   source: (!) https://github.com/EmilAhmaBoy/saturative
   modrinth: (!) https://modrinth.com/mod/saturative
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-06-30T13:30:33.244116Z
-    icon: https://cdn.modrinth.com/data/W6FxNQeL/bc41f4f1d017ad4ab79980bc05debd6ba242ffb5_96.webp
 - id: axialeaa/Glissando
   name: (!) Glissando
   source: (!) https://github.com/axialeaa/Glissando
   modrinth: (!) https://modrinth.com/mod/glissando
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-08T23:54:33.360283Z
-    icon: https://cdn.modrinth.com/data/SU1yssKs/7ca95504e97bd3b1b1bb321d6cc6c463e90b4116_96.webp
 - id: Overcontrol1/RandomFishing
   name: (!) Random Fishing
   source: (!) https://github.com/Overcontrol1/RandomFishing
   modrinth: (!) https://modrinth.com/mod/random-fishing
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-06-25T17:34:42.078745Z
-    icon: https://cdn.modrinth.com/data/vEyyiUWA/91d362cfc7d8c5197fd3f9daee9c3d546d4dc0e3_96.webp
 - id: Chailotl/inventory-sort
   name: Chai's Inventory Sorter
   source: (!) https://github.com/Chailotl/inventory-sort
   modrinth: (!) https://modrinth.com/mod/chais-inventory-sorter
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-08-17T22:46:12.859561Z
-    icon: https://cdn.modrinth.com/data/s9XXQTOb/b2ad6897ae0ae1277dc3fefe4d99ed6e7e3f9024.png
 - id: Mirsario/Minecraft-CameraOverhaul
   name: Camera Overhaul
   source: (!) https://github.com/Mirsario/Minecraft-CameraOverhaul
@@ -121,8 +86,6 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/cameraoverhaul
   internal:
     curseforge_id: 423602
-    updated: 2024-06-18T12:48:31.385470Z
-    icon: https://cdn.modrinth.com/data/m0oRwcZx/icon.png
 - id: Modpack-Update-Checker/MineMark
   valid: false
   name: (?) MineMark
@@ -138,32 +101,21 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/mru
   internal:
     curseforge_id: 669659
-    updated: 2024-12-16T14:12:41.415661Z
-    icon: https://cdn.modrinth.com/data/SNVQ2c0g/82339bfc8a0a3a6a3c376f5c29555a378379cfa0_96.webp
 - id: sirstotes/Pucks-Parity-Mod
   name: (!) Puck's Parity Mod
   source: (!) https://github.com/sirstotes/Pucks-Parity-Mod
   modrinth: (!) https://modrinth.com/mod/pucks-parity-mod
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-13T04:14:42.735841Z
-    icon: https://cdn.modrinth.com/data/dzWL2rgN/1c0b5d78a7d68d58927c3b1387e4d4f833c73807_96.webp
 - id: sailex428/HudEnhancer
   name: (!) HudEnhancer
   source: (!) https://github.com/sailex428/HudEnhancer
   modrinth: (!) https://modrinth.com/mod/hudenhancer
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-08-28T19:59:24.715517Z
-    icon: https://cdn.modrinth.com/data/UqXUT3DQ/e48c590ddc53b8c061eb5a428fa5786f6446b9b5.png
 - id: BareMinimumStudios/Guilded
   name: (!) Guilded
   source: (!) https://github.com/BareMinimumStudios/Guilded
   modrinth: (!) https://modrinth.com/mod/guilded-parties
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-08T00:30:15.762395Z
-    icon: https://cdn.modrinth.com/data/lGV5ilon/fe59493ac85f852a917b89e433a7921a845406cb.png
 - id: LopyMine/Fast-Recipe
   name: (!) Fast Recipe
   source: (!) https://github.com/LopyMine/Fast-Recipe
@@ -171,24 +123,16 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/fast-recipe
   internal:
     curseforge_id: 1069070
-    updated: 2024-07-22T18:28:55.696281Z
-    icon: https://cdn.modrinth.com/data/yItp8TXg/c9c6195bed46f9e44b5610a3f292f28d40cf3e1b_96.webp
 - id: Vulpeus-Server/kyoyu
   name: (!) kyoyu
   source: (!) https://github.com/Vulpeus-Server/kyoyu
   modrinth: (!) https://modrinth.com/mod/kyoyu
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-07T16:23:52.223886Z
-    icon: https://cdn.modrinth.com/data/VozTPxB4/44924886f169b3b8692b3c00761eeb47b804bb13_96.webp
 - id: axialeaa/BlockyBubbles
   name: (!) Blocky Bubbles
   source: (!) https://github.com/axialeaa/BlockyBubbles
   modrinth: (!) https://modrinth.com/mod/blocky-bubbles
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-12-30T15:06:34.148373Z
-    icon: https://cdn.modrinth.com/data/9pubtjcn/b59f944486e4878e1763e2cc8f08637f5c6e0c15_96.webp
 - id: ViolaFlower/Legacy-Tweaks
   valid: false
   name: (?) Legacy-Tweaks
@@ -198,9 +142,6 @@
   source: (!) https://github.com/o7Moon/OpenBoatUtils
   modrinth: (!) https://modrinth.com/mod/openboatutils
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-12-13T20:53:57.121032Z
-    icon: https://cdn.modrinth.com/data/kNtBiHzs/1304be2afdca97809bc5159cebb6050bb15df048_96.webp
 - id: GravityCY/FishingButGood
   valid: false
   name: (?) FishingButGood
@@ -210,9 +151,6 @@
   source: (!) https://github.com/skycatminepokie/autocut
   modrinth: (!) https://modrinth.com/mod/autocut
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-14T22:51:51.351732Z
-    icon: https://cdn.modrinth.com/data/DZJzhD8k/5af095f67a5a1768b5ef3fb5d46d22058f5a455f_96.webp
 - id: Wilyicaro/FactoryAPI
   name: (!) Factory API
   source: (!) https://github.com/Wilyicaro/FactoryAPI
@@ -220,24 +158,16 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/factory-api
   internal:
     curseforge_id: 704136
-    updated: 2024-12-28T14:41:43.730503Z
-    icon: https://cdn.modrinth.com/data/nkTZHOLD/e198823b85c66656ec5800b8100845570048aed1_96.webp
 - id: Kyagara/fred
   name: (!) Fred
   source: (!) https://github.com/Kyagara/fred
   modrinth: (!) https://modrinth.com/mod/fred
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-10-17T17:08:48.070721Z
-    icon: https://cdn.modrinth.com/data/WU1h9qa8/a070d4c4c142dc71ec7f0da8b0e13b09247888c9_96.webp
 - id: naari3/offers-hud
   name: (!) OffersHUD
   source: (!) https://github.com/naari3/offers-hud
   modrinth: (!) https://modrinth.com/mod/offershud
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-03T04:55:02.402099Z
-    icon: https://cdn.modrinth.com/data/Z35dS3OT/629faa4433ba52124ebc14fec6027976634c57eb_96.webp
 - id: UpcraftLP/mc-data-sync
   valid: false
   name: (?) mc-data-sync
@@ -249,24 +179,16 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/sound
   internal:
     curseforge_id: 925889
-    updated: 2025-01-01T15:26:40.283520Z
-    icon: https://cdn.modrinth.com/data/ZouiUX7t/b6ae84ea14654245f58856722473afeddf72360c_96.webp
 - id: snackbag/TT20
   name: (!) TT20 (TPS Fixer)
   source: (!) https://github.com/snackbag/TT20
   modrinth: (!) https://modrinth.com/mod/tt20
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-03T10:29:34.147917Z
-    icon: https://cdn.modrinth.com/data/YS3ZignI/f8056e4ce6ac00a50c431eac915509d14a0e90b4.png
 - id: kikugie/malilib-extras
   name: (!) Malilib Extras
   source: (!) https://github.com/kikugie/malilib-extras
   modrinth: (!) https://modrinth.com/mod/malilib-extras
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-01-08T15:15:02.215859Z
-    icon: https://cdn.modrinth.com/data/sZ1jaBe1/22dddf29946bc666407599baa3cdb40915fe3047_96.webp
 - id: Anime-pdf/i-cant-do-math
   name: (!) I Can't Do Math(!)
   source: (!) https://github.com/Anime-pdf/i-cant-do-math
@@ -274,32 +196,21 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/i-cant-do-math
   internal:
     curseforge_id: 1158132
-    updated: 2024-12-13T14:36:43.737Z
-    icon: https://media.forgecdn.net/avatars/1135/73/638696220585465735.png
 - id: enjarai/restart-detector
   name: (!) Restart Detector
   source: (!) https://github.com/enjarai/restart-detector
   modrinth: (!) https://modrinth.com/mod/restart-detector
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-12-29T15:46:23.625633Z
-    icon: https://cdn.modrinth.com/data/ZCH3dl0z/23ebe4a25feaf4cabde5cc808b9019c758497539.png
 - id: axialeaa/FlorumSporum
   name: (!) Florum Sporum
   source: (!) https://github.com/axialeaa/FlorumSporum
   modrinth: (!) https://modrinth.com/mod/florum-sporum
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-09T12:26:09.514882Z
-    icon: https://cdn.modrinth.com/data/3KmV3g7F/38dfae5e503fceb9a152d702f52edf87618e3a57_96.webp
 - id: Chailotl/sushi-bar
   name: (!) Sushi Bar
   source: (!) https://github.com/Chailotl/sushi-bar
   modrinth: (!) https://modrinth.com/mod/sushi-bar
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-08-26T00:57:16.613204Z
-    icon: https://cdn.modrinth.com/data/tr2Mv6ke/e8e985bb84b4ae2f4fa3a2722ad9d5419472e190_96.webp
 - id: enjarai/cicada-lib
   name: CICADA
   source: (!) https://github.com/enjarai/cicada-lib
@@ -307,8 +218,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/cicada
   internal:
     curseforge_id: 989574
-    updated: 2024-12-22T15:21:57.656816Z
-    icon: https://cdn.modrinth.com/data/IwCkru1D/53eee5642c7c426729b8313628b83f8513322484.png
 - id: natri0/lasers-mod
   valid: false
   name: (?) lasers-mod
@@ -320,8 +229,6 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/dupers-autowalk
   internal:
     curseforge_id: 1088788
-    updated: 2024-09-01T23:00:58.010Z
-    icon: https://cdn.modrinth.com/data/TdmWJlQa/034a2ef6e23b3581853b12741171190202b77272.png
 - id: Faboslav/it-takes-a-pillage
   name: (!) It Takes a Pillage
   source: (!) https://github.com/Faboslav/it-takes-a-pillage
@@ -329,16 +236,11 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/it-takes-a-pillage-continuation
   internal:
     curseforge_id: 1111063
-    updated: 2024-07-17T20:51:39.149554Z
-    icon: https://cdn.modrinth.com/data/pe7FN3d6/e401963a726db959e0faca6d7f3ea9f7e69618d2_96.webp
 - id: Mat0u5/LifeSeries
   name: (!) Life Series
   source: (!) https://github.com/Mat0u5/LifeSeries
   modrinth: (!) https://modrinth.com/mod/life-series
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-15T20:39:07.479957Z
-    icon: https://cdn.modrinth.com/data/aLasQi8P/88e9e2637dee4707a5f9eda10e37325b6a5b292a_96.webp
 - id: IMB11/SkinShufflePlugin
   valid: false
   name: (?) SkinShufflePlugin
@@ -354,8 +256,6 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/better-walls
   internal:
     curseforge_id: 1059737
-    updated: 2024-08-03T13:37:56.550Z
-    icon: https://cdn.modrinth.com/data/uYYEtS6i/b426dbb1b94dbb659ff1380fa08ddeed2ef17176_96.webp
 - id: ProunceDev/BetterCooldownsHUD
   name: (!) BetterCooldownsHUD
   source: (!) https://github.com/ProunceDev/BetterCooldownsHUD
@@ -363,8 +263,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/bettercooldownshud
   internal:
     curseforge_id: 1156416
-    updated: 2024-12-10T11:42:25.570Z
-    icon: https://media.forgecdn.net/avatars/1133/366/638693657930249076.png
 - id: FokshaWasTaken/loading-bar
   valid: false
   name: (?) loading-bar
@@ -374,25 +272,16 @@
   source: (!) https://github.com/Lemonnik6484/MossMod
   modrinth: (!) https://modrinth.com/mod/modsmod
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-12-03T19:33:19.906921Z
-    icon: https://cdn.modrinth.com/data/4GhX11Ed/icon.png
 - id: Kyagara/CoopTweaks
   name: (!) CoopTweaks
   source: (!) https://github.com/Kyagara/CoopTweaks
   modrinth: (!) https://modrinth.com/mod/cooptweaks
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-10-15T18:05:49.022305Z
-    icon: https://github.com/FabricMC/fabric-example-mod/blob/1.21/src/main/resources/assets/modid/icon.png?raw=true
 - id: btwonion/autodrop
   name: (!) autodrop
   source: (!) https://github.com/btwonion/autodrop
   modrinth: (!) https://modrinth.com/mod/autodrop
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-11-23T18:48:25.402059Z
-    icon: https://cdn.modrinth.com/data/lg17V3i3/d88de184e364d8dd1da21933c7c82ce298b0fb98.png
 - id: Imajo24I/Naturally-Trimmed
   valid: false
   name: (?) Naturally-Trimmed
@@ -402,9 +291,6 @@
   source: (!) https://github.com/Aeldit/CyanSetHome
   modrinth: (!) https://modrinth.com/mod/cyansethome
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-09T17:32:41.071536Z
-    icon: https://cdn.modrinth.com/data/9auOqb3o/add9577da17d09f4731da228c145865b8a5e3b5b_96.webp
 - id: Raik176/datapack-utils
   name: (!) Datapack Utils
   source: (!) https://github.com/Raik176/datapack-utils
@@ -412,16 +298,11 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/datapack-utils
   internal:
     curseforge_id: 1138955
-    updated: 2024-12-11T20:37:14.520984Z
-    icon: https://cdn.modrinth.com/data/I0ObTTI7/14cbcadf69c6540c484c2be7980f280eb6eec12b_96.webp
 - id: Seggan/deathview
   name: (!) DeathView
   source: (!) https://github.com/Seggan/deathview
   modrinth: (!) https://modrinth.com/mod/deathview
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-12-28T01:43:07.565554Z
-    icon: https://cdn.modrinth.com/data/ADFOAsco/2272e0cb41e035e0c9c1b2e829eb204870c6deac_96.webp
 - id: Drathonix/bringhomethebeacon
   valid: false
   name: (?) bringhomethebeacon
@@ -433,24 +314,16 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/dynamic-crosshair-compat
   internal:
     curseforge_id: 632420
-    updated: 2024-11-28T19:29:30.341745Z
-    icon: https://cdn.modrinth.com/data/EwPIWPJ9/icon.png
 - id: not-coded/WayFix
   name: (!) WayFix
   source: (!) https://github.com/not-coded/WayFix
   modrinth: (!) https://modrinth.com/mod/wayfix
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-11T20:53:38.638591Z
-    icon: https://cdn.modrinth.com/data/hxIWsdEF/11a8bb4badc214361593ec6d33e29998bcc6ef46.png
 - id: btwonion/better-boat-movement
   name: (!) Better Boat Movement
   source: (!) https://github.com/btwonion/better-boat-movement
   modrinth: (!) https://modrinth.com/mod/better-boat-movement
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-11-21T20:10:06.109876Z
-    icon: https://cdn.modrinth.com/data/wTfH1dkt/a9221646ce4c9cefe4e04ecae322e77fb9927389_96.webp
 - id: Raik176/detail-armor-bar-compat
   name: (!) Detail Armor Bar Compat
   source: (!) https://github.com/Raik176/detail-armor-bar-compat
@@ -458,16 +331,11 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/detailab-compat
   internal:
     curseforge_id: 1152394
-    updated: 2024-12-02T21:00:43.579687Z
-    icon: https://cdn.modrinth.com/data/idGcORfw/641ec3e3dab45567cbdf0e1c4c7990e72657cbac_96.webp
 - id: zly2006/x-backup
   name: (!) X Backup
   source: (!) https://github.com/zly2006/x-backup
   modrinth: (!) https://modrinth.com/mod/x-backup
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-13T12:34:27.885076Z
-    icon: https://github.com/FabricMC/fabric-example-mod/blob/1.21/src/main/resources/assets/modid/icon.png?raw=true
 - id: Crendgrim/libbamboo
   valid: false
   name: (?) libbamboo
@@ -477,17 +345,11 @@
   source: (!) https://github.com/Raik176/mod-credits-reborn
   modrinth: (!) https://modrinth.com/mod/mod-credits-reborn
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-12-02T22:11:56.207337Z
-    icon: https://cdn.modrinth.com/data/IGLFQSV1/73b5aa9914ff18af146ebaf59f4eaa890d582744.png
 - id: sailex428/AI-NPC
   name: (!) AI NPCs
   source: (!) https://github.com/sailex428/AI-NPC
   modrinth: (!) https://modrinth.com/mod/ai-npc
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-12-31T21:20:03.274064Z
-    icon: https://cdn.modrinth.com/data/CfgaDAdq/d82bbcd4006684ece9683acab20f8772a9de1e3e.png
 - id: finnhartshorn/controlify-integrations
   name: (?) controlify-integrations
   source: (!) https://github.com/finnhartshorn/controlify-integrations
@@ -498,17 +360,11 @@
   source: (!) https://github.com/plasmoapp/pv-addon-discs
   modrinth: https://modrinth.com/plugin/pv-addon-discs
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-12-06T12:10:55.077064Z
-    icon: https://cdn.modrinth.com/data/WXJRlyZ9/101d1b9d0d0e9ab99e53583ea218f034e09c3f73_96.webp
 - id: rosebudmods/skin-overrides
   name: (!) skin overrides
   source: (!) https://github.com/rosebudmods/skin-overrides
   modrinth: (!) https://modrinth.com/mod/skin-overrides
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-12-17T23:56:35.347978Z
-    icon: https://cdn.modrinth.com/data/GON0Fdk5/d3e77b37bc0c2dfa37d8adb54412c2fa1e874de1.png
 - id: txnimc/SodiumDynamicLights
   name: (!) Sodium Dynamic Lights
   source: (!) https://github.com/txnimc/SodiumDynamicLights
@@ -516,8 +372,6 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/dynamiclights-reforged
   internal:
     curseforge_id: 551736
-    updated: 2025-01-02T01:22:43.694531Z
-    icon: https://cdn.modrinth.com/data/PxQSWIcD/a5ab5515213391934e18baaf487c87e4b24ebfa3_96.webp
 - id: celestialfault/celestialwynn
   valid: false
   name: (?) celestialwynn
@@ -527,9 +381,6 @@
   source: (!) https://github.com/nobaboy/NobaAddons
   modrinth: (!) https://modrinth.com/mod/nobaaddons
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-12-30T04:38:20.008795Z
-    icon: https://github.com/FabricMC/fabric-example-mod/blob/1.21/src/main/resources/assets/modid/icon.png?raw=true
 - id: meza/ServerRedstoneBlock
   name: (!) Server Redstone Block
   source: (!) https://github.com/meza/ServerRedstoneBlock
@@ -537,16 +388,11 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/server-redstone-block
   internal:
     curseforge_id: 919522
-    updated: 2025-01-05T13:01:05.269691Z
-    icon: https://cdn.modrinth.com/data/7GZKzuhg/b2e39d7ff68fbddf7562251ce2b1c04acb24dd4f_96.webp
 - id: celestialfault/toggle-toggle-sprint
   name: (!) Toggle Toggle Sprint
   source: (!) https://github.com/celestialfault/toggle-toggle-sprint
   modrinth: (!) https://modrinth.com/mod/toggle-toggle-sprint
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-09-11T21:20:49.695267Z
-    icon: https://github.com/FabricMC/fabric-example-mod/blob/1.21/src/main/resources/assets/modid/icon.png?raw=true
 - id: txnimc/PackAnalytics
   name: (!) Pack Analytics
   source: (!) https://github.com/txnimc/PackAnalytics
@@ -554,8 +400,6 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/pack-analytics
   internal:
     curseforge_id: 1129768
-    updated: 2024-10-30T18:35:12.952428Z
-    icon: https://cdn.modrinth.com/data/4ZsHhmN9/021f7af991ee4ecdf85793d559e3b3dac33d4f78_96.webp
 - id: isXander/YetAnotherConfigLib
   name: (!) YetAnotherConfigLib (YACL)
   source: (!) https://github.com/isXander/YetAnotherConfigLib
@@ -563,8 +407,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/yacl
   internal:
     curseforge_id: 667299
-    updated: 2024-12-04T21:02:45.413677Z
-    icon: https://cdn.modrinth.com/data/1eAoo2KR/08c0cd32515e260f4bb20bbc0696510041523f9a_96.webp
 - id: cassiancc/Item-Descriptions
   name: (!) Item Descriptions
   source: (!) https://github.com/cassiancc/Item-Descriptions
@@ -572,16 +414,11 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/item-descriptions
   internal:
     curseforge_id: 1101501
-    updated: 2025-01-16T00:10:24.583852Z
-    icon: https://cdn.modrinth.com/data/UaizcMKP/990af67081998b8ef0ff9c3c044efb5a253fc476_96.webp
 - id: Event-Alerts/EventUtils
   name: (!) EventUtils
   source: (!) https://github.com/Event-Alerts/EventUtils
   modrinth: (!) https://modrinth.com/mod/alerts
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-13T22:44:27.998573Z
-    icon: https://cdn.modrinth.com/data/ZcRRACSs/a31b7fa85b82c9fd9bbd66c50260e7ac74ac01ae_96.webp
 - id: lvoegl/libanalog-mc
   name: LibAnalog
   source: (!) https://github.com/lvoegl/libanalog-mc
@@ -589,8 +426,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/libanalog
   internal:
     curseforge_id: 1159992
-    updated: 2024-12-15T19:52:54.697020Z
-    icon: https://cdn.modrinth.com/data/aJtTDttg/47e807a95f242bf721017b845e2bd5c2a28890e8.png
 - id: lvoegl/analogmovement-mc
   name: (!) AnalogMovement
   source: (!) https://github.com/lvoegl/analogmovement-mc
@@ -598,8 +433,6 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/analogmovement
   internal:
     curseforge_id: 1160677
-    updated: 2024-12-19T18:15:10.177068Z
-    icon: https://cdn.modrinth.com/data/ytvtAUF9/0dc2ac4fa7aa1b5ec215a85a12cca9e2f7f70b70.png
 - id: OmriPH/Penguins
   name: (!) Penguins
   source: (!) https://github.com/OmriPH/Penguins
@@ -607,8 +440,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/penguins
   internal:
     curseforge_id: 292762
-    updated: 2018-05-21T01:58:42.967Z
-    icon: https://media.forgecdn.net/avatars/151/288/636602900928364383.png
 - id: txnimc/PronounMC
   name: (!) PronounMC
   source: (!) https://github.com/txnimc/PronounMC
@@ -625,9 +456,6 @@
   source: (!) https://github.com/Raik176/rose-gold
   modrinth: (!) https://modrinth.com/mod/rose-gold
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-12-05T16:14:49.114799Z
-    icon: https://cdn.modrinth.com/data/YwUOyXdL/0df3ffb5c6b29105f4189c1f3d6765b29cc0f92f.png
 - id: isXander/armadilloader
   valid: false
   name: (?) armadilloader
@@ -639,8 +467,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/dcfixes
   internal:
     curseforge_id: 1059881
-    updated: 2024-07-13T09:21:47.923Z
-    icon: https://media.forgecdn.net/avatars/1036/86/638560506074394415.png
 - id: Awakened-Redstone/SakuraCake
   valid: false
   name: (?) SakuraCake
@@ -650,33 +476,21 @@
   source: (!) https://github.com/btwonion/KotlinLangForge
   modrinth: (!) https://modrinth.com/mod/kotlin-lang-forge
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-13T07:41:34.454431Z
-    icon: https://cdn.modrinth.com/data/1vrSzlao/5847e671ea46262af0174a2380ef87ad171e3cd8_96.webp
 - id: meza/DeckedOutOBS
   name: (!) DeckedOutOBS
   source: (!) https://github.com/meza/DeckedOutOBS
   modrinth: (!) https://modrinth.com/mod/deckedoutobs
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-12-28T18:39:03.355481Z
-    icon: https://cdn.modrinth.com/data/UjgrnbzD/eb529f15a8878479ad4f8cd9264151d630b14bad_96.webp
 - id: Aeldit/CTMSelector
   name: (!) CTM Selector
   source: (!) https://github.com/Aeldit/CTMSelector
   modrinth: (!) https://modrinth.com/mod/ctm-selector
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-10-08T16:30:13.663510Z
-    icon: https://cdn.modrinth.com/data/6OpnBWtt/c9c3cf93591f1c580fb0cbd887b9c2e50d997776_96.webp
 - id: MisterCheezeCake/SkyblockTweaks
   name: (!) Skyblock Tweaks
   source: (!) https://github.com/MisterCheezeCake/SkyblockTweaks
   modrinth: (!) https://modrinth.com/mod/skyblock-tweaks
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-15T04:19:53.784271Z
-    icon: https://cdn.modrinth.com/data/5SDy0bij/85f954e6f5727fa5f49425fc677b5ec663491a07_96.webp
 - id: Koralix-Studios/one-for-all
   valid: false
   name: (?) one-for-all
@@ -686,9 +500,6 @@
   source: (!) https://github.com/ModLabsCC/ShaderAPI
   modrinth: (!) https://modrinth.com/mod/shaderapi
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-09-05T16:28:43.365730Z
-    icon: https://cdn.modrinth.com/data/isng11Cp/3c4e009ee51afcf87fd5ac452ce94708a83f6d9c_96.webp
 - id: isXander/opti-painting
   name: (!) OptiPainting
   source: (!) https://github.com/isXander/opti-painting
@@ -696,8 +507,6 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/optipainting
   internal:
     curseforge_id: 1017042
-    updated: 2024-05-11T17:05:02.444511Z
-    icon: https://cdn.modrinth.com/data/EYUuZlGR/8bb50d9ba679d6818fd92b40a2822ccbdb1cd15a_96.webp
 - id: Drathonix/experiencedworlds2
   valid: false
   name: (?) experiencedworlds2
@@ -707,9 +516,6 @@
   source: (!) https://github.com/imide/ChatHistoryPlus
   modrinth: (!) https://modrinth.com/mod/chat-history-plus
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-11-03T17:20:59.990292Z
-    icon: https://cdn.modrinth.com/data/KpPHKRvY/ee4fe45e625b9bbd389fd20604ebf843f70c3408.png
 - id: meza/Disable-Christmas-Chests
   name: (!) Disable Christmas Chests
   source: (!) https://github.com/meza/Disable-Christmas-Chests
@@ -717,16 +523,11 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/disablechristmaschests
   internal:
     curseforge_id: 945775
-    updated: 2024-12-28T13:15:15.244417Z
-    icon: https://cdn.modrinth.com/data/bhuHzAIs/ccfadb10367c2f19472ef8638de405b1b49c381d_96.webp
 - id: not-coded/codelib
   name: (!) CodeLib
   source: (!) https://github.com/not-coded/codelib
   modrinth: (!) https://modrinth.com/mod/codelib
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2024-10-16T17:02:04.305824Z
-    icon: https://cdn.modrinth.com/data/XWtypImT/051e8d0adc3e80d873e2fe49f36b2eb4784ca00c_96.webp
 - id: kanzakirei/resources
   valid: false
   name: (?) resources
@@ -736,17 +537,11 @@
   source: (!) https://github.com/Aeldit/Cyan
   modrinth: (!) https://modrinth.com/mod/cyan
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-09T17:21:32.003273Z
-    icon: https://cdn.modrinth.com/data/zGxxQr33/49945cea54dd1731acfd941835e5255a870e0fb4_96.webp
 - id: Aeldit/CyanLib
   name: (!) CyanLib
   source: (!) https://github.com/Aeldit/CyanLib
   modrinth: (!) https://modrinth.com/mod/cyanlib
   curseforge: /EXCLUDED/
-  internal:
-    updated: 2025-01-09T17:13:48.465177Z
-    icon: https://cdn.modrinth.com/data/WwacPCzw/12fe1a3cc25f155b4c065f482c36df608b35642c_96.webp
 - id: txnimc/DoesItTickSC
   name: Does It Tick?
   source: (!) https://github.com/txnimc/DoesItTickSC
@@ -754,8 +549,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/does-it-tick
   internal:
     curseforge_id: 543308
-    updated: 2024-08-25T14:14:17.994252Z
-    icon: https://cdn.modrinth.com/data/vmg6jaPW/0d855dbd429a3fa7cda7e2aebf3f8225432add72_96.webp
 - id: Drathonix/capturetheflag
   valid: false
   name: (?) capturetheflag
@@ -775,8 +568,6 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/combat-effects
   internal:
     curseforge_id: 1148519
-    updated: 2024-11-27T04:52:05.313452Z
-    icon: https://cdn.modrinth.com/data/DRRYP3ch/82d7c0f41b3d3375eb96100f716d5647921dbbb2_96.webp
 - id: nvb-uy/OffHandTickFix
   name: Off Hand Tick Fix
   source: (!) https://github.com/nvb-uy/OffHandTickFix
@@ -784,8 +575,6 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/off-hand-tick-fix
   internal:
     curseforge_id: 1171190
-    updated: 2025-01-04T08:17:02.077Z
-    icon: https://media.forgecdn.net/avatars/1148/397/638715310547691056.png
 - id: nvb-uy/BossUltimatum
   valid: false
   name: (?) BossUltimatum
@@ -797,8 +586,6 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/better-saved-tabs
   internal:
     curseforge_id: 1136934
-    updated: 2024-11-09T17:07:59.013472Z
-    icon: https://cdn.modrinth.com/data/VUz4zrKr/7477e93c75fe6b89896364762c02c7a929f8696a.png
 - id: Raik176/undertale-death-screen
   name: (!) Undertale Death Screen
   source: (!) https://github.com/Raik176/undertale-death-screen
@@ -806,8 +593,6 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/undertale-death-screen
   internal:
     curseforge_id: 1161177
-    updated: 2024-12-18T17:23:07.163058Z
-    icon: https://cdn.modrinth.com/data/lawTOUCq/f8282b1ccf7baa66534486401262af8a7bc4b8f4_96.webp
 - id: txnitxnichopper/PronounMC
   name: (!) PronounMC
   source: (!) https://github.com/txnitxnichopper/PronounMC
@@ -815,8 +600,6 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/pronounmc
   internal:
     curseforge_id: 1091373
-    updated: 2024-08-26T17:33:19.027987Z
-    icon: https://cdn.modrinth.com/data/SrkzlZZ1/9616dacd8aa6764959c684521863e8be115a975c_96.webp
 - id: txnimc/SodiumOptionsModCompat
   name: (!) Sodium Options Mod Compat
   source: (!) https://github.com/txnimc/SodiumOptionsModCompat
@@ -824,8 +607,6 @@
   curseforge: https://www.curseforge.com/minecraft/mc-mods/sodium-embeddium-options-mod-compat
   internal:
     curseforge_id: 1146393
-    updated: 2025-01-01T03:52:54.597212Z
-    icon: https://cdn.modrinth.com/data/Yg1VT27P/ca677a47214e6428dca89dbfc80efa49e14de0b6_96.webp
 - id: txnimc/Featurizer
   valid: false
   name: (?) Featurizer
@@ -837,8 +618,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/cit-resewn
   internal:
     curseforge_id: 521427
-    updated: 2024-10-18T08:30:09.349887Z
-    icon: https://cdn.modrinth.com/data/otVJckYQ/4d29d9564b0ec6e21841097527c0b489dcc6a318_96.webp
 - id: LopyMine/PatPat
   name: (!) PatPat [Mod & Plugin]
   source: (!) https://github.com/LopyMine/PatPat
@@ -846,8 +625,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/patpat
   internal:
     curseforge_id: 1105962
-    updated: 2024-12-04T22:59:17.909121Z
-    icon: https://cdn.modrinth.com/data/dw7LChq9/125417ed34406a044dd53fdf9a7fdfe210a6fcf0_96.webp
 - id: ginsm/forgotten-graves
   name: (!) Forgotten Graves
   source: (!) https://github.com/ginsm/forgotten-graves
@@ -855,8 +632,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/forgotten-graves
   internal:
     curseforge_id: 550480
-    updated: 2025-01-03T07:16:30.785926Z
-    icon: https://cdn.modrinth.com/data/FrZIkosK/ed6e8806a6d44487211c0a149ab4878aefe5fff8_96.webp
 - id: kikugie/stonecutter-template
   valid: false
   name: (?) stonecutter-template
@@ -868,8 +643,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/bukkit-plugins/customdurability
   internal:
     curseforge_id: 88178
-    updated: 2016-12-03T04:52:05.203Z
-    icon: https://cdn.modrinth.com/data/OKRes5Es/16c8870d72779019359fdf3780398b2925433b02_96.webp
 - id: kr8gz/PlayerStatistics
   name: (!) Player Statistics
   source: (!) https://github.com/kr8gz/PlayerStatistics
@@ -877,8 +650,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/bukkit-plugins/playerstatistics
   internal:
     curseforge_id: 53943
-    updated: 2016-12-03T13:15:45.240Z
-    icon: https://cdn.modrinth.com/data/PztDP6Mf/081a85aa800fd31212f35dd13322ea555603116f_96.webp
 - id: Faboslav/structurify
   name: (!) Structurify
   source: (!) https://github.com/Faboslav/structurify
@@ -886,8 +657,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/structurify
   internal:
     curseforge_id: 1087551
-    updated: 2024-12-08T21:23:50.069907Z
-    icon: https://cdn.modrinth.com/data/yz7AM2zx/1e8c9087ff0c3378becc98c8798fb928d3072812_96.webp
 - id: Hipposgrumm/explosive-pitcher-pods
   name: (!) Explosive Pitcher Pods
   source: (!) https://github.com/Hipposgrumm/explosive-pitcher-pods
@@ -895,8 +664,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/explosive-pitcher-pods
   internal:
     curseforge_id: 906727
-    updated: 2024-09-20T01:54:37.860112Z
-    icon: https://cdn.modrinth.com/data/bL0Th6M3/49ed5a7f413fb841b7cad1abf3066183ffd58ef1_96.webp
 - id: IMB11/SkinShuffle
   name: (!) Skin Shuffle
   source: (!) https://github.com/IMB11/SkinShuffle
@@ -904,8 +671,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/skinshuffle
   internal:
     curseforge_id: 876386
-    updated: 2024-12-21T16:04:53.433468Z
-    icon: https://cdn.modrinth.com/data/3s19I5jr/3d21d8e87e38c814e8951f26ae0f5cb3ae1fb924_96.webp
 - id: ZipeStudio/TalkingHeads
   name: (!) Talking Heads
   source: (!) https://github.com/ZipeStudio/TalkingHeads
@@ -913,8 +678,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/bukkit-plugins/talking-heads
   internal:
     curseforge_id: 63469
-    updated: 2016-12-03T06:11:09.110Z
-    icon: https://cdn.modrinth.com/data/Os35nfkh/b7ded54ce306ae5f3746e826861032624abe176e_96.webp
 - id: Faboslav/variants-and-ventures
   name: (!) Variants & Ventures
   source: (!) https://github.com/Faboslav/variants-and-ventures
@@ -922,8 +685,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/variants-and-ventures
   internal:
     curseforge_id: 981139
-    updated: 2025-01-09T07:32:21.088872Z
-    icon: https://cdn.modrinth.com/data/lNDRiXkY/7314502cdc8095e86d3c8a8820914bfcfd1b4600_96.webp
 - id: Jab125/multiloader-example-mod-stonecutter
   valid: false
   name: (?) multiloader-example-mod-stonecutter
@@ -935,8 +696,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/armorful
   internal:
     curseforge_id: 693817
-    updated: 2024-08-18T19:33:05.941991Z
-    icon: https://cdn.modrinth.com/data/LlOkR2e2/e9758c3901f1ee67ddcdeb78586a189818ad5ab0_96.webp
 - id: PieKing1215/DripSounds
   name: (!) Drip Sounds
   source: (!) https://github.com/PieKing1215/DripSounds
@@ -944,8 +703,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/dripsounds
   internal:
     curseforge_id: 448311
-    updated: 2023-06-27T16:58:17.867Z
-    icon: https://cdn.modrinth.com/data/T8MMXTpr/d338decae13e71b934605932901921c4d72b8b6f_96.webp
 - id: LopyMine/My-Totem-Doll
   name: (!) My Totem Doll
   source: (!) https://github.com/LopyMine/My-Totem-Doll
@@ -953,8 +710,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/my-totem-doll
   internal:
     curseforge_id: 1065783
-    updated: 2024-07-22T13:21:08.590924Z
-    icon: https://cdn.modrinth.com/data/ygYU16dG/c732a70946ae3f0ad9e02d768d14a99b1a455d28_96.webp
 - id: pajicadvance/enchantmentdisabler
   name: (!) Enchantment Disabler
   source: (!) https://github.com/pajicadvance/enchantmentdisabler
@@ -962,8 +717,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/enchantmentdisabler
   internal:
     curseforge_id: 912326
-    updated: 2025-01-17T02:06:27.781976Z
-    icon: https://cdn.modrinth.com/data/Kd03i2oU/5bfab0390b4655470b95b80824df9ffe6e280514.png
 - id: UltimatChamp/ModpackUtils
   name: (!) ModpackUtils
   source: (!) https://github.com/UltimatChamp/ModpackUtils
@@ -971,8 +724,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/mutils
   internal:
     curseforge_id: 1135297
-    updated: 2024-11-29T07:53:18.684910Z
-    icon: https://cdn.modrinth.com/data/wklFEiuR/690d8f555972de3b24cd7ee82c083ebb6a3e2155_96.webp
 - id: IMB11/Fog
   name: (!) Fog
   source: (!) https://github.com/IMB11/Fog
@@ -980,8 +731,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/fog
   internal:
     curseforge_id: 815438
-    updated: 2024-12-27T20:55:28.380013Z
-    icon: https://cdn.modrinth.com/data/WuGVWUF2/ba23a02828e2b4a3d3246eec064cfa526c4f871c_96.webp
 - id: IMB11/Flow
   name: (!) Flow
   source: (!) https://github.com/IMB11/Flow
@@ -989,8 +738,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/flow
   internal:
     curseforge_id: 927561
-    updated: 2024-11-16T18:52:05.144706Z
-    icon: https://cdn.modrinth.com/data/Eoxi2LJd/63185dd55ac9b40b2cf3f66b14b7cd741817c451_96.webp
 - id: LopyMine/Texturized-Particles
   name: (!) Texturized Particles
   source: (!) https://github.com/LopyMine/Texturized-Particles
@@ -998,8 +745,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/texturized-particles
   internal:
     curseforge_id: 1120746
-    updated: 2024-10-28T08:39:35.034780Z
-    icon: https://cdn.modrinth.com/data/PLAGcSFJ/a1c206381f51a0fb2bf5e5e38bb850392b31141b_96.webp
 - id: IMB11/example-stonecutter-project
   valid: false
   name: (?) example-stonecutter-project
@@ -1011,8 +756,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/xanders-sodium-options
   internal:
     curseforge_id: 678306
-    updated: 2024-12-14T21:57:18.340175Z
-    icon: https://cdn.modrinth.com/data/sTkQBVyo/97ae55a771cade26987d40dfe43ef402097fe578_96.webp
 - id: GravityCY/ViewBobbingOptions
   name: (!) View Bobbing Options
   source: (!) https://github.com/GravityCY/ViewBobbingOptions
@@ -1020,8 +763,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/viewboboptions
   internal:
     curseforge_id: 901484
-    updated: 2024-12-13T06:27:01.566363Z
-    icon: https://cdn.modrinth.com/data/Yr9J16k6/dbbbfad815c425df5f3d4d3ab28def48c0207fd7_96.webp
 - id: Lemonnik6484/FasterSpawners
   name: (!) Faster Spawners
   source: (!) https://github.com/Lemonnik6484/FasterSpawners
@@ -1029,8 +770,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/faster-spawners
   internal:
     curseforge_id: 1104462
-    updated: 2024-08-05T16:27:18.762901Z
-    icon: https://cdn.modrinth.com/data/S7zlSLaM/cf8820db61d01185361010462a57244b546e2bc6_96.webp
 - id: SHsuperCM/Stonecutter
   valid: false
   name: (?) Stonecutter
@@ -1042,8 +781,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/easyrename
   internal:
     curseforge_id: 1027188
-    updated: 2024-08-11T11:27:44.570638Z
-    icon: https://cdn.modrinth.com/data/w9M3qI9U/e338d0dd4b2df5fbc8ad784d3c682f7f12bcacd2.png
 - id: pbone64/armor-toughness-bar
   name: (!) Armor Toughness Bar
   source: (!) https://github.com/pbone64/armor-toughness-bar
@@ -1051,8 +788,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/armor-toughness-bar
   internal:
     curseforge_id: 313816
-    updated: 2023-01-16T20:55:01.553Z
-    icon: https://cdn.modrinth.com/data/F7cOgVfw/f1786c4d6bc77027460e7e107310bc4d9315dec6.png
 - id: isXander/Controlify
   name: (!) Controlify
   source: (!) https://github.com/isXander/Controlify
@@ -1060,8 +795,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/controlify
   internal:
     curseforge_id: 835847
-    updated: 2024-12-15T01:15:21.326865Z
-    icon: https://cdn.modrinth.com/data/DOUdJVEm/5a6c126c4c761ba3e8e9d3ef09a68e16ff60ff22_96.webp
 - id: Cannoneers-of-Create/CreateBigCannons
   name: (!) Create Big Cannons
   source: (!) https://github.com/Cannoneers-of-Create/CreateBigCannons
@@ -1069,8 +802,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/create-big-cannons
   internal:
     curseforge_id: 646668
-    updated: 2025-01-08T01:22:47.193Z
-    icon: https://cdn.modrinth.com/data/GWp4jCJj/39d228c7abac7bb782db7d3f203a24beb164455f_96.webp
 - id: Skidamek/AutoModpack
   name: (!) AutoModpack
   source: (!) https://github.com/Skidamek/AutoModpack
@@ -1078,8 +809,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/automodpack
   internal:
     curseforge_id: 639211
-    updated: 2024-11-29T20:04:19.952794Z
-    icon: https://cdn.modrinth.com/data/k68glP2e/1cee94d3e17436d409839a79fa5d6bced5993023.png
 - id: HollowHorizon/HollowCore
   name: (!) Hollow Core
   source: (!) https://github.com/HollowHorizon/HollowCore
@@ -1087,8 +816,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/hollowcore
   internal:
     curseforge_id: 906892
-    updated: 2024-07-29T19:18:32.504186Z
-    icon: https://cdn.modrinth.com/data/XMd2cJSg/06c68f9f9ab8ced20197cc6e71ce91b49ed81324_96.webp
 - id: Crendgrim/AutoHUD
   name: (!) Auto HUD
   source: (!) https://github.com/Crendgrim/AutoHUD
@@ -1096,8 +823,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/auto-hud
   internal:
     curseforge_id: 623806
-    updated: 2025-01-18T10:14:51.817980Z
-    icon: https://cdn.modrinth.com/data/temczoTQ/880f66327a3f4a0bd416f99f12b12a6a353a96b3_96.webp
 - id: stonecutter-versioning/stonecutter-template-fabric
   valid: false
   name: (?) stonecutter-template-fabric
@@ -1109,8 +834,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/cull-less-leaves
   internal:
     curseforge_id: 619718
-    updated: 2024-10-25T15:26:44.156623Z
-    icon: https://cdn.modrinth.com/data/iG6ZHsUV/icon.png
 - id: txnimc/SodiumLeafCulling
   name: (!) Sodium Leaf Culling
   source: (!) https://github.com/txnimc/SodiumLeafCulling
@@ -1118,8 +841,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/sodium-leaf-culling
   internal:
     curseforge_id: 1089479
-    updated: 2024-08-23T17:20:35.996638Z
-    icon: https://cdn.modrinth.com/data/M25bkObt/b624afe158f3f4cd8e82d280b4f6de344d824186_96.webp
 - id: meza/SoundsBeGone
   name: (!) Sounds Be Gone(!)
   source: (!) https://github.com/meza/SoundsBeGone
@@ -1127,8 +848,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/sounds-be-gone
   internal:
     curseforge_id: 874633
-    updated: 2024-12-30T02:20:00.204368Z
-    icon: https://cdn.modrinth.com/data/FOIvwGKz/9496b43a0afca0d19e252f874f82ea1a02f15340_96.webp
 - id: Bawnorton/Dynamic-Trim
   name: (!) Dynamic Trim
   source: (!) https://github.com/Bawnorton/Dynamic-Trim
@@ -1136,8 +855,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/dynamic-trim
   internal:
     curseforge_id: 901658
-    updated: 2024-10-16T23:14:32.016468Z
-    icon: https://cdn.modrinth.com/data/zFCKsjVY/d2a1357abb045fdb21b03fc9b51a47d979bd4750.png
 - id: rvbsm/fsit
   name: (!) FSit
   source: (!) https://github.com/rvbsm/fsit
@@ -1145,8 +862,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/fsit
   internal:
     curseforge_id: 837056
-    updated: 2023-07-29T12:03:28.167Z
-    icon: https://cdn.modrinth.com/data/J5NAzRqK/43f9b135ef9ab49a67da667caa8b5987e1d5d864.png
 - id: HaXrDEV/Branded-Logs
   name: (!) Branded Logs
   source: (!) https://github.com/HaXrDEV/Branded-Logs
@@ -1154,8 +869,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/branded-logs
   internal:
     curseforge_id: 882472
-    updated: 2024-12-02T20:14:56.976517Z
-    icon: https://cdn.modrinth.com/data/tbktcZz2/3dd6d263f96b0f362488c08e51c2acee5dc6fec1_96.webp
 - id: kikugie/elytra-trims
   name: (!) Elytra Trims
   source: (!) https://github.com/kikugie/elytra-trims
@@ -1163,8 +876,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/elytra-trims
   internal:
     curseforge_id: 876199
-    updated: 2024-12-25T08:48:26.861373Z
-    icon: https://cdn.modrinth.com/data/XpzGz7KD/6bef3b556413d4273087f560e54ce820d5e531df_96.webp
 - id: nvb-uy/Necronomicon-Mod-Template
   valid: false
   name: (?) Necronomicon-Mod-Template
@@ -1176,8 +887,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/player-wizard
   internal:
     curseforge_id: 1087714
-    updated: 2024-08-25T08:53:16.370578Z
-    icon: https://cdn.modrinth.com/data/Vwq7vMlk/00c8f78543c7acf69208ed678efa11b9a0891de2.png
 - id: isXander/Zoomify
   name: (!) Zoomify
   source: (!) https://github.com/isXander/Zoomify
@@ -1185,8 +894,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/zoomify
   internal:
     curseforge_id: 574741
-    updated: 2024-10-23T17:25:46.111444Z
-    icon: https://cdn.modrinth.com/data/w7ThoJFB/e2de67a0bfb9e8aa2347982ab3ec5463f26cca31_96.webp
 - id: Bawnorton/BawnortonModTemplate
   valid: false
   name: (?) BawnortonModTemplate
@@ -1198,8 +905,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/autoelytra
   internal:
     curseforge_id: 817461
-    updated: 2025-01-15T22:29:25.598698Z
-    icon: https://cdn.modrinth.com/data/CanU29Ke/0ab954132a332b16bef6eb7727615f2965daffea.png
 - id: Clickism/ClickSigns
   name: (!) ClickSigns
   source: (!) https://github.com/Clickism/ClickSigns
@@ -1207,8 +912,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/clicksigns
   internal:
     curseforge_id: 1161795
-    updated: 2025-01-14T00:13:49.204290Z
-    icon: https://cdn.modrinth.com/data/xaXWiLzT/50242fb7beef614baceebee655da1f5d642dd3bb_96.webp
 - id: Clickism/ClickVillagers
   name: (!) ClickVillagers
   source: (!) https://github.com/Clickism/ClickVillagers
@@ -1216,8 +919,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/clickvillagers
   internal:
     curseforge_id: 1162587
-    updated: 2025-01-12T15:59:18.093Z
-    icon: https://cdn.modrinth.com/data/BITzwT7B/6be9d25207fe2406711546020b48b409803c40f6_96.webp
 - id: Raik176/milkable-blazes
   name: (!) Milkable Blazes
   source: (!) https://github.com/Raik176/milkable-blazes
@@ -1225,8 +926,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/milkable-blazes
   internal:
     curseforge_id: 1138865
-    updated: 2024-11-18T21:49:33.236623Z
-    icon: https://cdn.modrinth.com/data/GnrVpkf6/4708979a0fb2b1232986d101e129957bb8e38ee4_96.webp
 - id: Octol1ttle/FlightAssistant
   name: (!) FlightAssistant
   source: (!) https://github.com/Octol1ttle/FlightAssistant
@@ -1234,8 +933,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/flightassistant
   internal:
     curseforge_id: 972881
-    updated: 2025-01-16T15:23:10.552258Z
-    icon: https://cdn.modrinth.com/data/CWqLEOPt/854e2a2d0027121030a0e427226f84c12cedb9aa_96.webp
 - id: chrrs/scribble
   name: (!) Scribble
   source: (!) https://github.com/chrrs/scribble
@@ -1243,8 +940,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/scribble
   internal:
     curseforge_id: 1051344
-    updated: 2024-12-26T21:34:32.153Z
-    icon: https://cdn.modrinth.com/data/yXAvIk0x/cf63f0295c57f6f2f14c51d8e1075de19e9f4f76.png
 - id: Bawnorton/Configurable
   name: (!) Configurable
   source: (!) https://github.com/Bawnorton/Configurable
@@ -1252,8 +947,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/configurable
   internal:
     curseforge_id: 1092048
-    updated: 2024-11-18T02:25:31.344074Z
-    icon: https://cdn.modrinth.com/data/lGffrQ3O/c9aff8060d22c898ae8466e05e718fa2e6221653_96.webp
 - id: nobaboy/FabricModTemplate
   valid: false
   name: (?) FabricModTemplate
@@ -1265,8 +958,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/clickmobs
   internal:
     curseforge_id: 1179556
-    updated: 2025-01-15T11:22:37.897Z
-    icon: https://cdn.modrinth.com/data/tRdRT5jS/08afd66f210feeac992d88b9170540695e1a0864.png
 - id: txnimc/SodiumExtras
   name: (!) Sodium Extras
   source: (!) https://github.com/txnimc/SodiumExtras
@@ -1274,8 +965,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/sodium-extra
   internal:
     curseforge_id: 447673
-    updated: 2024-12-04T04:04:11.053Z
-    icon: https://cdn.modrinth.com/data/vqqx0QiE/3fcad840acf5e9e27fc71fa195f89a769f6ad27a_96.webp
 - id: txnimc/RedirectorX
   name: (!) Redirector
   source: (!) https://github.com/txnimc/RedirectorX
@@ -1283,8 +972,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/redirector
   internal:
     curseforge_id: 877289
-    updated: 2024-04-02T17:34:01.631101Z
-    icon: https://cdn.modrinth.com/data/nzRWPE5v/6587ccab7941f850cc14a63e8a191ea71ece91c2_96.webp
 - id: Imajo24I/Mob-Armor-Trims
   name: (!) Mob Armor Trims
   source: (!) https://github.com/Imajo24I/Mob-Armor-Trims
@@ -1292,8 +979,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/more-armor-trims
   internal:
     curseforge_id: 876103
-    updated: 2024-11-06T23:59:22.533Z
-    icon: https://cdn.modrinth.com/data/hHVaPgFK/f30f2886e466aaabca7e0e3a874e7fd1fe5a8e06_96.webp
 - id: Awakened-Redstone/AutoWhitelist
   name: (!) AutoWhitelist
   source: (!) https://github.com/Awakened-Redstone/AutoWhitelist
@@ -1301,8 +986,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/bukkit-plugins/autowhitelist
   internal:
     curseforge_id: 40724
-    updated: 2023-08-17T14:17:45.110Z
-    icon: https://cdn.modrinth.com/data/BMaqFQAd/116458c672aadeb31856563eaff8ed7edd764753.png
 - id: not-coded/NameFabric
   name: (!) NameFabric
   source: (!) https://github.com/not-coded/NameFabric
@@ -1310,8 +993,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/namefabric
   internal:
     curseforge_id: 649758
-    updated: 2024-02-06T09:33:41.327Z
-    icon: https://cdn.modrinth.com/data/Kt9bUp9L/f041fea791f16b6645089af8887fe0e37f0e8817_96.webp
 - id: Crendgrim/HaloHUD
   name: (!) Halo HUD
   source: (!) https://github.com/Crendgrim/HaloHUD
@@ -1319,8 +1000,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/halohud
   internal:
     curseforge_id: 805714
-    updated: 2024-11-28T19:18:33.376822Z
-    icon: https://cdn.modrinth.com/data/rbMt0AmF/1282c1df6e880444e568c834267e0c46732436a9.png
 - id: Bawnorton/Neruina
   name: (!) Neruina - Ticking Entity Fixer
   source: (!) https://github.com/Bawnorton/Neruina
@@ -1328,8 +1007,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/neruina
   internal:
     curseforge_id: 851046
-    updated: 2025-01-11T19:47:52.492265Z
-    icon: https://cdn.modrinth.com/data/1s5x833P/b7e3cf809f07d3cad88a60834c3e4e7248021744_96.webp
 - id: Bawnorton/AllTheTrims
   name: (!) All The Trims
   source: (!) https://github.com/Bawnorton/AllTheTrims
@@ -1337,8 +1014,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/all-the-trims
   internal:
     curseforge_id: 876154
-    updated: 2024-10-20T18:05:41.231428Z
-    icon: https://cdn.modrinth.com/data/pnsUKrap/789944d58acd7dd32ed6c063a7195829b0a2c4b4_96.webp
 - id: Furq07/ResourcePackCached
   name: (!) ResourcePackCached
   source: (!) https://github.com/Furq07/ResourcePackCached
@@ -1346,8 +1021,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/resourcepackcached
   internal:
     curseforge_id: 1125284
-    updated: 2024-12-06T00:28:40.731568Z
-    icon: https://cdn.modrinth.com/data/d4phKsx2/5ca543437d937f9f8098c82e5b8a523062d2836e_96.webp
 - id: stonecutter-versioning/stonecutter-template-architectury
   valid: false
   name: (?) stonecutter-template-architectury
@@ -1359,8 +1032,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/better-trims
   internal:
     curseforge_id: 821752
-    updated: 2024-10-19T23:35:14.886884Z
-    icon: https://cdn.modrinth.com/data/98ytUvlc/5fe39ebdd5acf2633835bb538ed384285357ae8a.png
 - id: txnimc/SatisfyingButtons
   name: (!) Satisfying Buttons
   source: (!) https://github.com/txnimc/SatisfyingButtons
@@ -1368,8 +1039,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/satisfying-buttons
   internal:
     curseforge_id: 972696
-    updated: 2024-09-17T18:57:30.711344Z
-    icon: https://cdn.modrinth.com/data/Zf8HMFM5/ad4d2dc2c85d7e94bb853dd0269a48dbbd60b293_96.webp
 - id: meza/Stonecraft-template
   valid: false
   name: (?) Stonecraft-template
@@ -1381,8 +1050,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/burnable-cobwebs
   internal:
     curseforge_id: 1132367
-    updated: 2024-11-05T18:14:12.033389Z
-    icon: https://cdn.modrinth.com/data/oQborhDc/fb62b6da4912a44b3b5219a3b08ecb8a464e7321_96.webp
 - id: Drathonix/LoadMyChunks
   name: (!) Load My Chunks
   source: (!) https://github.com/Drathonix/LoadMyChunks
@@ -1390,8 +1057,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/load-my-chunks
   internal:
     curseforge_id: 1024152
-    updated: 2024-12-27T21:40:41.980Z
-    icon: https://cdn.modrinth.com/data/OtbeKtn3/84b00a5052788dc9be3fc477648319d7374672c1.png
 - id: isXander/ModstitchStonecutterTemplate
   valid: false
   name: (?) ModstitchStonecutterTemplate
@@ -1403,8 +1068,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/sodium-options-api
   internal:
     curseforge_id: 1103431
-    updated: 2025-01-01T03:52:36.978185Z
-    icon: https://cdn.modrinth.com/data/Es5v4eyq/7bff17babb498584c0edd74211d97435b651c11f_96.webp
 - id: isXander/loom-stonecutter-cyclic
   valid: false
   name: (?) loom-stonecutter-cyclic
@@ -1416,8 +1079,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/vinyls
   internal:
     curseforge_id: 1097085
-    updated: 2024-10-10T16:44:50.660Z
-    icon: https://cdn.modrinth.com/data/NQW2ibaE/a9e5447e82bfe467d9779650d759a25f0cb1deb2.png
 - id: txnimc/ImmersiveMessages
   name: (!) Immersive Messages API
   source: (!) https://github.com/txnimc/ImmersiveMessages
@@ -1425,8 +1086,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/immersive-messages-api
   internal:
     curseforge_id: 1109713
-    updated: 2025-01-08T19:16:01.909953Z
-    icon: https://cdn.modrinth.com/data/6xvrmbjn/5b8bfbe8a7afa86c829c1ea06218dc6d12b7d03d_96.webp
 - id: txnimc/Mediumcore
   name: (!) Mediumcore
   source: (!) https://github.com/txnimc/Mediumcore
@@ -1434,8 +1093,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/mediumcore
   internal:
     curseforge_id: 506676
-    updated: 2023-04-25T05:09:12.693Z
-    icon: https://cdn.modrinth.com/data/XjSJMp3X/25193a82e4043cff1ce37a48540ff69c3ab786cc.png
 - id: txnimc/TxniTemplate
   valid: false
   name: (?) TxniTemplate
@@ -1447,8 +1104,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/runtimetrims
   internal:
     curseforge_id: 1122245
-    updated: 2024-10-26T17:21:58.388057Z
-    icon: https://cdn.modrinth.com/data/eRg6mpBy/c0a214181fb269d17f09c0af15052217d3189c47_96.webp
 - id: Crendgrim/DynamicCrosshair
   name: (!) Dynamic Crosshair
   source: (!) https://github.com/Crendgrim/DynamicCrosshair
@@ -1456,8 +1111,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/dynamic-crosshair
   internal:
     curseforge_id: 623800
-    updated: 2024-12-02T20:22:55.887006Z
-    icon: https://cdn.modrinth.com/data/ZcR9weSm/8da8af58ca961f937bd05d41dcefa26be7b5c182.png
 - id: Furq07/HoloDisplays
   name: (!) HoloDisplays
   source: (!) https://github.com/Furq07/HoloDisplays
@@ -1465,8 +1118,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/holodisplays
   internal:
     curseforge_id: 1150354
-    updated: 2024-12-04T03:23:05.696972Z
-    icon: https://cdn.modrinth.com/data/WdbPWi13/b18412e8e2b0b3498b901b698b774e16fa9c427f_96.webp
 - id: meza/minecraft-mod-gradle-plugin
   valid: false
   name: (?) minecraft-mod-gradle-plugin
@@ -1478,8 +1129,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/hollowengine
   internal:
     curseforge_id: 906903
-    updated: 2024-01-16T08:58:18.783Z
-    icon: https://cdn.modrinth.com/data/tDUCPbAl/9934b6e58812b22594e7aee731f8105ae828912e_96.webp
 - id: nvb-uy/Death-Knights
   name: (!) Death Knights (RPG Series)
   source: (!) https://github.com/nvb-uy/Death-Knights
@@ -1487,8 +1136,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/death-knights
   internal:
     curseforge_id: 968119
-    updated: 2024-11-27T00:22:18.912419Z
-    icon: https://cdn.modrinth.com/data/2EQER1gD/c8a4845d444763916661f8574558dee207c3fbe2_96.webp
 - id: Raik176/broken-nametags
   name: (!) Broken Nametags
   source: (!) https://github.com/Raik176/broken-nametags
@@ -1496,8 +1143,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/broken-name-tags
   internal:
     curseforge_id: 449128
-    updated: 2022-06-17T21:51:11.173Z
-    icon: https://cdn.modrinth.com/data/4eLgBzx7/039578e5f7a0c5cd89c6d0d98f9ab9b7d7623700_96.webp
 - id: txnimc/TxniLib
   name: (!) TxniLib
   source: (!) https://github.com/txnimc/TxniLib
@@ -1505,8 +1150,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/txnilib
   internal:
     curseforge_id: 1104882
-    updated: 2024-12-28T09:22:57.131202Z
-    icon: https://cdn.modrinth.com/data/vBbPDuOs/230624c5d6b08c340e02d2a0f67c737f759bf4e2_96.webp
 - id: meza/Stonecraft
   valid: false
   name: (?) Stonecraft
@@ -1518,5 +1161,3 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/resourcify
   internal:
     curseforge_id: 870076
-    updated: 2025-01-14T15:57:44.664007Z
-    icon: https://cdn.modrinth.com/data/RLzHAoZe/a353989ea9f0f124ebe7cf3e67274c2d72751431_96.webp
