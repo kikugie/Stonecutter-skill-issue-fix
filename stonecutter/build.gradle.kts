@@ -11,6 +11,7 @@ import kotlin.io.path.walk
 import kotlin.io.path.writeText
 
 plugins {
+    idea
     java
     `kotlin-dsl`
     alias(libs.plugins.shadow)
@@ -18,6 +19,13 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.dokka)
     alias(libs.plugins.kotlin.serialization)
+}
+
+idea {
+    module {
+        isDownloadJavadoc = true
+        isDownloadSources = true
+    }
 }
 
 sourceSets {
