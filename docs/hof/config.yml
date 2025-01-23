@@ -6,18 +6,18 @@ repositories:
     - template
     - example
 entries:
+  - id: IMB11/SkinShufflePlugin
+    valid: false
+  - id: kikugie/multilib
+    valid: false
   - id: Qendolin/better-clouds
     curseforge: /EXCLUDED/
-  - id: Wilyicaro/Legacy-Minecraft
-    valid: false
   - id: Superkat32/Explosive-Enhancement
     curseforge: /EXCLUDED/
   - id: enjarai/shared-resources
     curseforge: https://www.curseforge.com/minecraft/mc-mods/shared-resources
   - id: RedRain0o0/legacy-skins
     curseforge: https://www.curseforge.com/minecraft/mc-mods/legacy-skins
-  - id: RLLD576/Rober-Carpet
-    valid: false
   - id: Membercat-Studios/ModelShifter
     curseforge: /EXCLUDED/
   - id: anastarawneh/MCCINametagMod
@@ -41,10 +41,6 @@ entries:
   - id: Mirsario/Minecraft-CameraOverhaul
     name: Camera Overhaul
     curseforge: https://www.curseforge.com/minecraft/mc-mods/cameraoverhaul
-  - id: Modpack-Update-Checker/MineMark
-    valid: false
-  - id: LopyMine/Mossy
-    valid: false
   - id: IMB11/MRU
     curseforge: https://www.curseforge.com/minecraft/mc-mods/mru
   - id: sirstotes/Pucks-Parity-Mod
@@ -59,12 +55,8 @@ entries:
     curseforge: /EXCLUDED/
   - id: axialeaa/BlockyBubbles
     curseforge: /EXCLUDED/
-  - id: ViolaFlower/Legacy-Tweaks
-    valid: false
   - id: o7Moon/OpenBoatUtils
     curseforge: /EXCLUDED/
-  - id: GravityCY/FishingButGood
-    valid: false
   - id: skycatminepokie/autocut
     curseforge: /EXCLUDED/
   - id: Wilyicaro/FactoryAPI
@@ -73,8 +65,6 @@ entries:
     curseforge: /EXCLUDED/
   - id: naari3/offers-hud
     curseforge: /EXCLUDED/
-  - id: UpcraftLP/mc-data-sync
-    valid: false
   - id: IMB11/Sounds
     curseforge: https://www.curseforge.com/minecraft/mc-mods/sound
   - id: snackbag/TT20
@@ -91,40 +81,28 @@ entries:
     curseforge: /EXCLUDED/
   - id: enjarai/cicada-lib
     name: CICADA
-  - id: natri0/lasers-mod
-    valid: false
   - id: DuperKnight/DuperAutoWalk
     curseforge: https://www.curseforge.com/minecraft/mc-mods/dupers-autowalk
   - id: Faboslav/it-takes-a-pillage
     curseforge: https://www.curseforge.com/minecraft/mc-mods/it-takes-a-pillage-continuation
   - id: Mat0u5/LifeSeries
     curseforge: /EXCLUDED/
-  - id: IMB11/SkinShufflePlugin
-    valid: false
-  - id: kikugie/multilib
-    valid: false
   - id: Lemonnik6484/BetterWalls
     curseforge: https://www.curseforge.com/minecraft/mc-mods/better-walls
   - id: ProunceDev/BetterCooldownsHUD
     modrinth: https://www.curseforge.com/minecraft/mc-mods/bettercooldownshud
-  - id: FokshaWasTaken/loading-bar
-    valid: false
   - id: Lemonnik6484/MossMod
     curseforge: /EXCLUDED/
   - id: Kyagara/CoopTweaks
     curseforge: /EXCLUDED/
   - id: btwonion/autodrop
     curseforge: /EXCLUDED/
-  - id: Imajo24I/Naturally-Trimmed
-    valid: false
   - id: Aeldit/CyanSetHome
     curseforge: /EXCLUDED/
   - id: Raik176/datapack-utils
     curseforge: https://www.curseforge.com/minecraft/mc-mods/datapack-utils
   - id: Seggan/deathview
     curseforge: /EXCLUDED/
-  - id: Drathonix/bringhomethebeacon
-    valid: false
   - id: Crendgrim/DynamicCrosshairCompat
     curseforge: https://www.curseforge.com/minecraft/mc-mods/dynamic-crosshair-compat
   - id: not-coded/WayFix
@@ -135,8 +113,6 @@ entries:
     curseforge: https://www.curseforge.com/minecraft/mc-mods/detailab-compat
   - id: zly2006/x-backup
     curseforge: /EXCLUDED/
-  - id: Crendgrim/libbamboo
-    valid: false
   - id: Raik176/mod-credits-reborn
     curseforge: /EXCLUDED/
   - id: sailex428/AI-NPC
@@ -151,8 +127,6 @@ entries:
     curseforge: /EXCLUDED/
   - id: txnimc/SodiumDynamicLights
     curseforge: https://www.curseforge.com/minecraft/mc-mods/dynamiclights-reforged
-  - id: celestialfault/celestialwynn
-    valid: false
   - id: nobaboy/NobaAddons
     curseforge: /EXCLUDED/
   - id: meza/ServerRedstoneBlock
@@ -175,16 +149,10 @@ entries:
     modrinth: /EXCLUDED/
   - id: txnimc/PronounMC
     curseforge: https://www.curseforge.com/minecraft/mc-mods/pronounmc
-  - id: Raik176/item-cooldown-api
-    valid: false
   - id: Raik176/rose-gold
     curseforge: /EXCLUDED/
-  - id: isXander/armadilloader
-    valid: false
   - id: Bawnorton/DCFixes
     modrinth: /EXCLUDED/
-  - id: Awakened-Redstone/SakuraCake
-    valid: false
   - id: btwonion/KotlinLangForge
     curseforge: /EXCLUDED/
   - id: meza/DeckedOutOBS
@@ -193,42 +161,28 @@ entries:
     curseforge: /EXCLUDED/
   - id: MisterCheezeCake/SkyblockTweaks
     curseforge: /EXCLUDED/
-  - id: Koralix-Studios/one-for-all
-    valid: false
   - id: ModLabsCC/ShaderAPI
     curseforge: /EXCLUDED/
   - id: isXander/opti-painting
     curseforge: https://www.curseforge.com/minecraft/mc-mods/optipainting
-  - id: Drathonix/experiencedworlds2
-    valid: false
   - id: imide/ChatHistoryPlus
     curseforge: /EXCLUDED/
   - id: meza/Disable-Christmas-Chests
     curseforge: https://www.curseforge.com/minecraft/mc-mods/disablechristmaschests
   - id: not-coded/codelib
     curseforge: /EXCLUDED/
-  - id: kanzakirei/resources
-    valid: false
   - id: Aeldit/Cyan
     curseforge: /EXCLUDED/
   - id: Aeldit/CyanLib
     curseforge: /EXCLUDED/
   - id: txnimc/DoesItTickSC
     name: Does It Tick?
-  - id: Drathonix/capturetheflag
-    valid: false
-  - id: nvb-uy/Eternal-Attributes
-    valid: false
-  - id: nvb-uy/Effect-Adjuster
-    valid: false
   - id: nvb-uy/Combat-Effects
     curseforge: https://www.curseforge.com/minecraft/mc-mods/combat-effects
   - id: nvb-uy/OffHandTickFix
     name: Off Hand Tick Fix
     modrinth: /EXCLUDED/
     curseforge: https://www.curseforge.com/minecraft/mc-mods/off-hand-tick-fix
-  - id: nvb-uy/BossUltimatum
-    valid: false
   - id: Raik176/better-saved-tabs
     curseforge: https://www.curseforge.com/minecraft/mc-mods/better-saved-tabs
   - id: Raik176/undertale-death-screen
@@ -237,5 +191,7 @@ entries:
     curseforge: https://www.curseforge.com/minecraft/mc-mods/pronounmc
   - id: txnimc/SodiumOptionsModCompat
     curseforge: https://www.curseforge.com/minecraft/mc-mods/sodium-embeddium-options-mod-compat
-  - id: txnimc/Featurizer
-    valid: false
+  - id: pajicadvance/simple-smithing-overhaul
+    curseforge: https://www.curseforge.com/minecraft/mc-mods/simple-smithing-overhaul
+  - id: pajicadvance/simple-death-improvements
+    curseforge: https://www.curseforge.com/minecraft/mc-mods/simple-death-improvements

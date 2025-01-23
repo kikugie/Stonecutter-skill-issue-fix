@@ -4,7 +4,6 @@
   modrinth: (!) https://modrinth.com/mod/better-clouds
   curseforge: /EXCLUDED/
 - id: Wilyicaro/Legacy-Minecraft
-  valid: false
   name: (?) Legacy-Minecraft
   source: (!) https://github.com/Wilyicaro/Legacy-Minecraft
 - id: Superkat32/Explosive-Enhancement
@@ -27,7 +26,6 @@
   internal:
     curseforge_id: 1090749
 - id: RLLD576/Rober-Carpet
-  valid: false
   name: (?) Rober-Carpet
   source: (!) https://github.com/RLLD576/Rober-Carpet
 - id: Membercat-Studios/ModelShifter
@@ -87,11 +85,9 @@
   internal:
     curseforge_id: 423602
 - id: Modpack-Update-Checker/MineMark
-  valid: false
   name: (?) MineMark
   source: (!) https://github.com/Modpack-Update-Checker/MineMark
 - id: LopyMine/Mossy
-  valid: false
   name: (?) Mossy
   source: (!) https://github.com/LopyMine/Mossy
 - id: IMB11/MRU
@@ -134,7 +130,6 @@
   modrinth: (!) https://modrinth.com/mod/blocky-bubbles
   curseforge: /EXCLUDED/
 - id: ViolaFlower/Legacy-Tweaks
-  valid: false
   name: (?) Legacy-Tweaks
   source: (!) https://github.com/ViolaFlower/Legacy-Tweaks
 - id: o7Moon/OpenBoatUtils
@@ -143,7 +138,6 @@
   modrinth: (!) https://modrinth.com/mod/openboatutils
   curseforge: /EXCLUDED/
 - id: GravityCY/FishingButGood
-  valid: false
   name: (?) FishingButGood
   source: (!) https://github.com/GravityCY/FishingButGood
 - id: skycatminepokie/autocut
@@ -169,7 +163,6 @@
   modrinth: (!) https://modrinth.com/mod/offershud
   curseforge: /EXCLUDED/
 - id: UpcraftLP/mc-data-sync
-  valid: false
   name: (?) mc-data-sync
   source: (!) https://github.com/UpcraftLP/mc-data-sync
 - id: IMB11/Sounds
@@ -219,7 +212,6 @@
   internal:
     curseforge_id: 989574
 - id: natri0/lasers-mod
-  valid: false
   name: (?) lasers-mod
   source: (!) https://github.com/natri0/lasers-mod
 - id: DuperKnight/DuperAutoWalk
@@ -242,11 +234,9 @@
   modrinth: (!) https://modrinth.com/mod/life-series
   curseforge: /EXCLUDED/
 - id: IMB11/SkinShufflePlugin
-  valid: false
   name: (?) SkinShufflePlugin
   source: (!) https://github.com/IMB11/SkinShufflePlugin
 - id: kikugie/multilib
-  valid: false
   name: (?) multilib
   source: (!) https://github.com/kikugie/multilib
 - id: Lemonnik6484/BetterWalls
@@ -264,7 +254,6 @@
   internal:
     curseforge_id: 1156416
 - id: FokshaWasTaken/loading-bar
-  valid: false
   name: (?) loading-bar
   source: (!) https://github.com/FokshaWasTaken/loading-bar
 - id: Lemonnik6484/MossMod
@@ -283,7 +272,6 @@
   modrinth: (!) https://modrinth.com/mod/autodrop
   curseforge: /EXCLUDED/
 - id: Imajo24I/Naturally-Trimmed
-  valid: false
   name: (?) Naturally-Trimmed
   source: (!) https://github.com/Imajo24I/Naturally-Trimmed
 - id: Aeldit/CyanSetHome
@@ -304,7 +292,6 @@
   modrinth: (!) https://modrinth.com/mod/deathview
   curseforge: /EXCLUDED/
 - id: Drathonix/bringhomethebeacon
-  valid: false
   name: (?) bringhomethebeacon
   source: (!) https://github.com/Drathonix/bringhomethebeacon
 - id: Crendgrim/DynamicCrosshairCompat
@@ -337,7 +324,6 @@
   modrinth: (!) https://modrinth.com/mod/x-backup
   curseforge: /EXCLUDED/
 - id: Crendgrim/libbamboo
-  valid: false
   name: (?) libbamboo
   source: (!) https://github.com/Crendgrim/libbamboo
 - id: Raik176/mod-credits-reborn
@@ -373,7 +359,6 @@
   internal:
     curseforge_id: 551736
 - id: celestialfault/celestialwynn
-  valid: false
   name: (?) celestialwynn
   source: (!) https://github.com/celestialfault/celestialwynn
 - id: nobaboy/NobaAddons
@@ -448,7 +433,6 @@
   internal:
     curseforge_id: 1091373
 - id: Raik176/item-cooldown-api
-  valid: false
   name: (?) item-cooldown-api
   source: (!) https://github.com/Raik176/item-cooldown-api
 - id: Raik176/rose-gold
@@ -457,7 +441,6 @@
   modrinth: (!) https://modrinth.com/mod/rose-gold
   curseforge: /EXCLUDED/
 - id: isXander/armadilloader
-  valid: false
   name: (?) armadilloader
   source: (!) https://github.com/isXander/armadilloader
 - id: Bawnorton/DCFixes
@@ -468,7 +451,6 @@
   internal:
     curseforge_id: 1059881
 - id: Awakened-Redstone/SakuraCake
-  valid: false
   name: (?) SakuraCake
   source: (!) https://github.com/Awakened-Redstone/SakuraCake
 - id: btwonion/KotlinLangForge
@@ -492,7 +474,6 @@
   modrinth: (!) https://modrinth.com/mod/skyblock-tweaks
   curseforge: /EXCLUDED/
 - id: Koralix-Studios/one-for-all
-  valid: false
   name: (?) one-for-all
   source: (!) https://github.com/Koralix-Studios/one-for-all
 - id: ModLabsCC/ShaderAPI
@@ -508,7 +489,6 @@
   internal:
     curseforge_id: 1017042
 - id: Drathonix/experiencedworlds2
-  valid: false
   name: (?) experiencedworlds2
   source: (!) https://github.com/Drathonix/experiencedworlds2
 - id: imide/ChatHistoryPlus
@@ -529,7 +509,6 @@
   modrinth: (!) https://modrinth.com/mod/codelib
   curseforge: /EXCLUDED/
 - id: kanzakirei/resources
-  valid: false
   name: (?) resources
   source: (!) https://github.com/kanzakirei/resources
 - id: Aeldit/Cyan
@@ -550,15 +529,13 @@
   internal:
     curseforge_id: 543308
 - id: Drathonix/capturetheflag
-  valid: false
   name: (?) capturetheflag
   source: (!) https://github.com/Drathonix/capturetheflag
 - id: nvb-uy/Eternal-Attributes
-  valid: false
-  name: (?) Eternal-Attributes
+  name: (!) Eternal Attributes
   source: (!) https://github.com/nvb-uy/Eternal-Attributes
+  modrinth: (!) https://modrinth.com/mod/eternal-attributes
 - id: nvb-uy/Effect-Adjuster
-  valid: false
   name: (?) Effect-Adjuster
   source: (!) https://github.com/nvb-uy/Effect-Adjuster
 - id: nvb-uy/Combat-Effects
@@ -576,7 +553,6 @@
   internal:
     curseforge_id: 1171190
 - id: nvb-uy/BossUltimatum
-  valid: false
   name: (?) BossUltimatum
   source: (!) https://github.com/nvb-uy/BossUltimatum
 - id: Raik176/better-saved-tabs
@@ -608,7 +584,6 @@
   internal:
     curseforge_id: 1146393
 - id: txnimc/Featurizer
-  valid: false
   name: (?) Featurizer
   source: (!) https://github.com/txnimc/Featurizer
 - id: SHsuperCM/CITResewn
@@ -1014,13 +989,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/all-the-trims
   internal:
     curseforge_id: 876154
-- id: Furq07/ResourcePackCached
-  name: (!) ResourcePackCached
-  source: (!) https://github.com/Furq07/ResourcePackCached
-  modrinth: (!) https://modrinth.com/mod/resourcepackcached
-  curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/resourcepackcached
-  internal:
-    curseforge_id: 1125284
 - id: stonecutter-versioning/stonecutter-template-architectury
   valid: false
   name: (?) stonecutter-template-architectury
@@ -1072,13 +1040,6 @@
   valid: false
   name: (?) loom-stonecutter-cyclic
   source: (!) https://github.com/isXander/loom-stonecutter-cyclic
-- id: Furq07/Vinyls
-  name: (!) Vinyls
-  source: (!) https://github.com/Furq07/Vinyls
-  modrinth: (!) https://modrinth.com/mod/vinyls
-  curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/vinyls
-  internal:
-    curseforge_id: 1097085
 - id: txnimc/ImmersiveMessages
   name: (!) Immersive Messages API
   source: (!) https://github.com/txnimc/ImmersiveMessages
@@ -1111,13 +1072,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/dynamic-crosshair
   internal:
     curseforge_id: 623800
-- id: Furq07/HoloDisplays
-  name: (!) HoloDisplays
-  source: (!) https://github.com/Furq07/HoloDisplays
-  modrinth: (!) https://modrinth.com/mod/holodisplays
-  curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/holodisplays
-  internal:
-    curseforge_id: 1150354
 - id: meza/minecraft-mod-gradle-plugin
   valid: false
   name: (?) minecraft-mod-gradle-plugin
@@ -1161,3 +1115,52 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/resourcify
   internal:
     curseforge_id: 870076
+- id: Furqkun/Vinyls
+  name: (!) Vinyls
+  source: (!) https://github.com/Furqkun/Vinyls
+  modrinth: (!) https://modrinth.com/mod/vinyls
+  curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/vinyls
+  internal:
+    curseforge_id: 1097085
+- id: Furqkun/HoloDisplays
+  name: (!) HoloDisplays
+  source: (!) https://github.com/Furqkun/HoloDisplays
+  modrinth: (!) https://modrinth.com/mod/holodisplays
+  curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/holodisplays
+  internal:
+    curseforge_id: 1150354
+- id: Furqkun/ResourcePackCached
+  name: (!) ResourcePackCached
+  source: (!) https://github.com/Furqkun/ResourcePackCached
+  modrinth: (!) https://modrinth.com/mod/resourcepackcached
+  curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/resourcepackcached
+  internal:
+    curseforge_id: 1125284
+- id: ModLabsCC/CustomModelDataViewer
+  name: (!) Custom Model Data Viewer
+  source: (!) https://github.com/ModLabsCC/CustomModelDataViewer
+  modrinth: (!) https://modrinth.com/mod/cmdv
+- id: pajicadvance/simple-death-improvements
+  name: (!) Simple Death Improvements
+  source: (!) https://github.com/pajicadvance/simple-death-improvements
+  modrinth: (!) https://modrinth.com/mod/simple-death-improvements
+  curseforge: https://www.curseforge.com/minecraft/mc-mods/simple-death-improvements
+  internal:
+    curseforge_id: 1163907
+- id: pajicadvance/simple-smithing-overhaul
+  name: (!) Simple Smithing Overhaul
+  source: (!) https://github.com/pajicadvance/simple-smithing-overhaul
+  modrinth: (!) https://modrinth.com/mod/simple-smithing-overhaul
+  curseforge: https://www.curseforge.com/minecraft/mc-mods/simple-smithing-overhaul
+  internal:
+    curseforge_id: 1179744
+- id: pajicadvance/accessorify
+  name: (!) Accessorify
+  source: (!) https://github.com/pajicadvance/accessorify
+  modrinth: (!) https://modrinth.com/mod/accessorify
+  curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/accessorify
+  internal:
+    curseforge_id: 1169634
+- id: OliHeamon/Smokestack
+  name: (?) Smokestack
+  source: (!) https://github.com/OliHeamon/Smokestack
