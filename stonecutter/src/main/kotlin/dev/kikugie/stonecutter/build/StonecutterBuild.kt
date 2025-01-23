@@ -2,7 +2,6 @@ package dev.kikugie.stonecutter.build
 
 import dev.kikugie.stonecutter.*
 import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.hierarchy
-import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.locate
 import dev.kikugie.stonecutter.data.StonecutterProject
 import dev.kikugie.stonecutter.data.container.ConfigurationService.Companion.of
 import dev.kikugie.stonecutter.data.tree.*
@@ -32,19 +31,19 @@ public open class StonecutterBuild(private val project: Project) : BuildAbstract
 
     /**Project tree instance containing the necessary data and safe to use with configuration cache.
      * @see [withProject]*/
-    @StonecutterAPI public val tree: LightTree = StonecutterPlugin.SERVICE.of(parent.hierarchy).tree
+    @StonecutterAPI public val tree: ProjectTree = StonecutterPlugin.SERVICE.of(parent.hierarchy).tree?.withProject(project)
         ?: error("Tree for '${project.hierarchy}' not found. Present keys:\n%s"
             .format(StonecutterPlugin.SERVICE().parameters.projectTrees.keysToString()))
 
     /**Branch this node belongs to containing the necessary data and safe to use with configuration cache.
      * @see [withProject]*/
-    @StonecutterAPI public val branch: LightBranch = tree[parent.hierarchy]
+    @StonecutterAPI public val branch: ProjectBranch = tree[parent.hierarchy]
         ?: error("Branch for '${parent.hierarchy}' not found in ${tree.hierarchy}. Present keys:\n%s"
             .format(tree.keysToString()))
 
     /**This project's node containing only the necessary data and safe to use with configuration cache.
      * @see [withProject]*/
-    @StonecutterAPI public val node: LightNode = branch[project.hierarchy]
+    @StonecutterAPI public val node: ProjectNode = branch[project.hierarchy]
         ?: error("Node for '${project.hierarchy}' not found in ${branch.hierarchy}. Present keys:\n%s"
             .format(branch.keysToString()))
 
@@ -56,21 +55,6 @@ public open class StonecutterBuild(private val project: Project) : BuildAbstract
 
     /**Metadata of the currently processed version.*/
     @StonecutterAPI public val current: StonecutterProject = node.metadata
-
-    /**Creates a tree wrapper that implements its Gradle [Project].
-     * Can be used to retrieve properties from other projects, but unsafe to use in tasks.*/
-    @StonecutterDelicate public fun withProject(tree: LightTree): ProjectTree =
-        tree.withProject(project.locate(tree.hierarchy))
-
-    /**Creates a branch wrapper that implements its Gradle [Project].
-     * Can be used to retrieve properties from other projects, but unsafe to use in tasks.*/
-    @StonecutterDelicate public fun withProject(branch: LightBranch): ProjectBranch =
-        branch.withProject(project.locate(branch.hierarchy))
-
-    /**Creates a node wrapper that implements its Gradle [Project].
-     * Can be used to retrieve properties from other projects, but unsafe to use in tasks.*/
-    @StonecutterDelicate public fun withProject(node: LightNode): ProjectNode =
-        node.withProject(project.locate(node.hierarchy))
 
     init {
         createSetupTask()
@@ -89,7 +73,7 @@ public open class StonecutterBuild(private val project: Project) : BuildAbstract
 
         input("src")
         output(parent.projectPath.relativize(chiseledSrc).invariantSeparatorsPathString)
-        sources.set(listOf(branch))
+        sources.set(listOf(branch.light))
 
         parameters(StonecutterPlugin.SERVICE().snapshot())
         doFirst {

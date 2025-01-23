@@ -41,10 +41,10 @@ public open class StonecutterController(root: Project) :
         val maps: Array<MutableMap<ProjectHierarchy, Any>> = arrayOf(mutableMapOf(), mutableMapOf(), mutableMapOf())
         for (it in buildSet {
             add(tree.hierarchy)
-            addAll(tree.branches.map(LightBranch::hierarchy))
+            addAll(tree.branches.map { it.hierarchy })
             addAll(tree.versions.flatMap { v -> tree.branches.map { it.hierarchy + v.project } })
         }) {
-            maps[0][it] = tree
+            maps[0][it] = tree.light
             maps[1][it] = BuildParameters()
             maps[2][it] = this@StonecutterController.parameters
         }
@@ -54,7 +54,7 @@ public open class StonecutterController(root: Project) :
 
         val syncTask = root.tasks.create("chiseledStonecutter")
         for (it in tree.nodes) {
-            withProject(it).pluginManager.apply(StonecutterPlugin::class.java)
+            it.project.pluginManager.apply(StonecutterPlugin::class.java)
             syncTask.dependsOn("${it.hierarchy}:setupChiseledBuild")
         }
     }
@@ -62,7 +62,7 @@ public open class StonecutterController(root: Project) :
     @OptIn(StonecutterDelicate::class)
     private fun configureProject() {
         for (it in tree.nodes) {
-            val plugin = withProject(it).stonecutter
+            val plugin = it.stonecutter
             configurations[it.branch to it.metadata]?.run { plugin.from(this) }
             builds.onEach { execute(plugin) }
         }
@@ -117,7 +117,7 @@ public open class StonecutterController(root: Project) :
 
             input("src")
             output("src")
-            sources.set(tree.branches)
+            sources.set(tree.branches.map { it.light })
 
             parameters(StonecutterPlugin.SERVICE().snapshot())
             doLast { updateController(version) }

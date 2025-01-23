@@ -2,12 +2,10 @@ package dev.kikugie.stonecutter.controller
 
 import dev.kikugie.stonecutter.Identifier
 import dev.kikugie.stonecutter.StonecutterAPI
-import dev.kikugie.stonecutter.StonecutterDelicate
 import dev.kikugie.stonecutter.build.StonecutterBuild
 import dev.kikugie.stonecutter.controller.manager.ControllerManager
 import dev.kikugie.stonecutter.controller.manager.controller
 import dev.kikugie.stonecutter.data.ProjectHierarchy
-import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.locate
 import dev.kikugie.stonecutter.data.StonecutterProject
 import dev.kikugie.stonecutter.data.container.TreeBuilderContainer
 import dev.kikugie.stonecutter.data.container.getContainer
@@ -18,7 +16,7 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 
-internal typealias BranchEntry = Pair<LightBranch, StonecutterProject>
+internal typealias BranchEntry = Pair<BranchPrototype<*>, StonecutterProject>
 
 /**Separates public API properties from the controller configuration functionality.*/
 public abstract class ControllerAbstraction(protected val root: Project) {
@@ -31,7 +29,7 @@ public abstract class ControllerAbstraction(protected val root: Project) {
 
     /**Project tree instance containing the necessary data and safe to use with configuration cache.
      * @see [withProject]*/
-    @StonecutterAPI public val tree: LightTree = constructTree()
+    @StonecutterAPI public val tree: ProjectTree = constructTree()
 
     /**Version control project used by the `Reset active project` task.*/
     @StonecutterAPI public val vcsVersion: StonecutterProject get() = tree.vcs
@@ -48,21 +46,6 @@ public abstract class ControllerAbstraction(protected val root: Project) {
 
     /**Type of the chiseled task. Used with [registerChiseled].*/
     @StonecutterAPI public val chiseled: Class<ChiseledTask> = ChiseledTask::class.java
-
-    /**Creates a tree wrapper that implements its Gradle [Project].
-     * Can be used to retrieve properties from other projects, but unsafe to use in tasks.*/
-    @StonecutterDelicate public fun withProject(tree: LightTree): ProjectTree =
-        tree.withProject(root.locate(tree.hierarchy))
-
-    /**Creates a branch wrapper that implements its Gradle [Project].
-     * Can be used to retrieve properties from other projects, but unsafe to use in tasks.*/
-    @StonecutterDelicate public fun withProject(branch: LightBranch): ProjectBranch =
-        branch.withProject(root.locate(branch.hierarchy))
-
-    /**Creates a node wrapper that implements its Gradle [Project].
-     * Can be used to retrieve properties from other projects, but unsafe to use in tasks.*/
-    @StonecutterDelicate public fun withProject(node: LightNode): ProjectNode =
-        node.withProject(root.locate(node.hierarchy))
 
     // link: wiki-controller-active
     /**
@@ -94,11 +77,12 @@ public abstract class ControllerAbstraction(protected val root: Project) {
      *
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#global-parameters">Wiki page</a>
      */
-    @StonecutterAPI public infix fun parameters(configuration: Action<ParameterHolder>): Unit = tree.branches.asSequence()
-        .flatMap { b -> versions.map { b to it } }
-        .forEach {
-            configurations.getOrPut(it) { ParameterHolder(it.first, it.second) }.let(configuration::execute)
-        }
+    @StonecutterAPI public infix fun parameters(configuration: Action<ParameterHolder>): Unit =
+        tree.branches.asSequence()
+            .flatMap { b -> versions.map { b to it } }
+            .forEach {
+                configurations.getOrPut(it) { ParameterHolder(it.first, it.second) }.let(configuration::execute)
+            }
 
     /**
      * Executes the provided [action] on each node.
@@ -114,7 +98,7 @@ public abstract class ControllerAbstraction(protected val root: Project) {
     protected fun updateController(version: StonecutterProject): Unit =
         manager.updateHeader(root.buildFile.toPath(), version.project)
 
-    private fun constructTree(): LightTree {
+    private fun constructTree(): ProjectTree {
         val builder: TreeBuilder = checkNotNull(root.gradle.getContainer<TreeBuilderContainer>()[root]) {
             "Project ${root.path} is not registered. This might've been caused by removing a project while its active"
         }
@@ -127,8 +111,8 @@ public abstract class ControllerAbstraction(protected val root: Project) {
                 versions.forEach { (_, v) -> v.branch = it }
             }
         }
-        return LightTree(root.projectPath, ProjectHierarchy(root.path), builder.vcsProject, branches).also {
-            branches.forEach { (_, b) -> b.tree = it }
-        }
+        return LightTree(root.projectPath, ProjectHierarchy(root.path), builder.vcsProject, branches)
+            .also { branches.forEach { (_, b) -> b.tree = it } }
+            .withProject(root)
     }
 }

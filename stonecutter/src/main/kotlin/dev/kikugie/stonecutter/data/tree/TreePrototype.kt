@@ -63,7 +63,7 @@ public interface BranchPrototype<T> : GradleMember,
 
     /**Gets the [node] by its absolute path.*/
     public operator fun get(node: ProjectHierarchy): T? =
-        this[node.toString().removePrefix(hierarchy.toString()).removePrefix(":")]
+        get(node.toString().removePrefix(hierarchy.toString()).removePrefix(":"))
 }
 
 /**
@@ -92,5 +92,5 @@ public interface TreePrototype<T> : GradleMember,
 
     /**Gets the [branch] by its absolute path*/
     public operator fun get(branch: ProjectHierarchy): T? =
-        this[branch.toString().removePrefix(hierarchy.toString()).removePrefix(":")]
+        get(branch.toString().removePrefix(hierarchy.toString()).removePrefix(":"))
 }
