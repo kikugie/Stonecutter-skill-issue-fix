@@ -11,4 +11,4 @@ plugins {
 
 rootProject.name = "Stonecutter"
 include("stonecutter", "stitcher")
-includeBuild("testmod")
+//includeBuild("testmod")
