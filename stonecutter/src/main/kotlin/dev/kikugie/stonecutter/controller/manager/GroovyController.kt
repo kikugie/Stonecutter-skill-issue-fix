@@ -11,7 +11,7 @@ internal object GroovyController : ControllerManager {
         file.writeText(
             """
             plugins.apply "dev.kikugie.stonecutter"
-            stonecutter.active "$version" $KEY
+            stonecutter.active "$version"
             
             stonecutter.registerChiseled tasks.register("chiseledBuild", stonecutter.chiseled) { 
                 setGroup "project"
@@ -20,7 +20,4 @@ internal object GroovyController : ControllerManager {
             """.trimIndent(), Charsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING
         )
     }
-
-    override fun updateHeader(file: Path, version: Identifier) =
-        updateFileWithKey(file, filename, "stonecutter.active \"$version\" $KEY")
 }

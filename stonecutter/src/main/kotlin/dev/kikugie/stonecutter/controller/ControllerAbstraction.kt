@@ -15,6 +15,7 @@ import dev.kikugie.stonecutter.projectPath
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
+import java.io.File
 
 internal typealias BranchEntry = Pair<BranchPrototype<*>, StonecutterProject>
 
@@ -49,14 +50,24 @@ public abstract class ControllerAbstraction(protected val root: Project) {
 
     // link: wiki-controller-active
     /**
-     * Sets the active project. **DO NOT call on your own**.
+     * Sets the active project. **DO NOT call on your own without knowing what you're doing**.
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#active-version">Wiki page</a>
      */
     public infix fun active(name: Identifier): Unit = with(tree) {
         current.isActive = false
-        current = versions.find { it.project == name } ?: error("Project $name is not registered in ${root.path}")
+        current = versions.find { it.project == name } ?: error("Project '$name' is not registered in ${root.path}")
         current.isActive = true
     }
+
+    // link: wiki-controller-active
+    /**
+     * Sets the active project from the first line in the provided [file].
+     * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#active-version">Wiki page</a>
+     */
+    public infix fun active(file: File): Unit = requireNotNull(file.useLines { it.firstOrNull()?.trim() }?.let(::active)) {
+        "Provided file must specify the active version in the first line"
+    }
+
 
     // link: wiki-chisel
     /**

@@ -36,7 +36,6 @@ public open class StonecutterController(root: Project) :
     }
 
     @Suppress("UNCHECKED_CAST")
-    @OptIn(StonecutterDelicate::class)
     private fun prepareConfiguration() = with(StonecutterPlugin.SERVICE()) {
         val maps: Array<MutableMap<ProjectHierarchy, Any>> = arrayOf(mutableMapOf(), mutableMapOf(), mutableMapOf())
         for (it in buildSet {
@@ -59,8 +58,9 @@ public open class StonecutterController(root: Project) :
         }
     }
 
-    @OptIn(StonecutterDelicate::class)
     private fun configureProject() {
+        check(tree.configured) { "Active version has not been set!" }
+
         for (it in tree.nodes) {
             val plugin = it.stonecutter
             configurations[it.branch to it.metadata]?.run { plugin.from(this) }

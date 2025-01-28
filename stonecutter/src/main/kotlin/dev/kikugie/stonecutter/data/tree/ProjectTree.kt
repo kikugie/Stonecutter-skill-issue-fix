@@ -70,6 +70,7 @@ public class ProjectBranch(public val light: LightBranch, public val project: Pr
 
     override fun containsValue(value: ProjectNode): Boolean =
         light.containsValue(value.light)
+
     override fun get(key: Identifier): ProjectNode? = cache(key)
     override fun get(node: ProjectHierarchy): ProjectNode? = light[node]?.let { cache(it.metadata.project) }
 
@@ -85,6 +86,7 @@ public class ProjectBranch(public val light: LightBranch, public val project: Pr
  */
 public class ProjectTree(public val light: LightTree, public val project: Project) :
     TreePrototype<ProjectBranch> by light as TreePrototype<ProjectBranch> {
+    internal var configured: Boolean = false
     private val cache: (Identifier) -> ProjectBranch? = memoize { id ->
         light[id]?.let { ProjectBranch(it, project.locate(it.hierarchy)) }
     }
@@ -99,12 +101,14 @@ public class ProjectTree(public val light: LightTree, public val project: Projec
         get() = light.current
         set(value) {
             light.current = value
+            configured = true
         }
     override val branches: Collection<ProjectBranch> get() = values
     override val nodes: Collection<ProjectNode> get() = values.flatMap { it.nodes }
 
     override fun containsValue(value: ProjectBranch): Boolean =
         light.containsValue(value.light)
+
     override fun get(key: Identifier): ProjectBranch? = cache(key)
     override fun get(branch: ProjectHierarchy): ProjectBranch? = light[branch]?.let { cache(it.id) }
 
