@@ -107,14 +107,21 @@
       }
     },
     "versions": {
-      "type": "object",
-      "additionalProperties": {
-        "$ref": "#/definitions/branch-collection"
-      },
-      "minProperties": 1,
-      "propertyNames": {
-        "$ref": "#/definitions/project"
-      }
+      "oneOf": [
+        {
+          "$ref": "#/definitions/project-array"
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/branch-collection"
+          },
+          "minProperties": 1,
+          "propertyNames": {
+            "$ref": "#/definitions/project"
+          }
+        }
+      ]
     }
   },
   "oneOf": [

@@ -1,29 +1,92 @@
-package dev.kikugie.stonecutter.data.setup
+package dev.kikugie.stonecutter.data.tree
 
 import dev.kikugie.stonecutter.Identifier
 import dev.kikugie.stonecutter.data.StonecutterProject
-import dev.kikugie.stonecutter.data.tree.TreeBuilder
 import dev.kikugie.stonecutter.validateId
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 
-internal fun VersionConfiguration.toTree(builder: TreeBuilder) = builder.apply {
-    if (vcs != null) vcsVersion = vcs
+internal fun TreeSettings.toTree(builder: TreeBuilder) = builder.apply {
+    vcs?.let { vcsVersion = it }
     nodes.putAll(entries.mapValues { (_, it) -> it.toMutableSet() })
     versions.putAll(entries.values.flatten().associateWith { it })
 }
 
-// TODO: Documentation
-@Serializable(with = VersionConfiguration.JsonSerializer::class)
-public sealed interface VersionConfiguration {
+/**
+ * ## Intention
+ * Class used to deserialize a data-driven project tree setup. The configuration is meant to be written by the user,
+ * so it intentionally allows a choice between shorter or expanded syntax to allow encoding optional data for third-party tools.
+ * You can use the [Stonecutter Versions](https://github.com/stonecutter-versioning/stonecutter/blob/0.6/tools/settings-schema.json)
+ * JSON schema in your IDE to verify the syntax automatically.
+ *
+ * **Note**: The example comments use JSON5 formatting to allow comments, however, the real implementation only supports the standard JSON.
+ *
+ * ### Version specification
+ * Suprojects are provided in several places across the available formats, so their syntax is described separately here,
+ * and will have reference placeholders in other examples.
+ *
+ * - **String - `$[project-string]`**:
+ *   This type is written as a string in `"project"` or `"project:version"` format.
+ *   *Examples: `"1.20.1"`, `"1.21.4-fabric:1.21.4"`*.
+ * - **Object - `$[project-object]`**:
+ *   This type is declared with explicit fields:
+ *   ```json5
+ *   {
+ *      "project": "...",
+ *      "version": "..." // Optional
+ *   }
+ *   ```
+ *   *Examples: `{"project": "1.20.1"}`, `{"project": "1.21.4-fabric", "version": "1.21.4"}`*.
+ * - **Either - `$[project-either]`**:
+ *   Allows using a mix of `$[project-string]` and `$[project-object]` formats.
+ *
+ * ### Single-branch setup
+ * This setup provides shorter syntax for cases where only the main project branch is used.
+ * ```json5
+ * {
+ *   "vcs": "...", // Optional: project part of version specification
+ *   "versions": ["$[project-either]"]
+ * }
+ * ```
+ *
+ * ### Branches-first setup
+ * ```json5
+ * {
+ *   "vcs": "...", // Optional: project part of version specification
+ *   "branches": {
+ *      "": ["$[project-either]"],
+ *      "other": {
+ *          // Allows nesting the version array for optional additional data
+ *         "versions": ["$[project-either]"]
+ *      }
+ *   }
+ * }
+ * ```
+ *
+ * ### Versions-first setup
+ * ```json5
+ * {
+ *   "vcs": "...", // Optional: project part of version specification
+ *   "versions": {
+ *      "$[project-string]": ["..."],
+ *      "$[project-string]": {
+ *          // Allows nesting the branch array for optional additional data
+ *          "branches": ["..."]
+ *      }
+ *   }
+ * }
+ * ```
+ */
+@Serializable(with = TreeSettings.JsonSerializer::class)
+public sealed interface TreeSettings {
     public val vcs: Identifier?
     public val entries: Map<Identifier, List<StonecutterProject>>
 
     @Serializable
-    public data class Source(
+    public data class Standard(
         override val vcs: Identifier? = null,
         override val entries: Map<Identifier, List<StonecutterProject>>
-    ) : VersionConfiguration {
+    ) : TreeSettings {
         init {
             entries.keys
                 .filter(Identifier::isNotEmpty)
@@ -32,10 +95,10 @@ public sealed interface VersionConfiguration {
     }
 
     @Serializable
-    private data class BranchToVersions(
+    private data class BranchMap(
         override val vcs: Identifier? = null,
         val branches: Map<Identifier, ProjectList>
-    ) : VersionConfiguration {
+    ) : TreeSettings {
         init {
             branches.keys
                 .filter(Identifier::isNotEmpty)
@@ -47,10 +110,10 @@ public sealed interface VersionConfiguration {
     }
 
     @Serializable
-    private data class VersionsToBranches(
+    private data class VersionMap(
         override val vcs: Identifier? = null,
         val versions: Map<ExpandedProject.StringProject, BranchList>
-    ) : VersionConfiguration {
+    ) : TreeSettings {
         init {
             versions.entries.flatMap { it.value.entries }
                 .filter(Identifier::isNotEmpty)
@@ -65,12 +128,25 @@ public sealed interface VersionConfiguration {
             }
     }
 
-    private object JsonSerializer : JsonContentPolymorphicSerializer<VersionConfiguration>(VersionConfiguration::class) {
+    @Serializable
+    private data class VersionList(
+        override val vcs: Identifier? = null,
+        val versions: List<ExpandedProject>
+    ): TreeSettings {
+        override val entries: Map<Identifier, List<StonecutterProject>>
+            get() = mapOf("" to versions.map { it.entry })
+    }
+
+    private object JsonSerializer : JsonContentPolymorphicSerializer<TreeSettings>(TreeSettings::class) {
         override fun selectDeserializer(element: JsonElement) = when {
             element !is JsonObject -> error("Element must be a JSON object")
-            "branches" in element -> BranchToVersions.serializer()
-            "versions" in element -> VersionsToBranches.serializer()
-            "source" in element -> Source.serializer()
+            "source" in element -> Standard.serializer()
+            "branches" in element -> BranchMap.serializer()
+            "versions" in element -> when(element["versions"]) {
+                is JsonArray -> VersionList.serializer()
+                is JsonObject -> VersionMap.serializer()
+                else -> error("Invalid version configuration type")
+            }
             else -> error("No version configuration type specified")
         }
     }
