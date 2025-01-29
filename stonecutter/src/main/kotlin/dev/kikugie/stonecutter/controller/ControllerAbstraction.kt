@@ -16,6 +16,8 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import java.io.File
+import java.nio.file.StandardOpenOption
+import kotlin.io.path.writeText
 
 internal typealias BranchEntry = Pair<BranchPrototype<*>, StonecutterProject>
 
@@ -53,10 +55,8 @@ public abstract class ControllerAbstraction(protected val root: Project) {
      * Sets the active project. **DO NOT call on your own without knowing what you're doing**.
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#active-version">Wiki page</a>
      */
-    public infix fun active(name: Identifier): Unit = with(tree) {
-        current.isActive = false
-        current = versions.find { it.project == name } ?: error("Project '$name' is not registered in ${root.path}")
-        current.isActive = true
+    public infix fun active(name: Identifier) {
+        tree.current = tree.getByName(name)
     }
 
     // link: wiki-controller-active
@@ -64,8 +64,8 @@ public abstract class ControllerAbstraction(protected val root: Project) {
      * Sets the active project from the first line in the provided [file].
      * @see <a href="https://stonecutter.kikugie.dev/stonecutter/guide/setup#active-version">Wiki page</a>
      */
-    public infix fun active(file: File): Unit = requireNotNull(file.useLines { it.firstOrNull()?.trim() }?.let(::active)) {
-        "Provided file must specify the active version in the first line"
+    public infix fun active(file: File) {
+        tree.provider = file
     }
 
 
@@ -106,8 +106,9 @@ public abstract class ControllerAbstraction(protected val root: Project) {
         builds += action
     }
 
-    protected fun updateController(version: StonecutterProject): Unit =
-        manager.updateHeader(root.buildFile.toPath(), version.project)
+    protected fun updateController(version: StonecutterProject): Unit = tree.provider
+        ?.run { toPath().writeText(version.project, Charsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING) }
+        ?: manager.updateHeader(root.buildFile.toPath(), version.project)
 
     private fun constructTree(): ProjectTree {
         val builder: TreeBuilder = checkNotNull(root.gradle.getContainer<TreeBuilderContainer>()[root]) {

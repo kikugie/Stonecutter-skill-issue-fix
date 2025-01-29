@@ -7,9 +7,11 @@ import dev.kikugie.stonecutter.build.StonecutterBuild
 import dev.kikugie.stonecutter.data.ProjectHierarchy
 import dev.kikugie.stonecutter.data.ProjectHierarchy.Companion.locate
 import dev.kikugie.stonecutter.data.StonecutterProject
+import dev.kikugie.stonecutter.process.FileProcessor
 import org.gradle.api.Project
 import org.gradle.api.UnknownDomainObjectException
 import org.gradle.kotlin.dsl.getByType
+import java.io.File
 
 private inline fun <K, V, R> Map<K, V>.remap(block: (K, V) -> Pair<K, R>): Set<Map.Entry<K, R>> = buildSet {
     entries.map { (key, value) ->
@@ -87,6 +89,15 @@ public class ProjectBranch(public val light: LightBranch, public val project: Pr
 public class ProjectTree(public val light: LightTree, public val project: Project) :
     TreePrototype<ProjectBranch> by light as TreePrototype<ProjectBranch> {
     internal var configured: Boolean = false
+    internal var provider: File? = null
+        set(value) {
+            if (value == null) return.also { field = null }
+            val line = requireNotNull(value.useLines { it.firstOrNull() }) {
+                "Provided file ${value.invariantSeparatorsPath} must specify the active version in the first line"
+            }
+            current = getByName(line.trim())
+        }
+
     private val cache: (Identifier) -> ProjectBranch? = memoize { id ->
         light[id]?.let { ProjectBranch(it, project.locate(it.hierarchy)) }
     }
@@ -99,9 +110,11 @@ public class ProjectTree(public val light: LightTree, public val project: Projec
 
     override var current: StonecutterProject
         get() = light.current
-        set(value) {
-            light.current = value
+        internal set(value) = with(light) {
             configured = true
+            current.isActive = false
+            value.isActive = true
+            light.current = value
         }
     override val branches: Collection<ProjectBranch> get() = values
     override val nodes: Collection<ProjectNode> get() = values.flatMap { it.nodes }
@@ -115,4 +128,8 @@ public class ProjectTree(public val light: LightTree, public val project: Projec
     /**Finds the [ProjectBranch] corresponding to the given Gradle [project].*/
     public operator fun get(project: Project): ProjectBranch? =
         cache(project.path.removePrefix(this.project.path).removeStarting(':'))
+
+    internal fun getByName(name: Identifier) = requireNotNull(versions.find { it.project == name }) {
+        "Node '$name' is not registered in project $hierarchy"
+    }
 }
