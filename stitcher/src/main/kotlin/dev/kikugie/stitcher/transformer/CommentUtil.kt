@@ -44,13 +44,9 @@ internal fun CharSequence.charMatches(index: Int, char: Char): Boolean =
 
 internal fun CharSequence.getOrSpace(index: Int) = getOrElse(index) { ' ' }
 
-internal fun CharSequence.leadingSpaces() = buildString {
-    for (c in this@leadingSpaces) if (c.isWhitespace()) append(c) else break
-}
+internal fun CharSequence.leadingSpaces() = takeWhile(Char::isWhitespace)
 
-internal fun CharSequence.trailingSpaces() = buildString {
-    for (c in this@trailingSpaces.reversed()) if (c.isWhitespace()) append(c) else break
-}.reversed()
+internal fun CharSequence.trailingSpaces() = reversed().takeWhile(Char::isWhitespace).reversed()
 
 internal fun CharSequence.affectedRange(type: ScopeType): IntRange = when (type) {
     ScopeType.CLOSED -> leadingSpaces().length..<length
