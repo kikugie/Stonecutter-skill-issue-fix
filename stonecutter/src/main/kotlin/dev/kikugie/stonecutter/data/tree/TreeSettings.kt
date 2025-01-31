@@ -3,6 +3,7 @@ package dev.kikugie.stonecutter.data.tree
 import dev.kikugie.stonecutter.Identifier
 import dev.kikugie.stonecutter.data.StonecutterProject
 import dev.kikugie.stonecutter.validateId
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 
@@ -14,7 +15,7 @@ internal fun TreeSettings.toTree(builder: TreeBuilder) = builder.apply {
 
 /**
  * ## Intention
- * Class used to deserialize a data-driven project tree setup. The configuration is meant to be written by the user,
+ * This class is used to deserialize a data-driven project tree setup. The configuration is meant to be written by the user,
  * so it intentionally allows a choice between shorter or expanded syntax to allow encoding optional data for third-party tools.
  * You can use the [Stonecutter Versions](https://github.com/stonecutter-versioning/stonecutter/blob/0.6/tools/settings-schema.json)
  * JSON schema in your IDE to verify the syntax automatically.
@@ -79,9 +80,15 @@ internal fun TreeSettings.toTree(builder: TreeBuilder) = builder.apply {
  */
 @Serializable(with = TreeSettings.JsonSerializer::class)
 public sealed interface TreeSettings {
+    /**Version control point, matching [TreeBuilder.vcsVersion].*/
     public val vcs: Identifier?
+    /**Collection of branches and assigned versions. Data verification is handled by the interface implementations.*/
     public val entries: Map<Identifier, List<StonecutterProject>>
 
+    /**
+     * Publicly available [TreeSettings] implementation that preserve the base data structure.
+     * It can be used for debug serialization of the settings.
+     */
     @Serializable
     public data class Standard(
         override val vcs: Identifier? = null,
@@ -137,8 +144,9 @@ public sealed interface TreeSettings {
             get() = mapOf("" to versions.map { it.entry })
     }
 
-    private object JsonSerializer : JsonContentPolymorphicSerializer<TreeSettings>(TreeSettings::class) {
-        override fun selectDeserializer(element: JsonElement) = when {
+    /**Implements polymorphic format described in [TreeSettings]' documentation.*/
+    public object JsonSerializer : JsonContentPolymorphicSerializer<TreeSettings>(TreeSettings::class) {
+        override fun selectDeserializer(element: JsonElement): KSerializer<out TreeSettings> = when {
             element !is JsonObject -> error("Element must be a JSON object")
             "source" in element -> Standard.serializer()
             "branches" in element -> BranchMap.serializer()

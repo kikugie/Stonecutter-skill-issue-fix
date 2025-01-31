@@ -7,7 +7,7 @@ import dev.kikugie.stitcher.transformer.Replacements.RegexReplacement
 import dev.kikugie.stitcher.transformer.Replacements.ReplacementPhase
 import dev.kikugie.stitcher.transformer.Replacements.StringReplacement
 import dev.kikugie.stonecutter.Identifier
-import dev.kikugie.stonecutter.build.BuildAbstraction
+import dev.kikugie.stonecutter.build.*
 import dev.kikugie.stitcher.util.RegexSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -16,9 +16,12 @@ import kotlin.text.Regex
 /**
  * Represents the build parameters used by the file processor.
  *
- * @property constants Constant values set by [BuildAbstraction.const]
- * @property swaps Swap replacements set by [BuildAbstraction.swap]
- * @property dependencies Dependency versions set by [BuildAbstraction.dependency]
+ * @property constants Constant values set by [ConstantVariants]
+ * @property swaps Swap replacements set by [SwapVariants]
+ * @property dependencies Dependency versions set by [DependencyVariants]
+ * @property replacements String and regex replacement entries set by [ReplacementVariants]
+ * @property extensions Set of file formats allowlisted for file processing by [FilterVariants]
+ * @property exclusions Set of individual files excluded from processing by [FilterVariants]
  */
 @Serializable
 public data class BuildParameters(
