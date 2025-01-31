@@ -5,7 +5,6 @@ import dev.kikugie.stonecutter.data.tree.toTree
 import dev.kikugie.stonecutter.data.tree.TreeBuilder
 import dev.kikugie.stonecutter.data.tree.TreeSettings
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import org.gradle.api.Action
 import org.gradle.api.initialization.ProjectDescriptor
@@ -47,7 +46,7 @@ public abstract class SettingsAbstraction(private val settings: Settings) {
     /**Configures the specified [projects] to be versioned with setup provided by [file].*/
     @StonecutterAPI public fun create(projects: Iterable<ProjectDescriptor>, file: File) {
         require(file.extension == "json") { "Version setup file must be in JSON format. See Stonecutter wiki for more information." }
-        val data: TreeSettings = file.inputStream().use { Json.decodeFromStream(it) }
+        val data: TreeSettings = file.inputStream().use { LENIENT_JSON.decodeFromStream(it) }
         create(projects, Action(data::toTree))
     }
 

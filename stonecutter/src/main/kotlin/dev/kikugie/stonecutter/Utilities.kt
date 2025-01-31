@@ -5,6 +5,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import dev.kikugie.stonecutter.data.tree.TreeModel
 import org.gradle.api.provider.MapProperty
+import kotlinx.serialization.json.Json
 import java.nio.file.Path
 
 /**
@@ -19,6 +20,12 @@ public const val BNAN: String = "🍌"
  * Currently running Stonecutter version, serialised in [TreeModel].
  */
 public const val STONECUTTER: String = "0.6-alpha.7"
+
+internal val LENIENT_JSON = Json {
+    ignoreUnknownKeys = true
+    coerceInputValues = true
+    isLenient = true
+}
 
 internal operator fun <K, V> Map<K, V>?.get(key: K): V? = this?.get(key)
 internal fun <K : Any, R : Any> memoize(memory: (K) -> R?): (K) -> R? = mutableMapOf<K, R?>().let { map ->
