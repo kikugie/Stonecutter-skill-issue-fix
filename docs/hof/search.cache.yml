@@ -1115,27 +1115,6 @@
   curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/resourcify
   internal:
     curseforge_id: 870076
-- id: Furqkun/Vinyls
-  name: (!) Vinyls
-  source: (!) https://github.com/Furqkun/Vinyls
-  modrinth: (!) https://modrinth.com/mod/vinyls
-  curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/vinyls
-  internal:
-    curseforge_id: 1097085
-- id: Furqkun/HoloDisplays
-  name: (!) HoloDisplays
-  source: (!) https://github.com/Furqkun/HoloDisplays
-  modrinth: (!) https://modrinth.com/mod/holodisplays
-  curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/holodisplays
-  internal:
-    curseforge_id: 1150354
-- id: Furqkun/ResourcePackCached
-  name: (!) ResourcePackCached
-  source: (!) https://github.com/Furqkun/ResourcePackCached
-  modrinth: (!) https://modrinth.com/mod/resourcepackcached
-  curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/resourcepackcached
-  internal:
-    curseforge_id: 1125284
 - id: ModLabsCC/CustomModelDataViewer
   name: (!) Custom Model Data Viewer
   source: (!) https://github.com/ModLabsCC/CustomModelDataViewer
@@ -1164,3 +1143,31 @@
 - id: OliHeamon/Smokestack
   name: (?) Smokestack
   source: (!) https://github.com/OliHeamon/Smokestack
+- id: Furqit/ResourcePackCached
+  name: (!) ResourcePackCached
+  source: (!) https://github.com/Furqit/ResourcePackCached
+  modrinth: (!) https://modrinth.com/mod/resourcepackcached
+  curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/resourcepackcached
+  internal:
+    curseforge_id: 1125284
+- id: Furqit/HoloDisplays
+  name: (!) HoloDisplays
+  source: (!) https://github.com/Furqit/HoloDisplays
+  modrinth: (!) https://modrinth.com/mod/holodisplays
+  curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/holodisplays
+  internal:
+    curseforge_id: 1150354
+- id: FNewel/keepxp
+  name: (!) Keep Xp
+  source: (!) https://github.com/FNewel/keepxp
+  modrinth: (!) https://modrinth.com/mod/keep-xp
+  curseforge: (!) https://www.curseforge.com/minecraft/bukkit-plugins/keepxp
+  internal:
+    curseforge_id: 42546
+- id: Furqit/Vinyls
+  name: (!) Vinyls
+  source: (!) https://github.com/Furqit/Vinyls
+  modrinth: (!) https://modrinth.com/mod/vinyls
+  curseforge: (!) https://www.curseforge.com/minecraft/mc-mods/vinyls
+  internal:
+    curseforge_id: 1097085
